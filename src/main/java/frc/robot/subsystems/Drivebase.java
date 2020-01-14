@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import org.strongback.Executable;
 import org.strongback.components.TalonSRX;
+
+import frc.robot.Constants;
 import frc.robot.drive.routines.ConstantDrive;
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.drive.routines.DriveRoutine.DriveMotion;
@@ -9,6 +11,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Subsystem;
 
 import java.util.Map;
@@ -109,6 +112,15 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	public void enable() {
 		left.getSelectedSensorPosition(0);
 		right.getSelectedSensorPosition(0);
+		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
+		left.config_kP(0, helper.get("p", Constants.DRIVE_P), 10);
+		left.config_kI(0, helper.get("i", Constants.DRIVE_I), 10);
+		left.config_kD(0, helper.get("d", Constants.DRIVE_D), 10);
+		left.config_kF(0, helper.get("f", Constants.DRIVE_F), 10);
+		right.config_kP(0, helper.get("p", Constants.DRIVE_P), 10);
+		right.config_kI(0, helper.get("i", Constants.DRIVE_I), 10);
+		right.config_kD(0, helper.get("d", Constants.DRIVE_D), 10);
+		right.config_kF(0, helper.get("f", Constants.DRIVE_F), 10);
 		super.enable();
 		if (routine != null) routine.enable();
 	}

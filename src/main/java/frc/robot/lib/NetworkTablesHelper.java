@@ -11,11 +11,11 @@ import edu.wpi.first.networktables.NetworkTableType;
  * Note: This will not work from within unit tests as it requires loading a
  * shared library and that will only work on the roborio :(
  */
-public class ConfigHelper {
+public class NetworkTablesHelper {
 	private NetworkTable table;
 	private final String tableName;
 
-	public ConfigHelper(String tableName) {
+	public NetworkTablesHelper(String tableName) {
 	    this.tableName = tableName;
 	    table = NetworkTableInstance.getDefault().getTable(tableName);
 	}
@@ -29,6 +29,11 @@ public class ConfigHelper {
         	entry.setDouble(defaultValue);
         }
         return entry.getDouble(defaultValue);
+    }
+    
+    public void set(String key, double value) {
+        NetworkTableEntry entry = table.getEntry(key);
+        entry.setDouble(value);
     }
 
     // boolean

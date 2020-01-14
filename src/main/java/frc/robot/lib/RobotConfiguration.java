@@ -60,6 +60,10 @@ public class RobotConfiguration {
 	public int drivebaseContCurrent = Constants.DRIVE_CONT_CURRENT;
 	public int drivebasePeakCurrent = Constants.DRIVE_PEAK_CURRENT;
 	public double drivebaseRampRate = Constants.DRIVE_RAMP_RATE;
+	public double drivebaseP = Constants.DRIVE_P;
+	public double drivebaseI = Constants.DRIVE_I;
+	public double drivebaseD = Constants.DRIVE_D;
+	public double drivebaseF = Constants.DRIVE_F;
 	public String drivebaseMode = Constants.DRIVE_DEFAULT_MODE;
 	public double drivebaseMaxSpeed = Constants.DRIVE_MAX_SPEED;
 
@@ -192,6 +196,10 @@ public class RobotConfiguration {
 		drivebaseContCurrent = getAsInt("drivebase/maxCurrent", drivebaseContCurrent);
 		drivebasePeakCurrent = getAsInt("drivebase/peakCurrent", drivebasePeakCurrent);
 		drivebaseRampRate = getAsDouble("drivebase/rampRate", drivebaseRampRate);
+		drivebaseP = getAsDouble("drivebase/p", drivebaseP);
+		drivebaseI = getAsDouble("drivebase/i", drivebaseI);
+		drivebaseD = getAsDouble("drivebase/d", drivebaseD);
+		drivebaseF = getAsDouble("drivebase/f", drivebaseF);
 		drivebaseMode = getAsString("drivebase/mode", drivebaseMode);
 		drivebaseMaxSpeed = getAsDouble("drivebase/maxSpeed", drivebaseMaxSpeed);
 		drivebaseSwapLeftRight = getAsBoolean("drivebase/swapLeftRight", drivebaseSwapLeftRight);

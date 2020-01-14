@@ -44,14 +44,14 @@ public class Auto {
 		** Faces towards opposing alliance wall. Drives to align with nearest face of right rocket.
 		*/
 		Sequence seq = new Sequence("Drive test"); 
-		// Go forward 10"
+		// Go forward 10" not really
 		Waypoint[] waypoints1 = new Waypoint[] {
-		new Waypoint(0, 0, Pathfinder.d2r(0)), new Waypoint(190, -60, Pathfinder.d2r(-45))};
+		new Waypoint(0, 0, Pathfinder.d2r(0)), new Waypoint(10, 0, Pathfinder.d2r(0))};
 		seq.add().driveRelativeWaypoints(waypoints1, true);
 		// Go backwards 10"
 		Waypoint[] waypoints2 = new Waypoint[] {
 				new Waypoint(0, 0, Pathfinder.d2r(0)),  new Waypoint(-170, 0, Pathfinder.d2r(0))};
-		seq.add().driveRelativeWaypoints(waypoints2, false);
+		// seq.add().driveRelativeWaypoints(waypoints2, false);
 		autoProgram.addOption("Drive test", seq); 
 	}
 	

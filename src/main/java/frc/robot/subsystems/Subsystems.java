@@ -137,10 +137,11 @@ public class Subsystems implements DashboardUpdater {
 		// fail.
 		TalonSRX leftMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsLeftWithEncoders,
 				config.drivebaseCanIdsLeftWithoutEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
-				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, clock, log);
+				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, 
+				config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
 		TalonSRX rightMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsRightWithEncoders,
 				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
-				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, clock, log);
+				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
 		leftDriveDistance = () -> leftMotor.getSelectedSensorPosition(0);
 		rightDriveDistance = () -> rightMotor.getSelectedSensorPosition(0);
 		leftDriveSpeed = () -> leftMotor.getSelectedSensorVelocity(0);

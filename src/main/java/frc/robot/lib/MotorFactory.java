@@ -24,13 +24,13 @@ public class MotorFactory {
 
 	public static TalonSRX getDriveMotor(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean leftMotor,
 			boolean sensorPhase, double rampRate, boolean doCurrentLimiting, int contCurrent, int peakCurrent,
-			Clock clock, Log log) {
+			double p, double i, double d, double f, Clock clock, Log log) {
 		TalonSRX motor = getTalon(canIDsWithEncoders, canIDsWithoutEncoders, leftMotor, NeutralMode.Brake, clock, log)		// don't invert output
 				.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE);									// number of ticks per inch of travel.
-		motor.config_kF(0, Constants.DRIVE_F, 10);
-		motor.config_kP(0, Constants.DRIVE_P, 10);
-		motor.config_kI(0, Constants.DRIVE_I, 10);
-		motor.config_kD(0, Constants.DRIVE_D, 10);
+		motor.config_kP(0, p, 10);
+		motor.config_kI(0, i, 10);
+		motor.config_kD(0, d, 10);
+		motor.config_kF(0, f, 10);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setSensorPhase(sensorPhase);
 		motor.configClosedloopRamp(rampRate, 10);
@@ -44,6 +44,12 @@ public class MotorFactory {
 			motor.configPeakCurrentDuration(100, 0);
 			motor.enableCurrentLimit(true);
 		}
+		// Save PID values into Network Tables
+		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
+		helper.set("p", p);
+		helper.set("i", i);
+		helper.set("d", d);
+		helper.set("f", f);
 		return motor;
 	}
 	
@@ -99,7 +105,7 @@ public class MotorFactory {
 
 	public static SparkMAX getSparkTestMotor(int[] canIDs, boolean invert, Log log) {
 		SparkMAX motor = getSparkMAX(canIDs, invert, NeutralMode.Brake, log);
-		ConfigHelper config = new ConfigHelper("tunnable/sparkTest/");
+		NetworkTablesHelper config = new NetworkTablesHelper("tunnable/sparkTest/");
 		double p = config.get("p", 0.0);
 		double i = config.get("i", 0.0);
 		double d = config.get("d", 0.0);
