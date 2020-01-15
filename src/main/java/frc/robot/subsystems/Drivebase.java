@@ -52,8 +52,6 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(false, () -> right.getSelectedSensorVelocity(0), "%s/speed/Right", name) // talons work in units/100ms
 				.register(false, () -> left.getMotorOutputVoltage(), "%s/outputVoltage/Left", name)
 				.register(false, () -> right.getMotorOutputVoltage(), "%s/outputVoltage/Right", name)
-				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
-				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name)
 				.register(false, () -> left.getMotorOutputPercent(), "%s/outputPercentage/Left", name)
 				.register(false, () -> right.getMotorOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
@@ -110,7 +108,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 
 	@Override
 	public void enable() {
-		left.getSelectedSensorPosition(0);
+		left.getSelectedSensorPosition(0);	// TODO: should this be set?
 		right.getSelectedSensorPosition(0);
 		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
 		left.config_kP(0, helper.get("p", Constants.DRIVE_P), 10);
