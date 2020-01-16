@@ -29,13 +29,6 @@ import org.strongback.util.Values;
  * <li> {@code UNKNOWN} - neither switch is triggered (or both switches are triggered, typically as the result of a problem with
  * the robot hardware)</li>
  * </ol>
- * <p>
- * and three possible {@link Motor.Direction directions}:
- * <ol>
- * <li> {@code FORWARD} - the underlying motor is moving to the high limit</li>
- * <li> {@code REVERSE} - the underlying motor is moving to the low limit</li>
- * <li> {@code STOPPED} - the underlying motor is not moving</li>
- * </ol>
  *
  * @author Zach Anderson
  * @see Motor
@@ -43,18 +36,6 @@ import org.strongback.util.Values;
  */
 @Immutable
 public interface LimitedMotor extends Motor {
-
-    /**
-     * The possible positions for a limited motor.
-     */
-    public enum Position {
-        /** The motor is at the forward direction limit. **/
-        FORWARD_LIMIT,
-        /** The motor is at the reverse direction limit. **/
-        REVERSE_LIMIT,
-        /** The motor is between the forward and reverse limits, but the exact position is unknown. **/
-        UNKNOWN
-    }
 
     @Override
     public LimitedMotor setSpeed(double speed);
@@ -128,25 +109,6 @@ public interface LimitedMotor extends Motor {
     }
 
     /**
-     * Gets the current position of this {@link LimitedMotor}. Can be {@code HIGH}, {@code LOW}, or {@code UNKNOWN}.
-     *
-     * @return a {@link Position} representing the current position of this {@link LimitedMotor}
-     */
-    default public Position getPosition() {
-        switch (getDirection()) {
-            case FORWARD:
-            case REVERSE:
-                return Position.UNKNOWN;
-            case STOPPED:
-                boolean fwdLimited = isAtForwardLimit();
-                boolean revLimited = isAtReverseLimit();
-                if (fwdLimited && !revLimited) return Position.FORWARD_LIMIT;
-                if (revLimited && !fwdLimited) return Position.REVERSE_LIMIT;
-        }
-        return Position.UNKNOWN;
-    }
-
-    /**
      * Create a {@link LimitedMotor} around the given motor and switches.
      *
      * @param motor the {@link Motor} being limited; may not be null
@@ -195,26 +157,30 @@ public interface LimitedMotor extends Motor {
             }
 
             @Override
-            public Motor.Direction getDirection() {
-                Direction dir = motor.getDirection(); // uses getSpeed()
-                switch (dir) {
-                    case FORWARD:
-                        if (fwdSwitch.isTriggered()) return Direction.STOPPED;
-                        break;
-                    case REVERSE:
-                        if (revSwitch.isTriggered()) return Direction.STOPPED;
-                        break;
-                    case STOPPED:
-                        break;
-                }
-                return dir;
-            }
-
-            @Override
             public void stop() {
                 motor.stop();
             }
 
+            @Override
+            public Motor setScale(double scale) {
+                motor.setScale(scale);
+                return null;
+            }
+
+            @Override
+            public double getScale() {
+                return motor.getScale();
+            }
+
+            @Override
+            public Motor enable() {
+                return motor.enable();
+            }
+
+            @Override
+            public Motor disable() {
+                return motor.disable();
+            }
         };
     }
 }

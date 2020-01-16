@@ -44,23 +44,6 @@ public class MockMotor implements Motor {
     }
 
     @Override
-    public MockMotor invert() {
-        return new MockMotor(speed) {
-            @Override
-            public MockMotor setSpeed(double speed) {
-                super.setSpeed(-1 * speed);
-                return this;
-            }
-
-            @Override
-            public double getSpeed() {
-                return -1 * super.getSpeed();
-            }
-        };
-    }
-
-
-    @Override
     public String toString() {
         return Double.toString(getSpeed());
     }

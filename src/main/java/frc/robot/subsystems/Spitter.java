@@ -2,10 +2,10 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import org.strongback.Executable;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
@@ -22,7 +22,7 @@ public class Spitter extends Subsystem implements SpitterInterface, Executable, 
     private SpitterWheel left;
     private SpitterWheel right;
 
-    public Spitter(BooleanSupplier cargoSupplier, TalonSRX leftMotor, TalonSRX rightMotor, DashboardInterface dashboard, Log log) {
+    public Spitter(BooleanSupplier cargoSupplier, Motor leftMotor, Motor rightMotor, DashboardInterface dashboard, Log log) {
         super("Spitter", dashboard, log);
         this.cargoSupplier = cargoSupplier;
         left = new SpitterWheel("left", leftMotor);
@@ -54,15 +54,15 @@ public class Spitter extends Subsystem implements SpitterInterface, Executable, 
 
     protected class SpitterWheel {
 
-        private final TalonSRX motor;
+        private final Motor motor;
         private double targetDutyCycle;
     
-        public SpitterWheel(String name, TalonSRX motor) {
+        public SpitterWheel(String name, Motor motor) {
             this.motor = motor;
 
             log.register(false, () -> left.getTargetDutyCycle(), "Spitter/%s/dutyCycle", name)
-            .register(false, motor::getMotorOutputVoltage, "Spitter/%s/outputVoltage", name)
-            .register(false, motor::getMotorOutputPercent, "Spitter/%s/outputPercent", name)
+            .register(false, motor::getOutputVoltage, "Spitter/%s/outputVoltage", name)
+            .register(false, motor::getOutputPercent, "Spitter/%s/outputPercent", name)
             .register(false, motor::getOutputCurrent, "Spitter/%s/outputCurrent", name);
         }
         

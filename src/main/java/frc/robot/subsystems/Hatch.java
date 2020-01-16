@@ -1,11 +1,11 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import org.strongback.Executable;
 import org.strongback.components.Clock;
+import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
@@ -34,7 +34,7 @@ import frc.robot.lib.Subsystem;
  */
 public class Hatch extends Subsystem implements HatchInterface, Executable, DashboardUpdater {
 
-    private TalonSRX motor;  // Positioning motor.
+    private Motor motor;  // Positioning motor.
     private Solenoid holder;  // Holds the hatch in position.
     private Clock clock;
 
@@ -53,7 +53,7 @@ public class Hatch extends Subsystem implements HatchInterface, Executable, Dash
     private final boolean kEnableResetHack = true;
 
 
-    public Hatch(TalonSRX motor, Solenoid holder, DashboardInterface dashboard, Clock clock, Log log) {
+    public Hatch(Motor motor, Solenoid holder, DashboardInterface dashboard, Clock clock, Log log) {
         super("Hatch", dashboard, log);   
         this.motor = motor;
         this.holder = holder;
@@ -62,11 +62,11 @@ public class Hatch extends Subsystem implements HatchInterface, Executable, Dash
         log.register(true, () -> getHeld(), "%s/held", name)
         .register(true, () -> getReleased(), "%s/released", name)
         .register(false, () -> targetPosition, "%s/targetPosition", name)
-        .register(false, () -> motor.getSelectedSensorPosition(0), "%s/actualPosition", name)
-        .register(false, () -> motor.getSensorCollection().isRevLimitSwitchClosed(), "%s/minSensor", name)
-        .register(false, () -> motor.getSensorCollection().isFwdLimitSwitchClosed(), "%s/maxSensor", name)
-        .register(false, motor::getMotorOutputVoltage, "%s/outputVoltage", name)
-        .register(false, motor::getMotorOutputPercent, "%s/outputPercent", name)
+        .register(false, () -> motor.getPosition(), "%s/actualPosition", name)
+        .register(false, () -> motor.isAtReverseLimit(), "%s/minSensor", name)
+        .register(false, () -> motor.isAtForwardLimit(), "%s/maxSensor", name)
+        .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
+        .register(false, motor::getOutputPercent, "%s/outputPercent", name)
         .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
 
         targetPosition = getPosition();
@@ -181,11 +181,11 @@ public class Hatch extends Subsystem implements HatchInterface, Executable, Dash
     }
 
     private boolean isMinSensorTriggered() {
-        return motor.getSensorCollection().isRevLimitSwitchClosed();
+        return motor.isAtReverseLimit();
     }
 
     private boolean isMaxSensorTriggered() {
-        return motor.getSensorCollection().isFwdLimitSwitchClosed();
+        return motor.isAtForwardLimit();
     }
 
     @Override
@@ -241,7 +241,7 @@ public class Hatch extends Subsystem implements HatchInterface, Executable, Dash
     }
 
     public double getPosition() {
-        return motor.getSelectedSensorPosition(0);
+        return motor.getPosition();
     }
 
     /**
@@ -255,6 +255,6 @@ public class Hatch extends Subsystem implements HatchInterface, Executable, Dash
         dashboard.putString("Hatch min sensor", isMinSensorTriggered() ? "detected" : "not detected");
         dashboard.putString("Hatch max sensor", isMaxSensorTriggered() ? "detected" : "not detected");
 		dashboard.putNumber("Hatch motor current", motor.getOutputCurrent());
-		dashboard.putNumber("Hatch motor percent", motor.getMotorOutputPercent());
+		dashboard.putNumber("Hatch motor percent", motor.getOutputPercent());
 	}
 }

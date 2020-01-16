@@ -4,18 +4,17 @@ import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import org.strongback.Executor.Priority;
 import org.strongback.Strongback;
 import org.strongback.components.Clock;
 import org.strongback.components.Gyroscope;
+import org.strongback.components.Motor;
 import org.strongback.components.PneumaticsModule;
 import org.strongback.components.Solenoid;
-import org.strongback.components.SparkMAX;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
+import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
 import frc.robot.Constants;
 import frc.robot.controller.Controller.TrajectoryGenerator;
@@ -135,17 +134,17 @@ public class Subsystems implements DashboardUpdater {
 		}
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
-		TalonSRX leftMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsLeftWithEncoders,
+		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsLeftWithEncoders,
 				config.drivebaseCanIdsLeftWithoutEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, 
 				config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
-		TalonSRX rightMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsRightWithEncoders,
+		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsRightWithEncoders,
 				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
-		leftDriveDistance = () -> leftMotor.getSelectedSensorPosition(0);
-		rightDriveDistance = () -> rightMotor.getSelectedSensorPosition(0);
-		leftDriveSpeed = () -> leftMotor.getSelectedSensorVelocity(0);
-		rightDriveSpeed = () -> rightMotor.getSelectedSensorVelocity(0);
+		leftDriveDistance = () -> leftMotor.getPosition();
+		rightDriveDistance = () -> rightMotor.getPosition();
+		leftDriveSpeed = () -> leftMotor.getVelocity();
+		rightDriveSpeed = () -> rightMotor.getVelocity();
 
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
@@ -306,8 +305,8 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
-		TalonSRX intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
-		BooleanSupplier intakeSensor = () -> intakeMotor.getSensorCollection().isRevLimitSwitchClosed();
+		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
+		BooleanSupplier intakeSensor = () -> intakeMotor.isAtReverseLimit();
 		intake = new Intake(intakeMotor, intakeSensor, intakeSolenoid, dashboard, log);
 	}
 
@@ -333,7 +332,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		SparkMAX motor = MotorFactory.getSparkTestMotor(config.sparkTestCanIds, false, log);
+		HardwareSparkMAX motor = MotorFactory.getSparkTestMotor(config.sparkTestCanIds, false, log);
 		spark = new SparkTest(motor, dashboard, log);
 	}
 
@@ -352,7 +351,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		TalonSRX passthroughMotor = MotorFactory.getPassthroughMotor(config.passthroughCanID, false, log);
+		Motor passthroughMotor = MotorFactory.getPassthroughMotor(config.passthroughCanID, false, log);
 		passthrough = new Passthrough(config.teamNumber, passthroughMotor, dashboard, log);
 	}
 
@@ -372,9 +371,9 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		TalonSRX spitterLeftMotor = MotorFactory.getSpitterMotor(config.spitterLeftCanID, true, true, log);
-		TalonSRX spitterRightMotor = MotorFactory.getSpitterMotor(config.spitterRightCanID, true, false, log);
-		BooleanSupplier cargoSupplier = () -> spitterLeftMotor.getSensorCollection().isFwdLimitSwitchClosed();
+		Motor spitterLeftMotor = MotorFactory.getSpitterMotor(config.spitterLeftCanID, true, true, log);
+		Motor spitterRightMotor = MotorFactory.getSpitterMotor(config.spitterRightCanID, true, false, log);
+		BooleanSupplier cargoSupplier = () -> spitterLeftMotor.isAtForwardLimit();
 		spitter = new Spitter(cargoSupplier, spitterLeftMotor, spitterRightMotor, dashboard, log);
 	}
 
@@ -394,7 +393,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		TalonSRX motor = MotorFactory.getHatchMotor(config.hatchCanID, true, false, log);
+		Motor motor = MotorFactory.getHatchMotor(config.hatchCanID, true, false, log);
 		Solenoid holder = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.HATCH_HOLDER_PORT);
 		hatch = new Hatch(motor, holder, dashboard, clock, log);
 		Strongback.executor().register(hatch, Priority.LOW);
@@ -431,12 +430,12 @@ public class Subsystems implements DashboardUpdater {
 			climber = new MockClimber(log);
 			return;
 		}
-		TalonSRX frontWinchMotor = MotorFactory.getClimberWinchMotor(config.climberFrontCanID, false, false, log);
+		Motor frontWinchMotor = MotorFactory.getClimberWinchMotor(config.climberFrontCanID, false, false, log);
 		frontWinchMotor.setInverted(true);
 		frontWinchMotor.setScale(Constants.CLIMBER_WINCH_FRONT_SCALE_FACTOR); // 18" ticks = 20208 ticks
-		TalonSRX rearWinchMotor = MotorFactory.getClimberWinchMotor(config.climberRearCanID, false, false, log);
+		Motor rearWinchMotor = MotorFactory.getClimberWinchMotor(config.climberRearCanID, false, false, log);
 		rearWinchMotor.setScale(Constants.CLIMBER_WINCH_REAR_SCALE_FACTOR); // 18" ticks = 20208 ticks
-		TalonSRX driveMotor = MotorFactory.getClimberDriveMotor(config.climberDriveMotorCanID, true, log);
+		Motor driveMotor = MotorFactory.getClimberDriveMotor(config.climberDriveMotorCanID, true, log);
 		climber = new Climber(frontWinchMotor, rearWinchMotor, driveMotor, dashboard, log);
 		Strongback.executor().register(climber, Priority.HIGH);
 	}
@@ -464,7 +463,7 @@ public class Subsystems implements DashboardUpdater {
 
 		Solenoid deploy = Hardware.Solenoids.singleSolenoid(config.pcmCanId, config.liftSolenoidID,
 				config.liftSolenoidRetractTime, config.liftSolenoidExtendTime);
-		TalonSRX motor = MotorFactory.getLiftMotor(config.liftCanIds, false, false, log);
+		Motor motor = MotorFactory.getLiftMotor(config.liftCanIds, false, false, log);
 		lift = new Lift(motor, deploy, dashboard, log);
 		Strongback.executor().register(lift, Priority.HIGH);
 	}

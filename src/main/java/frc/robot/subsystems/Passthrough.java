@@ -1,27 +1,27 @@
 package frc.robot.subsystems;
 
 import org.strongback.Executable;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.interfaces.PassthroughInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 public class Passthrough extends Subsystem implements PassthroughInterface, Executable, DashboardUpdater {
-    private TalonSRX motor;
+    private Motor motor;
     private double targetCurrent = 0;
     
 
-    public Passthrough(int teamNumber, TalonSRX passthroughMotor, DashboardInterface dashboard, Log log) {
+    public Passthrough(int teamNumber, Motor passthroughMotor, DashboardInterface dashboard, Log log) {
         super("Passthrough", dashboard, log);
         this.motor = passthroughMotor;
 
         log.register(true, () -> getTargetMotorOutput(), "%s/targetMotorOutput", name)
-			   .register(false, motor::getMotorOutputVoltage, "%s/outputVoltage", name)
-			   .register(false, motor::getMotorOutputPercent, "%s/outputPercent", name)
+			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
+			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
 			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
     }
 
@@ -45,7 +45,7 @@ public class Passthrough extends Subsystem implements PassthroughInterface, Exec
     @Override
     public void updateDashboard() {
         dashboard.putNumber("Passthru motor current", motor.getOutputCurrent());
-        dashboard.putNumber("Passthru motor percent", motor.getMotorOutputPercent());
+        dashboard.putNumber("Passthru motor percent", motor.getOutputPercent());
     }
 
     @Override

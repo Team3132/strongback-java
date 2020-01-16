@@ -1,7 +1,8 @@
 package frc.robot.subsystems;
 
 import org.strongback.Executable;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
 
 import frc.robot.Constants;
 import frc.robot.drive.routines.ConstantDrive;
@@ -17,8 +18,6 @@ import frc.robot.lib.Subsystem;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 /**
  * Subsystem responsible for the drivetrain
  *
@@ -32,11 +31,11 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private DriveRoutineParameters parameters = DriveRoutineParameters.getConstantPower(0);
 	private DriveRoutine routine = null;
 	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
-	private final TalonSRX left;
-	private final TalonSRX right;
+	private final Motor left;
+	private final Motor right;
 	private DriveMotion currentMotion;
 
-	public Drivebase(TalonSRX left, TalonSRX right,	DashboardInterface dashboard, Log log) {
+	public Drivebase(Motor left, Motor right,	DashboardInterface dashboard, Log log) {
 		super("Drive", dashboard, log);
 		this.left = left;
 		this.right = right;
@@ -46,14 +45,14 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		disable(); // disable until we are ready to use it.
 		log.register(true, () -> currentMotion.left, "%s/setpoint/Left", name) // talons work in units/100ms
 				.register(true, () -> currentMotion.right, "%s/setpoint/Right", name) // talons work in units/100ms
-				.register(false, () -> left.getSelectedSensorPosition(0), "%s/position/Left", name)
-				.register(false, () -> right.getSelectedSensorPosition(0), "%s/position/Right", name)
-				.register(false, () -> left.getSelectedSensorVelocity(0), "%s/speed/Left", name) // talons work in units/100ms
-				.register(false, () -> right.getSelectedSensorVelocity(0), "%s/speed/Right", name) // talons work in units/100ms
-				.register(false, () -> left.getMotorOutputVoltage(), "%s/outputVoltage/Left", name)
-				.register(false, () -> right.getMotorOutputVoltage(), "%s/outputVoltage/Right", name)
-				.register(false, () -> left.getMotorOutputPercent(), "%s/outputPercentage/Left", name)
-				.register(false, () -> right.getMotorOutputPercent(), "%s/outputPercentage/Right", name)
+				.register(false, () -> left.getPosition(), "%s/position/Left", name)
+				.register(false, () -> right.getPosition(), "%s/position/Right", name)
+				.register(false, () -> left.getVelocity(), "%s/speed/Left", name) // talons work in units/100ms
+				.register(false, () -> right.getVelocity(), "%s/speed/Right", name) // talons work in units/100ms
+				.register(false, () -> left.getOutputVoltage(), "%s/outputVoltage/Left", name)
+				.register(false, () -> right.getOutputVoltage(), "%s/outputVoltage/Right", name)
+				.register(false, () -> left.getOutputPercent(), "%s/outputPercentage/Left", name)
+				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
 				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name);
 	}
@@ -108,17 +107,11 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 
 	@Override
 	public void enable() {
-		left.getSelectedSensorPosition(0);	// TODO: should this be set?
-		right.getSelectedSensorPosition(0);
 		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
-		left.config_kP(0, helper.get("p", Constants.DRIVE_P), 10);
-		left.config_kI(0, helper.get("i", Constants.DRIVE_I), 10);
-		left.config_kD(0, helper.get("d", Constants.DRIVE_D), 10);
-		left.config_kF(0, helper.get("f", Constants.DRIVE_F), 10);
-		right.config_kP(0, helper.get("p", Constants.DRIVE_P), 10);
-		right.config_kI(0, helper.get("i", Constants.DRIVE_I), 10);
-		right.config_kD(0, helper.get("d", Constants.DRIVE_D), 10);
-		right.config_kF(0, helper.get("f", Constants.DRIVE_F), 10);
+		left.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
+				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
+		right.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
+				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
 		super.enable();
 		if (routine != null) routine.enable();
 	}

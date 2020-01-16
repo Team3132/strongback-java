@@ -1,10 +1,10 @@
 package frc.robot.mock;
 
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class MockDrivebase implements DrivebaseInterface  {
 	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE);

@@ -3,15 +3,16 @@ package frc.robot.lib;
 import java.util.ArrayList;
 
 import org.strongback.components.Clock;
-import org.strongback.components.SparkMAX;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareSparkMAX;
+import org.strongback.hardware.HardwareTalonSRX;
+
 import frc.robot.Constants;
 import frc.robot.interfaces.Log;
 
 import com.ctre.phoenix.ParamEnum;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -22,15 +23,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class MotorFactory {
 
-	public static TalonSRX getDriveMotor(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean leftMotor,
+	public static Motor getDriveMotor(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean leftMotor,
 			boolean sensorPhase, double rampRate, boolean doCurrentLimiting, int contCurrent, int peakCurrent,
 			double p, double i, double d, double f, Clock clock, Log log) {
-		TalonSRX motor = getTalon(canIDsWithEncoders, canIDsWithoutEncoders, leftMotor, NeutralMode.Brake, clock, log)		// don't invert output
-				.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE);									// number of ticks per inch of travel.
-		motor.config_kP(0, p, 10);
-		motor.config_kI(0, i, 10);
-		motor.config_kD(0, d, 10);
-		motor.config_kF(0, f, 10);
+		HardwareTalonSRX motor = getTalon(canIDsWithEncoders, canIDsWithoutEncoders, leftMotor, NeutralMode.Brake, clock, log); // don't invert output
+	    motor.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
+		motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setSensorPhase(sensorPhase);
 		motor.configClosedloopRamp(rampRate, 10);
@@ -53,9 +51,9 @@ public class MotorFactory {
 		return motor;
 	}
 	
-	public static TalonSRX getLiftMotor(int[] canIDs, boolean sensorPhase, boolean invert, Log log) {
-    	TalonSRX motor = getTalon(canIDs, invert, NeutralMode.Brake, log)
-				.setScale(Constants.LIFT_SCALE);
+	public static HardwareTalonSRX getLiftMotor(int[] canIDs, boolean sensorPhase, boolean invert, Log log) {
+    	HardwareTalonSRX motor = getTalon(canIDs, invert, NeutralMode.Brake, log);
+		motor.setScale(Constants.LIFT_SCALE);
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.Analog, 0, 10);
 		// Limit switches.
@@ -72,14 +70,8 @@ public class MotorFactory {
 		motor.configContinuousCurrentLimit(Constants.LIFT_CONTINUOUS_CURRENT_LIMIT, Constants.LIFT_CURRENT_TIMEOUT_MS);
 		motor.configPeakCurrentLimit(Constants.LIFT_PEAK_CURRENT_LIMIT, Constants.LIFT_CURRENT_TIMEOUT_MS);
 		
-		motor.config_kF(0, Constants.LIFT_F_UP, 0);
-		motor.config_kP(0, Constants.LIFT_P_UP, 0);
-		motor.config_kI(0, Constants.LIFT_I_UP, 0);
-		motor.config_kD(0, Constants.LIFT_D_UP, 30);
-		motor.config_kF(1, Constants.LIFT_F_DOWN, 0);
-		motor.config_kP(1, Constants.LIFT_P_DOWN, 0);
-		motor.config_kI(1, Constants.LIFT_I_DOWN, 0);
-		motor.config_kD(1, Constants.LIFT_D_DOWN, 20);
+		motor.setPIDF(0, Constants.LIFT_P_UP, Constants.LIFT_I_UP, Constants.LIFT_D_UP, Constants.LIFT_F_UP);
+		motor.setPIDF(1, Constants.LIFT_P_DOWN, Constants.LIFT_I_DOWN, Constants.LIFT_D_DOWN, Constants.LIFT_F_DOWN);
 		
 		motor.configClosedloopRamp(0, 10);
 		// Set the deadband to zero.
@@ -93,8 +85,8 @@ public class MotorFactory {
 		return motor;
 	}
 	
-	public static TalonSRX getIntakeMotor(int canID, boolean invert, Log log) {
-		TalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+	public static HardwareTalonSRX getIntakeMotor(int canID, boolean invert, Log log) {
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(.25, 10);
 		motor.configReverseSoftLimitEnable(false, 10);
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
@@ -103,19 +95,19 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static SparkMAX getSparkTestMotor(int[] canIDs, boolean invert, Log log) {
-		SparkMAX motor = getSparkMAX(canIDs, invert, NeutralMode.Brake, log);
+	public static HardwareSparkMAX getSparkTestMotor(int[] canIDs, boolean invert, Log log) {
+		HardwareSparkMAX motor = getSparkMAX(canIDs, invert, NeutralMode.Brake, log);
 		NetworkTablesHelper config = new NetworkTablesHelper("tunnable/sparkTest/");
 		double p = config.get("p", 0.0);
 		double i = config.get("i", 0.0);
 		double d = config.get("d", 0.0);
 		double f = config.get("f", 0.1);
-		motor.setPIDF(p, i, d, f);
+		motor.setPIDF(0, p, i, d, f);
 		return motor;
 	}
 
-	public static TalonSRX getPassthroughMotor(int canID, boolean invert, Log log) {	
-		TalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+	public static HardwareTalonSRX getPassthroughMotor(int canID, boolean invert, Log log) {	
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(.25, 10);
 		motor.configReverseSoftLimitEnable(false, 10);
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
@@ -124,12 +116,9 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static TalonSRX getSpitterMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		TalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.config_kF(0, Constants.SPITTER_SPEED_F, 10);
-		motor.config_kP(0, Constants.SPITTER_SPEED_P, 10);
-		motor.config_kI(0, Constants.SPITTER_SPEED_I, 10);
-		motor.config_kD(0, Constants.SPITTER_SPEED_D, 10);
+	public static HardwareTalonSRX getSpitterMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		motor.setPIDF(0, Constants.SPITTER_SPEED_P, Constants.SPITTER_SPEED_I, Constants.SPITTER_SPEED_D, Constants.SPITTER_SPEED_F);
 		motor.setSensorPhase(sensorPhase);
 		// TODO: find out the configuration of this spitter motor.
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
@@ -137,8 +126,8 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static TalonSRX getHatchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		TalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+	public static HardwareTalonSRX getHatchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.setSensorPhase(sensorPhase);
 		// TODO: find out the configuration of this hatch motor.
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
@@ -146,10 +135,7 @@ public class MotorFactory {
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at base
 		motor.configContinuousCurrentLimit(Constants.HATCH_CONTINUOUS_CURRENT_LIMIT, Constants.HATCH_CURRENT_TIMEOUT_MS);
 		motor.configPeakCurrentLimit(Constants.HATCH_PEAK_CURRENT_LIMIT, Constants.HATCH_CURRENT_TIMEOUT_MS);
-		motor.config_kF(0, Constants.HATCH_POSITION_F, 10);
-		motor.config_kP(0, Constants.HATCH_POSITION_P, 10);
-		motor.config_kI(0, Constants.HATCH_POSITION_I, 10);
-		motor.config_kD(0, Constants.HATCH_POSITION_D, 10);
+		motor.setPIDF(0, Constants.HATCH_POSITION_P, Constants.HATCH_POSITION_I, Constants.HATCH_POSITION_D, Constants.HATCH_POSITION_F);
 		motor.configClosedloopRamp(0.1, 10);
 		double scaleFactor = 2456/13.15; // 13.15" for 2456 ticks
 		motor.setScale(scaleFactor);
@@ -162,18 +148,15 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static TalonSRX getClimberWinchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		TalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+	public static HardwareTalonSRX getClimberWinchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.getSensorCollection().setQuadraturePosition(0, 10);			// reset the encoders on code start. We assume we are on the floor and the lifts are retracted on code restart.
 		motor.set(ControlMode.Position, 0);
 		motor.configContinuousCurrentLimit(Constants.CLIMBER_CONTINUOUS_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
 		motor.configPeakCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
-		motor.config_kF(0, Constants.CLIMBER_POSITION_F, 10);
-		motor.config_kP(0, Constants.CLIMBER_POSITION_P, 10);
-		motor.config_kI(0, Constants.CLIMBER_POSITION_I, 10);
-		motor.config_kD(0, Constants.CLIMBER_POSITION_D, 10);
+		motor.setPIDF(0, Constants.CLIMBER_POSITION_P, Constants.CLIMBER_POSITION_I, Constants.CLIMBER_POSITION_D, Constants.CLIMBER_POSITION_F);
 		motor.configClosedloopRamp(0, 10);
 		// Set the deadband to zero.
 		motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
@@ -181,8 +164,8 @@ public class MotorFactory {
 		return motor;
 	}
 	
-	public static TalonSRX getClimberDriveMotor(int canID, boolean invert, Log log) {	
-		TalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+	public static HardwareTalonSRX getClimberDriveMotor(int canID, boolean invert, Log log) {	
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(.25, 10);
 		motor.configVoltageCompSaturation(8, 10);
 		motor.enableVoltageCompensation(true);
@@ -198,16 +181,16 @@ public class MotorFactory {
      * @param log logger.
      * @return
      */
-    private static TalonSRX getTalon(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean invert, NeutralMode mode, Clock clock, Log log) {
-    	ArrayList<TalonSRX> potentialLeaders = getTalonList(canIDsWithEncoders, invert, mode, log);
-    	ArrayList<TalonSRX> followers = getTalonList(canIDsWithoutEncoders, invert, mode, log);
+    private static HardwareTalonSRX getTalon(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean invert, NeutralMode mode, Clock clock, Log log) {
+    	ArrayList<HardwareTalonSRX> potentialLeaders = getTalonList(canIDsWithEncoders, invert, mode, log);
+    	ArrayList<HardwareTalonSRX> followers = getTalonList(canIDsWithoutEncoders, invert, mode, log);
     	return new RedundantTalonSRX(potentialLeaders, followers, clock, log);
 	}
 	
-	private static ArrayList<TalonSRX> getTalonList(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
-		ArrayList<TalonSRX> list = new ArrayList<>();
+	private static ArrayList<HardwareTalonSRX> getTalonList(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
+		ArrayList<HardwareTalonSRX> list = new ArrayList<>();
 		for (int i = 0; i < canIDs.length; i++) {
-			TalonSRX talon = Hardware.TalonSRXs.talonSRX(canIDs[i], invert, mode);
+			HardwareTalonSRX talon = Hardware.Motors.talonSRX(canIDs[i], invert, mode);
 			talon.configContinuousCurrentLimit(Constants.DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT, 10);
 			talon.configPeakCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
 			list.add(talon);
@@ -222,11 +205,11 @@ public class MotorFactory {
      * @param canIDs list of canIDs. First entry is the leader and the rest follow it.
      * @param invert change the direction.
      * @param log for registration of the current reporting.
-     * @return the leader TalonSRX
+     * @return the leader HardwareTalonSRX
      */
-    private static TalonSRX getTalon(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
+    private static HardwareTalonSRX getTalon(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
 
-    	TalonSRX leader = Hardware.TalonSRXs.talonSRX(abs(canIDs[0]), invert, mode);
+    	HardwareTalonSRX leader = Hardware.Motors.talonSRX(abs(canIDs[0]), invert, mode);
 		log.register(false, () -> leader.getOutputCurrent(), "Talons/%d/Current", canIDs[0]);
 		leader.configContinuousCurrentLimit(Constants.DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT, 10);
 		leader.configPeakCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
@@ -234,7 +217,7 @@ public class MotorFactory {
     	for (int i = 1; i < canIDs.length; i++) {
 			boolean shouldInvert = invert;
 			if (canIDs[i] < 0) shouldInvert = !shouldInvert;
-    		TalonSRX follower = Hardware.TalonSRXs.talonSRX(abs(canIDs[i]), shouldInvert, mode);
+    		HardwareTalonSRX follower = Hardware.Motors.talonSRX(abs(canIDs[i]), shouldInvert, mode);
 			follower.getHWTalon().follow(leader.getHWTalon());
 			log.register(false, () -> follower.getOutputCurrent(), "Talons/%d/Current", canIDs[i]);
 		}
@@ -247,9 +230,9 @@ public class MotorFactory {
 	  * @param invert Change the direction of the motor.
 	  * @param mode break or coast.
 	  * @param log for registration of the current values.
-	  * @return the TalonSRX motor controller.
+	  * @return the HardwareTalonSRX motor controller.
 	  */
-    private static TalonSRX getTalon(int canID, boolean invert, NeutralMode mode, Log log) {
+    private static HardwareTalonSRX getTalon(int canID, boolean invert, NeutralMode mode, Log log) {
 		log.sub("%s: " + canID, "talon");
 		int[] canIDs = new int[1];
 		canIDs[0] = canID;
@@ -265,16 +248,16 @@ public class MotorFactory {
      * @param log for registration of the current reporting.
      * @return the leader SparkMAX
      */
-    private static SparkMAX getSparkMAX(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
+    private static HardwareSparkMAX getSparkMAX(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
 
-    	HardwareSparkMAX leader = Hardware.SparkMAXs.sparkMAX(abs(canIDs[0]), MotorType.kBrushless, invert);
+    	HardwareSparkMAX leader = Hardware.Motors.sparkMAX(abs(canIDs[0]), MotorType.kBrushless, invert);
 		log.register(false, () -> leader.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[0]);
 		leader.setSmartCurrentLimit(Constants.DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT, 10);
 		leader.setSecondaryCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
     	for (int i = 1; i < canIDs.length; i++) {
 			boolean shouldInvert = invert;
 			if (canIDs[i] < 0) shouldInvert = !shouldInvert;
-    		HardwareSparkMAX follower = Hardware.SparkMAXs.sparkMAX(abs(canIDs[i]), MotorType.kBrushless, shouldInvert);
+    		HardwareSparkMAX follower = Hardware.Motors.sparkMAX(abs(canIDs[i]), MotorType.kBrushless, shouldInvert);
 			follower.getHWSpark().follow(leader.getHWSpark());
 			log.register(false, () -> follower.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[i]);
 		}

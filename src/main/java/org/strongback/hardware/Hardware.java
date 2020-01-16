@@ -26,9 +26,7 @@ import org.strongback.components.PowerPanel;
 import org.strongback.components.Relay;
 import org.strongback.components.Servo;
 import org.strongback.components.Solenoid;
-import org.strongback.components.SparkMAX;
 import org.strongback.components.Switch;
-import org.strongback.components.TalonSRX;
 import org.strongback.components.ThreeAxisAccelerometer;
 import org.strongback.components.TwoAxisAccelerometer;
 import org.strongback.components.ui.FlightStick;
@@ -626,26 +624,27 @@ public class Hardware {
         public static Motor spark(int channel, DoubleToDoubleFunction speedLimiter) {
             return new HardwareSpark(new Spark(channel), SPEED_LIMITER);
         }
-    }
-    
-    /**
-     * Factory Methods for TalonSRX.
-     */
-    public static final class TalonSRXs {
-    	public static TalonSRX talonSRX(int canID, boolean invert) {
+
+        /**
+         * Create a TalsonSRX using the specified CAN ID.
+         * @param canID the CAN ID to use.
+         * @param invert invert the motor if necessary.
+         * @return a motor
+         */
+        public static HardwareTalonSRX talonSRX(int canID, boolean invert) {
     		com.ctre.phoenix.motorcontrol.can.TalonSRX talon = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canID);
 			talon.setInverted(invert);
     		return new HardwareTalonSRX(talon);
     	}
     	
-    	public static TalonSRX talonSRX(int canID, boolean invert, NeutralMode mode) {
+    	public static HardwareTalonSRX talonSRX(int canID, boolean invert, NeutralMode mode) {
     		com.ctre.phoenix.motorcontrol.can.TalonSRX talon = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canID);
     		talon.setInverted(invert);
 			talon.setNeutralMode(mode);
     		return new HardwareTalonSRX(talon);
     	}
     	
-    	public static TalonSRX talonSRX(int[] canIDs, NeutralMode mode) {
+    	public static HardwareTalonSRX talonSRX(int[] canIDs, NeutralMode mode) {
     		com.ctre.phoenix.motorcontrol.can.TalonSRX master = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canIDs[0]);
     		master.setNeutralMode(mode);
     		for (int i = 1; i < canIDs.length; i++) {
@@ -656,7 +655,7 @@ public class Hardware {
     		return new HardwareTalonSRX(master);
     	}
     	
-    	public static TalonSRX talonSRX(int[] canIDs, boolean invert, NeutralMode mode) {
+    	public static HardwareTalonSRX talonSRX(int[] canIDs, boolean invert, NeutralMode mode) {
     		com.ctre.phoenix.motorcontrol.can.TalonSRX master = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canIDs[0]);
     		master.setInverted(invert);
     		master.setNeutralMode(mode);
@@ -668,13 +667,11 @@ public class Hardware {
     		}
     		return new HardwareTalonSRX(master);
     	}
-    }
     
-    /**
-     * Factory Methods for SparkMAX.
-     */
-    public static final class SparkMAXs {
-        // Only support brushless mode for now.
+        /**
+         * Factory Methods for SparkMAX.
+         * Only supports brushless mode for now.
+         */
         public static HardwareSparkMAX sparkMAX(int canID, MotorType type, boolean invert) {
     		CANSparkMax spark = new CANSparkMax(canID, type);
 			spark.setInverted(invert);

@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import org.strongback.Executable;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.Constants;
 import frc.robot.interfaces.ClimberInterface;
 import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
@@ -25,19 +25,19 @@ import frc.robot.lib.Subsystem;
  *   3) Both lots of stilts also have wheels, but the rear ones are powered by a single
  *      motor.
  * 
- * This class expects to be given a configured TalonSRXs for the two winches
+ * This class expects to be given a configured motors for the two winches
  * and the drive wheels.
  */
 public class Climber extends Subsystem implements ClimberInterface, Executable, DashboardUpdater {
 
     private Winch frontWinch;  // Controls the front stilts.
     private Winch rearWinch;  // Controls the rear stilts.
-    private TalonSRX wheelMotor;  // The powered wheels on the rear stilts.
+    private Motor wheelMotor;  // The powered wheels on the rear stilts.
     private ClimberAction action;
     private boolean holding = false;
 
-    public Climber(TalonSRX frontWinchMotor, TalonSRX rearWinchMotor,
-                      TalonSRX wheelMotor, DashboardInterface dashboard, Log log) {
+    public Climber(Motor frontWinchMotor, Motor rearWinchMotor,
+                      Motor wheelMotor, DashboardInterface dashboard, Log log) {
         super("Climber", dashboard, log);   
         this.frontWinch = new Winch("climber:Front", frontWinchMotor, dashboard, log);
         this.rearWinch = new Winch("climber:Rear", rearWinchMotor, dashboard, log);
@@ -128,24 +128,24 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     
     private class Winch implements DashboardUpdater {
         private String name;
-        private TalonSRX motor;
+        private Motor motor;
         private Log log;
         private double targetHeight = 0;
         private DashboardInterface dashboard;
 
-        public Winch(String name, TalonSRX motor, DashboardInterface dashboard, Log log) {
+        public Winch(String name, Motor motor, DashboardInterface dashboard, Log log) {
             this.name = name;
             this.motor = motor;
             this.log = log;
             this.dashboard = dashboard;
 
             // Reset the encoder as the robot starts with the stilts at zero height.
-            motor.getSensorCollection().setQuadraturePosition(0, 10);
+            motor.setPosition(0);
             log.register(false, () -> getTargetHeight(), "%s/targetHeight", name)
                .register(false, () -> getActualHeight(), "%s/actualHeight", name)
                .register(false, () -> getHallEffectTriggered(), "%s/hallEffect", name)
-               .register(false, motor::getMotorOutputVoltage, "%s/outputVoltage", name)
-               .register(false, motor::getMotorOutputPercent, "%s/outputPercent", name)
+               .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
+               .register(false, motor::getOutputPercent, "%s/outputPercent", name)
                .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
         }
 
@@ -161,7 +161,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
         }
 
         public double getActualHeight() {
-            return motor.getSelectedSensorPosition(0);
+            return motor.getPosition();
         }
 
         public double getTargetHeight() {
@@ -175,7 +175,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
         public boolean getHallEffectTriggered() {
             // On the rear, either sensor will do.
             // On the front, it doesn't matter which it is wired into.
-            return motor.getSensorCollection().isRevLimitSwitchClosed() || motor.getSensorCollection().isFwdLimitSwitchClosed();
+            return motor.isAtReverseLimit() || motor.isAtForwardLimit();
         }
 
     
