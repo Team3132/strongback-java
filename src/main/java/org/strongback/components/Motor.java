@@ -137,7 +137,6 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
 
     /**
      * Set PID parameters for motor controllers that support it.
-     * Spark MAX doesn't have the concept of multiple slots.
      */
     public default Motor setPIDF(int slotIdx, double p, double i, double d, double f) {
         // Not implmented by default.
@@ -146,7 +145,6 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
 
     /**
      * Tell the motor controller which set of PID values to use.
-     * Spark MAX doesn't have the concept of multiple slots.
      */
     public default Motor selectProfileSlot(int slotIdx) {
         // Not implmented by default.
