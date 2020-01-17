@@ -263,36 +263,6 @@ public class Mock {
     }
     
     /**
-     * Factory Methods for Mock TalonSRX.
-     */
-    public static final class TalonSRXs {
-    	public static MockTalonSRX talonSRX(int canID) {
-    		return new MockTalonSRX(canID);
-    	}
-    	
-    	public static MockTalonSRX talonSRX(int canID, boolean reverse) {
-    		return new MockTalonSRX(canID);
-    	}
-    	
-    	public static MockTalonSRX talonSRX(int[] canIDs) {
-    		return new MockTalonSRX(canIDs[0]);
-    	}
-    	
-    	public static MockTalonSRX talonSRX(int[] canIDs, boolean reverse) {
-    		return new MockTalonSRX(canIDs[0]);
-    	}
-    }
-
-    /**
-     * Factory Methods for Mock SparkMAX.
-     */
-    public static final class SparkMAXs {
-    	public static MockSparkMAX sparkMAX(int canID) {
-    		return new MockSparkMAX(canID);
-    	}
-    }
-
-    /**
      * Factory method for mock servos.
      */
     public static final class Servos {

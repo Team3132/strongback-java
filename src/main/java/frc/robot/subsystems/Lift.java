@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
+import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
@@ -27,11 +27,11 @@ public class Lift extends Subsystem implements LiftInterface, DashboardUpdater {
 	private double targetHeight = 0;
 	private double maxHeight = Constants.LIFT_DEFAULT_MAX_HEIGHT;
 	private double minHeight = 0.0;
-	private TalonSRX liftMotor;
+	private Motor liftMotor;
 	private boolean deployed = false;
 	private Solenoid deploySolenoid;
 	
-	public Lift(TalonSRX liftMotor, Solenoid deploy, DashboardInterface dashboard, Log log) {
+	public Lift(Motor liftMotor, Solenoid deploy, DashboardInterface dashboard, Log log) {
 		super("Lift", dashboard, log);
 		this.liftMotor = liftMotor;
 		this.deploySolenoid = deploy;
@@ -42,12 +42,12 @@ public class Lift extends Subsystem implements LiftInterface, DashboardUpdater {
 		   .register(true, () -> targetHeight, "%s/Desired", name)
 		   .register(false, () -> deploy.isExtended() ? 1.0 : 0.0, "%s/Deployed", name)
 		   .register(false, liftMotor::getOutputCurrent, "%s/Current", name)
-		   .register(false, liftMotor::getMotorOutputVoltage, "%s/Voltage", name)
-		   .register(false, liftMotor::getMotorOutputPercent, "%s/Percent", name);
+		   .register(false, liftMotor::getOutputVoltage, "%s/Voltage", name)
+		   .register(false, liftMotor::getOutputPercent, "%s/Percent", name);
 		
 		// Use slot 0 (up). PId values are configured in MotorFactory.
-		liftMotor.selectProfileSlot(UP_PID_SLOT, 0);
-		liftMotor.setSelectedSensorPosition(0, 0, 10);
+		liftMotor.selectProfileSlot(UP_PID_SLOT);
+		liftMotor.setPosition(0);
 		// Tell the lift that the current height is where we want to be.
 		// The robot should start with the lift at the bottom, but in case it
 		// doesn't leave the lift in the starting position for a sequence to change.
@@ -91,9 +91,9 @@ public class Lift extends Subsystem implements LiftInterface, DashboardUpdater {
 		// Use different PID values depending on where the lift is relative
 		// to the target.
 		if (targetHeight > getHeight()) {
-			liftMotor.selectProfileSlot(UP_PID_SLOT, 0);
+			liftMotor.selectProfileSlot(UP_PID_SLOT);
 		} else {
-			liftMotor.selectProfileSlot(DOWN_PID_SLOT, 0);
+			liftMotor.selectProfileSlot(DOWN_PID_SLOT);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class Lift extends Subsystem implements LiftInterface, DashboardUpdater {
 
 	@Override
 	public double getHeight() {
-		return liftMotor.getSelectedSensorPosition(0) - Constants.LIFT_DEFAULT_MIN_HEIGHT;
+		return liftMotor.getPosition() - Constants.LIFT_DEFAULT_MIN_HEIGHT;
 	}
 	
 	@Override
@@ -153,9 +153,9 @@ public class Lift extends Subsystem implements LiftInterface, DashboardUpdater {
 		dashboard.putString("Lift height", formatHeight(getHeight()));		
 		dashboard.putString("Lift target", formatHeight(getTargetHeight()));
 		dashboard.putString("Lift status", isDeployed() ? "Extended" : "Retracted");
-		dashboard.putString("Lift raw height", formatHeight(liftMotor.getSelectedSensorPosition(0)));
-		dashboard.putString("Lift top sensor", liftMotor.getSensorCollection().isFwdLimitSwitchClosed() ? "detected" : "not detected");
-		dashboard.putString("Lift bottom sensor", liftMotor.getSensorCollection().isRevLimitSwitchClosed() ? "detected" : "not detected");
+		dashboard.putString("Lift raw height", formatHeight(liftMotor.getPosition()));
+		dashboard.putString("Lift top sensor", liftMotor.isAtForwardLimit() ? "detected" : "not detected");
+		dashboard.putString("Lift bottom sensor", liftMotor.isAtReverseLimit() ? "detected" : "not detected");
 	}
 
 	public static String formatHeight(double height) {

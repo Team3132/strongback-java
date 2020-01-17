@@ -3,27 +3,27 @@ package frc.robot.subsystems;
 import java.util.function.BooleanSupplier;
 
 import org.strongback.Executable;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.IntakeInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 /**
  * Intake Subsystem 2019:
  * On the 2019 robot the intake is pneumatically driven and using one motor to intake game objects 
  */
 public class Intake extends Subsystem implements IntakeInterface, Executable, DashboardUpdater {
-    private TalonSRX motor;
+    private Motor motor;
     private Solenoid solenoid;
     private BooleanSupplier sensor;
     private double targetCurrent;
 
-    public Intake(TalonSRX motor, BooleanSupplier sensor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
+    public Intake(Motor motor, BooleanSupplier sensor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
         super("Intake", dashboard, log);   
         this.motor = motor;
         this.solenoid = solenoid;
@@ -32,8 +32,8 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         log.register(true, () -> isExtended(), "%s/extended", name)
                .register(true, () -> isRetracted(), "%s/retracted", name)
                .register(true, () -> hasCargo(), "%s/cargoOnBoard", name)
-			   .register(false, motor::getMotorOutputVoltage, "%s/outputVoltage", name)
-			   .register(false, motor::getMotorOutputPercent, "%s/outputPercent", name)
+			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
+			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
 			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
     }
 
@@ -90,7 +90,7 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         dashboard.putString("Intake position", isExtended() ? "extended" : isRetracted() ? "retracted" : "moving");
         dashboard.putString("Intake cargo status", hasCargo() ? "has cargo" : "empty");
         dashboard.putNumber("Intake motor current", motor.getOutputCurrent());
-		dashboard.putNumber("Intake motor percent", motor.getMotorOutputPercent());
+		dashboard.putNumber("Intake motor percent", motor.getOutputPercent());
 	}
 }
 

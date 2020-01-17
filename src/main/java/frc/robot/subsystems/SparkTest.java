@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.ControlType;
-
 import org.strongback.Executable;
-import org.strongback.components.SparkMAX;
+import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
@@ -15,14 +15,14 @@ import frc.robot.lib.Subsystem;
  * This was used to qualify the Spark MAX motor controllers.
  */
 public class SparkTest extends Subsystem implements SparkTestInterface, Executable, DashboardUpdater {
-    private SparkMAX motor;
+    private Motor motor;
     private double targetOutput = 0;
 
-    public SparkTest(SparkMAX motor, DashboardInterface dashboard, Log log) {
+    public SparkTest(Motor motor, DashboardInterface dashboard, Log log) {
         super("SparkTest", dashboard, log);   
         this.motor = motor;
 
-        log.register(false, motor::getAppliedOutput, "%s/outputPercent", name)
+        log.register(false, motor::getOutputPercent, "%s/outputPercent", name)
 			   .register(false, motor::getVelocity, "%s/speed", name)
 			   .register(false, motor::getPosition, "%s/position", name)
 			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name)
@@ -34,7 +34,7 @@ public class SparkTest extends Subsystem implements SparkTestInterface, Executab
         //log.sub("Setting spark test motor output to %.1f", output);
         targetOutput = output;
         //motor.set(output, ControlType.kDutyCycle);
-        motor.set(output, ControlType.kVelocity);
+        motor.set(ControlMode.Velocity ,output);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SparkTest extends Subsystem implements SparkTestInterface, Executab
 	public void updateDashboard() {
         dashboard.putNumber("Spark test motor target", getMotorOutput());
         dashboard.putNumber("Spark test motor current", motor.getOutputCurrent());
-        dashboard.putNumber("Spark test motor percent", motor.getAppliedOutput());
+        dashboard.putNumber("Spark test motor percent", motor.getOutputPercent());
         dashboard.putNumber("Spark test motor speed", motor.getVelocity());
         dashboard.putNumber("Spark test motor position", motor.getPosition());
 	}

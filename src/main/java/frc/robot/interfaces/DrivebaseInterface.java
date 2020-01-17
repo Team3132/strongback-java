@@ -1,8 +1,8 @@
 package frc.robot.interfaces;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import org.strongback.Executable;
+import org.strongback.components.Motor.ControlMode;
+
 import frc.robot.drive.routines.DriveRoutine;
 
 import jaci.pathfinder.Waypoint;

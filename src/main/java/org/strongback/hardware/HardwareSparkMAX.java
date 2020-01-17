@@ -4,12 +4,11 @@ import com.revrobotics.CANDigitalInput;
 import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 
-import org.strongback.components.SparkMAX;
+import org.strongback.components.Motor;
 
 /*
  * Package to wrap a Spark MAX controller driving a Neo.
@@ -21,9 +20,10 @@ import org.strongback.components.SparkMAX;
  * We have a scale factor. This is useful in position and velocity close loop feedback modes.
  * 	For reading it we divide by the scale factor, when writing values we multiply by the scale factor.
  */
-public class HardwareSparkMAX implements SparkMAX {
+public class HardwareSparkMAX implements Motor {
 	private final com.revrobotics.CANSparkMax spark;
 	private final com.revrobotics.CANEncoder encoder;
+	private int slotID = 0;
 	// There appears to be a bug where if the pid controller is created before
 	// any followers, then the followers won't follow. Hence the pid controller
 	// is created on demand in getPID() in case there have been followers added.
@@ -42,9 +42,9 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public void set(double value, ControlType mode) {
+	public void set(ControlMode mode, double value) {
 		//spark.set(value);
-		getPID().setReference(value, mode);
+		getPID().setReference(value, mode.revControlType, slotID);
 	}
 
 	private CANPIDController getPID() {
@@ -62,8 +62,9 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public void setInverted(boolean isInverted) {
+	public Motor setInverted(boolean isInverted) {
 		spark.setInverted(isInverted);
+		return this;
 	}
 
 	@Override
@@ -72,27 +73,30 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public void disable() {
+	public Motor disable() {
 		spark.disable();
+		return this;
 	}
 
 	@Override
-	public void stopMotor() {
+	public void stop() {
 		spark.stopMotor();
 	}
 
 	@Override
-	public void pidWrite(double output) {
-		spark.pidWrite(output);
+	public Motor setPIDF(int slotIdx, double p, double i, double d, double f) {
+		getPID().setP(p, slotIdx);
+		getPID().setI(i, slotIdx);
+		getPID().setD(d, slotIdx);
+		getPID().setFF(f, slotIdx);
+		return this;
 	}
 
-	@Override
-	public void setPIDF(double p, double i, double d, double f) {
-		getPID().setP(p);
-		getPID().setI(i);
-		getPID().setD(d);
-		getPID().setFF(f);
-	}
+	public Motor selectProfileSlot(int slotIdx) {
+		// Only used when set() is called.
+        slotID = slotIdx;
+        return this;
+    }
 
 	@Override
 	public double getPosition() {
@@ -100,8 +104,9 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public void setPosition(double position) {
+	public Motor setPosition(double position) {
 		encoder.setPosition(position);
+		return this;
 	}
 
 	@Override
@@ -110,7 +115,7 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public SparkMAX setScale(double scale) {
+	public Motor setScale(double scale) {
 		// Position is in turns.
 		encoder.setPositionConversionFactor(scale);
 		// Velocity is in rpm by default. Use rps instead.
@@ -119,86 +124,71 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public boolean isFwdLimitSwitchClosed() {
+	public boolean isAtForwardLimit() {
 		return fwdLimitSwitch.get();
 	}
 
 	@Override
-	public boolean isRevLimitSwitchClosed() {
+	public boolean isAtReverseLimit() {
 		return revLimitSwitch.get();
 	}
 
-	@Override
 	public boolean setSmartCurrentLimit(int limit) {
 		return spark.setSmartCurrentLimit(limit) == CANError.kOk;
 	}
 
-	@Override
 	public boolean setSmartCurrentLimit(int stallLimit, int freeLimit) {
 		return spark.setSmartCurrentLimit(stallLimit, freeLimit) == CANError.kOk;
 	}
 
-	@Override
 	public boolean setSmartCurrentLimit(int stallLimit, int freeLimit, int limitRPM) {
 		return spark.setSmartCurrentLimit(stallLimit, freeLimit, limitRPM) == CANError.kOk;
 	}
 
-	@Override
 	public boolean setSecondaryCurrentLimit(double limit) {
 		return spark.setSecondaryCurrentLimit(limit) == CANError.kOk;
 	}
 
-	@Override
 	public boolean setSecondaryCurrentLimit(double limit, int chopCycles) {
 		return spark.setSecondaryCurrentLimit(limit, chopCycles) == CANError.kOk;
 	}
 
-	@Override
 	public boolean setIdleMode(IdleMode mode) {
 		return spark.setIdleMode(mode) == CANError.kOk;
 	}
 
-	@Override
 	public IdleMode getIdleMode() {
 		return spark.getIdleMode();
 	}
 
-	@Override
 	public boolean enableVoltageCompensation(double nominalVoltage) {
 		return spark.enableVoltageCompensation(nominalVoltage) == CANError.kOk;
 	}
 
-	@Override
 	public boolean disableVoltageCompensation() {
 		return spark.disableVoltageCompensation() == CANError.kOk;
 	}
 
-	@Override
 	public double getVoltageCompensationNominalVoltage() {
 		return spark.getVoltageCompensationNominalVoltage();
 	}
 
-	@Override
 	public boolean setOpenLoopRampRate(double rate) {
 		return spark.setOpenLoopRampRate(rate) == CANError.kOk;
 	}
 
-	@Override
 	public boolean setClosedLoopRampRate(double rate) {
 		return spark.setClosedLoopRampRate(rate) == CANError.kOk;
 	}
 
-	@Override
 	public double getOpenLoopRampRate() {
 		return spark.getOpenLoopRampRate();
 	}
 
-	@Override
 	public double getClosedLoopRampRate() {
 		return spark.getClosedLoopRampRate();
 	}
 
-	// Next two aren't part of the SparkMAX interface.
 	public boolean follow(HardwareSparkMAX leader) {
 		return spark.follow(leader.getHWSpark()) == CANError.kOk;
 	}
@@ -207,27 +197,22 @@ public class HardwareSparkMAX implements SparkMAX {
 		return spark.follow(leader.getHWSpark(), invert) == CANError.kOk;
 	}
 
-	@Override
 	public boolean isFollower() {
 		return spark.isFollower();
 	}
 
-	@Override
 	public short getFaults() {
 		return spark.getFaults();
 	}
 
-	@Override
 	public short getStickyFaults() {
 		return spark.getStickyFaults();
 	}
 
-	@Override
 	public boolean getFault(FaultID faultID) {
 		return spark.getFault(faultID);
 	}
 
-	@Override
 	public boolean getStickyFault(FaultID faultID) {
 		return spark.getStickyFault(faultID);
 	}
@@ -238,7 +223,7 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public double getAppliedOutput() {
+	public double getOutputPercent() {
 		return spark.getAppliedOutput();
 	}
 
@@ -248,41 +233,41 @@ public class HardwareSparkMAX implements SparkMAX {
 	}
 
 	@Override
-	public double getMotorTemperature() {
+	public double getTemperature() {
 		return spark.getMotorTemperature();
 	}
 
 	@Override
+    public Motor setSensorPhase(boolean phase) {
+        encoder.setInverted(phase);
+        return this;
+    }
+
+
 	public boolean clearFaults() {
 		return spark.clearFaults() == CANError.kOk;
 	}
 
-	@Override
 	public boolean burnFlash() {
 		return spark.burnFlash() == CANError.kOk;
 	}
 
-	@Override
 	public boolean setCANTimeout(int milliseconds) {
 		return spark.setCANTimeout(milliseconds) == CANError.kOk;
 	}
 
-	@Override
 	public boolean enableSoftLimit(SoftLimitDirection direction, boolean enable) {
 		return spark.enableSoftLimit(direction, enable) == CANError.kOk;
 	}
 
-	@Override
 	public boolean setSoftLimit(SoftLimitDirection direction, float limit) {
 		return spark.setSoftLimit(direction, limit) == CANError.kOk;
 	}
 
-	@Override
 	public double getSoftLimit(SoftLimitDirection direction) {
 		return spark.getSoftLimit(direction);
 	}
 
-	@Override
 	public boolean isSoftLimitEnabled(SoftLimitDirection direction) {
 		return spark.isSoftLimitEnabled(direction);
 	}
