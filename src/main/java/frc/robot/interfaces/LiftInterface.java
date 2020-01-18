@@ -30,7 +30,7 @@ public interface LiftInterface extends SubsystemInterface, Executable, Dashboard
         }
 
         public enum Type{
-            SET_HEIGHT, 
+            START_CLIMBER_UP, 
 			ADJUST_HEIGHT,
 			SETPOINT_UP,
 			SETPOINT_DOWN
@@ -49,7 +49,7 @@ public interface LiftInterface extends SubsystemInterface, Executable, Dashboard
 		 */
 		public double calculateHeight(double currentHeight, double currentTarget) {
 			switch (this.type) {
-				case SET_HEIGHT:
+				case START_CLIMBER_UP:
 					return this.value;
 				case ADJUST_HEIGHT:
 					return currentTarget + this.value;

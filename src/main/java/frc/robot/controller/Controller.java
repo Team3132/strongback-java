@@ -163,7 +163,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		// Calculate the height that we want to use.
 		// We cannot just use desiredState.liftAction.value because it
-		// might not be of type SET_HEIGHT
+		// might not be of type START_CLIMBER_UP
 		double desiredLiftHeight = desiredState.liftAction.calculateHeight(
 			subsystems.lift.getHeight(),
 			subsystems.lift.getTargetHeight()
@@ -175,7 +175,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 		
 		// Retract the lift if the lift is going to the bottom so the spitter doesn't hit the bumpers.
-		// In updatedesiredState.liftAction was set to type SET_HEIGHT
+		// In updatedesiredState.liftAction was set to type START_CLIMBER_UP
 		if (desiredLiftHeight < Constants.LIFT_DEFAULT_MIN_HEIGHT) { // FIXME: This will never evaluate to true
 			if (subsystems.lift.isDeployed()) {
 				log.sub("Lift has been asked to move to 0, retracting spitter");

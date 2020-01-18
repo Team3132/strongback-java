@@ -12,8 +12,9 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
-public class Climber extends Subsystem implements ClimberInterface, Executable, DashboardUpdater {
+// TODO: Description of Subsystem once we know what it looks like.
 
+public class Climber extends Subsystem implements ClimberInterface, Executable, DashboardUpdater {
     private Winch climbWinch;  // Controls the front stilts.
     private ClimberAction action;
     private boolean holding = false;
@@ -21,7 +22,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     public Climber(Motor WinchMotor, DashboardInterface dashboard, Log log) {
         super("Climber", dashboard, log);   
         this.climbWinch = new Winch("climber:", WinchMotor, dashboard, log);
-        setDesiredAction(new ClimberAction(Type.HOLD_HEIGHT, 0));
+        setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));
     }
 
     @Override
@@ -35,8 +36,8 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
             holding = false;
         }
         switch (action.type) {
-            case SET_HEIGHT:
-                climbWinch.setTargetHeight(action.value);
+            case SET_CLIMBER_POWER:
+                climbWinch.setMotorPower(action.value);
                 break;
             case HOLD_HEIGHT:
                 if (!holding) {

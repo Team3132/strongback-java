@@ -181,9 +181,10 @@ public class OI implements OIInterface {
 			sysoutScoreMode();
 		});
 
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.setHeight());
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.stopClimber());
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.holdHeight());
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startClimberUp());
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.startClimberDown());
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.pauseClimber());
+		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.stopClimber());
 
 		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.moveLift(LiftSetpoint.LIFT_BOTTOM_HEIGHT));
 
@@ -339,7 +340,7 @@ public class OI implements OIInterface {
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.LIFT_DISABLE, OperatorBoxButtons.LIFT_MANUAL, liftOverride);
 	  // Override lift height.
-		onTriggered(box.getButton(OperatorBoxButtons.LIFT_SET_HEIGHT), 
+		onTriggered(box.getButton(OperatorBoxButtons.LIFT_START_CLIMBER_UP), 
 			() -> liftIF.setTargetHeight(scaleLiftPotHeight(box.getAxis(OperatorBoxButtons.LIFT_POT).read())));
 	  // Lift carriage.
 		onTriggered(box.getButton(OperatorBoxButtons.LIFT_DEPLOY_CARRIAGE), 

@@ -115,7 +115,7 @@ public class OperatorBoxButtons {
 	public static final int LIFT_DISABLE = BLUE_DISABLE;
 	public static final int LIFT_MANUAL = BLUE_MANUAL;
 	public static final int LIFT_POT = BLUE_POT;
-	public static final int LIFT_SET_HEIGHT = BLUE_BUTTON1;
+	public static final int LIFT_START_CLIMBER_UP = BLUE_BUTTON1;
 	public static final int LIFT_DEPLOY_CARRIAGE = BLUE_BUTTON2;
 	public static final int LIFT_RETRACT_CARRIAGE = BLUE_BUTTON3;  // Button 3 is broken?
 

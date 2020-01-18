@@ -15,7 +15,7 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
         }
 
         public enum Type{
-            SET_HEIGHT, 
+            SET_CLIMBER_POWER,
             HOLD_HEIGHT,
             STOP_CLIMBER,
         }

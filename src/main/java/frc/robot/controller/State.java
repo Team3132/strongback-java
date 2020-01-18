@@ -113,7 +113,7 @@ public class State {
 	 * @param height in inches from the bottom of the lift.
 	 */
 	public State setLiftHeight(double height) {
-		liftAction = new LiftAction(LiftAction.Type.SET_HEIGHT, height);
+		liftAction = new LiftAction(LiftAction.Type.START_CLIMBER_UP, height);
 		return this;
 	}
 
@@ -270,12 +270,12 @@ public class State {
 
 
 	// Climber
-	public State setHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_HEIGHT, height);
+	public State setClimberPower(double speed) {
+		climber = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER, speed);
 		return this;
 	}
 
-	public State holdHeight() {
+	public State holdClimber() {
 		climber = new ClimberAction(ClimberAction.Type.HOLD_HEIGHT, 0);
 		return this;
 	}
