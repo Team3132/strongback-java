@@ -239,6 +239,10 @@ class FirstPython:
             # Check object shape:
             peri = cv2.arcLength(c, closed = True)
             approx = cv2.approxPolyDP(c, epsilon = self.epsilon * peri, closed = True)
+            str2+= str(len(approx))
+            for x in approx:
+                jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),3 , jevois.YUYV.LightGreen)
+            
             if len(approx) < 7 or len(approx) > 9: continue  # 8 vertices for a U shape
             str2 += "S" # Shape is ok
             
@@ -281,6 +285,7 @@ class FirstPython:
 
             # check left & right angle
 
+            # left
             lratio = (BL_corner.xy[0] - TL_corner.xy[0])/(BL_corner.xy[1] - TL_corner.xy[1])
             rratio = (BR_corner.xy[0] - TR_corner.xy[0])/(BR_corner.xy[1] - TR_corner.xy[1])
 
@@ -391,7 +396,7 @@ class FirstPython:
     # ###################################################################################################
     ## Draw all detected objects in 3D
     def drawDetections(self, outimg, hlist, rvecs = None, tvecs = None):
-        """# Show trihedron and parallelepiped centered on object:
+        # Show trihedron and parallelepiped centered on object:
         hw = self.owm * 0.5
         hh = self.ohm * 0.5
         dd = -max(hw, hh)
@@ -425,45 +430,30 @@ class FirstPython:
             cu, jac2 = cv2.projectPoints(cubePoints, rvecs[i], tvecs[i], self.camMatrix, self.distCoeffs)
 
             # Round all the coordinates and cast to int for drawing:
-            cu = np.rint(cu)"""
+            cu = np.rint(cu)
             
-        TL_corner = Corner()
-        TR_corner = Corner()
-        BL_corner = Corner()
-        BR_corner = Corner()
+            TL_corner = Corner()
+            TR_corner = Corner()
+            BL_corner = Corner()            
+            BR_corner = Corner()
+            
+            for hull in hlist:
+                
+                for point in hull:
 
-        for hull in hlist:
+                    x = point[0][0]
+                    y = point[0][1]
 
-            for point in hull:
+                    TL_corner.update_score(x, y, -x - y)
+                    TR_corner.update_score(x, y, +x - y)
+                    BL_corner.update_score(x, y, -x + y)
+                    BR_corner.update_score(x, y, +x + y)
 
-                x = point[0][0]
-                y = point[0][1]
-
-                TL_corner.update_score(x, y, -x - y)
-                TR_corner.update_score(x, y, +x - y)
-                BL_corner.update_score(x, y, -x + y)
-                BR_corner.update_score(x, y, +x + y)
-
-        try:
-            # Draw top line of trapezium
-            jevois.drawLine(outimg, int(TL_corner.xy[0]), int(TL_corner.xy[1]), int(TR_corner.xy[0]),
-                            int(TR_corner.xy[1]),
+                            
+            jevois.drawLine(outimg, int(TL_corner.xy[0]),int(TL_corner.xy[1]),int(TR_corner.xy[0]), int(TR_corner.xy[1]),
                             1, jevois.YUYV.LightGreen)
 
-            # Draw dots on four corners
-            jevois.drawLine(outimg, int(TL_corner.xy[0]), int(TL_corner.xy[1]), int(TL_corner.xy[0]), int(TL_corner.xy[1]), 3, jevois.YUYV.White)
-            jevois.drawLine(outimg, int(TR_corner.xy[0]), int(TR_corner.xy[1]), int(TR_corner.xy[0]), int(TR_corner.xy[1]), 3, jevois.YUYV.White)
-            jevois.drawLine(outimg, int(BL_corner.xy[0]), int(BL_corner.xy[1]), int(BL_corner.xy[0]), int(BL_corner.xy[1]), 3, jevois.YUYV.White)
-            jevois.drawLine(outimg, int(BR_corner.xy[0]), int(BR_corner.xy[1]), int(BR_corner.xy[0]), int(BR_corner.xy[1]), 3, jevois.YUYV.White)
-
-        except:
-            print("Empty Corner Value")
-
-        print(TL_corner.xy)
-
-
-
-        #i += 1
+            i += 1
             
     # ###################################################################################################
     ## Process function with no USB output
