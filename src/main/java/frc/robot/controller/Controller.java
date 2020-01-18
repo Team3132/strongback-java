@@ -288,10 +288,10 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Blocks waiting till cargo is found, spat, or sequence is aborted.
 	 */
 	private void waitForCargo(boolean expectCargo) {
-		if (subsystems.spitter.hasCargo() == expectCargo) return;
+		if (subsystems.spitter.hasCell() == expectCargo) return;
 		logSub("Waiting for Cargo");
 		try {
-			waitUntilOrAbort(() -> subsystems.spitter.hasCargo() == expectCargo, "cargo");
+			waitUntilOrAbort(() -> subsystems.spitter.hasCell() == expectCargo, "cargo");
 		} catch (SequenceChangedException e) {
 			// Desired state has changed underneath us, give up waiting
 			//and return.

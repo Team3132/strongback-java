@@ -21,7 +21,7 @@ import frc.robot.mock.MockHatch;
 import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLog;
 import frc.robot.mock.MockPassthrough;
-import frc.robot.mock.MockSpitter;
+import frc.robot.mock.MockShooter;
 import frc.robot.simulator.IntakeSimulator;
 import frc.robot.simulator.LiftSimulator;
 import frc.robot.subsystems.Subsystems;
@@ -63,7 +63,7 @@ public class TestController {
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase(log);
 		subsystems.passthrough = new MockPassthrough(log);
-		subsystems.spitter = new MockSpitter(log);
+		subsystems.spitter = new MockShooter(log);
 		subsystems.hatch = new MockHatch(log);
 		subsystems.location = new MockLocation();
 		subsystems.leftDriveDistance = () -> 0;

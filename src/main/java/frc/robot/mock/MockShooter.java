@@ -1,17 +1,17 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.SpitterInterface;
+import frc.robot.interfaces.ShooterInterface;
 import frc.robot.interfaces.Log;
 
-public class MockSpitter implements SpitterInterface {
+public class MockShooter implements ShooterInterface {
 
     private double targetDutyCycle = 0; 
 
-    public MockSpitter(Log log) {
+    public MockShooter(Log log) {
     }
 
     @Override
-    public SpitterInterface setTargetDutyCycle(double dutyCycle) {
+    public ShooterInterface setTargetDutyCycle(double dutyCycle) {
         targetDutyCycle = dutyCycle;
         return this;
     }
@@ -22,7 +22,7 @@ public class MockSpitter implements SpitterInterface {
     }
 
     @Override
-    public boolean hasCargo() {
+    public boolean hasCell() {
         return false;
     }
 

@@ -76,7 +76,7 @@ public class State {
 		intakeExtended = subsystems.intake.isExtended();
 		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
-		hasCargo = subsystems.spitter.hasCargo();
+		hasCargo = subsystems.spitter.hasCell();
 		climber = subsystems.climber.getDesiredAction();
 		hatchAction = subsystems.hatch.getAction();
 		hatchHolderEnabled = subsystems.hatch.getHeld();

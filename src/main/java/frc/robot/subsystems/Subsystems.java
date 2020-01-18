@@ -46,8 +46,8 @@ public class Subsystems implements DashboardUpdater {
 	public OverridableSubsystem<SparkTestInterface> sparkTestOverride;
 	public PassthroughInterface passthrough;
 	public OverridableSubsystem<PassthroughInterface> passthroughOverride;
-	public SpitterInterface spitter;
-	public OverridableSubsystem<SpitterInterface> spitterOverride;
+	public ShooterInterface spitter;
+	public OverridableSubsystem<ShooterInterface> spitterOverride;
 	public HatchInterface hatch;
 	public OverridableSubsystem<HatchInterface> hatchOverride;
 	public LiftInterface lift;
@@ -366,7 +366,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createSpitter() {
 		if (!config.spitterIsPresent) {
-			spitter = new MockSpitter(log);
+			spitter = new MockShooter(log);
 			log.sub("Created a mock spitter!");
 			return;
 		}
@@ -374,14 +374,14 @@ public class Subsystems implements DashboardUpdater {
 		Motor spitterLeftMotor = MotorFactory.getSpitterMotor(config.spitterLeftCanID, true, true, log);
 		Motor spitterRightMotor = MotorFactory.getSpitterMotor(config.spitterRightCanID, true, false, log);
 		BooleanSupplier cargoSupplier = () -> spitterLeftMotor.isAtForwardLimit();
-		spitter = new Spitter(cargoSupplier, spitterLeftMotor, spitterRightMotor, dashboard, log);
+		spitter = new Shooter(cargoSupplier, spitterLeftMotor, spitterRightMotor, dashboard, log);
 	}
 
 	public void createSpitterOverride() {
 		// Setup the diagBox so that it can take control.
-		MockSpitter simulator = new MockSpitter(log);  // Nothing to simulate, use a mock instead.
-		MockSpitter mock = new MockSpitter(log);
-		spitterOverride = new OverridableSubsystem<SpitterInterface>("spitter", SpitterInterface.class, spitter, simulator, mock, log);
+		MockShooter simulator = new MockShooter(log);  // Nothing to simulate, use a mock instead.
+		MockShooter mock = new MockShooter(log);
+		spitterOverride = new OverridableSubsystem<ShooterInterface>("spitter", ShooterInterface.class, spitter, simulator, mock, log);
 		// Plumb accessing the spitter through the override.
 		spitter = spitterOverride.getNormalInterface();
 	}

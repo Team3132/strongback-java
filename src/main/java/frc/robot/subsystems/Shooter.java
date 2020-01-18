@@ -9,25 +9,23 @@ import org.strongback.components.Motor.ControlMode;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.SpitterInterface;
+import frc.robot.interfaces.ShooterInterface;
 import frc.robot.lib.Subsystem;
 
 /**
  * On the 2019 robot there are two spitter wheels that are under PID control for speed control.
  */
-public class Spitter extends Subsystem implements SpitterInterface, Executable, DashboardUpdater {
+public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
 
     private BooleanSupplier cargoSupplier;
 
-    private SpitterWheel left;
-    private SpitterWheel right;
+    private ShooterWheel flywheel;
 
-    public Spitter(BooleanSupplier cargoSupplier, Motor leftMotor, Motor rightMotor, DashboardInterface dashboard, Log log) {
+    public Shooter(BooleanSupplier cargoSupplier, Motor leftMotor, Motor rightMotor, DashboardInterface dashboard, Log log) {
         super("Spitter", dashboard, log);
         this.cargoSupplier = cargoSupplier;
-        left = new SpitterWheel("left", leftMotor);
-        right = new SpitterWheel("right", rightMotor);
-        log.register(false, () -> hasCargo(), "Spitter/beamBreakTripped");
+        flywheel = new ShooterWheel("flywheel", leftMotor);
+        log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
 
     }
 
@@ -35,35 +33,34 @@ public class Spitter extends Subsystem implements SpitterInterface, Executable, 
      * Set the duty cycle on the spitter wheels.
      */
     @Override
-    public SpitterInterface setTargetDutyCycle(double dutyCycle) { 
-        left.setTargetPower(dutyCycle);
-        right.setTargetPower(dutyCycle);
+    public ShooterInterface setTargetDutyCycle(double dutyCycle) { 
+        flywheel.setTargetPower(dutyCycle);
         return this;
     }
 
     @Override
     public double getTargetDutyCycle() {
-        return left.getTargetDutyCycle(); 
+        return flywheel.getTargetDutyCycle(); 
     }
 
     @Override
-    public boolean hasCargo(){
+    public boolean hasCell(){
         //System.out.println(cargoSupplier.getAsBoolean());
         return cargoSupplier.getAsBoolean();
     }
 
-    protected class SpitterWheel {
+    protected class ShooterWheel {
 
         private final Motor motor;
         private double targetDutyCycle;
     
-        public SpitterWheel(String name, Motor motor) {
+        public ShooterWheel(String name, Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> left.getTargetDutyCycle(), "Spitter/%s/dutyCycle", name)
-            .register(false, motor::getOutputVoltage, "Spitter/%s/outputVoltage", name)
-            .register(false, motor::getOutputPercent, "Spitter/%s/outputPercent", name)
-            .register(false, motor::getOutputCurrent, "Spitter/%s/outputCurrent", name);
+            log.register(false, () -> flywheel.getTargetDutyCycle(), "Shooter/%s/dutyCycle", name)
+            .register(false, motor::getOutputVoltage, "Shooter/%s/outputVoltage", name)
+            .register(false, motor::getOutputPercent, "Shooter/%s/outputPercent", name)
+            .register(false, motor::getOutputCurrent, "Shooter/%s/outputCurrent", name);
         }
         
         public void setTargetPower(double dutyCycle) {
@@ -75,12 +72,12 @@ public class Spitter extends Subsystem implements SpitterInterface, Executable, 
             // change the control mode from percent output, to avoid putting
             // unnecessary load on the battery and motor.
             if (dutyCycle == 0) { 
-                log.sub("Turning spitter wheel off.");
+                log.sub("Turning shooter wheel off.");
                 motor.set(ControlMode.PercentOutput, 0); 
             } else {
                 motor.set(ControlMode.PercentOutput, dutyCycle);
             }
-            log.sub("Setting spitter target duty cycle to %f", targetDutyCycle);
+            log.sub("Setting shooter target duty cycle to %f", targetDutyCycle);
         }
 
         public double getTargetDutyCycle() {
@@ -90,8 +87,8 @@ public class Spitter extends Subsystem implements SpitterInterface, Executable, 
 
     @Override
     public void updateDashboard() {
-        dashboard.putString("Spitter cargo status", hasCargo() ? "has cargo" : "no cargo");
-        dashboard.putNumber("Spitter duty cycle", left.getTargetDutyCycle());
+        dashboard.putString("Shooter cell status", hasCell() ? "has cell" : "no cell");
+        dashboard.putNumber("Shooter duty cycle", flywheel.getTargetDutyCycle());
     }
 }
 

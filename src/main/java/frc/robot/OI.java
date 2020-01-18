@@ -311,9 +311,9 @@ public class OI implements OIInterface {
 		*/
 
 		// Spitter overrides.
-		OverridableSubsystem<SpitterInterface> spitterOverride = subsystems.spitterOverride;
+		OverridableSubsystem<ShooterInterface> spitterOverride = subsystems.spitterOverride;
 	  // Get the interface that the diag box uses.
-		SpitterInterface spitterIF = spitterOverride.getOverrideInterface();
+		ShooterInterface spitterIF = spitterOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.SPITTER_DISABLE, OperatorBoxButtons.SPITTER_MANUAL, spitterOverride);
 	  // While the spitter speed button is pressed, set the target speed. Does not turn off.
