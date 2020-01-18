@@ -82,6 +82,12 @@ class Corner():
             self.xy = [X,Y]
             self.score = score
             
+TL_corner = Corner()
+TR_corner = Corner()
+BL_corner = Corner()
+BR_corner = Corner()
+            
+            
 
             
             
@@ -241,7 +247,6 @@ class FirstPython:
             approx = cv2.approxPolyDP(c, epsilon = self.epsilon * peri, closed = True)
             if len(approx) < 7 or len(approx) > 9: continue  # 8 vertices for a U shape
             str2 += "S" # Shape is ok
-            
 
             # Compute contour serr:
             serr = 100.0 * cv2.matchShapes(c, approx, cv2.CONTOURS_MATCH_I1, 0.0)
@@ -259,12 +264,9 @@ class FirstPython:
                
             if reject == 1: continue
             str2 += "M" # Margin ok
-           
             
-            TL_corner = Corner()
-            TR_corner = Corner()
-            BL_corner = Corner()            
-            BR_corner = Corner() 
+            
+       
             for point in c:
 
                 x = point[0][0]
@@ -276,12 +278,28 @@ class FirstPython:
                 BR_corner.update_score(x, y, +x + y)
 
             top = distance(TL_corner.xy[0],TL_corner.xy[1],TR_corner.xy[0], TR_corner.xy[1])
-            bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])     
-
-            if (top / bottom) < 1.3: continue
-            str2 += "r" #ratio is good
-                  
+            bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])
             
+            # Adding a bounding quadrilateral to each contour with an offset
+
+            offset = 5
+
+          
+             
+             #rect = cv.minAreaRect(np.array([TL_corner.xy, TR_corner.xy, BL_corner.xy, BR_corner.xy]))
+             #box = cv.boxPoints(rect)
+             #box = np.int0(box)
+             
+             #foundcontours = cv2.findcontours(, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+            
+             
+
+          
+        
+            
+
+
+            str2 += str(int(top - bottom))
           
             # Re-order the 4 points in the hull if needed: In the pose estimation code, we will assume vertices ordered
             # as follows:
@@ -420,24 +438,8 @@ class FirstPython:
 
             # Round all the coordinates and cast to int for drawing:
             cu = np.rint(cu)
-            
-            TL_corner = Corner()
-            TR_corner = Corner()
-            BL_corner = Corner()            
-            BR_corner = Corner()
-            
-            for hull in hlist:
-                
-                for point in hull:
-
-                    x = point[0][0]
-                    y = point[0][1]
-
-                    TL_corner.update_score(x, y, -x - y)
-                    TR_corner.update_score(x, y, +x - y)
-                    BL_corner.update_score(x, y, -x + y)
-                    BR_corner.update_score(x, y, +x + y)
-
+          
+         
                             
             jevois.drawLine(outimg, int(TL_corner.xy[0]),int(TL_corner.xy[1]),int(TR_corner.xy[0]), int(TR_corner.xy[1]),
                             1, jevois.YUYV.LightGreen)
@@ -516,3 +518,5 @@ class FirstPython:
     
         # We are done with the output, ready to send it to host over USB:
         outframe.send()
+
+
