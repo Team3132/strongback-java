@@ -275,8 +275,12 @@ class FirstPython:
                 BL_corner.update_score(x, y, -x + y)
                 BR_corner.update_score(x, y, +x + y)
 
+            # check top/bottom
             top = distance(TL_corner.xy[0],TL_corner.xy[1],TR_corner.xy[0], TR_corner.xy[1])
             bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])     
+
+            # check left & right angle
+            
 
             if (top / bottom) < 1.3: continue
             str2 += "r" #ratio is good  
@@ -293,32 +297,32 @@ class FirstPython:
 
             # v10+v23 should be pointing outward the U more than v03+v12 is:
             
-            # v10p23 = complex(hull[0][0,0] - hull[1][0,0] + hull[3][0,0] - hull[2][0,0],
-            #                  hull[0][0,1] - hull[1][0,1] + hull[3][0,1] - hull[2][0,1])
-            # len10p23 = abs(v10p23)
-            # v03p12 = complex(hull[3][0,0] - hull[0][0,0] + hull[2][0,0] - hull[1][0,0],
-            #                  hull[3][0,1] - hull[0][0,1] + hull[2][0,1] - hull[1][0,1])
-            # len03p12 = abs(v03p12)
+            v10p23 = complex(hull[0][0,0] - hull[1][0,0] + hull[3][0,0] - hull[2][0,0],
+                             hull[0][0,1] - hull[1][0,1] + hull[3][0,1] - hull[2][0,1])
+            len10p23 = abs(v10p23)
+            v03p12 = complex(hull[3][0,0] - hull[0][0,0] + hull[2][0,0] - hull[1][0,0],
+                             hull[3][0,1] - hull[0][0,1] + hull[2][0,1] - hull[1][0,1])
+            len03p12 = abs(v03p12)
 
-            # # Vector from centroid of U shape to centroid of its hull should also point outward of the U:
-            # momC = cv2.moments(c)
-            # momH = cv2.moments(hull)
-            # vCH = complex(momH['m10'] / momH['m00'] - momC['m10'] / momC['m00'],
-            #               momH['m01'] / momH['m00'] - momC['m01'] / momC['m00'])
-            # lenCH = abs(vCH)
+            # Vector from centroid of U shape to centroid of its hull should also point outward of the U:
+            momC = cv2.moments(c)
+            momH = cv2.moments(hull)
+            vCH = complex(momH['m10'] / momH['m00'] - momC['m10'] / momC['m00'],
+                          momH['m01'] / momH['m00'] - momC['m01'] / momC['m00'])
+            lenCH = abs(vCH)
 
-            # if len10p23 < 0.1 or len03p12 < 0.1 or lenCH < 0.1: continue
-            # str2 += "V" # Shape vectors ok
+            if len10p23 < 0.1 or len03p12 < 0.1 or lenCH < 0.1: continue
+            str2 += "V" # Shape vectors ok
 
-            # good = (v10p23.real * vCH.real + v10p23.imag * vCH.imag) / (len10p23 * lenCH)
-            # bad = (v03p12.real * vCH.real + v03p12.imag * vCH.imag) / (len03p12 * lenCH)
+            good = (v10p23.real * vCH.real + v10p23.imag * vCH.imag) / (len10p23 * lenCH)
+            bad = (v03p12.real * vCH.real + v03p12.imag * vCH.imag) / (len03p12 * lenCH)
 
-            # # We reject upside-down detections as those are likely to be spurious:
-            # if vCH.imag >= -2.0: continue
-            # str2 += "U" # U shape is upright
+            # We reject upside-down detections as those are likely to be spurious:
+            if vCH.imag >= -2.0: continue
+            str2 += "U" # U shape is upright
         
-            # # Fixup the ordering of the vertices if needed:
-            # if bad > good: hull = np.roll(hull, shift = 1, axis = 0)
+            # Fixup the ordering of the vertices if needed:
+            if bad > good: hull = np.roll(hull, shift = 1, axis = 0)
                 
             # This detection is a keeper:
             str2 += " OK"
