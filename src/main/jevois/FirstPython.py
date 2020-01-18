@@ -279,8 +279,8 @@ class FirstPython:
             bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])     
 
             if (top / bottom) < 1.3: continue
-            str2 += "r" #ratio is good
-                  
+            str2 += "r" #ratio is good  
+       
             
           
             # Re-order the 4 points in the hull if needed: In the pose estimation code, we will assume vertices ordered
