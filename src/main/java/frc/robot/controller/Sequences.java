@@ -328,8 +328,29 @@ public class Sequences {
 		return seq;
 	}
 
+	public static Sequence setHeight() {
+		Sequence seq = new Sequence("set climb height");
+		seq.add().setHeight(2);
+		return seq;
+	}
+
+	public static Sequence holdHeight() {
+		Sequence seq = new Sequence("hold climb");
+		seq.add().holdHeight();
+		return seq;
+	}
+
+	public static Sequence stopClimber() {
+		Sequence seq = new Sequence("stop climb");
+		seq.add().stopClimber();
+		return seq;
+	}
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
+		setHeight(),
+		holdHeight(),
+		stopClimber(),
 		getEmptySequence(), 
 		getStartSequence(), 
 		getResetSequence(),
