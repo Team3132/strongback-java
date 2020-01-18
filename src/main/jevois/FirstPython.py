@@ -385,7 +385,7 @@ class FirstPython:
     # ###################################################################################################
     ## Draw all detected objects in 3D
     def drawDetections(self, outimg, hlist, rvecs = None, tvecs = None):
-        # Show trihedron and parallelepiped centered on object:
+        """# Show trihedron and parallelepiped centered on object:
         hw = self.owm * 0.5
         hh = self.ohm * 0.5
         dd = -max(hw, hh)
@@ -419,30 +419,34 @@ class FirstPython:
             cu, jac2 = cv2.projectPoints(cubePoints, rvecs[i], tvecs[i], self.camMatrix, self.distCoeffs)
 
             # Round all the coordinates and cast to int for drawing:
-            cu = np.rint(cu)
+            cu = np.rint(cu)"""
             
-            TL_corner = Corner()
-            TR_corner = Corner()
-            BL_corner = Corner()            
-            BR_corner = Corner()
-            
-            for hull in hlist:
-                
-                for point in hull:
+        TL_corner = Corner()
+        TR_corner = Corner()
+        BL_corner = Corner()
+        BR_corner = Corner()
 
-                    x = point[0][0]
-                    y = point[0][1]
+        for hull in hlist:
 
-                    TL_corner.update_score(x, y, -x - y)
-                    TR_corner.update_score(x, y, +x - y)
-                    BL_corner.update_score(x, y, -x + y)
-                    BR_corner.update_score(x, y, +x + y)
+            for point in hull:
 
-                            
-            jevois.drawLine(outimg, int(TL_corner.xy[0]),int(TL_corner.xy[1]),int(TR_corner.xy[0]), int(TR_corner.xy[1]),
+                x = point[0][0]
+                y = point[0][1]
+
+                TL_corner.update_score(x, y, -x - y)
+                TR_corner.update_score(x, y, +x - y)
+                BL_corner.update_score(x, y, -x + y)
+                BR_corner.update_score(x, y, +x + y)
+
+        try:
+            jevois.drawLine(outimg, int(TL_corner.xy[0]), int(TL_corner.xy[1]), int(TR_corner.xy[0]),
+                            int(TR_corner.xy[1]),
                             1, jevois.YUYV.LightGreen)
+        except:
+            print("Empty Corner Value")
 
-            i += 1
+
+        #i += 1
             
     # ###################################################################################################
     ## Process function with no USB output

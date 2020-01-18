@@ -11,8 +11,8 @@ setcam bluebal 255
 setcam gain 16
 setcam absexp 500
 setcam brightness -1
-setcam contrast 3
-setcam saturation 3
+setcam contrast 0
+setcam saturation 4
 setcam sharpness 20
 
 # Send info log messages to None, Hard, or USB serial port - useful for debugging:
