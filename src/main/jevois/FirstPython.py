@@ -24,7 +24,7 @@ import math # for cos, sin, etc
 # This module is a simplified version of the C++ module \jvmod{FirstVision}. It is available with \jvversion{1.6.2} or
 # later.
 #
-# This module implements a simple color-based object detector using OpenCV in Python. Its main goal is to also
+# This module implements a simple color-based object detectojr using OpenCV in Python. Its main goal is to also
 # demonstrate full 6D pose recovery of the detected object, in Python.
 #
 # This module isolates pixels within a given HSV range (hue, saturation, and value of color pixels), does some cleanups,
