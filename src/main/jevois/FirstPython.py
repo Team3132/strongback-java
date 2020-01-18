@@ -445,11 +445,22 @@ class FirstPython:
                 BR_corner.update_score(x, y, +x + y)
 
         try:
+            # Draw top line of trapezium
             jevois.drawLine(outimg, int(TL_corner.xy[0]), int(TL_corner.xy[1]), int(TR_corner.xy[0]),
                             int(TR_corner.xy[1]),
                             1, jevois.YUYV.LightGreen)
+
+            # Draw dots on four corners
+            jevois.drawLine(outimg, int(TL_corner.xy[0]), int(TL_corner.xy[1]), int(TL_corner.xy[0]), int(TL_corner.xy[1]), 3, jevois.YUYV.White)
+            jevois.drawLine(outimg, int(TR_corner.xy[0]), int(TR_corner.xy[1]), int(TR_corner.xy[0]), int(TR_corner.xy[1]), 3, jevois.YUYV.White)
+            jevois.drawLine(outimg, int(BL_corner.xy[0]), int(BL_corner.xy[1]), int(BL_corner.xy[0]), int(BL_corner.xy[1]), 3, jevois.YUYV.White)
+            jevois.drawLine(outimg, int(BR_corner.xy[0]), int(BR_corner.xy[1]), int(BR_corner.xy[0]), int(BR_corner.xy[1]), 3, jevois.YUYV.White)
+
         except:
             print("Empty Corner Value")
+
+        print(TL_corner.xy)
+
 
 
         #i += 1
