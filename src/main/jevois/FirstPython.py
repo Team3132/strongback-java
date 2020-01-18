@@ -281,7 +281,6 @@ class FirstPython:
 
             # check left & right angle
 
-            # left
             lratio = (BL_corner.xy[0] - TL_corner.xy[0])/(BL_corner.xy[1] - TL_corner.xy[1])
             rratio = (BR_corner.xy[0] - TR_corner.xy[0])/(BR_corner.xy[1] - TR_corner.xy[1])
 
