@@ -328,101 +328,6 @@ public class Sequences {
 		return seq;
 	}
 
-	/** 
-	 * Climber Levels 2/3
-	 * 
-	 * There are six buttons (button level 2/level 3):
-	 * On The RIGHT driver's joystick
-	 * Step 1: Press and hold button 11/12; lift comes down and we start to climb to the appropriate height
-	 * Step 2: Release button 11/12: climbing stops when the button is released (and also if the height was reached)
-	 * Step 3: Press and hold button 9/10: we start driving towards the platform on the stilts
-	 * Step 4: Release button 9/10: we stop driving towards the platform
-	 * Step 5: Press and hold button 7/8: we start retracting the rear stilts
-	 * Step 6: Release button 7/8: we stop retracting the rear stilts
-	 * On The LEFT driver's joystick
-	 * Step 1: Press and hold button 11/12; we start driving towards the platform on the stilts
-	 * Step 2: Release button 11/12: we stop driving towards the platform
-	 * Step 3: Press and hold button 9/10: we start retracting the front stilts
-	 * Step 4: Release button 9/10: we stop retracting the front stilts
-	 * Step 5: Press and hold button 7/8: we start driving towards the platform on the stilts
-	 * Step 6: Release button 7/8: we stop driving towards the platform
-	 * 
-	 * Button 3 on the driver's right joystick will try and retract BOTh stilts, i.e. bring the robot back down if incorrectly raised.
-	 * 
-	 * The CG of the robot should keep it on the platfom. if this is not correct we need to modify this pattern.
-	 * 
-	 * For L3 we use the button sequence 
-	 */
-
-	public static Sequence startLevel2climb() { // Stage 1 of L2 Climb: Raise both winchs & drive towards platform (12)
-		Sequence seq = new Sequence("start level 2 climb");
-		seq.add().retractLift(); 
-		// seq.add().setLiftHeight(LIFT_BOTTOM_HEIGHT); // Need to be lowest lift height to climb
-		seq.add().setBothHeight(CLIMBER_L2_CLIMB_HEIGHT); // Front winch goes up to L2 height.
-		// Keep Climbing until the driver releases the button.
-		return seq;
-	}
-	
-	public static Sequence startLevel3climb() { // Stage 1 of L3 Climb: Raise both winchs & drive towards platform (10)
-		Sequence seq = new Sequence("start level 3 climb");
-		seq.add().retractLift(); 
-		// seq.add().setLiftHeight(LIFT_BOTTOM_HEIGHT); // Need to be lowest lift height to climb
-		seq.add().setBothHeight(CLIMBER_L3_CLIMB_HEIGHT); // Front winch goes up to L3 height.
-		// Keep Climbing until the driver releases the button.
-		return seq;
-	}
-	
-	public static Sequence stopLevelNclimb() { // Stage 1 of L2 Climb: stop the climb
-		Sequence seq = new Sequence("stop level N climb");
-		seq.add().stopBothHeight(); // Front winch goes up to L2 height.
-		return seq;
-	}
-
-	public static Sequence startLevelDriveForward() { // Start Driving forward as part of L2/3 Stage 1 (L9)
-		Sequence seq = new Sequence("start level drive forward");
-		seq.add().setDrivebasePower(-DRIVEBASE_L3_DRIVE_SLOW_POWER).setClimberDriveSpeed(CLIMBER_DRIVE_POWER);
-		return seq;
-	}
-
-	public static Sequence startLevelDriveBackward() { // Start Driving backward as part of L2/3 Stage 1 (L11)
-		Sequence seq = new Sequence("start level drive backward");
-		// seq.add().setDriveSpeed(-CLIMBER_DRIVE_POWER);
-		// seq.add().setDelayDelta(0.05);
-		// seq.add().setDriveBaseSpeed(-DRIVEBASE_CLIMBER_DRIVE_POWER);
-		seq.add().setDrivebasePower(-DRIVEBASE_CLIMBER_DRIVE_SPEED).setClimberDriveSpeed(-CLIMBER_DRIVE_POWER);
-		return seq;
-	}
-
-	public static Sequence stopLevelDrive() { // Stage 2 of L2/3 Climb: stop driving
-		Sequence seq = new Sequence("stop level drive");
-		seq.add().setDrivebasePower(0).setClimberDriveSpeed(0);
-		return seq;
-	}
-
-	public static Sequence startFrontRaise() { // (9)
-		Sequence seq = new Sequence("start front raise");
-		seq.add().setFrontHeight(0); // Front winch retracts.
-		return seq;
-	}
-
-	public static Sequence startRearRaise() { // (11)
-		Sequence seq = new Sequence("start front raise");
-		seq.add().deployIntake();
-		seq.add().setRearHeight(0); // Rear winch retracts.
-		return seq;
-	}
-	
-	public static Sequence abortLevelStage() { // Abort the climb - bring both winches back to home. Stop driving.
-		Sequence seq = new Sequence("abort level climb");
-		seq.add().retractLift(); 
-		seq.add().setLiftHeight(LIFT_DEFAULT_MIN_HEIGHT); // Need to be lowest lift height during climb
-		seq.add().setClimberDriveSpeed(0); // Turn off stilt driving.
-		seq.add().setDelayDelta(0.05);
-		seq.add().setDrivebasePower(0); // Stop drivebase just in case.
-		seq.add().setBothHeight(0); // Winches go back to ground level
-		return seq;
-	}
-
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
 		getEmptySequence(), 
@@ -444,11 +349,6 @@ public class Sequences {
 		getReadyHatchSequence(),
 		liftDeploy(),
 		liftRetract(),
-		startLevel2climb(),
-		startLevelDriveForward(),
-		stopLevelDrive(),
-		startFrontRaise(),
-		abortLevelStage(),
 		getMicroAdjustUpSequence(), 
 		getMicroAdjustDownSequence(), 
 		getDriveToWaypointSequence(0, 12, 0)

@@ -15,13 +15,9 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
         }
 
         public enum Type{
-            SET_FRONT_HEIGHT, 
-            SET_REAR_HEIGHT,
-            SET_BOTH_HEIGHT,
-            STOP_BOTH_HEIGHT,
-            SET_DRIVE_SPEED,
-            OVERRIDE_FRONT_PERCENT_OUTPUT,
-            OVERRIDE_REAR_PERCENT_OUTPUT
+            SET_HEIGHT, 
+            HOLD_HEIGHT,
+            STOP_CLIMBER,
         }
 
         @Override

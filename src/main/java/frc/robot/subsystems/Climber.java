@@ -12,103 +12,41 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
-/**
- * Implements the climber subsystem. TODO: Description
- * 
- * There are three parts to the subsystem:
- *   1) A pair of front stilts, driven by a single winch with an encoder and two hall
- *      effect sensors to detect when the stilt is fully retracted. Either sensor triggered
- *      indicates that the lift is high enough.
- *   2) A pair of rear stilts, driven by a single winch with an encoder and two hall
- *      effect sensors to detect when the stilt is fully retracted. Either sensor triggered
- *      indicates that the lift is high enough.
- *   3) Both lots of stilts also have wheels, but the rear ones are powered by a single
- *      motor.
- * 
- * This class expects to be given a configured motors for the two winches
- * and the drive wheels.
- */
 public class Climber extends Subsystem implements ClimberInterface, Executable, DashboardUpdater {
 
-    private Winch frontWinch;  // Controls the front stilts.
-    private Winch rearWinch;  // Controls the rear stilts.
-    private Motor wheelMotor;  // The powered wheels on the rear stilts.
+    private Winch climbWinch;  // Controls the front stilts.
     private ClimberAction action;
     private boolean holding = false;
 
-    public Climber(Motor frontWinchMotor, Motor rearWinchMotor,
-                      Motor wheelMotor, DashboardInterface dashboard, Log log) {
+    public Climber(Motor WinchMotor, DashboardInterface dashboard, Log log) {
         super("Climber", dashboard, log);   
-        this.frontWinch = new Winch("climber:Front", frontWinchMotor, dashboard, log);
-        this.rearWinch = new Winch("climber:Rear", rearWinchMotor, dashboard, log);
-        this.wheelMotor = wheelMotor;
-        setDesiredAction(new ClimberAction(Type.SET_BOTH_HEIGHT, 0));
+        this.climbWinch = new Winch("climber:", WinchMotor, dashboard, log);
+        setDesiredAction(new ClimberAction(Type.HOLD_HEIGHT, 0));
     }
 
     @Override
     public boolean isInPosition() {
-        return frontWinch.isInPosition() && rearWinch.isInPosition();
+        return climbWinch.isInPosition();
     }
 
     @Override
     public void execute(long timeInMillis) {
-        if (action.type != Type.STOP_BOTH_HEIGHT) {
+        if (action.type != Type.STOP_CLIMBER) {
             holding = false;
         }
         switch (action.type) {
-            case SET_FRONT_HEIGHT:
-                frontWinch.setTargetHeight(action.value);
+            case SET_HEIGHT:
+                climbWinch.setTargetHeight(action.value);
                 break;
-            case SET_REAR_HEIGHT:
-                rearWinch.setTargetHeight(action.value);
-                break;
-            case STOP_BOTH_HEIGHT:
+            case HOLD_HEIGHT:
                 if (!holding) {
-                    frontWinch.setTargetHeight(frontWinch.getActualHeight());
-                    rearWinch.setTargetHeight(rearWinch.getActualHeight());
+                    climbWinch.setTargetHeight(climbWinch.getActualHeight());
                 }
                 holding = true;
                 break;
-            case SET_BOTH_HEIGHT:
-                double targetHeight = action.value;
-                // Calculate if both winches are within max offset distance - i.e. safe to move.
-                if (Math.abs(frontWinch.getActualHeight() - rearWinch.getActualHeight()) > Constants.MAX_WINCH_PAIR_OFFSET) {
-                    // Log an error if the winches are not at safe heights. 
-                    log.error("%s: Not moving winches; winches did not begin at same height", name);
-                    return;
-                }
-                // Both winches are currently within 20mm of each other.
-                // Get the lowest & highest heights from both winches.
-                double lowestHeight = Math.min(frontWinch.getActualHeight(), rearWinch.getActualHeight());
-                double highestHeight = Math.max(frontWinch.getActualHeight(), rearWinch.getActualHeight());
-
-                // Calculate if deploying or retracting, and use the appropriate target height.
-                boolean goingUp = targetHeight > frontWinch.getTargetHeight();
-                if (goingUp){
-                    // Climber is going up; Target height is greater than current height.
-                    // Set the target height for faster winch to be 10mm above the slowest one.
-                    targetHeight = Math.min(lowestHeight + 20./25.4,targetHeight);
-                } else {
-                    // Climber is going down; Target height is lower than current height.
-                    // Note: Also applicable if Target height is equal to current height, but will not move climber.
-                    // Set the target height for faster winch to be 10mm below the slowest one.
-                    targetHeight = Math.max(highestHeight - 20./25.4, targetHeight);
-                }
-                
-                // Tell both winches their new target heights.
-                frontWinch.setTargetHeight(targetHeight);
-                rearWinch.setTargetHeight(targetHeight);
-                
-                break;
-            case SET_DRIVE_SPEED:
-                wheelMotor.set(ControlMode.PercentOutput, action.value);
-                break;
-            case OVERRIDE_FRONT_PERCENT_OUTPUT:
-                frontWinch.setMotorPower(action.value);
-                break;
-            case OVERRIDE_REAR_PERCENT_OUTPUT:
-                rearWinch.setMotorPower(action.value);
-                break;
+            case STOP_CLIMBER:
+                climbWinch.setMotorPower(0);
+                break;                
             default:
                 log.error("%s: Unknown Type %s", name, action.type);
                 break;
@@ -121,8 +59,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
      */
 	@Override
 	public void updateDashboard() {
-        frontWinch.updateDashboard();
-        rearWinch.updateDashboard();
+        climbWinch.updateDashboard();
         dashboard.putString("Climber type", action.type.toString());
     }
     

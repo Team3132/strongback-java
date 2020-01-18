@@ -270,28 +270,18 @@ public class State {
 
 
 	// Climber
-	public State setFrontHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_FRONT_HEIGHT, height);
+	public State setHeight(double height) {
+		climber = new ClimberAction(ClimberAction.Type.SET_HEIGHT, height);
 		return this;
 	}
 
-	public State stopBothHeight() {
-		climber = new ClimberAction(ClimberAction.Type.STOP_BOTH_HEIGHT, 0);
+	public State holdHeight() {
+		climber = new ClimberAction(ClimberAction.Type.HOLD_HEIGHT, 0);
 		return this;
 	}
 
-	public State setRearHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_REAR_HEIGHT, height);
-		return this;
-	}
-
-	public State setBothHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
-		return this;
-	}
-
-	public State setClimberDriveSpeed(double speed) {
-		climber = new ClimberAction(ClimberAction.Type.SET_DRIVE_SPEED, speed);
+	public State stopClimber() {
+		climber = new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0);
 		return this;
 	}
 

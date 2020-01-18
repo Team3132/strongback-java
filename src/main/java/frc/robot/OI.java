@@ -100,63 +100,6 @@ public class OI implements OIInterface {
 
 		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
 		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
-
-		// tell the climber to go back down
-		// Right Stick
-		onTriggered(rightStick.getButton(5), Sequences.abortLevelStage());
-		onUntriggered(rightStick.getButton(5), Sequences.stopLevelNclimb());
-
-		// Level 3 sequence of buttons
-		onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
-		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
-
-		onTriggered(rightStick.getButton(10), Sequences.startLevelDriveForward());
-		onUntriggered(rightStick.getButton(10), Sequences.stopLevelDrive());
-
-		onTriggered(rightStick.getButton(8), Sequences.startRearRaise());
-		onUntriggered(rightStick.getButton(8), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(12), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());
-
-		onTriggered(leftStick.getButton(10), Sequences.startFrontRaise());
-		onUntriggered(leftStick.getButton(10), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(8), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(8), Sequences.stopLevelDrive());
-
-		// Level 2 sequence of buttons
-
-		onTriggered(rightStick.getButton(11), Sequences.startLevel2climb());
-		onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
-
-		onTriggered(rightStick.getButton(9), Sequences.startLevelDriveForward());
-		onUntriggered(rightStick.getButton(9), Sequences.stopLevelDrive());
-
-		onTriggered(rightStick.getButton(7), Sequences.startRearRaise());
-		onUntriggered(rightStick.getButton(7), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(11), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(11), Sequences.stopLevelDrive());
-
-		onTriggered(leftStick.getButton(9), Sequences.startFrontRaise());
-		onUntriggered(leftStick.getButton(9), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(7), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(7), Sequences.stopLevelDrive());
-
-		//onTriggered(rightStick.getButton(9), Sequences.startFrontRaise());
-		//onUntriggered(rightStick.getButton(9), Sequences.stopLevelNclimb());
-
-		//onTriggered(rightStick.getButton(11), Sequences.startRearRaise());
-		//onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
-
-
-		//onTriggered(leftStick.getButton(9), Sequences.startLevelDriveForward());
-		//onUntriggered(leftStick.getButton(9), Sequences.stopLevelDrive());
-
-		//onTriggered(leftStick.getButton(11), Sequences.startLevelDriveBackward());
-		//onUntriggered(leftStick.getButton(11), Sequences.stopLevelDrive());
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
@@ -326,26 +269,6 @@ public class OI implements OIInterface {
 		ClimberInterface climberIF = climberOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.CLIMBER_DISABLE, OperatorBoxButtons.CLIMBER_MANUAL, climberOverride);
-	  // Override front stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_FRONT_HEIGHT), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_FRONT_HEIGHT,
-				scaleStiltsPotHeight(box.getAxis(OperatorBoxButtons.CLIMBER_POT).read()))));
-	  // Override rear stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_REAR_HEIGHT), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_REAR_HEIGHT,
-				scaleStiltsPotHeight(box.getAxis(OperatorBoxButtons.CLIMBER_POT).read()))));
-		// Override both front and rear stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_BOTH_HEIGHT),
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT,
-				scaleStiltsPotHeight(box.getAxis(OperatorBoxButtons.CLIMBER_POT).read()))));
-	  // Override stilts driving power.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_DRIVE_SPEED), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_DRIVE_SPEED,
-				box.getAxis(OperatorBoxButtons.CLIMBER_POT).read())));
 
 		// Intake overrides.
 		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
