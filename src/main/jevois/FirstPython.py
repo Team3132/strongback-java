@@ -82,8 +82,14 @@ class Corner():
             self.xy = [X,Y]
             self.score = score
             
+
+            
             
 class FirstPython:
+    
+         # Define each of the four corners as a Corner() class object
+      
+
 
     # ###################################################################################################
     ## Constructor
@@ -201,6 +207,7 @@ class FirstPython:
         
         # Identify the "good" objects:
         for c in contours:
+            
                   
             # Keep track of our best detection so far:
             if len(str2) > len(beststr2): beststr2 = str2
@@ -217,10 +224,13 @@ class FirstPython:
             # Is it the right shape?
             if (hull.shape != (4,1,2)): continue # 4 vertices for the rectangular convex outline (shows as a trapezoid)
             str2 += "H" # Hull is quadrilateral
+            
           
             huarea = cv2.contourArea(hull, oriented = False)
             if huarea < self.hullarea[0] or huarea > self.hullarea[1]: continue
             str2 += "A" # Hull area ok
+            
+            print(huarea)
           
             hufill = area / huarea * 100.0
             if hufill > self.hullfill: continue
@@ -231,6 +241,7 @@ class FirstPython:
             approx = cv2.approxPolyDP(c, epsilon = self.epsilon * peri, closed = True)
             if len(approx) < 7 or len(approx) > 9: continue  # 8 vertices for a U shape
             str2 += "S" # Shape is ok
+            
 
             # Compute contour serr:
             serr = 100.0 * cv2.matchShapes(c, approx, cv2.CONTOURS_MATCH_I1, 0.0)
@@ -248,14 +259,14 @@ class FirstPython:
                
             if reject == 1: continue
             str2 += "M" # Margin ok
-
-            # Define each of the four corners as a Corner() class object
+           
+            
             TL_corner = Corner()
             TR_corner = Corner()
-            BL_corner = Corner()
-            BR_corner = Corner()
-
+            BL_corner = Corner()            
+            BR_corner = Corner() 
             for point in c:
+
                 x = point[0][0]
                 y = point[0][1]
 
@@ -265,14 +276,16 @@ class FirstPython:
                 BR_corner.update_score(x, y, +x + y)
 
             top = distance(TL_corner.xy[0],TL_corner.xy[1],TR_corner.xy[0], TR_corner.xy[1])
-            bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])
+            bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])     
 
-
-            str2 += str(top - bottom)
+            if (top / bottom) < 1.3: continue
+            str2 += "r" #ratio is good  
+       
+            
           
             # Re-order the 4 points in the hull if needed: In the pose estimation code, we will assume vertices ordered
             # as follows:
-            
+            #
             #    0|        |3
             #     |        |
             #     |        |
@@ -280,32 +293,32 @@ class FirstPython:
 
             # v10+v23 should be pointing outward the U more than v03+v12 is:
             
-            v10p23 = complex(hull[0][0,0] - hull[1][0,0] + hull[3][0,0] - hull[2][0,0],
-                             hull[0][0,1] - hull[1][0,1] + hull[3][0,1] - hull[2][0,1])
-            len10p23 = abs(v10p23)
-            v03p12 = complex(hull[3][0,0] - hull[0][0,0] + hull[2][0,0] - hull[1][0,0],
-                             hull[3][0,1] - hull[0][0,1] + hull[2][0,1] - hull[1][0,1])
-            len03p12 = abs(v03p12)
+            # v10p23 = complex(hull[0][0,0] - hull[1][0,0] + hull[3][0,0] - hull[2][0,0],
+            #                  hull[0][0,1] - hull[1][0,1] + hull[3][0,1] - hull[2][0,1])
+            # len10p23 = abs(v10p23)
+            # v03p12 = complex(hull[3][0,0] - hull[0][0,0] + hull[2][0,0] - hull[1][0,0],
+            #                  hull[3][0,1] - hull[0][0,1] + hull[2][0,1] - hull[1][0,1])
+            # len03p12 = abs(v03p12)
 
-            # Vector from centroid of U shape to centroid of its hull should also point outward of the U:
-            momC = cv2.moments(c)
-            momH = cv2.moments(hull)
-            vCH = complex(momH['m10'] / momH['m00'] - momC['m10'] / momC['m00'],
-                          momH['m01'] / momH['m00'] - momC['m01'] / momC['m00'])
-            lenCH = abs(vCH)
+            # # Vector from centroid of U shape to centroid of its hull should also point outward of the U:
+            # momC = cv2.moments(c)
+            # momH = cv2.moments(hull)
+            # vCH = complex(momH['m10'] / momH['m00'] - momC['m10'] / momC['m00'],
+            #               momH['m01'] / momH['m00'] - momC['m01'] / momC['m00'])
+            # lenCH = abs(vCH)
 
-            if len10p23 < 0.1 or len03p12 < 0.1 or lenCH < 0.1: continue
-            str2 += "V" # Shape vectors ok
+            # if len10p23 < 0.1 or len03p12 < 0.1 or lenCH < 0.1: continue
+            # str2 += "V" # Shape vectors ok
 
-            good = (v10p23.real * vCH.real + v10p23.imag * vCH.imag) / (len10p23 * lenCH)
-            bad = (v03p12.real * vCH.real + v03p12.imag * vCH.imag) / (len03p12 * lenCH)
+            # good = (v10p23.real * vCH.real + v10p23.imag * vCH.imag) / (len10p23 * lenCH)
+            # bad = (v03p12.real * vCH.real + v03p12.imag * vCH.imag) / (len03p12 * lenCH)
 
-            # We reject upside-down detections as those are likely to be spurious:
-            if vCH.imag >= -2.0: continue
-            str2 += "U" # U shape is upright
+            # # We reject upside-down detections as those are likely to be spurious:
+            # if vCH.imag >= -2.0: continue
+            # str2 += "U" # U shape is upright
         
-            # Fixup the ordering of the vertices if needed:
-            if bad > good: hull = np.roll(hull, shift = 1, axis = 0)
+            # # Fixup the ordering of the vertices if needed:
+            # if bad > good: hull = np.roll(hull, shift = 1, axis = 0)
                 
             # This detection is a keeper:
             str2 += " OK"
@@ -407,31 +420,26 @@ class FirstPython:
 
             # Round all the coordinates and cast to int for drawing:
             cu = np.rint(cu)
-          
-            # Draw parallelepiped lines:
-            jevois.drawLine(outimg, int(cu[0][0,0]), int(cu[0][0,1]), int(cu[1][0,0]), int(cu[1][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[1][0,0]), int(cu[1][0,1]), int(cu[2][0,0]), int(cu[2][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[2][0,0]), int(cu[2][0,1]), int(cu[3][0,0]), int(cu[3][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[3][0,0]), int(cu[3][0,1]), int(cu[0][0,0]), int(cu[0][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[4][0,0]), int(cu[4][0,1]), int(cu[5][0,0]), int(cu[5][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[5][0,0]), int(cu[5][0,1]), int(cu[6][0,0]), int(cu[6][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[6][0,0]), int(cu[6][0,1]), int(cu[7][0,0]), int(cu[7][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[7][0,0]), int(cu[7][0,1]), int(cu[4][0,0]), int(cu[4][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[0][0,0]), int(cu[0][0,1]), int(cu[4][0,0]), int(cu[4][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[1][0,0]), int(cu[1][0,1]), int(cu[5][0,0]), int(cu[5][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[2][0,0]), int(cu[2][0,1]), int(cu[6][0,0]), int(cu[6][0,1]),
-                            1, jevois.YUYV.LightGreen)
-            jevois.drawLine(outimg, int(cu[3][0,0]), int(cu[3][0,1]), int(cu[7][0,0]), int(cu[7][0,1]),
+            
+            TL_corner = Corner()
+            TR_corner = Corner()
+            BL_corner = Corner()            
+            BR_corner = Corner()
+            
+            for hull in hlist:
+                
+                for point in hull:
+
+                    x = point[0][0]
+                    y = point[0][1]
+
+                    TL_corner.update_score(x, y, -x - y)
+                    TR_corner.update_score(x, y, +x - y)
+                    BL_corner.update_score(x, y, -x + y)
+                    BR_corner.update_score(x, y, +x + y)
+
+                            
+            jevois.drawLine(outimg, int(TL_corner.xy[0]),int(TL_corner.xy[1]),int(TR_corner.xy[0]), int(TR_corner.xy[1]),
                             1, jevois.YUYV.LightGreen)
 
             i += 1
@@ -496,7 +504,9 @@ class FirstPython:
 
         # Send all serial messages:
         self.sendAllSerial(w, h, hlist, rvecs, tvecs)
-
+        
+        #cv2.drawContours(outimg, [foundcontours], 0, (255, 0, 0), 2)
+    
         # Draw all detections in 3D:
         self.drawDetections(outimg, hlist, rvecs, tvecs)
 
