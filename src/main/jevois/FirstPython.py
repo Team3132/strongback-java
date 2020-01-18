@@ -280,10 +280,13 @@ class FirstPython:
             bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])     
 
             # check left & right angle
-            
 
-            if (top / bottom) < 1.3: continue
-            str2 += "r" #ratio is good  
+            # left
+            lratio = (BL_corner.xy[0] - TL_corner.xy[0])/(BL_corner.xy[1] - TL_corner.xy[1])
+            rratio = (BR_corner.xy[0] - TR_corner.xy[0])/(BR_corner.xy[1] - TR_corner.xy[1])
+
+            if (top / bottom) < 1.3 or lratio > 0.6 or rratio < -1: continue
+            str2 += "R" #ratio is good  
        
             
           
