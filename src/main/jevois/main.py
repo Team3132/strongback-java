@@ -101,8 +101,15 @@ class FirstPython:
         # S: 0 for unsaturated (whitish discolored object) to 255 for fully saturated (solid color)
         # V: 0 for dark to 255 for maximally bright
         #self.HSVmin = np.array([ 20,  50, 180], dtype=np.uint8)
-        self.HSVmin = np.array([ 50,  10, 100], dtype=np.uint8)
+        # for auto line
+        # self.HSVmin = np.array([ 50,  10, 100], dtype=np.uint8)
+        # self.HSVmax = np.array([ 100, 255, 255], dtype=np.uint8)
+        
+        # for CP 
+        self.HSVmin = np.array([ 50,  30, 95], dtype=np.uint8)
         self.HSVmax = np.array([ 100, 255, 255], dtype=np.uint8)
+        
+        
         #self.HSVmin = np.array([ 70,  100, 100], dtype=np.uint8)
         #self.HSVmax = np.array([ 90, 255, 255], dtype=np.uint8)
         #self.HSVmax = np.array([ 80, 255, 255], dtype=np.uint8)
@@ -113,7 +120,7 @@ class FirstPython:
 
         # Other processing parameters:
         self.epsilon = 0.015               # Shape smoothing factor (higher for smoother)
-        self.hullarea = ( 20*20, 300*300 ) # Range of object area (in pixels) to track
+        self.hullarea = ( 15*15, 300*300 ) # Range of object area (in pixels) to track 
         self.hullfill = 50                 # Max fill ratio of the convex hull (percent)
         self.ethresh = 1500                 # Shape error threshold (lower is stricter for exact shape)
         self.margin = 5                    # Margin from from frame borders (pixels)
@@ -167,6 +174,14 @@ class FirstPython:
 
     # ###################################################################################################
     ## Detect objects within our HSV range
+    # Do the following checks to ensure it's the correct shape: 
+        # Hull is quadrilateral
+        # Number of edges / vertices
+        # Angle of lines
+        # Top corners further apart than bottom corners
+        # Area
+        # Fill
+
     def detect(self, imgbgr, outimg = None):
 
         def distance(x1, y1, x2, y2):
@@ -188,12 +203,13 @@ class FirstPython:
 
         # Create structuring elements for morpho maths:
         if not hasattr(self, 'erodeElement'):
-            self.erodeElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+            self.erodeElement = cv2.getStructuringElement(cv2.MORPH_RECT, (1,1))
             self.dilateElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
         
         # Apply morphological operations to cleanup the image noise:
         imgth = cv2.erode(imgth, self.erodeElement)
         imgth = cv2.dilate(imgth, self.dilateElement)
+        
        
 
         # Detect objects by finding contours:
@@ -239,10 +255,12 @@ class FirstPython:
           
             # Check object shape:
             peri = cv2.arcLength(c, closed = True)
-            approx = cv2.approxPolyDP(c, epsilon = self.epsilon * peri, closed = True)
+            approx = cv2.approxPolyDP(c, epsilon = 0.01 * peri, closed = True)
             str2+= str(len(approx))
+
             for x in approx:
                 jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),3 , jevois.YUYV.LightGreen)
+            
             
             if len(approx) < 7 or len(approx) > 9: continue  # 8 vertices for a U shape
             str2 += "S" # Shape is ok
@@ -294,6 +312,7 @@ class FirstPython:
             str2 += "R" #ratio is good  
        
             
+
           
             # Re-order the 4 points in the hull if needed: In the pose estimation code, we will assume vertices ordered
             # as follows:

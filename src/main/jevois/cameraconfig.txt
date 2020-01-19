@@ -6,8 +6,10 @@ setcam presetwb 0
 setcam autowb 0
 setcam autogain 0
 setcam autoexp 0
-setcam redbal 210
-setcam bluebal 255
+
+setcam redbal 150
+setcam bluebal 190
+
 setcam gain 16
 setcam absexp 500
 setcam brightness -1
