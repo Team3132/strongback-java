@@ -117,8 +117,8 @@ public class RobotConfiguration {
 	public double visionVMax = Constants.VISION_V_MAX;
 	
 	public boolean climberIsPresent = true;
-	public int climberFrontCanID = Constants.CLIMBER_FRONT_CAN_ID;
-	public int climberRearCanID = Constants.CLIMBER_REAR_CAN_ID;
+	public int climberLeftCanID = Constants.CLIMBER_LEFT_CAN_ID;
+	public int climberRightCanID = Constants.CLIMBER_RIGHT_CAN_ID;
 	public int climberDriveMotorCanID = Constants.CLIMBER_DRIVE_MOTOR_CAN_ID;
 
 
@@ -252,8 +252,8 @@ public class RobotConfiguration {
 		visionVMax = getAsDouble("vision/hsvFilter/v/max", Constants.VISION_V_MAX);
 
 		climberIsPresent = getAsBoolean("climber/present", false);
-		climberFrontCanID = getAsInt("climber/frontCanID", Constants.CLIMBER_FRONT_CAN_ID);
-		climberRearCanID = getAsInt("climber/rearCanID", Constants.CLIMBER_REAR_CAN_ID);
+		climberLeftCanID = getAsInt("climber/leftCanID", Constants.CLIMBER_LEFT_CAN_ID);
+		climberRightCanID = getAsInt("climber/rightCanID", Constants.CLIMBER_RIGHT_CAN_ID);
 		climberDriveMotorCanID = getAsInt("climber/driveMotorCanID", Constants.CLIMBER_DRIVE_MOTOR_CAN_ID);
 			
 		// logging default is to not log anything to the graph, and to only log local information when we turn it on.

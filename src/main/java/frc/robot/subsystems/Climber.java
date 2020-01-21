@@ -15,38 +15,44 @@ import frc.robot.lib.Subsystem;
 // TODO: Description of Subsystem once we know what it looks like.
 
 public class Climber extends Subsystem implements ClimberInterface, Executable, DashboardUpdater {
-    private Winch climbWinch;  // Controls the front stilts.
+    private Winch leftWinch; 
+    private Winch rightWinch;
     private ClimberAction action;
     private boolean holding = false;
 
-    public Climber(Motor WinchMotor, DashboardInterface dashboard, Log log) {
+    public Climber(Motor leftWinchMotor, Motor rightWinchMotor, DashboardInterface dashboard, Log log) {
         super("Climber", dashboard, log);   
-        this.climbWinch = new Winch("climber:", WinchMotor, dashboard, log);
+        this.leftWinch = new Winch("climber:", leftWinchMotor, dashboard, log);
+        this.rightWinch = new Winch("climber:", rightWinchMotor, dashboard, log);
         setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));
     }
 
     @Override
     public boolean isInPosition() {
-        return climbWinch.isInPosition();
+        return leftWinch.isInPosition() && rightWinch.isInPosition();
     }
-
     @Override
     public void execute(long timeInMillis) {
         if (action.type != Type.STOP_CLIMBER) {
             holding = false;
         }
         switch (action.type) {
-            case SET_CLIMBER_POWER:
-                climbWinch.setMotorPower(action.value);
+            case SET_CLIMBER_POWER_LEFT:
+                leftWinch.setMotorPower(action.value);
+                break;
+            case SET_CLIMBER_POWER_RIGHT:
+                rightWinch.setMotorPower(action.value);
                 break;
             case HOLD_HEIGHT:
                 if (!holding) {
-                    climbWinch.setTargetHeight(climbWinch.getActualHeight());
+                    leftWinch.setTargetHeight(leftWinch.getActualHeight());
+                    rightWinch.setTargetHeight(rightWinch.getActualHeight());
                 }
                 holding = true;
                 break;
             case STOP_CLIMBER:
-                climbWinch.setMotorPower(0);
+                leftWinch.setMotorPower(0);
+                rightWinch.setMotorPower(0);
                 break;                
             default:
                 log.error("%s: Unknown Type %s", name, action.type);
@@ -60,7 +66,8 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
      */
 	@Override
 	public void updateDashboard() {
-        climbWinch.updateDashboard();
+        leftWinch.updateDashboard();
+        rightWinch.updateDashboard();        
         dashboard.putString("Climber type", action.type.toString());
     }
     
