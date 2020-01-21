@@ -106,8 +106,12 @@ class FirstPython:
         # self.HSVmax = np.array([ 100, 255, 255], dtype=np.uint8)
         
         # for CP 
-        self.HSVmin = np.array([ 50,  30, 95], dtype=np.uint8)
+        self.HSVmin = np.array([ 40,  20, 40], dtype=np.uint8)
         self.HSVmax = np.array([ 100, 255, 255], dtype=np.uint8)
+        
+        # for CP 
+        #self.HSVmin = np.array([ 50,  30, 95], dtype=np.uint8)
+        #self.HSVmax = np.array([ 100, 255, 255], dtype=np.uint8)
         
         
         #self.HSVmin = np.array([ 70,  100, 100], dtype=np.uint8)
@@ -121,7 +125,7 @@ class FirstPython:
         # Other processing parameters:
         self.epsilon = 0.015               # Shape smoothing factor (higher for smoother)
         self.hullarea = ( 15*15, 300*300 ) # Range of object area (in pixels) to track 
-        self.hullfill = 50                 # Max fill ratio of the convex hull (percent)
+        self.hullfill = 35                 # Max fill ratio of the convex hull (percent)
         self.ethresh = 1500                 # Shape error threshold (lower is stricter for exact shape)
         self.margin = 5                    # Margin from from frame borders (pixels)
     
@@ -198,37 +202,39 @@ class FirstPython:
 
         # Isolate pixels inside our desired HSV range:
         imgth = cv2.inRange(imghsv, self.HSVmin, self.HSVmax)
-        str1 = "H={}-{} S={}-{} V={}-{} ".format(self.HSVmin[0], self.HSVmax[0], self.HSVmin[1],
+        maskValues = "H={}-{} S={}-{} V={}-{} ".format(self.HSVmin[0], self.HSVmax[0], self.HSVmin[1],
                                                 self.HSVmax[1], self.HSVmin[2], self.HSVmax[2])
-
+        
+        
         # Create structuring elements for morpho maths:
         if not hasattr(self, 'erodeElement'):
-            self.erodeElement = cv2.getStructuringElement(cv2.MORPH_RECT, (1,1))
-            self.dilateElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+            self.erodeElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
+            self.dilateElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
         
         # Apply morphological operations to cleanup the image noise:
         imgth = cv2.erode(imgth, self.erodeElement)
         imgth = cv2.dilate(imgth, self.dilateElement)
         
-       
+        
+        imgth = cv2.medianBlur(imgth,3)
+
 
         # Detect objects by finding contours:
         contours, hierarchy = cv2.findContours(imgth, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
-        str1 += "N={} ".format(len(contours))
+        maskValues += "N={} ".format(len(contours))
 
         # Only consider the 5 biggest objects by area:
         contours = sorted(contours, key = cv2.contourArea, reverse = True)[:maxn]
-        hlist = [ ] # list of hulls of good objects, which we will return
-        str2 = ""
-        beststr2 = ""
+        bestHull = [] # best hull detection
+        goalCriteria = ""
+        bestgoalCriteria = ""
         
         # Identify the "good" objects:
         for c in contours:
             
-                  
             # Keep track of our best detection so far:
-            if len(str2) > len(beststr2): beststr2 = str2
-            str2 = ""
+            if len(goalCriteria) > len(bestgoalCriteria): bestgoalCriteria = goalCriteria
+            goalCriteria = ""
 
             # Compute contour area:
             area = cv2.contourArea(c, oriented = False)
@@ -240,36 +246,33 @@ class FirstPython:
 
             # Is it the right shape?
             if (hull.shape != (4,1,2)): continue # 4 vertices for the rectangular convex outline (shows as a trapezoid)
-            str2 += "H" # Hull is quadrilateral
+            goalCriteria += "H" # Hull is quadrilateral
             
           
             huarea = cv2.contourArea(hull, oriented = False)
             if huarea < self.hullarea[0] or huarea > self.hullarea[1]: continue
-            str2 += "A" # Hull area ok
-            
-            print(huarea)
-          
+            goalCriteria += "A" # Hull area ok
+                      
             hufill = area / huarea * 100.0
             if hufill > self.hullfill: continue
-            str2 += "F" # Fill is ok
+            goalCriteria += "F" # Fill is ok
           
             # Check object shape:
             peri = cv2.arcLength(c, closed = True)
-            approx = cv2.approxPolyDP(c, epsilon = 0.01 * peri, closed = True)
-            str2+= str(len(approx))
+            approx = cv2.approxPolyDP(c, epsilon = 0.015 * peri, closed = True)
 
-            for x in approx:
-                jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),3 , jevois.YUYV.LightGreen)
+            for x in hull:
+                 jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),1 , jevois.YUYV.LightGreen)
+            
+            # corners aren't really accurate at CP 
+            #if len(approx) < 7 or len(approx) > 9: continue  # 8 vertices for a U shape
+            #goalCriteria += "S" # Shape is ok
             
             
-            if len(approx) < 7 or len(approx) > 9: continue  # 8 vertices for a U shape
-            str2 += "S" # Shape is ok
-            
-
             # # Compute contour serr:
             # serr = 100.0 * cv2.matchShapes(c, approx, cv2.CONTOURS_MATCH_I1, 0.0)
             # if serr > self.ethresh: continue
-            # str2 += "E" # Shape error is ok
+            # goalCriteria += "E" # Shape error is ok
           
             # Reject the shape if any of its vertices gets within the margin of the image bounds. This is to avoid
             # getting grossly incorrect 6D pose estimates as the shape starts getting truncated as it partially exits
@@ -281,7 +284,7 @@ class FirstPython:
                    break
                
             if reject == 1: continue
-            str2 += "M" # Margin ok
+            goalCriteria += "M" # Margin ok
            
             
             TL_corner = Corner()
@@ -303,178 +306,73 @@ class FirstPython:
             bottom = distance(BL_corner.xy[0],BL_corner.xy[1],BR_corner.xy[0], BR_corner.xy[1])     
 
             # check left & right angle
-
-            # left
             lratio = (BL_corner.xy[0] - TL_corner.xy[0])/(BL_corner.xy[1] - TL_corner.xy[1])
             rratio = (BR_corner.xy[0] - TR_corner.xy[0])/(BR_corner.xy[1] - TR_corner.xy[1])
 
             if (top / bottom) < 1.3 or lratio > 0.6 or rratio < -1: continue
-            str2 += "R" #ratio is good  
+            goalCriteria += "R" #ratio is good  
        
-            
-
-          
-            # Re-order the 4 points in the hull if needed: In the pose estimation code, we will assume vertices ordered
-            # as follows:
-            #
-            #    0|        |3
-            #     |        |
-            #     |        |
-            #    1----------2
-
-            # v10+v23 should be pointing outward the U more than v03+v12 is:
-            
-            v10p23 = complex(hull[0][0,0] - hull[1][0,0] + hull[3][0,0] - hull[2][0,0],
-                             hull[0][0,1] - hull[1][0,1] + hull[3][0,1] - hull[2][0,1])
-            len10p23 = abs(v10p23)
-            v03p12 = complex(hull[3][0,0] - hull[0][0,0] + hull[2][0,0] - hull[1][0,0],
-                             hull[3][0,1] - hull[0][0,1] + hull[2][0,1] - hull[1][0,1])
-            len03p12 = abs(v03p12)
-
-            # Vector from centroid of U shape to centroid of its hull should also point outward of the U:
-            momC = cv2.moments(c)
-            momH = cv2.moments(hull)
-            vCH = complex(momH['m10'] / momH['m00'] - momC['m10'] / momC['m00'],
-                          momH['m01'] / momH['m00'] - momC['m01'] / momC['m00'])
-            lenCH = abs(vCH)
-
-            if len10p23 < 0.1 or len03p12 < 0.1 or lenCH < 0.1: continue
-            str2 += "V" # Shape vectors ok
-
-            good = (v10p23.real * vCH.real + v10p23.imag * vCH.imag) / (len10p23 * lenCH)
-            bad = (v03p12.real * vCH.real + v03p12.imag * vCH.imag) / (len03p12 * lenCH)
-
-            # We reject upside-down detections as those are likely to be spurious:
-            if vCH.imag >= -2.0: continue
-            str2 += "U" # U shape is upright
-        
-            # Fixup the ordering of the vertices if needed:
-            if bad > good: hull = np.roll(hull, shift = 1, axis = 0)
-                
             # This detection is a keeper:
-            str2 += " OK"
-            hlist.append(hull)
-
-        if len(str2) > len(beststr2):  beststr2 = str2
+            goalCriteria += " OK"
+            bestHull = hull
+            break
+        
         
         # Display any results requested by the users:
         if outimg is not None and outimg.valid():
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgth, outimg, w, 0)
-            jevois.writeText(outimg, str1 + beststr2, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)
-
-        return hlist
-
-
-    # ###################################################################################################
-    ## Estimate 6D pose of each of the quadrilateral objects in hlist:
-    def estimatePose(self, hlist):
-        rvecs = []
-        tvecs = []
+            jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)
         
-        # set coordinate system in the middle of the object, with Z pointing out
-        objPoints = np.array([ ( -self.owm * 0.5, -self.ohm * 0.5, 0 ),
-                               ( -self.owm * 0.5,  self.ohm * 0.5, 0 ),
-                               (  self.owm * 0.5,  self.ohm * 0.5, 0 ),
-                               (  self.owm * 0.5, -self.ohm * 0.5, 0 ) ])
-
-        for detection in hlist:
-            det = np.array(detection, dtype=np.float).reshape(4,2,1)
-            (ok, rv, tv) = cv2.solvePnP(objPoints, det, self.camMatrix, self.distCoeffs)
-            if ok:
-                rvecs.append(rv)
-                tvecs.append(tv)
-            else:
-                rvecs.append(np.array([ (0.0), (0.0), (0.0) ]))
-                tvecs.append(np.array([ (0.0), (0.0), (0.0) ]))
-
-        return (rvecs, tvecs)        
+    
+        return bestHull
+ 
         
     # ###################################################################################################
     ## Send serial messages, one per object
-    def sendAllSerial(self, w, h, hlist, rvecs, tvecs):
-        idx = 0
-        for c in hlist:
-            # Compute quaternion: FIXME need to check!
-            tv = tvecs[idx]
-            axis = rvecs[idx]
-            angle = (axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]) ** 0.5
+    def sendAllSerial(self, w, h, bestHull, rvecs, tvecs):
+        
+        # Compute quaternion: FIXME need to check!
+        tv = tvecs[idx]
+        axis = rvecs[idx]
+        angle = (axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]) ** 0.5
 
-            # This code lifted from pyquaternion from_axis_angle:
-            mag_sq = axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]
-            if (abs(1.0 - mag_sq) > 1e-12): axis = axis / (mag_sq ** 0.5)
-            theta = angle / 2.0
-            r = math.cos(theta)
-            i = axis * math.sin(theta)
-            q = (r, i[0], i[1], i[2])
+        # This code lifted from pyquaternion from_axis_angle:
+        mag_sq = axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]
+        if (abs(1.0 - mag_sq) > 1e-12): axis = axis / (mag_sq ** 0.5)
+        theta = angle / 2.0
+        r = math.cos(theta)
+        i = axis * math.sin(theta)
+        q = (r, i[0], i[1], i[2])
 
-            jevois.sendSerial("D3 {} {} {} {} {} {} {} {} {} {} FIRST".
-                              format(np.asscalar(tv[0]), np.asscalar(tv[1]), np.asscalar(tv[2]),  # position
-                                     self.owm, self.ohm, 1.0,                                     # size
-                                     r, np.asscalar(i[0]), np.asscalar(i[1]), np.asscalar(i[2]))) # pose
-            idx += 1
+        jevois.sendSerial("D3 {} {} {} {} {} {} {} {} {} {} FIRST".
+                            format(np.asscalar(tv[0]), np.asscalar(tv[1]), np.asscalar(tv[2]),  # position
+                                    self.owm, self.ohm, 1.0,                                     # size
+                                    r, np.asscalar(i[0]), np.asscalar(i[1]), np.asscalar(i[2]))) # pose
                               
     # ###################################################################################################
     ## Draw all detected objects in 3D
-    def drawDetections(self, outimg, hlist, rvecs = None, tvecs = None):
-        # Show trihedron and parallelepiped centered on object:
-        hw = self.owm * 0.5
-        hh = self.ohm * 0.5
-        dd = -max(hw, hh)
-        i = 0
-        empty = np.array([ (0.0), (0.0), (0.0) ])
-            
-        for obj in hlist:
-            # skip those for which solvePnP failed:
-            if np.array_equal(rvecs[i], empty):
-                i += 1
-                continue
-            
-            # Project axis points:
-            axisPoints = np.array([ (0.0, 0.0, 0.0), (hw, 0.0, 0.0), (0.0, hh, 0.0), (0.0, 0.0, dd) ])
-            imagePoints, jac = cv2.projectPoints(axisPoints, rvecs[i], tvecs[i], self.camMatrix, self.distCoeffs)
-            
-            # Draw axis lines:
-            jevois.drawLine(outimg, int(imagePoints[0][0,0] + 0.5), int(imagePoints[0][0,1] + 0.5),
-                            int(imagePoints[1][0,0] + 0.5), int(imagePoints[1][0,1] + 0.5),
-                            2, jevois.YUYV.MedPurple)
-            jevois.drawLine(outimg, int(imagePoints[0][0,0] + 0.5), int(imagePoints[0][0,1] + 0.5),
-                            int(imagePoints[2][0,0] + 0.5), int(imagePoints[2][0,1] + 0.5),
-                            2, jevois.YUYV.MedGreen)
-            jevois.drawLine(outimg, int(imagePoints[0][0,0] + 0.5), int(imagePoints[0][0,1] + 0.5),
-                            int(imagePoints[3][0,0] + 0.5), int(imagePoints[3][0,1] + 0.5),
-                            2, jevois.YUYV.MedGrey)
-          
-            # Also draw a parallelepiped:
-            cubePoints = np.array([ (-hw, -hh, 0.0), (hw, -hh, 0.0), (hw, hh, 0.0), (-hw, hh, 0.0),
-                                    (-hw, -hh, dd), (hw, -hh, dd), (hw, hh, dd), (-hw, hh, dd) ])
-            cu, jac2 = cv2.projectPoints(cubePoints, rvecs[i], tvecs[i], self.camMatrix, self.distCoeffs)
+    def drawDetections(self, outimg, bestHull):
+                   
+        TL_corner = Corner()
+        TR_corner = Corner()
+        BL_corner = Corner()            
+        BR_corner = Corner()
+               
+        for point in bestHull:
 
-            # Round all the coordinates and cast to int for drawing:
-            cu = np.rint(cu)
-            
-            TL_corner = Corner()
-            TR_corner = Corner()
-            BL_corner = Corner()            
-            BR_corner = Corner()
-            
-            for hull in hlist:
-                
-                for point in hull:
+            x = point[0][0]
+            y = point[0][1]
 
-                    x = point[0][0]
-                    y = point[0][1]
+            TL_corner.update_score(x, y, -x - y)
+            TR_corner.update_score(x, y, +x - y)
+            BL_corner.update_score(x, y, -x + y)
+            BR_corner.update_score(x, y, +x + y)
 
-                    TL_corner.update_score(x, y, -x - y)
-                    TR_corner.update_score(x, y, +x - y)
-                    BL_corner.update_score(x, y, -x + y)
-                    BR_corner.update_score(x, y, +x + y)
-
-                            
-            jevois.drawLine(outimg, int(TL_corner.xy[0]),int(TL_corner.xy[1]),int(TR_corner.xy[0]), int(TR_corner.xy[1]),
-                            1, jevois.YUYV.LightGreen)
-
-            i += 1
-            
+        mx = int((TL_corner.xy[0]+TR_corner.xy[0])/2)
+        my = int((TL_corner.xy[1]+TR_corner.xy[1])/2)
+        
+        jevois.drawLine(outimg,mx,my,mx,my,2 , jevois.YUYV.LightGrey)
+        
     # ###################################################################################################
     ## Process function with no USB output
     def processNoUSB(self, inframe):
@@ -486,16 +384,13 @@ class FirstPython:
         self.timer.start()
 
         # Get a list of quadrilateral convex hulls for all good objects:
-        hlist = self.detect(imgbgr)
+        bestHull = self.detect(imgbgr)
 
         # Load camera calibration if needed:
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
-        # Map to 6D (inverse perspective):
-        (rvecs, tvecs) = self.estimatePose(hlist)
-
         # Send all serial messages:
-        self.sendAllSerial(w, h, hlist, rvecs, tvecs)
+        self.sendAllSerial(w, h, bestHull, rvecs, tvecs)
 
         # Log frames/s info (will go to serlog serial port, default is None):
         self.timer.stop()
@@ -525,21 +420,18 @@ class FirstPython:
         inframe.done()
         
         # Get a list of quadrilateral convex hulls for all good objects:
-        hlist = self.detect(imgbgr, outimg)
+        bestHull = self.detect(imgbgr, outimg)
 
         # Load camera calibration if needed:
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
-        # Map to 6D (inverse perspective):
-        (rvecs, tvecs) = self.estimatePose(hlist)
-
         # Send all serial messages:
-        self.sendAllSerial(w, h, hlist, rvecs, tvecs)
+        #self.sendAllSerial(w, h, bestHull, rvecs, tvecs)
         
         #cv2.drawContours(outimg, [foundcontours], 0, (255, 0, 0), 2)
     
         # Draw all detections in 3D:
-        self.drawDetections(outimg, hlist, rvecs, tvecs)
+        self.drawDetections(outimg, bestHull)
 
         # Write frames/s info from our timer into the edge map (NOTE: does not account for output conversion time):
         fps = self.timer.stop()
