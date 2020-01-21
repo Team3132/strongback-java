@@ -134,11 +134,11 @@ public class Subsystems implements DashboardUpdater {
 		}
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
-		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsLeftWithEncoders,
+		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsLeftWithEncoders,
 				config.drivebaseCanIdsLeftWithoutEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, 
 				config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
-		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsRightWithEncoders,
+		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
 				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
 		leftDriveDistance = () -> leftMotor.getPosition();

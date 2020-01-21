@@ -56,6 +56,11 @@ public class Constants {
 	public static final boolean DRIVE_BRAKE_MODE			= true;
 	public static final double DRIVE_WHEEL_DIAMETER         = 3.79;
 	public static final int DRIVE_ENCODER_CODES_PER_REV		= 4 * 360;
+	
+	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
+	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
+	public static final String DRIVE_DEFAULT_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
+
 	// distance the robot moves per revolution of the encoders. Gearing needs to be taken into account here.
 	// at full speed in a static environment the encoders are producing 2000 count differences per 100ms
 	public static final double DRIVE_DISTANCE_PER_REV = DRIVE_WHEEL_DIAMETER * Math.PI;
