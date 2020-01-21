@@ -75,7 +75,7 @@ public class Constants {
 	public static final double DRIVE_MAX_SPEED = 4;
 	public static final double DRIVE_MAX_ACCELERATION = 2; // Inches/sec/sec
 	public static final double DRIVE_MAX_JERK = 1; // Inches/sec/sec/sec.
-	public static final double DRIVE_P = 2.0;//5;//1.0;
+	public static final double DRIVE_P = 0.0;//5;//1.0;
 	public static final double DRIVE_I = 0.0;
 	public static final double DRIVE_D = 0.0;//0.01;
 	public static final double DRIVE_F = 0.7;//0.665;

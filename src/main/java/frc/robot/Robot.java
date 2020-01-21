@@ -205,7 +205,8 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void teleopPeriodic() {
 		// Set the speed of the spark to the left joystick for testing.
-		subsystems.spark.setMotorOutput(0.3 * driverLeftJoystick.getAxis(0).read());
+		subsystems.spark.setMotorOutput(1.0 * driverLeftJoystick.getAxis(0).read());
+
 	}
 
 	/**
