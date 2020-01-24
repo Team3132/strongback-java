@@ -9,6 +9,8 @@
 package frc.robot.controller;
 
 import static frc.robot.Constants.*;
+
+import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.lib.WaypointUtil;
 
 import jaci.pathfinder.Waypoint;
@@ -420,6 +422,24 @@ public class Sequences {
 		seq.add().setDelayDelta(0.05);
 		seq.add().setDrivebasePower(0); // Stop drivebase just in case.
 		seq.add().setBothHeight(0); // Winches go back to ground level
+		return seq;
+	}
+
+	public static Sequence rotational() {
+		Sequence seq = new Sequence("start roational control");
+		seq.add().rotational();
+		return seq;
+	}
+	
+	public static Sequence positional(Colour colour) {
+		Sequence seq = new Sequence("start positional control");
+		seq.add().positional(colour);
+		return seq;
+	}
+
+	public static Sequence stopColourWheel() {
+		Sequence seq = new Sequence("stop colour wheel spinner");
+		seq.add().stopColourWheel();
 		return seq;
 	}
 

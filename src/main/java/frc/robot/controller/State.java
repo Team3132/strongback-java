@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import org.strongback.components.Clock;
+
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.interfaces.LiftInterface.LiftAction;
@@ -60,6 +63,9 @@ public class State {
 
 	public Waypoint resetPosition = null;  // Reset where the location subsystem thinks the robot is
 
+	//Colour Wheel
+	public ColourAction colourWheel = null;
+
 	/**
 	 * Create a blank state
 	 */
@@ -82,6 +88,7 @@ public class State {
 		hatchHolderEnabled = subsystems.hatch.getHeld();
 		liftDeploy = subsystems.lift.shouldBeDeployed();
 		drive = subsystems.drivebase.getDriveRoutine();
+		colourWheel = subsystems.colourWheel.getDesiredAction();
 	}
 
 	// Time
@@ -292,6 +299,22 @@ public class State {
 
 	public State setClimberDriveSpeed(double speed) {
 		climber = new ClimberAction(ClimberAction.Type.SET_DRIVE_SPEED, speed);
+		return this;
+	}
+
+	// Color Wheel
+	public State rotational() {
+		colourWheel = new ColourAction(ColourAction.Type.POSITION, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State positional(Colour colour) {
+		colourWheel = new ColourAction(ColourAction.Type.ROTATION, colour);
+		return this;
+	}
+
+	public State stopColourWheel() {
+		colourWheel = new ColourAction(ColourAction.Type.NONE, Colour.UNKNOWN);
 		return this;
 	}
 

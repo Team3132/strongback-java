@@ -206,12 +206,15 @@ public class Controller implements Runnable, DashboardUpdater {
 		
 		subsystems.spitter.setTargetDutyCycle(desiredState.spitterDutyCycle);
 
+		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
+
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		
 		maybeWaitForLift();  // This be aborted, so the intake needs to be wary below.
 		waitForHatch();
 		waitForIntake();
 		waitForClimber();
+		waitForColourWheel();
 		//waitForLiftDeployer();
 		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
 		
@@ -311,6 +314,10 @@ public class Controller implements Runnable, DashboardUpdater {
 	 */
 	private void waitForLiftDeployer() {
 		waitUntil(() -> subsystems.lift.isDeployed() || !subsystems.lift.isDeployed(), "lift deployer to stop moving");
+	}
+
+	private void waitForColourWheel() {
+		waitUntil(() -> subsystems.colourWheel.isFinished(), "colour wheel to stop moving");
 	}
 
 	/**

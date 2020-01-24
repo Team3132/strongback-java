@@ -13,6 +13,7 @@ import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
@@ -212,6 +213,7 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
 		
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
+		/* Using these buttons for colour wheel while testing.
 		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
 			sysoutScoreMode();
 			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
@@ -236,8 +238,16 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), () -> {
 			scoreModeCargo = !scoreModeCargo;
 			sysoutScoreMode();
-		});
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.moveLift(LiftSetpoint.LIFT_BOTTOM_HEIGHT));
+		}); */
+
+		//Colour Wheel testing.
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.positional(Colour.YELLOW));
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.positional(Colour.BLUE));
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.positional(Colour.RED));
+		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.positional(Colour.GREEN));
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.positional(Colour.YELLOW));
+		onTriggered(stick.getDPad(0,GamepadButtonsX.RIGHT_THUMBSTICK_CLICK), Sequences.rotational());
+		onTriggered(stick.getDPad(0,GamepadButtonsX.START_BUTTON), Sequences.stopColourWheel());
 
 		// Lift microadjust
 		whileTriggered(() -> {
@@ -418,6 +428,8 @@ public class OI implements OIInterface {
 			() -> liftIF.deploy());
 		onTriggered(box.getButton(OperatorBoxButtons.LIFT_RETRACT_CARRIAGE), 
 			() -> liftIF.retract());
+		
+		//
 	}
 
 	private double scaleStiltsPotHeight(double value) {
