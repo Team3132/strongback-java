@@ -3,43 +3,11 @@ import cv2
 import numpy as np
 import math # for cos, sin, etc
 import time
+from angle_util import *
+
 
 GOAL_WIDTH = 1.0098 # width in meters
 GOAL_HEIGHT = 0.432 # height in meters
-
-SCREEN_HEIGHT = 252 # pixels
-CAMERA_HEIGHT = 28 # center of camera height off the ground, in inches
-
-def deg_to_rad(degrees):
-    return degrees * (math.pi / 180)
-
-# converts radians to degrees
-def rad_to_deg(radians):
-    return radians * (180 / math.pi)
-
-# sine function which uses degrees
-def sin(degrees):
-    return math.sin(deg_to_rad(degrees))
-
-# cosine function which uses degrees
-def cos(degrees):
-    return math.cos(deg_to_rad(degrees))
-
-# tan function which uses degrees
-def tan(degrees):
-    return math.tan(deg_to_rad(degrees))
-
-# inverse sine function which returns degrees
-def asin(ratio):
-    return rad_to_deg(math.asin(ratio))
-
-# inverse cosine function which returns degrees
-def acos(ratio):
-    return rad_to_deg(math.acos(ratio))
-
-# inverse tan function which returns degrees
-def atan(degrees):
-    return rad_to_deg(math.atan(degrees))
 
 class Corner():
     def __init__(self):
@@ -103,22 +71,19 @@ def cal_cosine_rule_deg(adj1, adj2, opposite):
         return 0
     return acos((adj1_sqrd + adj2_sqrd - opposite_sqrd)/(2*adj1*adj2))
 
-def cal_distance(center_point): 
-    # h1 is the top of the screen to the center of goal
-    # h2 is center of goal to (floor + robot height)
-    # h2 = 98.25" - camera height
-
-    h2_pixels = (SCREEN_HEIGHT - center_point[1]) 
-    h1_pixels = center_point[1]
-    
-    h2_actual = (98.25 - CAMERA_HEIGHT) * 0.0254
-
-    ratio = h2_actual / h2_pixels # metre / pixel
-
-    h1_actual = h1_pixels * ratio
-
-    distance = (h1_actual + h2_actual)/(tan(24.375))
-
+def cal_distance(avg_height): # Calculates distance to the goal based on the pixel height and real height
+    # Actual height of 3 point goal is 20
+    screen_height = avg_height / 48.33 * 12
+    """Use this code to calibrate factor
+    1.Change "distance" to the robot's current distance away fromt he goal
+    2.Run program and average the first ten console outputs
+    distance = 15
+    FACTOR = distance*screen_height/14
+    FACTOR = round(FACTOR,5)
+    print("FACTOR=",FACTOR)"""
+    FACTOR = 10.93305
+    distance = round((FACTOR * 14 /screen_height), 3)
+    #print(distance)
     return distance
 
 class FirstPython:
@@ -285,8 +250,8 @@ class FirstPython:
             bottom = cal_point_distance(BL,BR)   
 
             # check left & right angle
-            lratio = (BL[0] - TL[0])/(BL[1] - TL[1])
-            rratio = (BR[0] - TR[0])/(BR[1] - TR[1])
+            lratio = (BL.xy[0] - TL.xy[0])/(BL.xy[1] - TL.xy[1])
+            rratio = (BR.xy[0] - TR.xy[0])/(BR.xy[1] - TR.xy[1])
 
             if (top / bottom) < 1.3 or lratio > 0.6 or rratio < -1: continue
             goalCriteria += "R" #ratio is good  
@@ -296,15 +261,6 @@ class FirstPython:
             bestHull = hull
             break
             
-        TL,TR,BL,BR = cal_corners(bestHull)
-
-        try: 
-            mx = int((TL[0]+TR[0])/2)
-            my = int((TL[1]+TR[1])/2)
-            midpoint = [mx,my]
-            goalCriteria += str(int(cal_distance(midpoint)))
-        except:
-            print("hi")
         # Display any results requested by the users:
         if outimg is not None and outimg.valid():
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgth, outimg, w, 0)
@@ -327,15 +283,11 @@ class FirstPython:
                    
         TL,TR,BL,BR = cal_corners(bestHull)
 
-        try: 
-            mx = int((TL[0]+TR[0])/2)
-            my = int((TL[1]+TR[1])/2)
-            jevois.drawLine(outimg,mx,my,mx,my,2 , jevois.YUYV.LightGrey)
-
-        except:
-            print("hi")
+        mx = int((TL.xy[0]+TR.xy[0])/2)
+        my = int((TL.xy[1]+TR.xy[1])/2)
         
         # center of goal
+        jevois.drawLine(outimg,mx,my,mx,my,2 , jevois.YUYV.LightGrey)
         
     # ###################################################################################################
     ## Process function with no USB output
