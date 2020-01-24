@@ -346,5 +346,5 @@ public class Constants {
 	/*
 	 * Colour Sensor
 	 */
-	public static final int COLOUR_WHEEL_CAN_ID = 7; // FIXME: Pick can ID.
+	public static final int COLOUR_WHEEL_CAN_ID = 7;
 }
