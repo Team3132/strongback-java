@@ -42,13 +42,13 @@ public class ShooterSimulator implements ShooterInterface{
     }
 
     @Override
-    public ShooterInterface setTargetDutyCycle(double dutyCycle) {
+    public ShooterInterface setTargetSpeed(double dutyCycle) {
         this.dutyCycle = dutyCycle;
         return this;
     }
 
     @Override
-    public double getTargetDutyCycle() {
+    public double getTargetSpeed() {
         return dutyCycle;
     }
 

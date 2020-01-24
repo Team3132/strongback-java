@@ -7,8 +7,8 @@ public interface ShooterInterface extends SubsystemInterface, Executable, Dashbo
     /**
      * Sets the duty cycle on the spitter.
      */
-    public ShooterInterface setTargetDutyCycle(double dutyCycle);
-    public double getTargetDutyCycle();
+    public ShooterInterface setTargetSpeed(double speed);
+    public double getTargetSpeed();
 
     public boolean hasCell();
 }

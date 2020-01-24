@@ -318,7 +318,7 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.SPITTER_DISABLE, OperatorBoxButtons.SPITTER_MANUAL, spitterOverride);
 	  // While the spitter speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.SPITTER_SPEED), 
-			() -> {spitterIF.setTargetDutyCycle(box.getAxis(OperatorBoxButtons.SPITTER_POT).read());log.sub("Spitter speed button pressed %f", box.getAxis(OperatorBoxButtons.SPITTER_POT).read());});
+			() -> {spitterIF.setTargetSpeed(box.getAxis(OperatorBoxButtons.SPITTER_POT).read());log.sub("Spitter speed button pressed %f", box.getAxis(OperatorBoxButtons.SPITTER_POT).read());});
 
 		// Climber overrides.
 		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;

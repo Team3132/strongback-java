@@ -11,13 +11,13 @@ public class MockShooter implements ShooterInterface {
     }
 
     @Override
-    public ShooterInterface setTargetDutyCycle(double dutyCycle) {
+    public ShooterInterface setTargetSpeed(double dutyCycle) {
         targetDutyCycle = dutyCycle;
         return this;
     }
 
     @Override
-    public double getTargetDutyCycle() {
+    public double getTargetSpeed() {
         return targetDutyCycle;
     }
 

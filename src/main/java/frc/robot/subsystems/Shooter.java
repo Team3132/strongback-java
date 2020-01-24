@@ -33,14 +33,14 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
      * Set the duty cycle on the spitter wheels.
      */
     @Override
-    public ShooterInterface setTargetDutyCycle(double dutyCycle) { 
-        flywheel.setTargetPower(dutyCycle);
+    public ShooterInterface setTargetSpeed(double speed) { 
+        flywheel.setTargetPower(speed);
         return this;
     }
 
     @Override
-    public double getTargetDutyCycle() {
-        return flywheel.getTargetDutyCycle(); 
+    public double getTargetSpeed() {
+        return flywheel.getTargetSpeed(); 
     }
 
     @Override
@@ -52,43 +52,43 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     protected class ShooterWheel {
 
         private final Motor motor;
-        private double targetDutyCycle;
+        private double targetSpeed;
     
         public ShooterWheel(String name, Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> flywheel.getTargetDutyCycle(), "Shooter/%s/dutyCycle", name)
+            log.register(false, () -> flywheel.getTargetSpeed(), "Shooter/%s/dutyCycle", name)
             .register(false, motor::getOutputVoltage, "Shooter/%s/outputVoltage", name)
             .register(false, motor::getOutputPercent, "Shooter/%s/outputPercent", name)
             .register(false, motor::getOutputCurrent, "Shooter/%s/outputCurrent", name);
         }
         
-        public void setTargetPower(double dutyCycle) {
-            if (dutyCycle == targetDutyCycle) {
+        public void setTargetPower(double speed) {
+            if (speed == targetSpeed) {
                  return;
             }
-            targetDutyCycle = dutyCycle;
+            targetSpeed = speed;
             // Note that if velocity mode is used and the speed is ever set to 0, 
             // change the control mode from percent output, to avoid putting
             // unnecessary load on the battery and motor.
-            if (dutyCycle == 0) { 
+            if (speed == 0) { 
                 log.sub("Turning shooter wheel off.");
                 motor.set(ControlMode.PercentOutput, 0); 
             } else {
-                motor.set(ControlMode.PercentOutput, dutyCycle);
+                motor.set(ControlMode.Velocity, speed);
             }
-            log.sub("Setting shooter target duty cycle to %f", targetDutyCycle);
+            log.sub("Setting shooter target duty cycle to %f", targetSpeed);
         }
 
-        public double getTargetDutyCycle() {
-            return targetDutyCycle;
+        public double getTargetSpeed() {
+            return targetSpeed;
         }
     }
 
     @Override
     public void updateDashboard() {
         dashboard.putString("Shooter cell status", hasCell() ? "has cell" : "no cell");
-        dashboard.putNumber("Shooter duty cycle", flywheel.getTargetDutyCycle());
+        dashboard.putNumber("Shooter duty cycle", flywheel.getTargetSpeed());
     }
 }
 
