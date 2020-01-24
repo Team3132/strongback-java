@@ -103,7 +103,7 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.createIntake();
 		subsystems.createClimber();
 		subsystems.createPassthrough();
-		subsystems.createSpitter();
+		subsystems.createShooter();
 		subsystems.createHatch();
 		subsystems.createLift();
 		subsystems.createVision();

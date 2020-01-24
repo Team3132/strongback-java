@@ -96,7 +96,7 @@ public class Constants {
 	 */
 	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
 	
-	public static final double INTAKE_MOTOR_CURRENT = 0.5;  // Running at 0.6 with the PT and spitter can cause brownouts.s
+	public static final double INTAKE_MOTOR_CURRENT = 0.5;  // Running at 0.6 with the PT and Shooter can cause brownouts.s
 	public static final double INTAKE_POSITION_F = 0;
 	public static final double INTAKE_POSITION_P = 0;
 	public static final double INTAKE_POSITION_I = 0;
@@ -109,20 +109,17 @@ public class Constants {
 	public static final int[] OUTTAKE_MOTOR_TALON_CAN_ID_LIST = {15};
 
 	/*
-	* Spitter Constant
+	* Shooter Constant
 	* TODO: add the actual can Id values to the constants.
-	* TODO: Tune the Spitter F, P, I, D values.
-	* TODO: Find the tolerance and spitter_speed value.
+	* TODO: Tune the Shooter F, P, I, D values.
+	* TODO: Find the tolerance and Shooter_speed value.
 	*/
-	public static final int SPITTER_LEFT_TALON_CAN_ID = 40; 
-	public static final int SPITTER_RIGHT_TALON_CAN_ID = 41; 
-	public static final double SPITTER_SPEED = 0.15;  // Power 0...1
-	public static final double SPITTER_SCORE_SPEED = 1; //0.55; //was 0.75; 
-	public static final double SPITTER_SPEED_TOLERANCE = 0;
-	public static final double SPITTER_SPEED_F = 10.0/6;
-	public static final double SPITTER_SPEED_P = 1;
-	public static final double SPITTER_SPEED_I = 0;
-	public static final double SPITTER_SPEED_D = 0;
+	public static final int SHOOTER_TALON_CAN_ID = 41; 
+	public static final double SHOOTER_SPEED_TOLERANCE = 0;
+	public static final double SHOOTER_F = 0;
+	public static final double SHOOTER_P = 0;
+	public static final double SHOOTER_I = 0;
+	public static final double SHOOTER_D = 0;
 
 	/**
 	 * Tape Constants
@@ -235,7 +232,7 @@ public class Constants {
 	// Position Constants
 	public static final double LIFT_DEFAULT_MIN_HEIGHT = 0;
 	public static final double LIFT_DEFAULT_MAX_HEIGHT = 39; // 42
-	public static final double LIFT_DEPLOY_THRESHOLD_HEIGHT = 0; //18 / 25.4; // cannot deploy the spitter unless it is 18mm above the lift base height 
+	public static final double LIFT_DEPLOY_THRESHOLD_HEIGHT = 0; //18 / 25.4; // cannot deploy the shooter unless it is 18mm above the lift base height 
 
 	// Power distribution Panel (PDP)
 	public static final int PDP_CAN_ID = 62;

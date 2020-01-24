@@ -38,8 +38,8 @@ public class State {
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
 	
-	// Spitter
-	public Double spitterDutyCycle = null;  // Power level to supply to spitter. -1..0..1
+	// Shooter
+	public Double shooterTargetSpeed = null;  // Power level to supply to shooter. -1..0..1
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
 	// Passthrough
@@ -75,8 +75,8 @@ public class State {
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
 		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
-		spitterDutyCycle = subsystems.spitter.getTargetSpeed();
-		hasCargo = subsystems.spitter.hasCell();
+		shooterTargetSpeed = subsystems.shooter.getTargetSpeed();
+		hasCargo = subsystems.shooter.hasCell();
 		climber = subsystems.climber.getDesiredAction();
 		hatchAction = subsystems.hatch.getAction();
 		hatchHolderEnabled = subsystems.hatch.getHeld();
@@ -181,9 +181,9 @@ public class State {
 	}
 
 
-	// Spitter
-	public State setSpitterDutyCycle(double dutyCycle) {
-		spitterDutyCycle = Double.valueOf(dutyCycle);
+	// Shooter
+	public State setShooterTargetSpeed(double dutyCycle) {
+		shooterTargetSpeed = Double.valueOf(dutyCycle);
 		return this;
 	}
 
@@ -422,7 +422,7 @@ public class State {
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
-		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
+		maybeAdd("shooterDutyCycle", shooterTargetSpeed, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);
 		maybeAdd("hatchHolderGrabbed", hatchHolderEnabled, result);

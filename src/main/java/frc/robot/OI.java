@@ -179,10 +179,6 @@ public class OI implements OIInterface {
 		onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
 		onUntriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftRetract());
 
-		// Spitter Sequence (cargoSpit) 
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startCargoSpit());
-		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
-
 		// Reverse button
 		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
@@ -310,15 +306,15 @@ public class OI implements OIInterface {
 		onUntriggered(box.getButton(OperatorBoxButtons.GREEN4), Sequences.setL3DrivePower(0));
 		*/
 
-		// Spitter overrides.
-		OverridableSubsystem<ShooterInterface> spitterOverride = subsystems.spitterOverride;
+		// Shooter overrides.
+		OverridableSubsystem<ShooterInterface> shooterOverride = subsystems.shooterOverride;
 	  // Get the interface that the diag box uses.
-		ShooterInterface spitterIF = spitterOverride.getOverrideInterface();
+		ShooterInterface shooterIF = shooterOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.SPITTER_DISABLE, OperatorBoxButtons.SPITTER_MANUAL, spitterOverride);
-	  // While the spitter speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.SPITTER_SPEED), 
-			() -> {spitterIF.setTargetSpeed(box.getAxis(OperatorBoxButtons.SPITTER_POT).read());log.sub("Spitter speed button pressed %f", box.getAxis(OperatorBoxButtons.SPITTER_POT).read());});
+		mapOverrideSwitch(box, OperatorBoxButtons.SHOOTER_DISABLE, OperatorBoxButtons.SHOOTER_MANUAL, shooterOverride);
+	  // While the shooter speed button is pressed, set the target speed. Does not turn off.
+		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), 
+			() -> {shooterIF.setTargetSpeed(box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());});
 
 		// Climber overrides.
 		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;

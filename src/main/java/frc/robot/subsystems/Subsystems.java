@@ -46,8 +46,8 @@ public class Subsystems implements DashboardUpdater {
 	public OverridableSubsystem<SparkTestInterface> sparkTestOverride;
 	public PassthroughInterface passthrough;
 	public OverridableSubsystem<PassthroughInterface> passthroughOverride;
-	public ShooterInterface spitter;
-	public OverridableSubsystem<ShooterInterface> spitterOverride;
+	public ShooterInterface shooter;
+	public OverridableSubsystem<ShooterInterface> shooterOverride;
 	public HatchInterface hatch;
 	public OverridableSubsystem<HatchInterface> hatchOverride;
 	public LiftInterface lift;
@@ -73,7 +73,7 @@ public class Subsystems implements DashboardUpdater {
 	public void createOverrides() {
 		createIntakeOverride();
 		createPassthrougOverride();
-		createSpitterOverride();
+		createShooterOverride();
 		createHatchOverride();
 		createClimberOverride();
 		createLiftOverride();
@@ -86,7 +86,7 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.enable();
 		intake.enable();
 		passthrough.enable();
-		spitter.enable();
+		shooter.enable();
 		climber.enable();
 		lift.enable();
 		hatch.enable();
@@ -98,7 +98,7 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.disable();
 		intake.disable();
 		passthrough.disable();
-		spitter.disable();
+		shooter.disable();
 		climber.disable();
 		lift.disable();
 		hatch.disable();
@@ -113,7 +113,7 @@ public class Subsystems implements DashboardUpdater {
 		climber.updateDashboard();
 		location.updateDashboard();
 		passthrough.updateDashboard();
-		spitter.updateDashboard();
+		shooter.updateDashboard();
 		lift.updateDashboard();
 		vision.updateDashboard();
 		spark.updateDashboard();
@@ -364,26 +364,24 @@ public class Subsystems implements DashboardUpdater {
 		passthrough = passthroughOverride.getNormalInterface();
 	}
 
-	public void createSpitter() {
-		if (!config.spitterIsPresent) {
-			spitter = new MockShooter(log);
-			log.sub("Created a mock spitter!");
+	public void createShooter() {
+		if (!config.shooterIsPresent) {
+			shooter = new MockShooter(log);
+			log.sub("Created a mock shooter!");
 			return;
 		}
 
-		Motor spitterLeftMotor = MotorFactory.getSpitterMotor(config.spitterLeftCanID, true, true, log);
-		Motor spitterRightMotor = MotorFactory.getSpitterMotor(config.spitterRightCanID, true, false, log);
-		BooleanSupplier cargoSupplier = () -> spitterLeftMotor.isAtForwardLimit();
-		spitter = new Shooter(cargoSupplier, spitterLeftMotor, spitterRightMotor, dashboard, log);
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanID, true, false, log);
+		shooter = new Shooter(shooterMotor, dashboard, log);
 	}
 
-	public void createSpitterOverride() {
+	public void createShooterOverride() {
 		// Setup the diagBox so that it can take control.
 		MockShooter simulator = new MockShooter(log);  // Nothing to simulate, use a mock instead.
 		MockShooter mock = new MockShooter(log);
-		spitterOverride = new OverridableSubsystem<ShooterInterface>("spitter", ShooterInterface.class, spitter, simulator, mock, log);
-		// Plumb accessing the spitter through the override.
-		spitter = spitterOverride.getNormalInterface();
+		shooterOverride = new OverridableSubsystem<ShooterInterface>("shooter", ShooterInterface.class, shooter, simulator, mock, log);
+		// Plumb accessing the shooter through the override.
+		shooter = shooterOverride.getNormalInterface();
 	}
 
 	public void createHatch() {

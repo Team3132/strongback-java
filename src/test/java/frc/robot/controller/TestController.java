@@ -63,7 +63,7 @@ public class TestController {
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase(log);
 		subsystems.passthrough = new MockPassthrough(log);
-		subsystems.spitter = new MockShooter(log);
+		subsystems.shooter = new MockShooter(log);
 		subsystems.hatch = new MockHatch(log);
 		subsystems.location = new MockLocation();
 		subsystems.leftDriveDistance = () -> 0;

@@ -13,7 +13,7 @@ public class ShooterSimulator implements ShooterInterface{
 
     @Override
     public String getName() {
-        return "SpitterSimulator";
+        return "ShooterSimulator";
     }
 
     @Override

@@ -116,11 +116,10 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareTalonSRX getSpitterMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+	public static HardwareTalonSRX getShooterMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.setPIDF(0, Constants.SPITTER_SPEED_P, Constants.SPITTER_SPEED_I, Constants.SPITTER_SPEED_D, Constants.SPITTER_SPEED_F);
+		motor.setPIDF(0, Constants.SHOOTER_P, Constants.SHOOTER_I, Constants.SHOOTER_D, Constants.SHOOTER_F);
 		motor.setSensorPhase(sensorPhase);
-		// TODO: find out the configuration of this spitter motor.
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(36);
 		return motor;

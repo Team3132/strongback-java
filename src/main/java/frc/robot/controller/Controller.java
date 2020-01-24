@@ -204,7 +204,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.hatch.setAction(desiredState.hatchAction);
 		subsystems.hatch.setHeld(desiredState.hatchHolderEnabled);
 		
-		subsystems.spitter.setTargetSpeed(desiredState.spitterDutyCycle);
+		subsystems.shooter.setTargetSpeed(desiredState.shooterTargetSpeed);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		
@@ -288,10 +288,10 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Blocks waiting till cargo is found, spat, or sequence is aborted.
 	 */
 	private void waitForCargo(boolean expectCargo) {
-		if (subsystems.spitter.hasCell() == expectCargo) return;
+		if (subsystems.shooter.hasCell() == expectCargo) return;
 		logSub("Waiting for Cargo");
 		try {
-			waitUntilOrAbort(() -> subsystems.spitter.hasCell() == expectCargo, "cargo");
+			waitUntilOrAbort(() -> subsystems.shooter.hasCell() == expectCargo, "cargo");
 		} catch (SequenceChangedException e) {
 			// Desired state has changed underneath us, give up waiting
 			//and return.

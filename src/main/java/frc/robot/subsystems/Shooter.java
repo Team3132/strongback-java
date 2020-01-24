@@ -6,14 +6,16 @@ import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
+import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ShooterInterface;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.NetworkTablesHelper;
 
 /**
- * On the 2019 robot there are two spitter wheels that are under PID control for speed control.
+ * On the 2020 robot there is one shooter wheel that are under PID control for speed control.
  */
 public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
 
@@ -21,20 +23,37 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
     private ShooterWheel flywheel;
 
-    public Shooter(BooleanSupplier cargoSupplier, Motor leftMotor, Motor rightMotor, DashboardInterface dashboard, Log log) {
-        super("Spitter", dashboard, log);
+    public Shooter(Motor shooterMotor, DashboardInterface dashboard, Log log) {
+        super("Shooter", dashboard, log);
         this.cargoSupplier = cargoSupplier;
-        flywheel = new ShooterWheel("flywheel", leftMotor);
-        log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
-
+        flywheel = new ShooterWheel("flywheel", shooterMotor);
+        //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
     }
 
+	@Override
+	public void enable() {
+		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
+		double shooterP = helper.get("p", Constants.SHOOTER_P);
+		double shooterI = helper.get("i", Constants.SHOOTER_I);
+		double shooterD = helper.get("d", Constants.SHOOTER_D);
+		double shooterF = helper.get("f", Constants.SHOOTER_F);
+		//flywheel.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
+		//		helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
+		super.enable();
+		log.info("Shooter PID values: %f %f %f %f", shooterP, shooterI, shooterD, shooterF);
+	}
+
+	public void disable() {
+		super.disable();
+		flywheel.setTargetSpeed(0);
+	}
+    
     /**
-     * Set the duty cycle on the spitter wheels.
+     * Set the speed on the shooter wheels.
      */
     @Override
     public ShooterInterface setTargetSpeed(double speed) { 
-        flywheel.setTargetPower(speed);
+        flywheel.setTargetSpeed(speed);
         return this;
     }
 
@@ -57,13 +76,13 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
         public ShooterWheel(String name, Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> flywheel.getTargetSpeed(), "Shooter/%s/dutyCycle", name)
+            log.register(false, () -> flywheel.getTargetSpeed(), "Shooter/%s/speed", name)
             .register(false, motor::getOutputVoltage, "Shooter/%s/outputVoltage", name)
             .register(false, motor::getOutputPercent, "Shooter/%s/outputPercent", name)
             .register(false, motor::getOutputCurrent, "Shooter/%s/outputCurrent", name);
         }
         
-        public void setTargetPower(double speed) {
+        public void setTargetSpeed(double speed) {
             if (speed == targetSpeed) {
                  return;
             }
@@ -77,7 +96,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
             } else {
                 motor.set(ControlMode.Velocity, speed);
             }
-            log.sub("Setting shooter target duty cycle to %f", targetSpeed);
+            log.sub("Setting shooter target speed to %f", targetSpeed);
         }
 
         public double getTargetSpeed() {
@@ -88,7 +107,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     @Override
     public void updateDashboard() {
         dashboard.putString("Shooter cell status", hasCell() ? "has cell" : "no cell");
-        dashboard.putNumber("Shooter duty cycle", flywheel.getTargetSpeed());
+        dashboard.putNumber("Shooter target speed", flywheel.getTargetSpeed());
     }
 }
 

@@ -106,20 +106,12 @@ public class Sequences {
 		seq.add().setLiftHeight(LIFT_DEFAULT_MIN_HEIGHT)
  				 .setHatchPosition(HATCH_INTAKE_HOLD_POSITION);
 		// Waits for the lift to go to the set height before turning on to the motor
-		// The spitter speed should be set at a small speed.
-		seq.add().setPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
-				 .setSpitterDutyCycle(SPITTER_SPEED); 
-		seq.add().waitForCargo();
-		seq.add().setSpitterDutyCycle(0)
-				 .setIntakeMotorOutput(0)
-				 .setPassthroughMotorOutput(0);
 		return seq;
 	}
 
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
-		seq.add().setSpitterDutyCycle(0)
-				 .setIntakeMotorOutput(0)
+		seq.add().setIntakeMotorOutput(0)
 				 .setPassthroughMotorOutput(0);
 		seq.add().setDelayDelta(0.1);
 		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
@@ -132,24 +124,8 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence startCargoSpit() {
-		Sequence seq = new Sequence("Start CargoSpit");
-		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
-		seq.add().setSpitterDutyCycle(SPITTER_SCORE_SPEED);
-		return seq;
-	}
-
-	public static Sequence stopCargoSpit() {
-		Sequence seq = new Sequence("Stop CargoSpit");
-		seq.add().setSpitterDutyCycle(0);
-		// Doesn't lower the lift like startCargoSpit so that the lift doesn't drop
-		// every time the operator wishes to abort the cargo spit.
-		return seq;
-	}
-
 	public static Sequence startReverseCycle() {
 		Sequence seq = new Sequence("Start reverse cycle");
-		seq.add().setSpitterDutyCycle(-SPITTER_SPEED);
 		seq.add().setPassthroughMotorOutput(-PASSTHROUGH_MOTOR_CURRENT);
 		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
 		return seq;
@@ -157,7 +133,6 @@ public class Sequences {
 
 	public static Sequence stopReverseCycle() {
 		Sequence seq = new Sequence("Stop reverse cycle");
-		seq.add().setSpitterDutyCycle(0);
 		seq.add().setPassthroughMotorOutput(0);
 		seq.add().setIntakeMotorOutput(0);
 		return seq;
@@ -429,15 +404,11 @@ public class Sequences {
 		getStartSequence(), 
 		getResetSequence(),
 		startIntaking(),
-		stopIntaking(), 
-		startCargoSpit(),
-		stopCargoSpit(),
+		stopIntaking(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
 		startPassthrough(),
 		stopPassthrough(),
-		//startSpitterOnly(),
-		//stopSpitterOnly(),
 		holdHatch(),
 		releaseHatch(),
 		getStowHatchSequence(),
