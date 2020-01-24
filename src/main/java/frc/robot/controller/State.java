@@ -53,7 +53,7 @@ public class State {
 	public CameraMode cameraMode = null;
 
 	// Climber
-	public ClimberAction climber = null;  // What the climber should do.
+	public ClimberAction climberAction = null;  // What the climber should do.
 
 	// Driving.
 	public DriveRoutineParameters drive = null;
@@ -77,7 +77,7 @@ public class State {
 		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
 		hasCargo = subsystems.spitter.hasCargo();
-		climber = subsystems.climber.getDesiredAction();
+		climberAction = subsystems.climber.getDesiredAction();
 		hatchAction = subsystems.hatch.getAction();
 		hatchHolderEnabled = subsystems.hatch.getHeld();
 		liftDeploy = subsystems.lift.shouldBeDeployed();
@@ -268,20 +268,29 @@ public class State {
 		return this;
 	}
 
-
 	// Climber
 	public State setClimberPower(double speed) {
-		climber = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER, speed);
+		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_BOTH, speed);
+		return this;
+	}
+
+	public State setClimberPowerLeft(double speed) {
+		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_LEFT, speed);
+		return this;
+	}
+
+	public State setClimberPowerRight(double speed) {
+		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_RIGHT, speed);
 		return this;
 	}
 
 	public State holdClimber() {
-		climber = new ClimberAction(ClimberAction.Type.HOLD_HEIGHT, 0);
+		climberAction = new ClimberAction(ClimberAction.Type.HOLD_HEIGHT, 0);
 		return this;
 	}
 
 	public State stopClimber() {
-		climber = new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0);
+		climberAction = new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0);
 		return this;
 	}
 
@@ -419,7 +428,7 @@ public class State {
 		maybeAdd("liftDeploy", liftDeploy, result);
 		maybeAdd("liftAction", liftAction, result);
 		maybeAdd("drive", drive, result);
-		maybeAdd("climber", climber, result);
+		maybeAdd("climber", climberAction, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
 	

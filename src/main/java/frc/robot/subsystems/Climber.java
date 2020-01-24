@@ -43,6 +43,10 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
             case SET_CLIMBER_POWER_RIGHT:
                 rightWinch.setMotorPower(action.value);
                 break;
+            case SET_CLIMBER_POWER_BOTH:
+                leftWinch.setMotorPower(action.value);
+                rightWinch.setMotorPower(action.value);
+                break;
             case HOLD_HEIGHT:
                 if (!holding) {
                     leftWinch.setTargetHeight(leftWinch.getActualHeight());

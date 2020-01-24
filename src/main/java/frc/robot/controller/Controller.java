@@ -1,5 +1,5 @@
 package frc.robot.controller;
-
+  
 import java.util.Iterator;
 import java.util.function.BooleanSupplier;
 
@@ -199,7 +199,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.passthrough.setTargetMotorOutput(desiredState.passthroughMotorOutput);
 
-		subsystems.climber.setDesiredAction(desiredState.climber);
+		subsystems.climber.setDesiredAction(desiredState.climberAction);
 
 		subsystems.hatch.setAction(desiredState.hatchAction);
 		subsystems.hatch.setHeld(desiredState.hatchHolderEnabled);
@@ -257,7 +257,7 @@ public class Controller implements Runnable, DashboardUpdater {
 	private void maybeWaitForAutoDriving() {
 		try {
 			waitUntilOrAbort(() -> subsystems.drivebase.hasFinished(), "auto driving");
-		} catch (SequenceChangedException e) {
+		} catch (SequenceChangedException e) {	
 			logSub("Sequence changed while driving, switching drivebase back to arcade");
 			subsystems.drivebase.setArcadeDrive();
 		}
@@ -288,7 +288,7 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Blocks waiting till cargo is found, spat, or sequence is aborted.
 	 */
 	private void waitForCargo(boolean expectCargo) {
-		if (subsystems.spitter.hasCargo() == expectCargo) return;
+		if (subsystems.spitter.hasCargo() == expectCargo) return;	
 		logSub("Waiting for Cargo");
 		try {
 			waitUntilOrAbort(() -> subsystems.spitter.hasCargo() == expectCargo, "cargo");
