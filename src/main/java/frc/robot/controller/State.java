@@ -455,6 +455,7 @@ public class State {
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
+		maybeAdd("colourwheelmode", colourWheel, result);
 	
 		return "[" + String.join(",", result) + "]";
 	}

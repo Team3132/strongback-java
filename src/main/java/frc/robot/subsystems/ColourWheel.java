@@ -17,7 +17,7 @@ import frc.robot.lib.Subsystem;
 public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   private Colour colourPrev = Colour.UNKNOWN;
-  private Colour colour;
+  private Colour colour = Colour.UNKNOWN;
   private Colour startColour;
   private Colour pairColour;
   private int rotCount;
@@ -47,6 +47,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   public ColourWheel(Motor motor, ColorSensorV3 colourSensor, DashboardInterface dash, Log log) {
     super("ColourWheel", dash, log);
+    log.info("Creating Colour Wheel Subsystem");
     colourMatcher.addColorMatch(BlueTarget);
     colourMatcher.addColorMatch(GreenTarget);
     colourMatcher.addColorMatch(RedTarget);
@@ -122,6 +123,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     updateColour();
     if (desired == colour || desired == Colour.UNKNOWN) {
       action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+      log.info("ColourWheel: Desired colour found.");
       return 0;
     }
     if (colour == Colour.RED && desired == Colour.YELLOW) {
@@ -222,6 +224,14 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   @Override
   public boolean isFinished() {
+    //log.info("isFinished Colour Wheel Action: %s", action);
     return action.type == Type.NONE;
   }
+
+  @Override
+	public void updateDashboard() {
+    dashboard.putString("Desired colour", action.colour.toString());
+    dashboard.putString("Current colour", colour.toString());
+    dashboard.putNumber("Colour wheel motor", motor.get());
+	}
 }

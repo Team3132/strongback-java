@@ -108,7 +108,7 @@ public class OI implements OIInterface {
 		onUntriggered(rightStick.getButton(5), Sequences.stopLevelNclimb());
 
 		// Level 3 sequence of buttons
-		onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
+		/*onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
 		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
 
 		onTriggered(rightStick.getButton(10), Sequences.startLevelDriveForward());
@@ -118,7 +118,7 @@ public class OI implements OIInterface {
 		onUntriggered(rightStick.getButton(8), Sequences.stopLevelNclimb());
 
 		onTriggered(leftStick.getButton(12), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());
+		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());*/
 
 		onTriggered(leftStick.getButton(10), Sequences.startFrontRaise());
 		onUntriggered(leftStick.getButton(10), Sequences.stopLevelNclimb());

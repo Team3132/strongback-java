@@ -1,6 +1,8 @@
 package frc.robot.interfaces;
 
-public interface ColourWheelInterface extends SubsystemInterface {
+import org.strongback.Executable;
+
+public interface ColourWheelInterface extends SubsystemInterface, Executable, DashboardUpdater {
     public enum Colour {
         RED,
         YELLOW,
@@ -23,6 +25,12 @@ public interface ColourWheelInterface extends SubsystemInterface {
             POSITION,
             NONE
         }
+
+        @Override
+        public String toString() {
+            return String.format("%s: %s", type.toString().toLowerCase(), colour);
+    }
+
     }
     /** 
      * Sets the desired action for the colour sensor.

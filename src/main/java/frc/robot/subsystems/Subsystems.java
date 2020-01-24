@@ -130,6 +130,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.updateDashboard();
 		vision.updateDashboard();
 		spark.updateDashboard();
+		colourWheel.updateDashboard();
 	}
 
 	/**
@@ -340,6 +341,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, false, log);
 		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
+		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 
 	public void createSparkTest() {
