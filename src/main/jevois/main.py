@@ -68,25 +68,28 @@ def cal_corners(contour):
     BR = BR_corner.xy
     return TL, TR, BL, BR
 
+def cal_goal_center_distance(distance):
+    opposite = (98.25 - CAMERA_HEIGHT) * 0.0254
+    hypotenuse = math.sqrt(pow(opposite,2) + pow(distance,2))
+    return hypotenuse
+
 def cal_point_distance(p, q):
     x = math.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)
     return x
 
-def cal_goal_skew(corners, center_distance):
-    HALF_WIDTH_GOAL = GOAL_WIDTH /2
 
-    TL = corners[0]
-    TR = corners[1]
-    BL = corners[2]
-    BR = corners[3]
+def cal_goal_skew(TL,TR,BL,BR, center_distance):
+    # center_distance is the hypotenuse 
+    HALF_WIDTH_GOAL = GOAL_WIDTH /2
 
     left_side_length = cal_point_distance(TL, BL)
     right_side_length = cal_point_distance(TR, BR)
 
-    left_side_distance = cal_distance(left_side_length)
+
+    left_side_distance = cal_distance(left_side_length) # this is wrong pls fix
     left_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, left_side_distance)
 
-    right_side_distance = cal_distance(left_side_length)
+    right_side_distance = cal_distance(right_side_length)
     right_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, right_side_distance)
     avg_angle = (left_acute_angle + (180 - right_acute_angle))/2
     return 90 - avg_angle
@@ -103,13 +106,13 @@ def cal_cosine_rule_deg(adj1, adj2, opposite):
         return 0
     return acos((adj1_sqrd + adj2_sqrd - opposite_sqrd)/(2*adj1*adj2))
 
-def cal_distance(center_point): 
+def cal_distance(center_y): 
     # h1 is the top of the screen to the center of goal
     # h2 is center of goal to (floor + robot height)
     # h2 = 98.25" - camera height
-
-    h2_pixels = (SCREEN_HEIGHT - center_point[1]) 
-    h1_pixels = center_point[1]
+        
+    h2_pixels = (SCREEN_HEIGHT - center_y) 
+    h1_pixels = center_y
     
     h2_actual = (98.25 - CAMERA_HEIGHT) * 0.0254
 
@@ -297,14 +300,19 @@ class FirstPython:
             break
             
         TL,TR,BL,BR = cal_corners(bestHull)
-
-        try: 
+        jevois.LINFO(str(bestHull))
+        
+        try:
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
-            midpoint = [mx,my]
-            goalCriteria += str(int(cal_distance(midpoint)))
+            distance = cal_distance(my)
+            center_distance = cal_goal_center_distance(distance)
+            skew = cal_goal_skew(TL,TR,BL,BR, center_distance)
+            goalCriteria += "ground dist = " + str(int(distance))
+            goalCriteria += "skew = " + str(skew)
         except:
             print("hi")
+        
         # Display any results requested by the users:
         if outimg is not None and outimg.valid():
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgth, outimg, w, 0)
