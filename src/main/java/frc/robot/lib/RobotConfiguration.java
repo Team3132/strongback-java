@@ -82,6 +82,9 @@ public class RobotConfiguration {
 	public boolean intakeIsPresent = false;
 	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
 
+	public boolean colourWheelIsPresent = false;
+	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;
+
 	public boolean sparkTestIsPresent = false;
 	public int[] sparkTestCanIds = Constants.TEST_SPARK_MOTOR_CAN_ID_LIST;
 

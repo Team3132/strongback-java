@@ -342,4 +342,9 @@ public class Constants {
 	public static final double TIME_COMMAND_RUN_PERIOD = (1.0/50.0);		// run the commands 50 times a second
 	public static final double TIME_LOCATION_PERIOD = (1.0/(double)LOCATION_HISTORY_CYCLE_SPEED);	// update the location subsystem 100 times a second
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
+
+	/*
+	 * Colour Sensor
+	 */
+	public static final int COLOUR_WHEEL_CAN_ID = 7; // FIXME: Pick can ID.
 }
