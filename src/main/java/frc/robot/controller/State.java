@@ -182,8 +182,8 @@ public class State {
 
 
 	// Shooter
-	public State setShooterTargetSpeed(double dutyCycle) {
-		shooterTargetSpeed = Double.valueOf(dutyCycle);
+	public State setShooterTargetSpeed(double targetSpeed) {
+		shooterTargetSpeed = Double.valueOf(targetSpeed);
 		return this;
 	}
 

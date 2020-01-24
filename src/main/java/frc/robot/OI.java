@@ -207,8 +207,11 @@ public class OI implements OIInterface {
 
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
 		
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startShooter());
+		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopShooter());
+
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
+		/**onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
 			sysoutScoreMode();
 			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
 								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
@@ -228,7 +231,7 @@ public class OI implements OIInterface {
 			sysoutScoreMode();
 			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_CARGO_HEIGHT)
 								  : Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_HATCH_HEIGHT);
-		});
+		});*/
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), () -> {
 			scoreModeCargo = !scoreModeCargo;
 			sysoutScoreMode();
@@ -241,7 +244,7 @@ public class OI implements OIInterface {
 		}, Sequences.getMicroAdjustDownSequence());
 		whileTriggered(() -> {
 			return stick.getAxis(GamepadButtonsX.RIGHT_Y_AXIS).read() < -0.8;
-		}, Sequences.getMicroAdjustUpSequence());
+		}, Sequences.getMicroAdjustUpSequence()); 
 	}
 
 	private void sysoutScoreMode() {

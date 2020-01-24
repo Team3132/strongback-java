@@ -19,16 +19,16 @@ import frc.robot.lib.NetworkTablesHelper;
  */
 public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
 
-    private BooleanSupplier cargoSupplier;
-
     private ShooterWheel flywheel;
+    private ShooterWheel feederWheel;
 
     public Shooter(Motor shooterMotor, DashboardInterface dashboard, Log log) {
         super("Shooter", dashboard, log);
-        this.cargoSupplier = cargoSupplier;
         flywheel = new ShooterWheel("flywheel", shooterMotor);
         //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
     }
+
+    
 
 	@Override
 	public void enable() {
@@ -37,8 +37,8 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 		double shooterI = helper.get("i", Constants.SHOOTER_I);
 		double shooterD = helper.get("d", Constants.SHOOTER_D);
 		double shooterF = helper.get("f", Constants.SHOOTER_F);
-		//flywheel.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
-		//		helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
+		flywheel.setPIDF(helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
+				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
 		super.enable();
 		log.info("Shooter PID values: %f %f %f %f", shooterP, shooterI, shooterD, shooterF);
 	}
@@ -64,8 +64,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
     @Override
     public boolean hasCell(){
-        //System.out.println(cargoSupplier.getAsBoolean());
-        return cargoSupplier.getAsBoolean();
+        return true; // Returns true by default for now
     }
 
     protected class ShooterWheel {
@@ -101,6 +100,14 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
         public double getTargetSpeed() {
             return targetSpeed;
+        }
+
+        public void setFeederSpeed(double speed) {
+            motor.set(ControlMode.PercentOutput, speed);
+        }
+
+        public void setPIDF(double p, double i, double d, double f) {
+            motor.setPIDF(0, p, i, d, f);
         }
     }
 

@@ -218,6 +218,19 @@ public class Sequences {
 		return seq;
 	}
 
+	public static Sequence startShooter() {
+		Sequence seq = new Sequence("start shooter");
+		seq.add().setShooterTargetSpeed(100); //RPM
+		return seq;
+	}
+
+	public static Sequence stopShooter() {
+		Sequence seq = new Sequence("stop shooter");
+		seq.add().setShooterTargetSpeed(0); //RPM
+		return seq;
+	}
+
+
 	/*public static Sequence startSpitterOnly() {
 		Sequence seq = new Sequence("Start Spitter");
 		seq.add().grabHatch(); //To allow the cargo ball to pass by the hatch mechanism unobstructed
