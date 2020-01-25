@@ -22,7 +22,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     private ShooterWheel flywheel;
     private ShooterWheel feederWheel;
 
-    public Shooter(Motor shooterMotor, DashboardInterface dashboard, Log log) {
+    public Shooter(Motor shooterMotor, Motor feederMotor, DashboardInterface dashboard, Log log) {
         super("Shooter", dashboard, log);
         flywheel = new ShooterWheel("flywheel", shooterMotor);
         //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
@@ -53,6 +53,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
      */
     @Override
     public ShooterInterface setTargetSpeed(double speed) { 
+        System.out.println("Setting target speed");
         flywheel.setTargetSpeed(speed);
         return this;
     }
@@ -60,6 +61,11 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     @Override
     public double getTargetSpeed() {
         return flywheel.getTargetSpeed(); 
+    }
+
+    public ShooterInterface setFeederSpeed(double percent) {
+        feederWheel.setFeederSpeed(percent);
+        return this;
     }
 
     @Override
@@ -109,6 +115,25 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
         public void setPIDF(double p, double i, double d, double f) {
             motor.setPIDF(0, p, i, d, f);
         }
+    }
+
+    protected class FeederWheel {
+
+        private final Motor motor;
+    
+        public FeederWheel(String name, Motor motor) {
+            this.motor = motor;
+
+            log.register(false, () -> flywheel.getTargetSpeed(), "Shooter/%s/speed", name)
+            .register(false, motor::getOutputVoltage, "Shooter/%s/outputVoltage", name)
+            .register(false, motor::getOutputPercent, "Shooter/%s/outputPercent", name)
+            .register(false, motor::getOutputCurrent, "Shooter/%s/outputCurrent", name);
+        }
+
+        public void setFeederSpeed(double percent) {
+            motor.set(ControlMode.PercentOutput, percent);
+        }
+
     }
 
     @Override

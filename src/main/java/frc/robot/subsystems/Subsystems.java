@@ -372,7 +372,9 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanID, true, false, log);
-		shooter = new Shooter(shooterMotor, dashboard, log);
+		Motor feederMotor = MotorFactory.getFeederMotor(config.shooterFeederCanID, true, false, log);
+
+		shooter = new Shooter(shooterMotor, feederMotor, dashboard, log);
 	}
 
 	public void createShooterOverride() {

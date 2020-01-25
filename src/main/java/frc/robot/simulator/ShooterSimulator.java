@@ -9,7 +9,8 @@ import frc.robot.interfaces.ShooterInterface;
  */
 public class ShooterSimulator implements ShooterInterface{
 
-    private double dutyCycle = 0;
+    private double targetSpeed = 0;
+    private double feederPercent = 0;
 
     @Override
     public String getName() {
@@ -42,14 +43,20 @@ public class ShooterSimulator implements ShooterInterface{
     }
 
     @Override
-    public ShooterInterface setTargetSpeed(double dutyCycle) {
-        this.dutyCycle = dutyCycle;
+    public ShooterInterface setTargetSpeed(double speed) {
+        this.targetSpeed = speed;
         return this;
     }
 
     @Override
     public double getTargetSpeed() {
-        return dutyCycle;
+        return targetSpeed;
+    }
+
+    @Override
+    public ShooterInterface setFeederSpeed(double percent) {
+        this.feederPercent = percent;
+        return this;
     }
 
     @Override

@@ -125,6 +125,14 @@ public class MotorFactory {
 		return motor;
 	}
 
+	public static HardwareTalonSRX getFeederMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		motor.setSensorPhase(sensorPhase);
+		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		motor.setScale(36);
+		return motor;
+	}
+
 	public static HardwareTalonSRX getHatchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.setSensorPhase(sensorPhase);

@@ -9,6 +9,9 @@
 package frc.robot.controller;
 
 import static frc.robot.Constants.*;
+
+import com.ctre.phoenix.time.StopWatch;
+
 import frc.robot.lib.WaypointUtil;
 
 import jaci.pathfinder.Waypoint;
@@ -221,12 +224,14 @@ public class Sequences {
 	public static Sequence startShooter() {
 		Sequence seq = new Sequence("start shooter");
 		seq.add().setShooterTargetSpeed(100); //RPM
+		seq.add().setShooterFeederSpeed(1); //PercentOutput
 		return seq;
 	}
 
 	public static Sequence stopShooter() {
 		Sequence seq = new Sequence("stop shooter");
 		seq.add().setShooterTargetSpeed(0); //RPM
+		seq.add().setShooterFeederSpeed(1); //PercentOutput
 		return seq;
 	}
 
@@ -418,6 +423,8 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
+		startShooter(),
+		stopShooter(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
 		startPassthrough(),

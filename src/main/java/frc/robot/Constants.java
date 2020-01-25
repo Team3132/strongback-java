@@ -114,7 +114,8 @@ public class Constants {
 	* TODO: Tune the Shooter F, P, I, D values.
 	* TODO: Find the tolerance and Shooter_speed value.
 	*/
-	public static final int SHOOTER_TALON_CAN_ID = 41; 
+	public static final int SHOOTER_TALON_CAN_ID = 4;
+	public static final int SHOOTER_FEEDER_TALON_CAN_ID = 2;
 	public static final double SHOOTER_SPEED_TOLERANCE = 0;
 	public static final double SHOOTER_F = 0;
 	public static final double SHOOTER_P = 0;

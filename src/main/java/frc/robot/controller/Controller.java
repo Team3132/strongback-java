@@ -205,6 +205,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.hatch.setHeld(desiredState.hatchHolderEnabled);
 		
 		subsystems.shooter.setTargetSpeed(desiredState.shooterTargetSpeed);
+		subsystems.shooter.setFeederSpeed(desiredState.shooterFeederSpeed);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		

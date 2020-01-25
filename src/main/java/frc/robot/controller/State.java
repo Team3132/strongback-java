@@ -39,7 +39,8 @@ public class State {
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
 	
 	// Shooter
-	public Double shooterTargetSpeed = null;  // Power level to supply to shooter. -1..0..1
+	public Double shooterTargetSpeed = null;  // Target speed in RPM to give to shooter.
+	public Double shooterFeederSpeed = null;  // Power level to supply to shooter feeder wheel. -1..0..1
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
 	// Passthrough
@@ -182,10 +183,17 @@ public class State {
 
 
 	// Shooter
+	public State setShooterFeederSpeed(double feederSpeed) {
+		shooterFeederSpeed = Double.valueOf(feederSpeed);
+		return this;
+	}
+
 	public State setShooterTargetSpeed(double targetSpeed) {
 		shooterTargetSpeed = Double.valueOf(targetSpeed);
 		return this;
 	}
+
+
 
 	public State waitForCargo() {
 		hasCargo = Boolean.valueOf(true);
@@ -422,7 +430,7 @@ public class State {
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
-		maybeAdd("shooterDutyCycle", shooterTargetSpeed, result);
+		maybeAdd("shooterTargetRPM", shooterTargetSpeed, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);
 		maybeAdd("hatchHolderGrabbed", hatchHolderEnabled, result);

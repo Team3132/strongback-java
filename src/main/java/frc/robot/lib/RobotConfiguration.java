@@ -90,6 +90,7 @@ public class RobotConfiguration {
 
 	public boolean shooterIsPresent = false;
 	public int shooterCanID = Constants.SHOOTER_TALON_CAN_ID;
+	public int shooterFeederCanID = Constants.SHOOTER_FEEDER_TALON_CAN_ID;
 
 	public boolean pdpIsPresent = false;
 	public int pdpCanId = Constants.PDP_CAN_ID;
@@ -222,7 +223,8 @@ public class RobotConfiguration {
 		passthroughCanID = getAsInt("passthrough/canID", Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID);
 
 		shooterIsPresent = getAsBoolean("shooter/present", true);
-		shooterCanID = getAsInt("shooter/canID", Constants.SHOOTER_TALON_CAN_ID);
+		shooterCanID = getAsInt("shooter/shooterCanID", Constants.SHOOTER_TALON_CAN_ID);
+		shooterFeederCanID = getAsInt("shooter/feederCanID", Constants.SHOOTER_FEEDER_TALON_CAN_ID);
 		
 		pdpIsPresent = getAsBoolean("pdp/present", true);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);
