@@ -20,12 +20,19 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   private Colour colour = Colour.UNKNOWN;
   private Colour startColour;
   private Colour pairColour;
-  private int rotCount;
+  private int rotCount = -1;
+
+  public boolean correctColor = false;
+  public boolean firstLoop = true;
 
   private ColourAction action = new ColourAction(Type.NONE, Colour.UNKNOWN);
 
   private final Motor motor;
 
+  private long spinTime;
+
+  private int direction = -1; //Reverse this if doubleCheck() is not working.
+  
   // Values callibrated using vynl sticker for control panel.
   private final Color BlueTarget = ColorMatch.makeColor(0.147, 0.437, 0.416);
   private final Color GreenTarget = ColorMatch.makeColor(0.189, 0.559, 0.250);
@@ -76,6 +83,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     }
     if (newSpeed != speed) {
       motor.set(ControlMode.PercentOutput, newSpeed);
+      log.info("set new speed %.2f", newSpeed);
       speed = newSpeed;
     }
   }
@@ -122,9 +130,24 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public double positionalControl(Colour desired) {
     updateColour();
     if (desired == colour || desired == Colour.UNKNOWN) {
-      action = new ColourAction(Type.NONE, Colour.UNKNOWN);
-      log.info("ColourWheel: Desired colour found.");
-      return 0;
+      if (firstLoop == true) {
+        spinTime = System.currentTimeMillis();
+        if (motor.get() > 0) {
+          firstLoop = false;
+          return 0.3;
+        } else {
+          firstLoop = false;
+          return -0.3;
+        }
+      } 
+      if (System.currentTimeMillis() - spinTime < 500) {
+        return motor.get();
+      } else {
+        action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+        firstLoop = true;
+        log.info("ColourWheel: Desired colour found.");
+        return 0;
+      }
     }
     if (colour == Colour.RED && desired == Colour.YELLOW) {
       return -0.5;
@@ -151,7 +174,11 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       return 0.5;
     }
     if (colour == Colour.UNKNOWN) {
-      return speed;
+      if(speed != 0) {
+        return speed;
+      } else {
+        return 0.5;
+      }
     }
     return 1;
   }
@@ -175,39 +202,46 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   public Colour doubleCheck() {
     if (colour != colourPrev) {
-      if (colourPrev == Colour.GREEN && motor.get() < 0 && colour != Colour.BLUE) {
-        System.out.println("Middle");
-        return colourPrev;
+      if (colourPrev == Colour.GREEN) {
+        if (motor.get() * direction < 0 && colour != Colour.BLUE) {
+          return colourPrev;
+        }
+        if (motor.get() *direction > 0 && colour != Colour.RED) {
+          return colourPrev;
+        }
       }
-      if (colourPrev == Colour.GREEN && motor.get() > 0 && colour != Colour.RED) {
-        System.out.println("Middle");
-        return colourPrev;
+      if (colourPrev == Colour.BLUE) {
+        if (motor.get() * direction < 0 && colour != Colour.YELLOW) {
+          System.out.println("Middle");
+          return colourPrev;
+        }
+        if (motor.get() * direction > 0 && colour != Colour.GREEN) {
+          System.out.println("Middle");
+          return colourPrev;
+        }
       }
-      if (colourPrev == Colour.BLUE && motor.get() < 0 && colour != Colour.YELLOW) {
-        System.out.println("Middle");
-        return colourPrev;
+      if (colourPrev == Colour.YELLOW) {
+        if (motor.get() * direction < 0 && colour != Colour.RED) {
+          System.out.println("Middle");
+          return colourPrev;
+        }
+        if (motor.get() * direction > 0 && colour != Colour.BLUE) {
+          System.out.println("Middle");
+          return colourPrev;
+        }
       }
-      if (colourPrev == Colour.BLUE && motor.get() > 0 && colour != Colour.GREEN) {
-        System.out.println("Middle");
-        return colourPrev;
-      }
-      if (colourPrev == Colour.YELLOW && motor.get() < 0 && colour != Colour.RED) {
-        System.out.println("Middle");
-        return colourPrev;
-      }
-      if (colourPrev == Colour.YELLOW && motor.get() > 0 && colour != Colour.BLUE) {
-        System.out.println("Middle");
-        return colourPrev;
-      }
-      if (colourPrev == Colour.RED && motor.get() < 0 && colour != Colour.GREEN) {
-        System.out.println("Middle");
-        return colourPrev;
-      }
-      if (colourPrev == Colour.RED && motor.get() > 0 && colour != Colour.YELLOW) {
-        System.out.println("Middle");
-        return colourPrev;
+      if (colourPrev == Colour.RED) {
+        if (motor.get() * direction < 0 && colour != Colour.GREEN) {
+          System.out.println("Middle");
+          return colourPrev;
+        }
+        if (motor.get() * direction > 0 && colour != Colour.YELLOW) {
+          System.out.println("Middle");
+          return colourPrev;
+        }
       }
     }
+    colourPrev = colour;
     return colour;
   }
 
@@ -233,5 +267,9 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     dashboard.putString("Desired colour", action.colour.toString());
     dashboard.putString("Current colour", colour.toString());
     dashboard.putNumber("Colour wheel motor", motor.get());
+    dashboard.putString("Colour wheel action", action.type.toString());
+    dashboard.putNumber("Colour wheel rotations", rotCount);
+    dashboard.putNumber("spinTime", spinTime);
+    dashboard.putNumber("realTime", System.currentTimeMillis());
 	}
 }

@@ -8,6 +8,9 @@ import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
 import frc.robot.lib.Position;
 import frc.robot.subsystems.Subsystems;
 
@@ -214,7 +217,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitForHatch();
 		waitForIntake();
 		waitForClimber();
-		waitForColourWheel();
+		maybeWaitForColourWheel();
 		//waitForLiftDeployer();
 		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
 		
@@ -316,8 +319,18 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitUntil(() -> subsystems.lift.isDeployed() || !subsystems.lift.isDeployed(), "lift deployer to stop moving");
 	}
 
-	private void waitForColourWheel() {
-		waitUntil(() -> subsystems.colourWheel.isFinished(), "colour wheel to stop moving");
+
+	private void maybeWaitForColourWheel() {
+		try {
+			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while moving colour wheel");
+			// The sequence has changed, setting action to null.
+			subsystems.colourWheel.setDesiredAction(new ColourAction(Type.NONE, Colour.UNKNOWN));
+			logSub("Resetting colour wheel to no action.");
+			// Give it a chance to stop moving.
+			clock.sleepSeconds(0.1);
+		}
 	}
 
 	/**

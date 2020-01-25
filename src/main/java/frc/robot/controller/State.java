@@ -304,12 +304,12 @@ public class State {
 
 	// Color Wheel
 	public State rotational() {
-		colourWheel = new ColourAction(ColourAction.Type.POSITION, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.Type.ROTATION, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State positional(Colour colour) {
-		colourWheel = new ColourAction(ColourAction.Type.ROTATION, colour);
+		colourWheel = new ColourAction(ColourAction.Type.POSITION, colour);
 		return this;
 	}
 

@@ -174,7 +174,7 @@ public class OI implements OIInterface {
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
 
-		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
+		//onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
 		
 		// Deploy/retract lift. 
 		onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
@@ -245,9 +245,8 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.positional(Colour.BLUE));
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.positional(Colour.RED));
 		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.positional(Colour.GREEN));
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.positional(Colour.YELLOW));
-		onTriggered(stick.getDPad(0,GamepadButtonsX.RIGHT_THUMBSTICK_CLICK), Sequences.rotational());
-		onTriggered(stick.getDPad(0,GamepadButtonsX.START_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.rotational());
+		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.stopColourWheel());
 
 		// Lift microadjust
 		whileTriggered(() -> {
