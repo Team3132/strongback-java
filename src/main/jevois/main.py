@@ -7,6 +7,7 @@ import time
 GOAL_WIDTH = 1.0098 # width in meters
 GOAL_HEIGHT = 0.432 # height in meters
 
+SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 252 # pixels
 CAMERA_HEIGHT = 28 # center of camera height off the ground, in inches
 
@@ -82,16 +83,24 @@ def cal_goal_skew(TL,TR,BL,BR, center_distance):
     # center_distance is the hypotenuse 
     HALF_WIDTH_GOAL = GOAL_WIDTH /2
 
-    left_side_length = cal_point_distance(TL, BL)
-    right_side_length = cal_point_distance(TR, BR)
+    # left_side_length = cal_point_distance(TL, BL)
+    # right_side_length = cal_point_distance(TR, BR)
 
+    # left_side_distance = cal_distance(left_side_length) # this is wrong pls fix
+    # left_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, left_side_distance)
 
-    left_side_distance = cal_distance(left_side_length) # this is wrong pls fix
+    # right_side_distance = cal_distance(right_side_length)
+    # right_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, right_side_distance)
+    # avg_angle = (left_acute_angle + (180 - right_acute_angle))/2
+    
+    left_side_distance = cal_distance(TL[1])
     left_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, left_side_distance)
 
-    right_side_distance = cal_distance(right_side_length)
+    right_side_distance = cal_distance(TR[1])
     right_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, right_side_distance)
+
     avg_angle = (left_acute_angle + (180 - right_acute_angle))/2
+
     return 90 - avg_angle
 
 # calculates the angle in a triangle of known lengths
@@ -202,6 +211,7 @@ class FirstPython:
 
     def detect(self, imgbgr, outimg = None):
 
+
         maxn = 5 # max number of objects we will consider
         h, w, chans = imgbgr.shape
 
@@ -300,7 +310,6 @@ class FirstPython:
             break
             
         TL,TR,BL,BR = cal_corners(bestHull)
-        jevois.LINFO(str(bestHull))
         
         try:
             mx = int((TL[0]+TR[0])/2)
@@ -322,12 +331,12 @@ class FirstPython:
  
     # ###################################################################################################
     ## Send serial messages, one per object
-    def sendAllSerial(self,found, distance, skew):
-        # time, found, distance, skew
+    def sendAllSerial(self,found, distance, x):
+        # time, found, distance, center of goal 
         now = time.time()
         
         jevois.sendSerial("D3 {} {} {} {} FIRST".
-                            format(now,now,now,now)) # pose
+                            format(now,found, distance,x)) # pose
                               
     # ###################################################################################################
     ## Draw all detected objects in 3D
@@ -362,7 +371,7 @@ class FirstPython:
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
         # Send all serial messages:
-        self.sendAllSerial(w, h, bestHull, rvecs, tvecs)
+        #self.sendAllSerial(w, h, bestHull, rvecs, tvecs)
 
         # Log frames/s info (will go to serlog serial port, default is None):
         self.timer.stop()
@@ -391,14 +400,35 @@ class FirstPython:
         # Let camera know we are done using the input image:
         inframe.done()
         
-        # Get a list of quadrilateral convex hulls for all good objects:
-        bestHull = self.detect(imgbgr, outimg)
-
         # Load camera calibration if needed:
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
+        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
+
+        # Get a list of quadrilateral convex hulls for all good objects:
+        bestHull = self.detect(imgbgr, outimg)
+        
+        found = False
+        distance = 0
+        x = 0
+
+        try: 
+            if(bestHull.any()):
+                found = True
+            TL,TR,BL,BR = cal_corners(bestHull)
+        
+            mx = int((TL[0]+TR[0])/2)
+            my = int((TL[1]+TR[1])/2)
+                        
+            distance = cal_distance(my)
+            x = mx-(SCREEN_WIDTH/2) 
+        except:
+            print("target not found")
+        
+        
+
         # Send all serial messages:
-        #self.sendAllSerial(w, h, bestHull, rvecs, tvecs)
+        self.sendAllSerial(found, distance, x)
         
         #cv2.drawContours(outimg, [foundcontours], 0, (255, 0, 0), 2)
     

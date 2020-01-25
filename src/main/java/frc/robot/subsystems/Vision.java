@@ -38,10 +38,13 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		this.visionVMax = visionVMax;
 	
 		log.register(true, () -> isConnected(), "%s/connected", name)
-				.register(true, () -> lastSeenTarget.location.x, "%s/curX", name)
-				.register(true, () -> lastSeenTarget.location.y, "%s/curY", name)
-				.register(true, () -> lastSeenTarget.location.heading, "%s/heading", name)
-				.register(true, () -> clock.currentTime() - lastSeenTarget.seenAtSec, "%s/seenAt", name);
+				//.register(true, () -> lastSeenTarget.location.x, "%s/curX", name)
+				//.register(true, () -> lastSeenTarget.location.y, "%s/curY", name)
+				//.register(true, () -> lastSeenTarget.location.heading, "%s/heading", name)
+				.register(true, () -> clock.currentTime() - lastSeenTarget.seenAtSec, "%s/seenAt", name)
+				.register(true, () -> lastSeenTarget.targetFound, "%s/targetFound", name)
+				.register(true, () -> lastSeenTarget.distance, "%s/distance", name)
+				.register(true, () -> lastSeenTarget.xOffset, "%s/xOffset", name);
 		// Start reading from the Jevois camera.
 		(new Thread(this)).start();
 	}
@@ -112,6 +115,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	 */
 	private void processLine(String line) {
 		// Split the line on whitespace.
+		// "D3 timestamp found distance x FIRST"
 		String[] parts = line.split("\\s+");
 
 		if (!parts[0].equals("D3")) {
@@ -123,32 +127,23 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		// Specs for the Jevois camera: https://www.jevoisinc.com/pages/hardware
 		final double horizontalFOV = 65;
 		final double verticalFOV = horizontalFOV / (4.0/3.0);
-		double xAngle = -Double.parseDouble(parts[1]) * horizontalFOV / 2;  // Parsed value is -1...1, so need to halve it.
-		double yAngle = Double.parseDouble(parts[2]) * verticalFOV / 2;
-		// All measurements on the robot are in inches for consistency with the game manual. /sigh
-		double distanceInches = MathUtil.metresToInches(Double.parseDouble(parts[3])); // distance of the camera relative to the goal
-		double height = distanceInches * Math.sin(yAngle);
+		
 		double seenAtSec = clock.currentTime() - 0.01; // when the image was taken
 		// A target was seen, update the TargetDetails in case it's asked for.
 		// Fill in a new TargetDetails so it can be returned if asked for and it won't
 		// change as the caller uses it.
 		TargetDetails latestTargetSeen = new TargetDetails();
-		Position robotPosition = location.getHistoricalLocation(seenAtSec);
 		//log.sub("Vision old pos = %s", robotPosition);
 		//log.sub("Vision: angle=%.1f, distance=%.1f", xAngle, distanceInches);
-		latestTargetSeen.location = robotPosition.addVector(distanceInches, xAngle);
 
 		// When the target is flat with the camera the skew is inaccurate. Can be as bad as +-20 degrees
 		// Use a low pass filter to try and smooth these out
 		// TODO: since this is an issue when the skew is zero try to squash small skew values
-		double skewRelRobot = -Double.parseDouble(parts[9])*360/Math.PI;
-		double skewAlpha = 0.6;
-		latestTargetSeen.location.heading += xAngle + skewRelRobot * skewAlpha + (1-skewAlpha)*prevSkew;
-		prevSkew = skewRelRobot;
 		
-		latestTargetSeen.height = height;
-		latestTargetSeen.targetFound = true;
 		latestTargetSeen.seenAtSec = seenAtSec;
+		latestTargetSeen.targetFound = Boolean.parseBoolean(parts[2]);
+		latestTargetSeen.distance = Double.parseDouble(parts[3]);
+		latestTargetSeen.xOffset = Double.parseDouble(parts[4]);
 		synchronized (this) {
 			lastSeenTarget = latestTargetSeen;
 		}
@@ -178,7 +173,9 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		dashboard.putNumber("Vision Heading", lastSeenTarget.location.heading);
 		dashboard.putNumber("Vision height", lastSeenTarget.height);
 		dashboard.putNumber("Vision angle to target", angle);
-		dashboard.putNumber("Vision distance to target", distance);
+		dashboard.putNumber("Vision distance to target", lastSeenTarget.distance);
+		dashboard.putBoolean("Vision target found", lastSeenTarget.targetFound);
+		dashboard.putNumber("Vision xOffset", lastSeenTarget.xOffset);
 	}
 
 	/**

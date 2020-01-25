@@ -17,6 +17,8 @@ public interface VisionInterface extends DashboardUpdater {
 		public double seenAtSec; // What time this target was seen at in seconds since boot.
 		public Position location = new Position(0, 0);  // Co-ordinates relative to the location subsystem.
 		public double height;  // How high the target is.
+		public double distance;
+		public double xOffset;
 		
 		@Override
 		public String toString() {
