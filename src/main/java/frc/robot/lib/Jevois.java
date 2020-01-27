@@ -183,7 +183,7 @@ public class Jevois implements JevoisInterface {
         visionMode.setSharpness(6);
         webcamMode.setAutogain(false);
         // The first mapping line in the file should be the FirstPython one.
-        visionMode.setModeString("setmapping 25");
+        visionMode.setModeString("setmapping 29");
         // 25 - OUT: YUYV 640x252 @ 60fps CAM: YUYV 320x240 @ 60fps MOD: JeVois:FirstPython Python
         //visionMode.setModeString("setmapping2 YUYV 320 240 60.0 JeVois FirstPython");
     }
@@ -272,12 +272,16 @@ public class Jevois implements JevoisInterface {
      */
     @Override
     public String readLine() throws IOException {
-        if (!isConnected())
+        if (!isConnected()){
+            log.sub("CAMERA NOT CONNECTED");
             throw new IOException("No camera connected"); // No connection, give up.
+
+        }
 
         StringBuffer line = new StringBuffer(200);
         while (true) {
             synchronized (this) {
+               // log.sub(line.toString());
                 try {
                     int b = istream.read();
                     if (b < 0) {

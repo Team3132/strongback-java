@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.strongback.components.Clock;
 import frc.robot.interfaces.DashboardInterface;
@@ -74,11 +76,13 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 			log.sub(jevois.issueCommand("info"));
 			connected = true;
 			// Update the HSV filter ranges from the config values.
-			jevois.issueCommand(String.format("setHSVMin %.0f %.0f %.0f", visionHMin, visionSMin, visionVMin));
-			jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax, visionSMax, visionVMax));
-			while (true) {
-				processLine(jevois.readLine());
-			}
+
+			// jevois.issueCommand(String.format("setHSVMin %.0f %.0f %.0f", visionHMin, visionSMin, visionVMin));
+			// log.sub("HSVMin set");
+			// jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax, visionSMax, visionVMax));
+			// log.sub("HSVMax set");
+			log.sub("reading line from jevois");
+			processLine(jevois.readLine());
 		} catch (IOException e) {
 			log.error("Failed to read from jevois, aborting vision processing\n");
 			connected = false;
@@ -116,6 +120,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	private void processLine(String line) {
 		// Split the line on whitespace.
 		// "D3 timestamp found distance x FIRST"
+		log.sub(line);
 		String[] parts = line.split("\\s+");
 
 		if (!parts[0].equals("D3")) {
@@ -166,13 +171,6 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 			distance = robotPos.distanceTo(lastSeenTarget.location);
 		}
 		dashboard.putBoolean("Vision camera found", connected);
-		dashboard.putBoolean("Vision lock", targetFound);
-		dashboard.putNumber("Vision lock age", lockAgeSec);
-		dashboard.putNumber("Vision X", lastSeenTarget.location.x);
-		dashboard.putNumber("Vision Y", lastSeenTarget.location.y);
-		dashboard.putNumber("Vision Heading", lastSeenTarget.location.heading);
-		dashboard.putNumber("Vision height", lastSeenTarget.height);
-		dashboard.putNumber("Vision angle to target", angle);
 		dashboard.putNumber("Vision distance to target", lastSeenTarget.distance);
 		dashboard.putBoolean("Vision target found", lastSeenTarget.targetFound);
 		dashboard.putNumber("Vision xOffset", lastSeenTarget.xOffset);

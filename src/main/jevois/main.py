@@ -9,7 +9,7 @@ GOAL_HEIGHT = 0.432 # height in meters
 
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 252 # pixels
-CAMERA_HEIGHT = 28 # center of camera height off the ground, in inches
+CAMERA_HEIGHT = 15 # center of camera height off the ground, in inches
 
 def deg_to_rad(degrees):
     return degrees * (math.pi / 180)
@@ -317,7 +317,7 @@ class FirstPython:
             distance = cal_distance(my)
             center_distance = cal_goal_center_distance(distance)
             skew = cal_goal_skew(TL,TR,BL,BR, center_distance)
-            goalCriteria += "ground dist = " + str(int(distance))
+            goalCriteria += "ground dist = " + str(distance)
             goalCriteria += "skew = " + str(skew)
         except:
             print("hi")
@@ -336,7 +336,7 @@ class FirstPython:
         now = time.time()
         
         jevois.sendSerial("D3 {} {} {} {} FIRST".
-                            format(now,found, distance,x)) # pose
+                            format(now,found, distance,x)) 
                               
     # ###################################################################################################
     ## Draw all detected objects in 3D
