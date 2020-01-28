@@ -55,6 +55,8 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                 holding = true;
                 break;
             case STOP_CLIMBER:
+                leftWinch.setTargetHeight(leftWinch.getActualHeight());
+                rightWinch.setTargetHeight(rightWinch.getActualHeight());
                 leftWinch.setMotorPower(0);
                 rightWinch.setMotorPower(0);
                 break;                

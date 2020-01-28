@@ -30,9 +30,9 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
 
     /** 
      * Sets the desired action for the climber.
-     * @param action
+     * @param climberAction
      */
-    public void setDesiredAction(ClimberAction action);
+    public void setDesiredAction(ClimberAction climberAction);
 
     /**
      * Gets the target action of the climber.

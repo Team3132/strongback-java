@@ -340,6 +340,30 @@ public class Sequences {
 		return seq;
 	}
 
+	public static Sequence startClimberLeftUp() {
+		Sequence seq = new Sequence("left climber up");
+		seq.add().setClimberPowerLeft(1);
+		return seq;
+	}
+
+	public static Sequence startClimberLeftDown() {
+		Sequence seq = new Sequence("left climber down");
+		seq.add().setClimberPowerLeft(-1);
+		return seq;
+	}
+
+	public static Sequence startClimberRightUp() {
+		Sequence seq = new Sequence("right climber up");
+		seq.add().setClimberPowerRight(1);
+		return seq;
+	}
+
+	public static Sequence startClimberRightDown() {
+		Sequence seq = new Sequence("right climber down");
+		seq.add().setClimberPowerRight(-1);
+		return seq;
+	}
+
 	public static Sequence pauseClimber() {
 		Sequence seq = new Sequence("hold climb");
 		seq.add().holdClimber();

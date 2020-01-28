@@ -119,9 +119,9 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
 		
 		// Deploy/retract lift. 
-		onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
+	/*	onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
 		onUntriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftRetract());
-
+*/
 		// Spitter Sequence (cargoSpit) 
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startCargoSpit());
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
@@ -139,9 +139,9 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.holdHatch());
 
 		// Hatch deploy/stow buttons.
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_WEST), Sequences.getReadyHatchSequence());			
+/*		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_WEST), Sequences.getReadyHatchSequence());			
 		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_EAST), Sequences.getStowHatchSequence());
-		
+		*/
 		// Microadjust hatch left and right
 		//whileTriggered(axisAsSwitch(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS)),
 		//		() -> { return Sequences.getHatchDeltaPositionSequence(-1 * stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read()); });
@@ -183,11 +183,15 @@ public class OI implements OIInterface {
 
 		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startClimberUp());
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.startClimberDown());
+		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_NORTH), Sequences.startClimberLeftUp());
+		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_WEST), Sequences.startClimberLeftDown());
+		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.startClimberRightDown());
+		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_EAST), Sequences.startClimberRightUp());
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.pauseClimber());
 		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.stopClimber());
-
+/*
 		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.moveLift(LiftSetpoint.LIFT_BOTTOM_HEIGHT));
-
+*/
 		// Lift microadjust
 		whileTriggered(() -> {
 			return stick.getAxis(GamepadButtonsX.RIGHT_Y_AXIS).read() > 0.8;

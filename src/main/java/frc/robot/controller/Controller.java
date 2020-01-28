@@ -5,47 +5,52 @@ import java.util.function.BooleanSupplier;
 
 import org.strongback.components.Clock;
 import frc.robot.Constants;
+import frc.robot.interfaces.ClimberInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
 import frc.robot.lib.Position;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Subsystems;
 
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
 
 /**
- * The controller of State Sequences while ensuring the robot is safe at every step.
+ * The controller of State Sequences while ensuring the robot is safe at every
+ * step.
  * 
- * Allows higher level code to specify just the states that the robot needs
- * to pass through but it doesn't need to care how it gets there - this code
- * will ensure it gets there safely.
+ * Allows higher level code to specify just the states that the robot needs to
+ * pass through but it doesn't need to care how it gets there - this code will
+ * ensure it gets there safely.
  * 
  * This is very similar to commands, with the differences to a command-based
- * approach being:
- *  - Unlike commands, the activation logic is concentrated in one place, making
- *    it much safer to add new functionality.
- *  - Every state doesn't need to be aware of every other state (much simpler).
- *  - Creating strings of sequences is much simpler and shorter than commands.
- *  - Arbitrary combinations of parallel and sequential commands aren't supported,
- *    only a series of parallel operations.
+ * approach being: - Unlike commands, the activation logic is concentrated in
+ * one place, making it much safer to add new functionality. - Every state
+ * doesn't need to be aware of every other state (much simpler). - Creating
+ * strings of sequences is much simpler and shorter than commands. - Arbitrary
+ * combinations of parallel and sequential commands aren't supported, only a
+ * series of parallel operations.
  * 
- * This could be made faster, but we need to be careful it doesn't make it unsafe.
+ * This could be made faster, but we need to be careful it doesn't make it
+ * unsafe.
  */
 public class Controller implements Runnable, DashboardUpdater {
 	private final Subsystems subsystems;
 	private final Clock clock;
 	private final DashboardInterface dashboard;
 	private final Log log;
-	private Sequence sequence = new Sequence("idle");  // Current sequence we are working through.
+	private Sequence sequence = new Sequence("idle"); // Current sequence we are working through.
 	private boolean sequenceHasChanged = true;
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
 
 	/**
-	 * The Pathfinder library can't be run on x86 without recompiling, which makes it
-	 * hard to unit test. Instead it's abstracted out.
+	 * The Pathfinder library can't be run on x86 without recompiling, which makes
+	 * it hard to unit test. Instead it's abstracted out.
 	 */
 	public interface TrajectoryGenerator {
 		Trajectory[] generate(Waypoint[] waypoints);
@@ -58,18 +63,19 @@ public class Controller implements Runnable, DashboardUpdater {
 		this.log = subsystems.log;
 		(new Thread(this)).start();
 	}
-	
+
 	synchronized public void doSequence(Sequence sequence) {
 		if (this.sequence == sequence) {
 			// Exactly the same same sequence. Only start it again if it has
 			// finished. Used in the whileTriggered(...) case.
 			// Intentionally using == instead of .equalTo().
-			if (!sequenceHasFinished) return;
+			if (!sequenceHasFinished)
+				return;
 		}
 		this.sequence = sequence;
 		sequenceHasChanged = true;
 		logSub("Sequence has changed to %s sequence", sequence.getName());
-		notifyAll();  // Tell the run() method that there is a new sequence.
+		notifyAll(); // Tell the run() method that there is a new sequence.
 	}
 
 	/**
@@ -117,28 +123,27 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * For use by unit tests only. 
+	 * For use by unit tests only.
+	 * 
 	 * @return if an unhandled excpetions has occured in the controller
 	 */
 	public boolean isAlive() {
 		return isAlive;
 	}
-	
+
 	/**
 	 * Does the simple, dumb and most importantly, safe thing.
 	 * 
 	 * See the design doc before changing this.
 	 * 
-	 * Steps through:
-	 *  - Wait for all subsystems to finish moving.
-	 *  - Deploy or retract the intake if necessary.
-	 *  - 
-	 *  
+	 * Steps through: - Wait for all subsystems to finish moving. - Deploy or
+	 * retract the intake if necessary. -
+	 * 
 	 * Note if the step asks for something which will cause harm to the robot, the
 	 * request will be ignored. For example if the lift was moved into a position
 	 * the intake could hit it and then the intake was moved into the lift, the
 	 * intake move would be ignored.
-	 *  
+	 * 
 	 * @param desiredState The state to leave the robot in.
 	 */
 	private void applyState(State desiredState) {
@@ -147,10 +152,10 @@ public class Controller implements Runnable, DashboardUpdater {
 		}
 
 		logSub("Applying requested state: %s", desiredState);
-		//logSub("Waiting subsystems to finish moving before applying state");
+		// logSub("Waiting subsystems to finish moving before applying state");
 		// waitForLift();
 		waitForIntake();
-		
+
 		// Get the current state of the subsystems.
 		State currentState = new State(subsystems, clock);
 		logSub("Current state: %s", currentState);
@@ -159,22 +164,21 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Calculated new 'safe' state: %s", desiredState);
 
 		// The time beyond which we are allowed to move onto the next state
-		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());	
+		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());
 
 		// Calculate the height that we want to use.
 		// We cannot just use desiredState.liftAction.value because it
 		// might not be of type START_CLIMBER_UP
-		double desiredLiftHeight = desiredState.liftAction.calculateHeight(
-			subsystems.lift.getHeight(),
-			subsystems.lift.getTargetHeight()
-		);
-		
+		double desiredLiftHeight = desiredState.liftAction.calculateHeight(subsystems.lift.getHeight(),
+				subsystems.lift.getTargetHeight());
+
 		maybeResetPosition(desiredState.resetPosition, subsystems);
-		
+
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
-		
-		// Retract the lift if the lift is going to the bottom so the spitter doesn't hit the bumpers.
+
+		// Retract the lift if the lift is going to the bottom so the spitter doesn't
+		// hit the bumpers.
 		// In updatedesiredState.liftAction was set to type START_CLIMBER_UP
 		if (desiredLiftHeight < Constants.LIFT_DEFAULT_MIN_HEIGHT) { // FIXME: This will never evaluate to true
 			if (subsystems.lift.isDeployed()) {
@@ -184,9 +188,10 @@ public class Controller implements Runnable, DashboardUpdater {
 			waitForLiftDeployer();
 		}
 		subsystems.lift.setTargetHeight(desiredLiftHeight);
-		
-		// Do the next steps in parallel as they don't mechanically conflict with each other.
-		
+
+		// Do the next steps in parallel as they don't mechanically conflict with each
+		// other.
+
 		if (desiredState.liftDeploy) {
 			subsystems.lift.deploy();
 			waitForLiftDeployer();
@@ -203,18 +208,18 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.hatch.setAction(desiredState.hatchAction);
 		subsystems.hatch.setHeld(desiredState.hatchHolderEnabled);
-		
+
 		subsystems.spitter.setTargetDutyCycle(desiredState.spitterDutyCycle);
 
-		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
-		
-		maybeWaitForLift();  // This be aborted, so the intake needs to be wary below.
+		// subsystems.jevois.setCameraMode(desiredState.cameraMode);
+
+		maybeWaitForLift(); // This be aborted, so the intake needs to be wary below.
 		waitForHatch();
 		waitForIntake();
-		waitForClimber();
-		//waitForLiftDeployer();
+		maybeWaitForClimber();
+		// waitForLiftDeployer();
 		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
-		
+
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
 		maybeWaitForAutoDriving();
@@ -224,19 +229,21 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * If not null, reset the current location in the Location subsystem to be position.
-	 * Useful when starting autonomous.
+	 * If not null, reset the current location in the Location subsystem to be
+	 * position. Useful when starting autonomous.
+	 * 
 	 * @param position
 	 * @param subsystems
 	 */
 	private void maybeResetPosition(Waypoint position, Subsystems subsystems) {
-		if (position == null) return;
+		if (position == null)
+			return;
 		subsystems.location.setCurrentLocation(new Position(position.x, position.y, position.angle));
 	}
 
 	/**
-	 * Blocks waiting till the lift is in position.
-	 * If the sequence changes it will stop the lift.
+	 * Blocks waiting till the lift is in position. If the sequence changes it will
+	 * stop the lift.
 	 */
 	private void maybeWaitForLift() {
 		try {
@@ -253,11 +260,10 @@ public class Controller implements Runnable, DashboardUpdater {
 		}
 	}
 
-
 	private void maybeWaitForAutoDriving() {
 		try {
 			waitUntilOrAbort(() -> subsystems.drivebase.hasFinished(), "auto driving");
-		} catch (SequenceChangedException e) {	
+		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while driving, switching drivebase back to arcade");
 			subsystems.drivebase.setArcadeDrive();
 		}
@@ -267,7 +273,8 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Blocks waiting till the lift is in position.
 	 */
 	private void waitForLift() {
-		waitUntil(() -> subsystems.lift.isInPosition(), String.format("lift to move to %.0f", subsystems.lift.getTargetHeight()));
+		waitUntil(() -> subsystems.lift.isInPosition(),
+				String.format("lift to move to %.0f", subsystems.lift.getTargetHeight()));
 	}
 
 	/**
@@ -280,8 +287,15 @@ public class Controller implements Runnable, DashboardUpdater {
 	/**
 	 * Blocks waiting till the climber is in position.
 	 */
-	private void waitForClimber() {
-		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
+	private void maybeWaitForClimber() {
+		try {
+			waitUntilOrAbort(() -> subsystems.climber.isInPosition(), "climber");
+		} catch (SequenceChangedException e) {
+			logSub("Climber sequence aborted");
+			subsystems.climber.setDesiredAction(new ClimberAction(Type.HOLD_HEIGHT, 0));
+			
+		}
+			
 	}
 
 	/**
