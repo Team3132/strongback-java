@@ -180,6 +180,7 @@ public class OI implements OIInterface {
 		onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
 		onUntriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftRetract());
 
+		/*
 		// Spitter Sequence (cargoSpit) 
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startCargoSpit());
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
@@ -187,6 +188,7 @@ public class OI implements OIInterface {
 		// Reverse button
 		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
+		*/
 
 		// Hatch hold & release
 		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), () -> {
@@ -247,6 +249,10 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.positional(Colour.GREEN));
 		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.rotational());
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());
+		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelRight());
+		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
 
 		// Lift microadjust
 		whileTriggered(() -> {

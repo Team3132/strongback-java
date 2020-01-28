@@ -23,6 +23,8 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         public enum Type {
             ROTATION,
             POSITION,
+            MOVE_LEFT,
+            MOVE_RIGHT,
             NONE
         }
 

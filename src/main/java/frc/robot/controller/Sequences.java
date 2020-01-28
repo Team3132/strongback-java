@@ -443,6 +443,18 @@ public class Sequences {
 		return seq;
 	}
 
+	public static Sequence colourWheelLeft() {
+		Sequence seq = new Sequence("moving colour wheel left");
+		seq.add().colourWheelLeft();
+		return seq;
+	}
+
+	public static Sequence colourWheelRight() {
+		Sequence seq = new Sequence("moving colour wheel right");
+		seq.add().colourWheelRight();
+		return seq;
+	}
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
 		getEmptySequence(), 

@@ -318,6 +318,15 @@ public class State {
 		return this;
 	}
 
+	public State colourWheelLeft() {
+		colourWheel = new ColourAction(ColourAction.Type.MOVE_LEFT, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State colourWheelRight() {
+		colourWheel = new ColourAction(ColourAction.Type.MOVE_RIGHT, Colour.UNKNOWN);
+		return this;
+	}
 
 	// Drive base
 	/**

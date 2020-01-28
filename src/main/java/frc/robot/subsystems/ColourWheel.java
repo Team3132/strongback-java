@@ -74,6 +74,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     case POSITION:
       newSpeed = positionalControl(action.colour);
       break;
+    case MOVE_LEFT:
+      newSpeed = -0.3 * direction;
+      break;
+    case MOVE_RIGHT:
+      newSpeed = 0.3 * direction;
+      break;
     case NONE:
       newSpeed = 0;
       break;
