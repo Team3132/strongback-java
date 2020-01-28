@@ -40,7 +40,7 @@ public class State {
 	
 	// Shooter
 	public Double shooterTargetSpeed = null;  // Target speed in RPM to give to shooter.
-	public Double shooterFeederSpeed = null;  // Power level to supply to shooter feeder wheel. -1..0..1
+	public Double feederPower = null;  // Power level to supply to shooter feeder wheel. -1..0..1
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
 	// Passthrough
@@ -77,6 +77,7 @@ public class State {
 		intakeExtended = subsystems.intake.isExtended();
 		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
 		shooterTargetSpeed = subsystems.shooter.getTargetSpeed();
+		feederPower = subsystems.shooter.getFeederPower();
 		hasCargo = subsystems.shooter.hasCell();
 		climber = subsystems.climber.getDesiredAction();
 		hatchAction = subsystems.hatch.getAction();
@@ -183,8 +184,8 @@ public class State {
 
 
 	// Shooter
-	public State setShooterFeederSpeed(double feederSpeed) {
-		shooterFeederSpeed = Double.valueOf(feederSpeed);
+	public State setFeederPower(double power) {
+		feederPower = Double.valueOf(power);
 		return this;
 	}
 

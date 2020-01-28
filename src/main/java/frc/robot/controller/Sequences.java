@@ -224,14 +224,14 @@ public class Sequences {
 	public static Sequence startShooter() {
 		Sequence seq = new Sequence("start shooter");
 		seq.add().setShooterTargetSpeed(100); //RPM
-		seq.add().setShooterFeederSpeed(1); //PercentOutput
+		seq.add().setFeederPower(1); //PercentOutput
 		return seq;
 	}
 
 	public static Sequence stopShooter() {
 		Sequence seq = new Sequence("stop shooter");
 		seq.add().setShooterTargetSpeed(0); //RPM
-		seq.add().setShooterFeederSpeed(1); //PercentOutput
+		seq.add().setFeederPower(1); //PercentOutput
 		return seq;
 	}
 

@@ -10,7 +10,7 @@ import frc.robot.interfaces.ShooterInterface;
 public class ShooterSimulator implements ShooterInterface{
 
     private double targetSpeed = 0;
-    private double feederPercent = 0;
+    private double feederPower = 0;
 
     @Override
     public String getName() {
@@ -54,13 +54,18 @@ public class ShooterSimulator implements ShooterInterface{
     }
 
     @Override
-    public ShooterInterface setFeederSpeed(double percent) {
-        this.feederPercent = percent;
+    public ShooterInterface setFeederPower(double percent) {
+        this.feederPower = percent;
         return this;
     }
 
     @Override
     public boolean hasCell() {
         return false;
+    }
+
+    @Override
+    public double getFeederPower() {
+        return feederPower;
     }
 }

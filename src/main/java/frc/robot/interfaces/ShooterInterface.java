@@ -6,8 +6,8 @@ public interface ShooterInterface extends SubsystemInterface, Executable, Dashbo
 
     public ShooterInterface setTargetSpeed(double speed);
     public double getTargetSpeed();
-
-    public ShooterInterface setFeederSpeed(double percent);
-
+    
+    public ShooterInterface setFeederPower(double percent);
+    public double getFeederPower();
     public boolean hasCell();
 }

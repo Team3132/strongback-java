@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
@@ -19,16 +17,15 @@ import frc.robot.lib.NetworkTablesHelper;
  */
 public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
 
-    private ShooterWheel flywheel;
-    private ShooterWheel feederWheel;
+    private ShooterWheel flyWheel;
+    private FeederWheel feederWheel;
 
     public Shooter(Motor shooterMotor, Motor feederMotor, DashboardInterface dashboard, Log log) {
         super("Shooter", dashboard, log);
-        flywheel = new ShooterWheel("flywheel", shooterMotor);
+        flyWheel = new ShooterWheel(shooterMotor);
+        feederWheel = new FeederWheel(feederMotor);
         //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
     }
-
-    
 
 	@Override
 	public void enable() {
@@ -37,7 +34,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 		double shooterI = helper.get("i", Constants.SHOOTER_I);
 		double shooterD = helper.get("d", Constants.SHOOTER_D);
 		double shooterF = helper.get("f", Constants.SHOOTER_F);
-		flywheel.setPIDF(helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
+		flyWheel.setPIDF(helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
 				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
 		super.enable();
 		log.info("Shooter PID values: %f %f %f %f", shooterP, shooterI, shooterD, shooterF);
@@ -45,7 +42,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
 	public void disable() {
 		super.disable();
-		flywheel.setTargetSpeed(0);
+		flyWheel.setTargetSpeed(0);
 	}
     
     /**
@@ -54,17 +51,21 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     @Override
     public ShooterInterface setTargetSpeed(double speed) { 
         System.out.println("Setting target speed");
-        flywheel.setTargetSpeed(speed);
+        flyWheel.setTargetSpeed(speed);
         return this;
     }
 
     @Override
     public double getTargetSpeed() {
-        return flywheel.getTargetSpeed(); 
+        return flyWheel.getTargetSpeed(); 
     }
 
-    public ShooterInterface setFeederSpeed(double percent) {
-        feederWheel.setFeederSpeed(percent);
+    public double getFeederPower() {
+        return feederWheel.getPower();
+    }
+
+    public ShooterInterface setFeederPower(double percent) {
+        feederWheel.setPower(percent);
         return this;
     }
 
@@ -78,13 +79,14 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
         private final Motor motor;
         private double targetSpeed;
     
-        public ShooterWheel(String name, Motor motor) {
+        public ShooterWheel(Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> flywheel.getTargetSpeed(), "Shooter/%s/speed", name)
-            .register(false, motor::getOutputVoltage, "Shooter/%s/outputVoltage", name)
-            .register(false, motor::getOutputPercent, "Shooter/%s/outputPercent", name)
-            .register(false, motor::getOutputCurrent, "Shooter/%s/outputCurrent", name);
+            log.register(false, () -> flyWheel.getTargetSpeed(), "Shooter/flyWheel/targetSpeed", name)
+            .register(false, motor::getSpeed, "Shooter/flyWheel/speed", name)
+            .register(false, motor::getOutputVoltage, "Shooter/flyWheel/outputVoltage", name)
+            .register(false, motor::getOutputPercent, "Shooter/flyWheel/outputPercent", name)
+            .register(false, motor::getOutputCurrent, "Shooter/flyWheel/outputCurrent", name);
         }
         
         public void setTargetSpeed(double speed) {
@@ -108,10 +110,6 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
             return targetSpeed;
         }
 
-        public void setFeederSpeed(double speed) {
-            motor.set(ControlMode.PercentOutput, speed);
-        }
-
         public void setPIDF(double p, double i, double d, double f) {
             motor.setPIDF(0, p, i, d, f);
         }
@@ -121,27 +119,33 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
         private final Motor motor;
     
-        public FeederWheel(String name, Motor motor) {
+        public FeederWheel(Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> flywheel.getTargetSpeed(), "Shooter/%s/speed", name)
-            .register(false, motor::getOutputVoltage, "Shooter/%s/outputVoltage", name)
-            .register(false, motor::getOutputPercent, "Shooter/%s/outputPercent", name)
-            .register(false, motor::getOutputCurrent, "Shooter/%s/outputCurrent", name);
+            log.register(false, () -> flyWheel.getTargetSpeed(), "Shooter/feederWheel/speed")
+            .register(false, motor::getOutputVoltage, "Shooter/feederWheel/outputVoltage")
+            .register(false, motor::getOutputPercent, "Shooter/feederWheel/outputPercent")
+            .register(false, motor::getOutputCurrent, "Shooter/feederWheel/outputCurrent");
         }
 
-        public void setFeederSpeed(double percent) {
+        public void setPower(double percent) {
             motor.set(ControlMode.PercentOutput, percent);
         }
 
+        public double getPower() {
+            return motor.get();
+        }
     }
 
     @Override
     public void updateDashboard() {
         dashboard.putString("Shooter cell status", hasCell() ? "has cell" : "no cell");
-        dashboard.putNumber("Shooter target speed", flywheel.getTargetSpeed());
+        dashboard.putNumber("Shooter target speed", flyWheel.getTargetSpeed());
     }
 }
 
+    
 
+
+       
 
