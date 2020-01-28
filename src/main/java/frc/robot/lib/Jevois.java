@@ -277,29 +277,35 @@ public class Jevois implements JevoisInterface {
             throw new IOException("No camera connected"); // No connection, give up.
 
         }
-
+        log.sub("Beginning to read lines...");
         StringBuffer line = new StringBuffer(200);
         while (true) {
             synchronized (this) {
-               // log.sub(line.toString());
+               //log.sub(line.toString());
                 try {
                     int b = istream.read();
                     if (b < 0) {
+                        //log.sub("lines 288 flag!!!!!!!!!!!!!!");
                         connected = false;
                         throw new IOException(
                                 "End of file reached on serial port - was the camera disconnected / incorrect permissions?");
                     }
                     // Handle both \r\n and \n line endings.
-                    if (b == '\r')
+                    if (b == '\r'){
+                        //log.sub("lines 295 flag!!!!!!!!!!!!!!");
                         continue;
+                    }
+                        
                     if (b == '\n') {
                         // Have a newline, return the current line.
+                        //log.sub("lines 301 flag!!!!!!!!!!!!!!");
                         String result = line.toString();
                         line.setLength(0);
                         return result;
                     }
                     line.append((char) b);
                 } catch (SerialPortTimeoutException e) {
+                    log.sub("There is serial port timeout!!!!!!!!!");
                     // Give up reading in case a command needs to be sent.
                 }
             }
@@ -319,6 +325,7 @@ public class Jevois implements JevoisInterface {
             return "ERR: JeVois not connected";
 
         log.info(command);
+        log.sub(ostream.toString());
         ostream.write(command.getBytes());
         String newline = "\n";
         ostream.write(newline.getBytes());

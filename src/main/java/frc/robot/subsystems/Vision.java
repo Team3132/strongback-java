@@ -13,6 +13,7 @@ import frc.robot.interfaces.Log;
 import frc.robot.interfaces.VisionInterface;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
+import frc.robot.lib.PrintStack;
 import frc.robot.lib.Subsystem;
 
 public class Vision extends Subsystem implements VisionInterface, DashboardUpdater, Runnable {
@@ -65,6 +66,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	 */
 	@Override
 	public void run() {
+		new PrintStack().trace();
 		log.sub("Vision waiting for the camera server to start up");
 		try {
 			Thread.sleep(5000);
@@ -73,7 +75,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		try {
 			// Attempt to detect if there is a camera plugged in. It will throw an exception
 			// if not.
-			log.sub(jevois.issueCommand("info"));
+			//log.sub(jevois.issueCommand("info"));
 			connected = true;
 			// Update the HSV filter ranges from the config values.
 
@@ -81,10 +83,12 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 			// log.sub("HSVMin set");
 			// jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax, visionSMax, visionVMax));
 			// log.sub("HSVMax set");
-			log.sub("reading line from jevois");
+			while (true){
 			processLine(jevois.readLine());
+			//log.sub("Passed this line...");
+			}
 		} catch (IOException e) {
-			log.error("Failed to read from jevois, aborting vision processing\n");
+			//log.error("Failed to read from jevois, aborting vision processing\n");
 			connected = false;
 			e.printStackTrace();
 		}
@@ -174,6 +178,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		dashboard.putNumber("Vision distance to target", lastSeenTarget.distance);
 		dashboard.putBoolean("Vision target found", lastSeenTarget.targetFound);
 		dashboard.putNumber("Vision xOffset", lastSeenTarget.xOffset);
+	
 	}
 
 	/**

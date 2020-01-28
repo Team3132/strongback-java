@@ -133,6 +133,32 @@ def cal_distance(center_y):
 
     return distance
 
+def cal_vert_dist_pixel_ratio(y):
+    
+    # h1 is the top of the screen to the center of goal
+    # h2 is the  to (floor + robot height)
+    # h2 = 98.25" - camera height
+    h2_pixels = (SCREEN_HEIGHT - y) 
+    h2_actual = (98.25 - CAMERA_HEIGHT) *0.0254
+    ratio = h2_actual / h2_pixels
+    return ratio
+    
+def cal_hori_dist_pixel_ratio(vert_ratio):
+    return vert_ratio * (4/3) # 4:3 aspect ratio
+
+def cal_x_offset(mx, hori_ratio):
+    x = mx - (SCREEN_WIDTH/2.0)
+    return x * hori_ratio
+
+# def cal_get_pixel_length(distance, pixel):
+#     pdratio = (distance/pixel) *(4.0/3.0)
+#     p1 = ratio * pdratio
+#     return p1
+    
+def cal_angle(pixel, distance):
+    angle = math.atan(pixel/distance)
+    return angle
+
 class FirstPython:
     # ###################################################################################################
     ## Constructor
@@ -210,8 +236,6 @@ class FirstPython:
         # Fill
 
     def detect(self, imgbgr, outimg = None):
-
-
         maxn = 5 # max number of objects we will consider
         h, w, chans = imgbgr.shape
 
@@ -396,21 +420,22 @@ class FirstPython:
         outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
         jevois.paste(inimg, outimg, 0, 0)
         jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
-        
+
         # Let camera know we are done using the input image:
         inframe.done()
         
+        # Get a list of quadrilateral convex hulls for all good objects:
+        bestHull = self.detect(imgbgr, outimg)
+
         # Load camera calibration if needed:
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
         imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
 
-        # Get a list of quadrilateral convex hulls for all good objects:
-        bestHull = self.detect(imgbgr, outimg)
         
         found = False
         distance = 0
-        x = 0
+        angle = 0
 
         try: 
             if(bestHull.any()):
@@ -421,14 +446,16 @@ class FirstPython:
             my = int((TL[1]+TR[1])/2)
                         
             distance = cal_distance(my)
-            x = mx-(SCREEN_WIDTH/2) 
+            p = cal_vert_dist_pixel_ratio(my)
+            cal_hori = cal_hori_dist_pixel_ratio(p)
+            xOffset = cal_x_offset(mx, cal_hori)
+            angle = cal_angle(xOffset,distance)
+
         except:
             print("target not found")
         
-        
-
         # Send all serial messages:
-        self.sendAllSerial(found, distance, x)
+        self.sendAllSerial(found, distance, angle)
         
         #cv2.drawContours(outimg, [foundcontours], 0, (255, 0, 0), 2)
     
