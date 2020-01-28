@@ -71,57 +71,5 @@ public class OperatorBoxButtons {
 	public static final int GREEN_DISABLE = 30;
 	public static final int BLUE_MANUAL = 31;
 	public static final int BLUE_DISABLE = 32;
-
-	// This years game-specific mappings
-	// Spitter
-	public static final int SPITTER_DISABLE = WHITE_DISABLE;
-	public static final int SPITTER_MANUAL = WHITE_MANUAL;
-	public static final int SPITTER_POT = WHITE_POT;
-	public static final int SPITTER_SPEED = WHITE_BUTTON1;
-
-	// Climber
-	public static final int CLIMBER_DISABLE = RED_DISABLE;
-	public static final int CLIMBER_MANUAL = RED_MANUAL;
-	public static final int CLIMBER_POT = RED_POT;
-	public static final int CLIMBER_FRONT_HEIGHT = RED_BUTTON1;
-	public static final int CLIMBER_REAR_HEIGHT = RED_BUTTON2;
-	public static final int CLIMBER_BOTH_HEIGHT = RED_BUTTON3;
-	public static final int CLIMBER_DRIVE_SPEED = RED_BUTTON4;
-
-	// Intake (shares with passthru)
-	public static final int INTAKE_DISABLE = YELLOW_DISABLE;
-	public static final int INTAKE_MANUAL = YELLOW_MANUAL;
-	public static final int INTAKE_POT = YELLOW_POT;
-
-	// Passthru (shares with intake)
-	public static final int PASSTHRU_DISABLE = YELLOW_DISABLE;
-	public static final int PASSTHRU_MANUAL = YELLOW_MANUAL;
-	public static final int PASSTHRU_POT = YELLOW_POT;
-	public static final int INTAKE_MOTOR = YELLOW_BUTTON1;
-	public static final int PASSTHRU_MOTOR = YELLOW_BUTTON2;
-	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
-	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
-
-	// Hatch
-	public static final int HATCH_DISABLE = GREEN_DISABLE;
-	public static final int HATCH_MANUAL = GREEN_MANUAL;
-	public static final int HATCH_POT = GREEN_POT;
-	public static final int HATCH_MOVE_LEFT = GREEN_BUTTON1;
-	public static final int HATCH_MOVE_RIGHT = GREEN_BUTTON2;
-	public static final int HATCH_HOLD = GREEN_BUTTON3;
-	public static final int HATCH_RELEASE = GREEN_BUTTON4;
-
-	// Lift (shared with spark test, ensure that one or the other is disabled).
-	public static final int LIFT_DISABLE = BLUE_DISABLE;
-	public static final int LIFT_MANUAL = BLUE_MANUAL;
-	public static final int LIFT_POT = BLUE_POT;
-	public static final int LIFT_START_CLIMBER_UP = BLUE_BUTTON1;
-	public static final int LIFT_DEPLOY_CARRIAGE = BLUE_BUTTON2;
-	public static final int LIFT_RETRACT_CARRIAGE = BLUE_BUTTON3;  // Button 3 is broken?
-
-	// Spark test (shared with lift, ensure that one or the other is disabled).
-	public static final int SPARK_DISABLE = BLUE_DISABLE;
-	public static final int SPARK_MANUAL = BLUE_MANUAL;
-	public static final int SPARK_POT = BLUE_POT;
-	public static final int SPARK_SET_SPEED = BLUE_BUTTON1;
 }
+	

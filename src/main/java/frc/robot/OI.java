@@ -180,18 +180,8 @@ public class OI implements OIInterface {
 			scoreModeCargo = !scoreModeCargo;
 			sysoutScoreMode();
 		});
-
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startClimberUp());
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.startClimberDown());
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_NORTH), Sequences.startClimberLeftUp());
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_WEST), Sequences.startClimberLeftDown());
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.startClimberRightDown());
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_EAST), Sequences.startClimberRightUp());
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.pauseClimber());
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.stopClimber());
-/*
 		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.moveLift(LiftSetpoint.LIFT_BOTTOM_HEIGHT));
-*/
+
 		// Lift microadjust
 		whileTriggered(() -> {
 			return stick.getAxis(GamepadButtonsX.RIGHT_Y_AXIS).read() > 0.8;
@@ -211,146 +201,23 @@ public class OI implements OIInterface {
 
  	@Override
 	public void configureDiagBox(InputDevice box) {
-		/*
-		// Intake
-		onTriggered(box.getButton(OperatorBoxButtons.RED1), Sequences.startIntakingOnly());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED1), Sequences.stopIntakingOnly());
+		//Red1 and Red2 for both
+		//Yellow1 and Yellow2 for left
+		//Green1 and Green2 for right
 
-		// Spitter 
-		onTriggered(box.getButton(OperatorBoxButtons.RED2), Sequences.startSpitterOnly());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED2), Sequences.stopSpitterOnly());
-
-		
-		// Test passthrough (this is temporary)
-		onTriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.startPassthrough());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.stopPassthrough());
-
-		
-		// Lift movement. Multiple presses move up through configured stops.
-		onTriggered(box.getButton(OperatorBoxButtons.RED4), Sequences.liftSetpointUp());
-		onTriggered(box.getButton(OperatorBoxButtons.RED5), Sequences.liftSetpointDown());
-		
-		// Hatch deploy/stow buttons.
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW1), Sequences.getReadyHatchSequence());
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW2), Sequences.getStowHatchSequence());
-
-		// Lift deploy/stow buttons.
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW3), Sequences.liftDeploy());
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW4), Sequences.liftRetract());
-
-		// Level three
-		// Extend overrides
-		final double l3ExtendPower = 0.25;
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN1), Sequences.setL3LeftFrontStiltsPowerOverride(l3ExtendPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN1), Sequences.setL3LeftFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.BLUE2), Sequences.setL3RightFrontStiltsPowerOverride(l3ExtendPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.BLUE2), Sequences.setL3RightFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.CLEAR), Sequences.setL3RearStiltsPowerOverride(l3ExtendPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.CLEAR), Sequences.setL3RearStiltsPowerOverride(0));
-		// Retract overrides
-		final double l3RetractPower = -0.5;
-		onTriggered(box.getButton(OperatorBoxButtons.BLUE1), Sequences.setL3LeftFrontStiltsPowerOverride(l3RetractPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.BLUE1), Sequences.setL3LeftFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN2), Sequences.setL3RightFrontStiltsPowerOverride(l3RetractPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN2), Sequences.setL3RightFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN5), Sequences.setL3RearStiltsPowerOverride(l3RetractPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN5), Sequences.setL3RearStiltsPowerOverride(0));
-		// L3 driving.
-		final double l3DrivePower = 0.3;
-		onTriggered(box.getButton(OperatorBoxButtons.BLUE4), Sequences.setL3DrivePower(l3DrivePower));
-		onUntriggered(box.getButton(OperatorBoxButtons.BLUE4), Sequences.setL3DrivePower(0));
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN4), Sequences.setL3DrivePower(-l3DrivePower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN4), Sequences.setL3DrivePower(0));
-		*/
-
-		// Spitter overrides.
-		OverridableSubsystem<SpitterInterface> spitterOverride = subsystems.spitterOverride;
-	  // Get the interface that the diag box uses.
-		SpitterInterface spitterIF = spitterOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.SPITTER_DISABLE, OperatorBoxButtons.SPITTER_MANUAL, spitterOverride);
-	  // While the spitter speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.SPITTER_SPEED), 
-			() -> {spitterIF.setTargetDutyCycle(box.getAxis(OperatorBoxButtons.SPITTER_POT).read());log.sub("Spitter speed button pressed %f", box.getAxis(OperatorBoxButtons.SPITTER_POT).read());});
-
-		// Climber overrides.
-		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;
-		// Get the interface that the diag box uses.
-		ClimberInterface climberIF = climberOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.CLIMBER_DISABLE, OperatorBoxButtons.CLIMBER_MANUAL, climberOverride);
-
-		// Intake overrides.
-		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
-		// Get the interface that the diag box uses.
-		IntakeInterface intakeIF = intakeOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.INTAKE_DISABLE, OperatorBoxButtons.INTAKE_MANUAL, intakeOverride);
-	  // While the intake speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
-			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
-		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_EXTEND), 
-			() -> intakeIF.setExtended(true));
-		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_RETRACT), 
-			() -> intakeIF.setExtended(false));
-
-		// Spark Test overrides. Buttons shared with the lift, disable it before enabling sparks.
-		OverridableSubsystem<SparkTestInterface> sparkTestOverride = subsystems.sparkTestOverride;
-		// Get the interface that the diag box uses.
-		SparkTestInterface sparkTestIF = sparkTestOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.SPARK_DISABLE, OperatorBoxButtons.SPARK_MANUAL, sparkTestOverride);
-		// While the spark speed button is pressed, set the target output level. Does not turn off on release.
-		final double outputScale = 42;  
-		whileTriggered(box.getButton(OperatorBoxButtons.SPARK_SET_SPEED), 
-			() -> sparkTestIF.setMotorOutput(outputScale * box.getAxis(OperatorBoxButtons.SPARK_POT).read()));
-
-		// Passthrough overrides.
-		OverridableSubsystem<PassthroughInterface> passthroughOverride = subsystems.passthroughOverride;
-		// Get the interface that the diag box uses.
-		PassthroughInterface passthroughIF = passthroughOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.PASSTHRU_DISABLE, OperatorBoxButtons.PASSTHRU_MANUAL, passthroughOverride);
-	  // While the passthrough speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.PASSTHRU_MOTOR), 
-			() -> passthroughIF.setTargetMotorOutput(box.getAxis(OperatorBoxButtons.PASSTHRU_POT).read()));
-
-		// Hatch overrides.
-		OverridableSubsystem<HatchInterface> hatchOverride = subsystems.hatchOverride;
-		// Get the interface that the diag box uses.
-		HatchInterface hatchIF = hatchOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.HATCH_DISABLE, OperatorBoxButtons.HATCH_MANUAL, hatchOverride);
-	  // Run the motor left while the move left button is pressed.
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_LEFT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, 0.2)));
-		onUntriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_LEFT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, 0)));
-		// Run the motor right while the move right button is pressed.
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_RIGHT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, -0.2)));
-		onUntriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_RIGHT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, 0)));
-		// Hatch grabber.
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_HOLD), 
-			() -> hatchIF.setHeld(true));
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_RELEASE), 
-			() -> hatchIF.setHeld(false));
-
-		// Lift overrides. Buttons shared with the Spark Test override, disable it before enabling lift.
-		OverridableSubsystem<LiftInterface> liftOverride = subsystems.liftOverride;
-		// Get the interface that the diag box uses.
-		LiftInterface liftIF = liftOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.LIFT_DISABLE, OperatorBoxButtons.LIFT_MANUAL, liftOverride);
-	  // Override lift height.
-		onTriggered(box.getButton(OperatorBoxButtons.LIFT_START_CLIMBER_UP), 
-			() -> liftIF.setTargetHeight(scaleLiftPotHeight(box.getAxis(OperatorBoxButtons.LIFT_POT).read())));
-	  // Lift carriage.
-		onTriggered(box.getButton(OperatorBoxButtons.LIFT_DEPLOY_CARRIAGE), 
-			() -> liftIF.deploy());
-		onTriggered(box.getButton(OperatorBoxButtons.LIFT_RETRACT_CARRIAGE), 
-			() -> liftIF.retract());
+		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.startClimberUp());
+		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.pauseClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.startClimberDown());
+		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.pauseClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.startClimberLeftUp());
+		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.pauseClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.startClimberLeftDown());
+		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.pauseClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), Sequences.startClimberRightDown());
+		onUntriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), Sequences.pauseClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), Sequences.startClimberRightUp());
+		onUntriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), Sequences.pauseClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON5), Sequences.stopClimber());
 	}
 
 	private double scaleStiltsPotHeight(double value) {
