@@ -11,6 +11,8 @@ SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 252 # pixels
 CAMERA_HEIGHT = 15 # center of camera height off the ground, in inches
 
+CAMERA_FOV = 65 #horizontal
+
 def deg_to_rad(degrees):
     return degrees * (math.pi / 180)
 
@@ -120,7 +122,7 @@ def cal_distance(center_y):
     # h2 is center of goal to (floor + robot height)
     # h2 = 98.25" - camera height
         
-    h2_pixels = (SCREEN_HEIGHT - center_y) 
+    h2_pixels = (SCREEN_HEIGHT/2 - center_y) 
     h1_pixels = center_y
     
     h2_actual = (98.25 - CAMERA_HEIGHT) * 0.0254
@@ -138,7 +140,7 @@ def cal_vert_dist_pixel_ratio(y):
     # h1 is the top of the screen to the center of goal
     # h2 is the  to (floor + robot height)
     # h2 = 98.25" - camera height
-    h2_pixels = (SCREEN_HEIGHT - y) 
+    h2_pixels = (SCREEN_HEIGHT/2 - y) 
     h2_actual = (98.25 - CAMERA_HEIGHT) *0.0254
     ratio = h2_actual / h2_pixels
     return ratio
@@ -157,6 +159,12 @@ def cal_x_offset(mx, hori_ratio):
     
 def cal_angle(pixel, distance):
     angle = math.atan(pixel/distance)
+    angle = rad_to_deg(angle)
+    return angle
+
+
+def cal_angle_test(x): # this works better, uses FOV 
+    angle = ((x-(SCREEN_WIDTH/2))/(SCREEN_WIDTH/2))*(CAMERA_FOV/2)
     return angle
 
 class FirstPython:
@@ -449,7 +457,8 @@ class FirstPython:
             p = cal_vert_dist_pixel_ratio(my)
             cal_hori = cal_hori_dist_pixel_ratio(p)
             xOffset = cal_x_offset(mx, cal_hori)
-            angle = cal_angle(xOffset,distance)
+            #angle = cal_angle(xOffset,distance)
+            angle = cal_angle_test(mx)
 
         except:
             print("target not found")
