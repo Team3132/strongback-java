@@ -152,16 +152,10 @@ def cal_x_offset(mx, hori_ratio):
     x = mx - (SCREEN_WIDTH/2.0)
     return x * hori_ratio
 
-# def cal_get_pixel_length(distance, pixel):
-#     pdratio = (distance/pixel) *(4.0/3.0)
-#     p1 = ratio * pdratio
-#     return p1
-    
-def cal_angle(pixel, distance):
-    angle = math.atan(pixel/distance)
-    angle = rad_to_deg(angle)
-    return angle
-
+# def cal_angle(pixel, distance):
+#     angle = math.atan(pixel/distance)
+#     angle = rad_to_deg(angle)
+#     return angle
 
 def cal_angle_test(x): # this works better, uses FOV 
     angle = ((x-(SCREEN_WIDTH/2))/(SCREEN_WIDTH/2))*(CAMERA_FOV/2)
@@ -433,14 +427,16 @@ class FirstPython:
         inframe.done()
         
         # Get a list of quadrilateral convex hulls for all good objects:
-        bestHull = self.detect(imgbgr, outimg)
+        # bestHull = self.detect(imgbgr, outimg)
 
         # Load camera calibration if needed:
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
         imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
-
         
+        # Get a list of quadrilateral convex hulls for all good objects:
+        bestHull = self.detect(imgbgr, outimg)
+
         found = False
         distance = 0
         angle = 0
@@ -457,8 +453,8 @@ class FirstPython:
             p = cal_vert_dist_pixel_ratio(my)
             cal_hori = cal_hori_dist_pixel_ratio(p)
             xOffset = cal_x_offset(mx, cal_hori)
-            #angle = cal_angle(xOffset,distance)
-            angle = cal_angle_test(mx)
+            # angle = cal_angle(xOffset,distance) # calculated based on pixel:distance ratio
+            angle = cal_angle_test(mx) # calculated based on FOV, works better 
 
         except:
             print("target not found")
