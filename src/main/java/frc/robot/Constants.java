@@ -117,11 +117,11 @@ public class Constants {
 	public static final int SHOOTER_TALON_CAN_ID = 4;
 	public static final int SHOOTER_FEEDER_TALON_CAN_ID = 2;
 	public static final double SHOOTER_SPEED_TOLERANCE = 0;
-	public static final double SHOOTER_F = 0;
-	public static final double SHOOTER_P = 0;
+	public static final double SHOOTER_F = 0.18;
+	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-	public static final int SHOOTER_TARGET_SPEED = 25;
+	public static final int SHOOTER_TARGET_SPEED = 6500;
 	public static final int SHOOTER_FEEDER_POWER = 1;
 	
 	/**
