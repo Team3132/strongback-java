@@ -18,10 +18,15 @@ public class MockShooter implements ShooterInterface {
     }
 
     @Override
+    public boolean isTargetSpeed() {
+        return true;
+    }
+
+    @Override
     public double getTargetSpeed() {
         return targetSpeed;
     }
-
+    
     @Override
     public boolean hasCell() {
         return false;

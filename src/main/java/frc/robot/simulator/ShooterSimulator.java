@@ -1,6 +1,7 @@
 
 package frc.robot.simulator;
 
+import java.lang.*;
 import frc.robot.interfaces.ShooterInterface;
 
 /**
@@ -11,6 +12,7 @@ public class ShooterSimulator implements ShooterInterface{
 
     private double targetSpeed = 0;
     private double feederPower = 0;
+    private double shooterTime = 0;
 
     @Override
     public String getName() {
@@ -45,12 +47,22 @@ public class ShooterSimulator implements ShooterInterface{
     @Override
     public ShooterInterface setTargetSpeed(double speed) {
         this.targetSpeed = speed;
+        this.shooterTime = System.currentTimeMillis();
         return this;
     }
 
     @Override
     public double getTargetSpeed() {
         return targetSpeed;
+    }
+
+
+    @Override
+    public boolean isTargetSpeed() {
+        if ((System.currentTimeMillis() - this.shooterTime) < 1000) {
+            return true;
+        }
+        return false;
     }
 
     @Override

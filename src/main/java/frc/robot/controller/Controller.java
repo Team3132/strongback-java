@@ -213,6 +213,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitForHatch();
 		waitForIntake();
 		waitForClimber();
+		maybeWaitForShooter();
 		//waitForLiftDeployer();
 		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
 		
@@ -283,6 +284,15 @@ public class Controller implements Runnable, DashboardUpdater {
 	 */
 	private void waitForClimber() {
 		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
+	}
+
+	private void maybeWaitForShooter() {
+		try {
+			waitUntilOrAbort(() -> subsystems.shooter.isTargetSpeed(), "shooter");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while spinning up shooter, stopping shooter");
+			subsystems.shooter.disable();
+		}
 	}
 
 	/**

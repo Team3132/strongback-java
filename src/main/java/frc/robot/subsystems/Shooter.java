@@ -59,6 +59,13 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     public double getTargetSpeed() {
         return flyWheel.getTargetSpeed(); 
     }
+    
+    public boolean isTargetSpeed() {
+        if (flyWheel.getSpeed() >= flyWheel.getTargetSpeed()) {
+            return true;
+        }
+        return false;
+    }
 
     public double getFeederPower() {
         return feederWheel.getPower();
@@ -73,6 +80,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     public boolean hasCell(){
         return true; // Returns true by default for now
     }
+
 
     protected class ShooterWheel {
 
@@ -110,6 +118,10 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
             return targetSpeed;
         }
 
+        public double getSpeed() {
+            return motor.getSpeed();
+        }
+
         public void setPIDF(double p, double i, double d, double f) {
             motor.setPIDF(0, p, i, d, f);
         }
@@ -141,5 +153,6 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     public void updateDashboard() {
         dashboard.putString("Shooter cell status", hasCell() ? "has cell" : "no cell");
         dashboard.putNumber("Shooter target speed", flyWheel.getTargetSpeed());
+        dashboard.putNumber("Feeder power", feederWheel.getPower());
     }
 }
