@@ -7,6 +7,9 @@ import java.util.List;
 
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
+import com.revrobotics.ColorMatch;
+
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
@@ -344,7 +347,17 @@ public class Constants {
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
 
 	/*
-	 * Colour Sensor
+	 * Colour Wheel
 	 */
 	public static final int COLOUR_WHEEL_CAN_ID = 7;
+	// Values callibrated using vynl sticker for control panel.
+	public static final Color COLOUR_WHEEL_BLUE_VALUE = ColorMatch.makeColor(0.147, 0.437, 0.416); //Values from the colour sensor used to match colours.
+	public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250);
+	public static final Color COLOUR_WHEEL_RED_TARGET = ColorMatch.makeColor(0.484, 0.366, 0.150);
+	public static final Color COLOUR_WHEEL_YELLOW_TARGET = ColorMatch.makeColor(0.322, 0.546, 0.131);
+	public static final Color COLOUR_WHEEL_WHITE_TARGET = ColorMatch.makeColor(0.276, 0.587, 0.217);
+	public static final double COLOUR_WHEEL_MOTOR_OFF = 0;
+	public static final double COLOUR_WHEEL_MOTOR_ADJUST = 0.3;
+	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
+	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
 }

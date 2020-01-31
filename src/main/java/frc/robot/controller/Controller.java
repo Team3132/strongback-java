@@ -328,8 +328,6 @@ public class Controller implements Runnable, DashboardUpdater {
 			// The sequence has changed, setting action to null.
 			subsystems.colourWheel.setDesiredAction(new ColourAction(Type.NONE, Colour.UNKNOWN));
 			logSub("Resetting colour wheel to no action.");
-			// Give it a chance to stop moving.
-			clock.sleepSeconds(0.1);
 		}
 	}
 

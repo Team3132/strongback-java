@@ -1,14 +1,33 @@
 package frc.robot.interfaces;
-
 import org.strongback.Executable;
 
 public interface ColourWheelInterface extends SubsystemInterface, Executable, DashboardUpdater {
     public enum Colour {
-        RED,
-        YELLOW,
-        BLUE,
-        GREEN,
-        UNKNOWN
+        RED(0),
+        YELLOW(1),
+        BLUE(2),
+        GREEN(3),
+        UNKNOWN(-1);
+
+        public final int id;
+        Colour(int id) {
+            this.id = id;
+        }
+
+        public static Colour of(int id) {
+            switch(id) {
+                case 0:
+                    return RED;
+                case 1:
+                    return YELLOW;
+                case 2:
+                    return BLUE;
+                case 3:
+                    return GREEN;
+                default:
+                    return UNKNOWN;
+            }
+        }
     }
 
     public class ColourAction {
@@ -23,8 +42,8 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         public enum Type {
             ROTATION,
             POSITION,
-            MOVE_LEFT,
-            MOVE_RIGHT,
+            ADJUST_WHEEL_ANTICLOCKWISE,
+            ADJUST_WHEEL_CLOCKWISE,
             NONE
         }
 

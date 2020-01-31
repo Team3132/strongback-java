@@ -12,7 +12,7 @@ public class MockColourWheel implements ColourWheelInterface {
 
     @Override
     public String getName() {
-        return null;
+        return "MockColourWheel";
     }
 
     @Override

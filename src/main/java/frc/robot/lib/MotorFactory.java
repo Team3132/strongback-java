@@ -98,10 +98,6 @@ public class MotorFactory {
 	public static HardwareTalonSRX getColourWheelMotor(int canID, boolean invert, Log log) {
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(.25, 10);
-		motor.configReverseSoftLimitEnable(false, 10);
-		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
-		motor.configVoltageCompSaturation(8, 10);
-		motor.enableVoltageCompensation(true);
 		return motor;
 	}
 
