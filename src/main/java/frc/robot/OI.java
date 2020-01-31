@@ -243,11 +243,11 @@ public class OI implements OIInterface {
 		}); */
 
 		//Colour Wheel testing.
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.positional(Colour.YELLOW));
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.positional(Colour.BLUE));
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.positional(Colour.RED));
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.positional(Colour.GREEN));
-		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.rotational());
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(Colour.YELLOW));
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(Colour.BLUE));
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(Colour.RED));
+		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(Colour.GREEN));
+		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.colourWheelRotational());
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.stopColourWheel());
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
@@ -433,8 +433,6 @@ public class OI implements OIInterface {
 			() -> liftIF.deploy());
 		onTriggered(box.getButton(OperatorBoxButtons.LIFT_RETRACT_CARRIAGE), 
 			() -> liftIF.retract());
-		
-		//
 	}
 
 	private double scaleStiltsPotHeight(double value) {

@@ -425,15 +425,15 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence rotational() {
-		Sequence seq = new Sequence("start roational control");
-		seq.add().rotational();
+	public static Sequence colourWheelRotational() {
+		Sequence seq = new Sequence("start rotational control");
+		seq.add().colourWheelRotational();
 		return seq;
 	}
 	
-	public static Sequence positional(Colour colour) {
+	public static Sequence colourWheelPositional(Colour colour) {
 		Sequence seq = new Sequence("start positional control");
-		seq.add().positional(colour);
+		seq.add().colourWheelPositional(colour);
 		return seq;
 	}
 

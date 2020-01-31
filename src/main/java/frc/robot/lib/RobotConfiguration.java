@@ -219,9 +219,9 @@ public class RobotConfiguration {
 		intakeIsPresent = getAsBoolean("intake/present", true);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
 
-		colourWheelIsPresent = getAsBoolean("colourWheel/present", true);
+		colourWheelIsPresent = getAsBoolean("colourWheel/present", false);
 		colourWheelCanID = getAsInt("colourWheel/canID", Constants.COLOUR_WHEEL_CAN_ID);
-		
+
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
