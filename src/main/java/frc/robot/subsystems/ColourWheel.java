@@ -123,7 +123,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * 
   */
   public double rotate3_5() {
-    if (rotCount < 0) {
+    if (rotCount < 0) { //First run through checks the current colour and sets the colour 2 tiles across to the pair colour.
       startColour = colour;
       if (startColour == Colour.UNKNOWN) {
         return -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
@@ -132,16 +132,16 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       rotCount = 0;
     }
     if ((rotCount % 2 == 0 && colour == pairColour) || (rotCount % 2 != 0 && colour == startColour)) {
-      rotCount += 1;
+      rotCount += 1; //Checks if it is expecting the start or pair colour and adds one if it finds it.
     }
     if (rotCount < 14) { // 3.5 rotations == 14 quarter rotations
       if (rotCount > 12) {
-        return -Constants.COLOUR_WHEEL_MOTOR_HALF;
+        return -Constants.COLOUR_WHEEL_MOTOR_HALF; //Slows down with 0.5 full rotations left.
       } else {
         return -Constants.COLOUR_WHEEL_MOTOR_FULL;
       }
     } else {
-      rotCount = -1;
+      rotCount = -1; //Reset rotation count and action.
       action = new ColourAction(Type.NONE, Colour.UNKNOWN);
       return Constants.COLOUR_WHEEL_MOTOR_OFF;
     }
@@ -173,10 +173,17 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * 
   */
   public double positionalControl(Colour desired) {
-    if (desired == colour || desired == Colour.UNKNOWN) {
+    if (colour == Colour.UNKNOWN) { //Colour is unknown, move in current direcion until colour identified.
+      if(speed != 0) {
+        return speed;
+      } else {
+        return Constants.COLOUR_WHEEL_MOTOR_HALF;
+      }
+    }
+    if (desired == colour || desired == Colour.UNKNOWN) { //If correct colour found, move slowly to line up better and then stop.
       if (firstLoop == true) {
-        spinTime = System.currentTimeMillis();
-        if (motor.get() > 0) {
+        spinTime = System.currentTimeMillis(); //Check time when correct colour found.
+        if (motor.get() > 0) { //Move at slow speed in current direction.
           firstLoop = false;
           return Constants.COLOUR_WHEEL_MOTOR_ADJUST;
         } else {
@@ -184,7 +191,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
           return -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
         }
       } 
-      if (System.currentTimeMillis() - spinTime < 500) {
+      if (System.currentTimeMillis() - spinTime < 500) { //Check if 0.5 seconds has passed.
         return motor.get();
       } else {
         action = new ColourAction(Type.NONE, Colour.UNKNOWN);
@@ -193,15 +200,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
     }
-    if (colour == Colour.UNKNOWN) {
-      if(speed != 0) {
-        return speed;
-      } else {
-        return Constants.COLOUR_WHEEL_MOTOR_HALF;
-      }
-    }
-    int newSpeed = (colour.id - desired.id) % 4 / 2;
-    if (newSpeed > 1) newSpeed-=2;
+    int newSpeed = (colour.id - desired.id) % 4 / 2; //Calculate new speed.
+    if (newSpeed > 1) newSpeed-=2; //If above calculation is 3, set speed to 1.
     return newSpeed;
   }
 
@@ -222,9 +222,18 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     colour = doubleCheck();
   }
 
+  /**
+   * 
+   * Method to check if the current detected colour
+   * was a possible colour after seeing the previous colour.
+   * Example: The colour sensor cannot see blue directly after red,
+   *          so it sets the detected colour back to blue and checks
+   *          again after the wheel has moved.
+   * 
+  */
   public Colour doubleCheck() {
     if (colour == colourPrev) return colourPrev;
-    int direction = speed > 0 ? 1 : -1;
+    int direction = speed > 0 ? 1 : -1; //Get direction
     int newColour = (colourPrev.id + direction) % 4;
     if (newColour == colour.id) colourPrev = colour;
     return colourPrev;
