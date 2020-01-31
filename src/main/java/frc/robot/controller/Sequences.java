@@ -221,15 +221,15 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence startShooter() {
-		Sequence seq = new Sequence("start shooter");
-		seq.add().setShooterTargetSpeed(100); //RPM
+	public static Sequence startShooting() {
+		Sequence seq = new Sequence("start shooting");
+		seq.add().setShooterTargetSpeed(25); //RPM
 		seq.add().setFeederPower(1); //PercentOutput
 		return seq;
 	}
 
-	public static Sequence stopShooter() {
-		Sequence seq = new Sequence("stop shooter");
+	public static Sequence stopShooting() {
+		Sequence seq = new Sequence("stop shooting");
 		seq.add().setShooterTargetSpeed(0); //RPM
 		seq.add().setFeederPower(1); //PercentOutput
 		return seq;
@@ -423,8 +423,8 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		startShooter(),
-		stopShooter(),
+		startShooting(),
+		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
 		startPassthrough(),

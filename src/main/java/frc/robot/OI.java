@@ -207,8 +207,8 @@ public class OI implements OIInterface {
 
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
 		
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startShooter());
-		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopShooter());
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startShooting());
+		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopShooting());
 
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
 		/**onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 

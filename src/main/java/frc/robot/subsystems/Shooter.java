@@ -42,7 +42,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
 	public void disable() {
 		super.disable();
-		flyWheel.setTargetSpeed(0);
+        flyWheel.setTargetSpeed(0);
 	}
     
     /**
@@ -143,9 +143,3 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
         dashboard.putNumber("Shooter target speed", flyWheel.getTargetSpeed());
     }
 }
-
-    
-
-
-       
-
