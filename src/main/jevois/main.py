@@ -226,15 +226,16 @@ class FirstPython:
         else:
             jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
     
-    def thresholding(self, imgth):
+    def thresholding(self, imgbgr):
+        
+        h, w, chans = imgbgr.shape
+
         # Convert input image to HSV:
         imghsv = cv2.cvtColor(imgbgr, cv2.COLOR_BGR2HSV)
         
         # Isolate pixels inside our desired HSV range:
         imgth = cv2.inRange(imghsv, self.HSVmin, self.HSVmax)
-        maskValues = "H={}-{} S={}-{} V={}-{} ".format(self.HSVmin[0], self.HSVmax[0], self.HSVmin[1],
-                                                self.HSVmax[1], self.HSVmin[2], self.HSVmax[2])    
-        
+
         # Create structuring elements for morpho maths:
         if not hasattr(self, 'erodeElement'):
             self.erodeElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
@@ -246,9 +247,7 @@ class FirstPython:
             
         imgth = cv2.medianBlur(imgth,3)
 
-        # Detect objects by finding contours:
-        contours, hierarchy = cv2.findContours(imgth, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
-        maskValues += "N={} ".format(len(contours))
+        
 
         return imgth
 
@@ -265,8 +264,16 @@ class FirstPython:
 
     def detect(self, imgbgr, outimg = None):
         maxn = 5 # max number of objects we will consider
-        h, w, chans = imgbgr.shape
+        h, w = imgbgr.shape
 
+        maskValues = "H={}-{} S={}-{} V={}-{} ".format(self.HSVmin[0], self.HSVmax[0], self.HSVmin[1],
+                                                self.HSVmax[1], self.HSVmin[2], self.HSVmax[2])    
+        
+
+        # Detect objects by finding contours:
+        contours, hierarchy = cv2.findContours(imgbgr, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        maskValues += "N={} ".format(len(contours))
+ 
  
 
         # Only consider the 5 biggest objects by area:
@@ -355,7 +362,7 @@ class FirstPython:
         
         # Display any results requested by the users:
         if outimg is not None and outimg.valid():
-            if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgth, outimg, w, 0)
+            if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgbgr, outimg, w, 0)
             jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)
        
             
@@ -439,7 +446,7 @@ class FirstPython:
         #jevois.convertCvBGRtoRawImage(imgbgr, outimg, 0)
         jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
 
-        imgbgr = thresholding(imgbgr)
+        imgbgr = self.thresholding(imgbgr)
 
         
         # Get a list of quadrilateral convex hulls for all good objects:
