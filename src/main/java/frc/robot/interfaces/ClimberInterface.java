@@ -19,7 +19,12 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
             STOP_CLIMBER, 
             SET_CLIMBER_POWER_LEFT,
             SET_CLIMBER_POWER_RIGHT, 
-            SET_CLIMBER_POWER_BOTH
+            SET_CLIMBER_POWER_BOTH, 
+            SET_LEFT_HEIGHT, 
+            SET_RIGHT_HEIGHT, 
+            SET_BOTH_HEIGHT, 
+            OVERRIDE_LEFT_PERCENT_OUTPUT, 
+            OVERRIDE_RIGHT_PERCENT_OUTPUT
         }
 
         @Override

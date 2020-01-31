@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
+import org.strongback.components.Clock;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.ClimberInterface;
@@ -11,6 +12,9 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.NetworkTablesHelper;
+import frc.robot.lib.SimplePID;
+import frc.robot.lib.MathUtil;
 
 // TODO: Description of Subsystem once we know what it looks like.
 
@@ -19,13 +23,31 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     private Winch rightWinch;
     private ClimberAction action;
     private boolean holding = false;
+    private SimplePID leftPID, rightPID;
+    private Clock clock;
+    private double targetHeight, oldTargetHeight;
+    private double climberDiffP;
+    private double climberDiffTime;
+    private double leftMotorPower;
+    private double rightMotorPower;
+    
 
     public Climber(Motor leftWinchMotor, Motor rightWinchMotor, DashboardInterface dashboard, Log log) {
         super("Climber", dashboard, log);   
         this.leftWinch = new Winch("climber:", leftWinchMotor, dashboard, log);
         this.rightWinch = new Winch("climber:", rightWinchMotor, dashboard, log);
-        setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));
+        rightPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
+                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
+        leftPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
+                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
+        setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));  
+        targetHeight = 0;
+        oldTargetHeight = 0;
+        climberDiffP = Constants.CLIMBER_POWER_NOT_LEVEL_P;
+        climberDiffTime = 0;
     }
+
+    
 
     @Override
     public boolean isInPosition() {
@@ -59,7 +81,94 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                 rightWinch.setTargetHeight(rightWinch.getActualHeight());
                 leftWinch.setMotorPower(0);
                 rightWinch.setMotorPower(0);
-                break;                
+                break;
+            case SET_LEFT_HEIGHT:
+                leftWinch.setTargetHeight(action.value);
+                break;
+            case SET_RIGHT_HEIGHT:
+                leftWinch.setTargetHeight(action.value);
+                break;
+            case SET_BOTH_HEIGHT:
+                /*
+                // when we are in SET_BOTH_HEIGHT we are trying to move the left and the back together.
+                // If we are at the target height (Or close enough to it we change to position mode and let the talon control
+                // the fine movement. Otherwise we use power mode to get to the position.
+                //
+                // We look at the location of the two heights and work out the difference. If the difference is beyond the threshold
+                // we adjust power to make sure that they are moving up in parallel.
+                */
+                targetHeight = action.value;
+
+                double leftHeight = leftWinch.getActualHeight();
+                double rightHeight = rightWinch.getActualHeight();
+
+                // // Calculate if both winches are within max offset distance - i.e. safe to move.
+                // if (Math.abs(leftHeight - rightHeight) > Constants.CLIMBER_MAX_WINCH_PAIR_OFFSET) {
+                //     // Log an error if the winches are not at safe heights. 
+                //     log.error("%s: Not moving winches; winches did not begin at same height %f, %f (%f)", name, leftHeight, rightHeight, targetHeight);
+                //     return;
+                // }
+
+                if ((Math.abs(leftHeight - targetHeight) < Constants.CLIMBER_MAX_DISTANCE_FROM_TOP) && 
+                    (Math.abs(rightHeight - targetHeight) < Constants.CLIMBER_MAX_DISTANCE_FROM_TOP)) {
+                    // We are at the target position. Change over to maintaining the position.
+                    log.sub("%s: At holding height %f,%f setting target to %f", name, leftHeight, rightHeight, targetHeight);
+                    leftWinch.setTargetHeight(targetHeight);
+                    rightWinch.setTargetHeight(targetHeight);
+                    setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));  
+                    break;
+                }//
+                // We run a modified PID loop for both the left and back motors.
+                //
+                if (oldTargetHeight != targetHeight) {
+                    // we set the target setpoint as it has changed.
+                    leftPID.setSetpoint(targetHeight);
+                    rightPID.setSetpoint(targetHeight);
+                    oldTargetHeight = targetHeight;
+                }
+
+                // one or both are not at the target height yet. Set the power and direction depending on whether we are moving up or down.
+                //
+                // There are four possibilities:
+                // 1.  left < target, back < target
+                // 2.  left > target, back > target
+                // 3.  left < target, back > target
+                // 4.  left > target, back < target
+                // 1 and 2 are the most common. Check them first.
+
+                leftMotorPower = MathUtil.clamp(leftPID.getOutput(rightHeight), -Constants.CLIMBER_LEFT_MAX_MOTOR_POWER, Constants.CLIMBER_LEFT_MAX_MOTOR_POWER);
+                rightMotorPower = MathUtil.clamp(leftPID.getOutput(rightHeight), -Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER, Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER);
+                 
+                if (leftHeight > rightHeight) {
+                // left is too far up, speed up the right to try and compensate
+                rightMotorPower += (climberDiffP * (leftHeight - rightHeight));
+                if (rightMotorPower > Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER) {
+                    leftMotorPower -= (rightMotorPower - Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER);
+                    rightMotorPower = Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER;
+                }
+            } else {
+                // right is too far up, speed up the left to try and compensate
+                leftMotorPower += (climberDiffP * (rightHeight - leftHeight));
+                if (leftMotorPower > Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER) {
+                    rightMotorPower -= (leftMotorPower - Constants.CLIMBER_LEFT_MAX_MOTOR_POWER);
+                    leftMotorPower = Constants.CLIMBER_LEFT_MAX_MOTOR_POWER;
+                }
+            }
+
+                //log.debug("%s: SET_BOTH_HEIGHT: %f,%f => %f,%f", name, leftHeight, rightHeight, leftMotorPower, rightMotorPower);
+                leftWinch.setMotorPower(leftMotorPower);
+                rightWinch.setMotorPower(rightMotorPower);
+                break;
+
+            case OVERRIDE_LEFT_PERCENT_OUTPUT:
+                leftWinch.setMotorPower(action.value);
+                break;
+
+            case OVERRIDE_RIGHT_PERCENT_OUTPUT:
+                rightWinch.setMotorPower(action.value);
+                break;
+
+
             default:
                 log.error("%s: Unknown Type %s", name, action.type);
                 break;
@@ -99,6 +208,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                .register(false, motor::getOutputPercent, "%s/outputPercent", name)
                .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
         }
+        
 
         public void setTargetHeight(double height) {
             if (height == targetHeight) return;
@@ -124,8 +234,8 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
         }
 
         public boolean getHallEffectTriggered() {
-            // On the rear, either sensor will do.
-            // On the front, it doesn't matter which it is wired into.
+            // On the right, either sensor will do.
+            // On the left, it doesn't matter which it is wired into.
             return motor.isAtReverseLimit() || motor.isAtForwardLimit();
         }
 
@@ -138,7 +248,12 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
             dashboard.putNumber(name + " current", motor.getOutputCurrent());
             dashboard.putString(name + " hall effect", getHallEffectTriggered() ? "triggered" : "untriggered");
         }
-    }
+
+        
+        }
+    
+
+   
 
     @Override
     public void setDesiredAction(ClimberAction action) {

@@ -376,6 +376,38 @@ public class Sequences {
 		return seq;
 	}
 
+	//Smart climber
+	public static Sequence setClimber() {
+		Sequence seq = new Sequence("set climb");
+		seq.add().setClimberBoth(3);
+		return seq;
+	}
+
+	public static Sequence setClimberLeft() {
+		Sequence seq = new Sequence("set left climb");
+		seq.add().setClimberLeft(3);
+		return seq;
+	}
+
+	public static Sequence setClimberRight() {
+		Sequence seq = new Sequence("set right climb");
+		seq.add().setClimberRight(3);
+		return seq;
+	}
+
+	public static Sequence overrideClimberLeft() {
+		Sequence seq = new Sequence("override left climber");
+		seq.add().leftClimberOverride(3);
+		return seq;
+	}
+
+	public static Sequence overrideClimberRight() {
+		Sequence seq = new Sequence("override right climb");
+		seq.add().rightClimberOverride(3);
+		return seq;
+	}
+
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
 		startClimberUp(),

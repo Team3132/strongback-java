@@ -268,7 +268,6 @@ public class Constants {
 	public static final int L3_PEAK_CURRENT_LIMIT = 43;
 	public static final int L3_CURRENT_TIMEOUT_MS = 100;
 
-
 	/*
 	 * Camera server constants
 	 * These are magic numbers to tell the Jevois which vision processor to load.
@@ -303,7 +302,7 @@ public class Constants {
 
 	// Climber (both level 2 and level 3). Replaces L3.
 	public static final double CLIMBER_TOLERANCE = 0.5;
-	public static final double MAX_WINCH_PAIR_OFFSET = 20./25.4;
+	public static final double CLIMBER_MAX_DISTANCE_FROM_TOP = 0;
 	public static final int CLIMBER_FRONT_CAN_ID = 45;
 	public static final int CLIMBER_REAR_CAN_ID = 47;
 	public static final int CLIMBER_DRIVE_MOTOR_CAN_ID = 48;
@@ -313,15 +312,21 @@ public class Constants {
 	public static final double DRIVEBASE_CLIMBER_DRIVE_SPEED = -2.5; // inches/sec
 	//public static final double DRIVEBASE_CLIMBER_DRIVE_SLOW_POWER = -0.15;
 	public static final double CLIMBER_DRIVE_POWER = 1;
-	public static final double CLIMBER_POSITION_F = 0;
-	public static final double CLIMBER_POSITION_P = 4;
-	public static final double CLIMBER_POSITION_I = 0;
-	public static final double CLIMBER_POSITION_D = 0;
+	public static final double CLIMBER_F = 0;
+	public static final double CLIMBER_P = 4;
+	public static final double CLIMBER_I = 0;
+	public static final double CLIMBER_D = 0;
+
+	public static final double CLIMBER_LEFT_MAX_MOTOR_POWER = 1;
+	public static final double CLIMBER_RIGHT_MAX_MOTOR_POWER = 1;
+
+	public static final double 	CLIMBER_POWER_NOT_LEVEL_P = 0;
+	
 	public static final int CLIMBER_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
 	public static final int CLIMBER_PEAK_CURRENT_LIMIT = 43;
 	public static final int CLIMBER_CURRENT_TIMEOUT_MS = 100;
-	public static final double CLIMBER_WINCH_FRONT_SCALE_FACTOR = 9609/7.9529;     // 7.7953;	// 18" ticks = 20208 ticks
-	public static final double CLIMBER_WINCH_REAR_SCALE_FACTOR = 9634/7.9528;
+	public static final double CLIMBER_WINCH_LEFT_SCALE_FACTOR = 9609/7.9529;     // 7.7953;	// 18" ticks = 20208 ticks
+	public static final double CLIMBER_WINCH_RIGHT_SCALE_FACTOR = 9634/7.9528;
 
 	// logging information constants
 	public static final String WEB_BASE_PATH = "/media/sda1";		// where web server's data lives
@@ -344,5 +349,4 @@ public class Constants {
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
 	public static final int CLIMBER_LEFT_CAN_ID = 0;
 	public static final int CLIMBER_RIGHT_CAN_ID = 0;
-	public static final double CLIMBER_WINCH_LEFT_SCALE_FACTOR = 0;
 }

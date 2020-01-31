@@ -294,6 +294,32 @@ public class State {
 		return this;
 	}
 
+	//Auto-climber
+	public State setClimberBoth(double height) {
+		climberAction = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
+		return this;
+	}
+
+	public State setClimberLeft(double height) {
+		climberAction = new ClimberAction(ClimberAction.Type.SET_LEFT_HEIGHT, height);
+		return this;
+	}
+
+	public State setClimberRight(double height) {
+		climberAction = new ClimberAction(ClimberAction.Type.SET_RIGHT_HEIGHT, height);
+		return this;
+	}
+
+	public State leftClimberOverride(double height) {
+		climberAction = new ClimberAction(ClimberAction.Type.OVERRIDE_LEFT_PERCENT_OUTPUT, height);
+		return this;
+	}
+
+	public State rightClimberOverride(double height) {
+		climberAction = new ClimberAction(ClimberAction.Type.OVERRIDE_RIGHT_PERCENT_OUTPUT, height);
+		return this;
+	}
+
 
 	// Drive base
 	/**

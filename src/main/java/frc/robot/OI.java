@@ -207,17 +207,30 @@ public class OI implements OIInterface {
 
 		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.startClimberUp());
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.pauseClimber());
+
 		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.startClimberDown());
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.pauseClimber());
+
+		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3), Sequences.setClimber());
+		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3), Sequences.pauseClimber());
+
 		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.startClimberLeftUp());
 		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.pauseClimber());
+
 		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.startClimberLeftDown());
 		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.pauseClimber());
+
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON3), Sequences.setClimberRight());
+		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON3), Sequences.pauseClimber());
+
 		onTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), Sequences.startClimberRightDown());
 		onUntriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), Sequences.pauseClimber());
+
 		onTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), Sequences.startClimberRightUp());
 		onUntriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), Sequences.pauseClimber());
+				
 		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON5), Sequences.stopClimber());
+
 	}
 
 	private double scaleStiltsPotHeight(double value) {
