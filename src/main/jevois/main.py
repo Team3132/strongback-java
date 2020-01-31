@@ -8,7 +8,7 @@ GOAL_WIDTH = 1.0098 # width in meters
 GOAL_HEIGHT = 0.432 # height in meters
 
 SCREEN_WIDTH = 320
-SCREEN_HEIGHT = 252 # pixels
+SCREEN_HEIGHT = 240 # pixels
 CAMERA_HEIGHT = 15 # center of camera height off the ground, in inches
 
 CAMERA_FOV = 65 #horizontal
@@ -225,22 +225,8 @@ class FirstPython:
             jevois.LINFO("Loaded camera calibration from {}".format(cpf))
         else:
             jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
-
     
-    # ###################################################################################################
-    ## Detect objects within our HSV range
-    # Do the following checks to ensure it's the correct shape: 
-        # Hull is quadrilateral
-        # Number of edges / vertices
-        # Angle of lines
-        # Top corners further apart than bottom corners
-        # Area
-        # Fill
-
-    def detect(self, imgbgr, outimg = None):
-        maxn = 5 # max number of objects we will consider
-        h, w, chans = imgbgr.shape
-
+    def thresholding(self, imgth):
         # Convert input image to HSV:
         imghsv = cv2.cvtColor(imgbgr, cv2.COLOR_BGR2HSV)
         
@@ -263,6 +249,25 @@ class FirstPython:
         # Detect objects by finding contours:
         contours, hierarchy = cv2.findContours(imgth, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         maskValues += "N={} ".format(len(contours))
+
+        return imgth
+
+    
+    # ###################################################################################################
+    ## Detect objects within our HSV range
+    # Do the following checks to ensure it's the correct shape: 
+        # Hull is quadrilateral
+        # Number of edges / vertices
+        # Angle of lines
+        # Top corners further apart than bottom corners
+        # Area
+        # Fill
+
+    def detect(self, imgbgr, outimg = None):
+        maxn = 5 # max number of objects we will consider
+        h, w, chans = imgbgr.shape
+
+ 
 
         # Only consider the 5 biggest objects by area:
         contours = sorted(contours, key = cv2.contourArea, reverse = True)[:maxn]
@@ -352,8 +357,11 @@ class FirstPython:
         if outimg is not None and outimg.valid():
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgth, outimg, w, 0)
             jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)
+       
             
         return bestHull
+    
+
  
     # ###################################################################################################
     ## Send serial messages, one per object
@@ -415,24 +423,29 @@ class FirstPython:
         
         # Convert input image to BGR24:
         imgbgr = jevois.convertToCvBGR(inimg)
+        # Let camera know we are done using the input image:
+        inframe.done()
         h, w, chans = imgbgr.shape
+        
+        # Load camera calibration if needed:
+        if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
+
+        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
 
         # Get pre-allocated but blank output image which we will send over USB:
         outimg = outframe.get()
         outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
         jevois.paste(inimg, outimg, 0, 0)
+        #jevois.convertCvBGRtoRawImage(imgbgr, outimg, 0)
         jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
 
-        # Let camera know we are done using the input image:
-        inframe.done()
+        imgbgr = thresholding(imgbgr)
+
         
         # Get a list of quadrilateral convex hulls for all good objects:
         # bestHull = self.detect(imgbgr, outimg)
 
-        # Load camera calibration if needed:
-        if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
-        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
         
         # Get a list of quadrilateral convex hulls for all good objects:
         bestHull = self.detect(imgbgr, outimg)
