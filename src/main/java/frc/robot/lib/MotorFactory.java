@@ -116,12 +116,19 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareTalonSRX getShooterMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+	public static HardwareTalonSRX getShooterMotor(int canID, boolean sensorPhase, boolean invert, double p, double i, double d, double f, Log log) {
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.setPIDF(0, Constants.SHOOTER_P, Constants.SHOOTER_I, Constants.SHOOTER_D, Constants.SHOOTER_F);
+		motor.setPIDF(0, p, i, d, f);
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(36);
+
+		// Save PID values into Network Tables
+		NetworkTablesHelper helper = new NetworkTablesHelper("shooter");
+		helper.set("p", p);
+		helper.set("i", i);
+		helper.set("d", d);
+		helper.set("f", f);
 		return motor;
 	}
 

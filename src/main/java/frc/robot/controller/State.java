@@ -432,6 +432,7 @@ public class State {
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
 		maybeAdd("shooterTargetRPM", shooterTargetSpeed, result);
+		maybeAdd("feederPower", feederPower, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);
 		maybeAdd("hatchHolderGrabbed", hatchHolderEnabled, result);

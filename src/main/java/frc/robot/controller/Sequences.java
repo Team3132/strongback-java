@@ -10,8 +10,6 @@ package frc.robot.controller;
 
 import static frc.robot.Constants.*;
 
-import com.ctre.phoenix.time.StopWatch;
-
 import frc.robot.lib.WaypointUtil;
 
 import jaci.pathfinder.Waypoint;
@@ -221,21 +219,20 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence startShooting() {
-		Sequence seq = new Sequence("start shooting");
-		seq.add().setShooterTargetSpeed(25); //RPM
-		seq.add().setFeederPower(1); //PercentOutput
+	public static Sequence startShooter() {
+		Sequence seq = new Sequence("start shooter");
+		seq.add().setShooterTargetSpeed(SHOOTER_TARGET_SPEED); //RPM
+		seq.add().setFeederPower(SHOOTER_FEEDER_POWER); //PercentOutput
 		return seq;
 	}
 
-	public static Sequence stopShooting() {
-		Sequence seq = new Sequence("stop shooting");
+	public static Sequence stopShooter() {
+		Sequence seq = new Sequence("stop shooter");
 		seq.add().setShooterTargetSpeed(0); //RPM
 		seq.add().setFeederPower(1); //PercentOutput
 		return seq;
 	}
-
-
+	
 	/*public static Sequence startSpitterOnly() {
 		Sequence seq = new Sequence("Start Spitter");
 		seq.add().grabHatch(); //To allow the cargo ball to pass by the hatch mechanism unobstructed
@@ -423,8 +420,8 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		startShooting(),
-		stopShooting(),
+		startShooter(),
+		stopShooter(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
 		startPassthrough(),
@@ -444,4 +441,4 @@ public class Sequences {
 		getMicroAdjustDownSequence(), 
 		getDriveToWaypointSequence(0, 12, 0)
 	};	
-}
+}  

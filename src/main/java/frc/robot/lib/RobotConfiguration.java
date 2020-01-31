@@ -92,6 +92,11 @@ public class RobotConfiguration {
 	public int shooterCanID = Constants.SHOOTER_TALON_CAN_ID;
 	public int shooterFeederCanID = Constants.SHOOTER_FEEDER_TALON_CAN_ID;
 
+	public double shooterP = Constants.SHOOTER_P;
+	public double shooterI = Constants.SHOOTER_I;
+	public double shooterD = Constants.SHOOTER_D;
+	public double shooterF = Constants.SHOOTER_F;
+
 	public boolean pdpIsPresent = false;
 	public int pdpCanId = Constants.PDP_CAN_ID;
 	public boolean pdpMonitor = false;  // by default we do NOT monitor the PDP
@@ -225,6 +230,11 @@ public class RobotConfiguration {
 		shooterIsPresent = getAsBoolean("shooter/present", true);
 		shooterCanID = getAsInt("shooter/shooterCanID", Constants.SHOOTER_TALON_CAN_ID);
 		shooterFeederCanID = getAsInt("shooter/feederCanID", Constants.SHOOTER_FEEDER_TALON_CAN_ID);
+		
+		shooterP = getAsDouble("shooter/p", shooterP);
+		shooterI = getAsDouble("drivebase/i", shooterI);
+		shooterD = getAsDouble("drivebase/d", shooterD);
+		shooterF = getAsDouble("drivebase/f", shooterF);
 		
 		pdpIsPresent = getAsBoolean("pdp/present", true);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);

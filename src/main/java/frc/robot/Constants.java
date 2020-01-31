@@ -121,7 +121,9 @@ public class Constants {
 	public static final double SHOOTER_P = 0;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-
+	public static final int SHOOTER_TARGET_SPEED = 25;
+	public static final int SHOOTER_FEEDER_POWER = 1;
+	
 	/**
 	 * Tape Constants
 	 */
