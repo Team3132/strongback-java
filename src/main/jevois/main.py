@@ -430,20 +430,25 @@ class FirstPython:
         
         # Convert input image to BGR24:
         imgbgr = jevois.convertToCvBGR(inimg)
+        
         # Let camera know we are done using the input image:
         inframe.done()
-        h, w, chans = imgbgr.shape
+        
         
         # Load camera calibration if needed:
+        
+        h, w, chans = imgbgr.shape
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
-        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
-
+        #imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
+        h, w, chans = imgbgr.shape
         # Get pre-allocated but blank output image which we will send over USB:
         outimg = outframe.get()
         outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
+
+        jevois.convertCvBGRtoRawImage(imgbgr, inimg, 0)
         jevois.paste(inimg, outimg, 0, 0)
-        #jevois.convertCvBGRtoRawImage(imgbgr, outimg, 0)
+        
         jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
 
         imgbgr = self.thresholding(imgbgr)
