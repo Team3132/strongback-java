@@ -1,5 +1,6 @@
 package frc.robot.drive.routines;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.strongback.components.Clock;
@@ -22,9 +23,10 @@ public class PositionalPIDDrive implements DriveRoutine {
 
 	private final Log log;
 	private PositionPID leftPID, rightPID;
+	private BooleanSupplier finished;
 	    
 	public PositionalPIDDrive(
-		String name, DoubleSupplier targetSpeed, DoubleSupplier targetTurn,
+		String name, BooleanSupplier finished, DoubleSupplier targetSpeed, DoubleSupplier targetTurn,
 		double speedScale, double turnScale,
  	 	double maxJerk,
 	  	DoubleSupplier leftDistance, DoubleSupplier leftSpeed,
@@ -48,6 +50,17 @@ public class PositionalPIDDrive implements DriveRoutine {
 	   		},
 	    maxJerk, rightDistance, rightSpeed, clock, log);
 	}
+
+	public PositionalPIDDrive(
+		String name, DoubleSupplier targetSpeed, DoubleSupplier targetTurn,
+		double speedScale, double turnScale,
+ 	 	double maxJerk,
+	  	DoubleSupplier leftDistance, DoubleSupplier leftSpeed,
+	  	DoubleSupplier rightDistance, DoubleSupplier rightSpeed,
+		Clock clock, Log log){
+			this(name,() -> true,targetSpeed,targetTurn,speedScale,turnScale,maxJerk,leftDistance,leftSpeed,rightDistance,rightSpeed,clock,log);
+	}
+	
 	
 	private PositionPID createPID(String name, DoubleSupplier targetSpeed, double maxJerk,
 		 DoubleSupplier distance, DoubleSupplier speed, Clock clock, Log log) {
@@ -90,6 +103,8 @@ public class PositionalPIDDrive implements DriveRoutine {
 
 	@Override
 	public boolean hasFinished() {
-		return true;  // Always ready for the next state.
+		
+		return finished.getAsBoolean();  // Always ready for the next state.
 	}
+
 }

@@ -212,11 +212,15 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
 		
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
-		});
+		// onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
+		// 	sysoutScoreMode();
+		// 	return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
+		// 						  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
+		// });
+
+		whileTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.visionAim());
+		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.abortVisionAim());
+
 
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), () -> { 
 			sysoutScoreMode();

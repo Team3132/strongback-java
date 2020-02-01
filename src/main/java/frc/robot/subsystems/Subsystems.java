@@ -205,6 +205,15 @@ public class Subsystems implements DashboardUpdater {
 				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
+		// Vision aiming for shooter
+		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
+				new PositionalPIDDrive("visionAim",
+				() -> getVisionTurnAdjustment()<2, 
+				() -> 0,
+				() -> getVisionTurnAdjustment(),
+				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
+				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
+				rightDriveSpeed, clock, log));
 		// Driving using the tape on the floor to help with alignment. Overrides the
 		// steering but not the speed.
 		drivebase.registerDriveRoutine(DriveRoutineType.TAPE_ASSIST,
@@ -256,9 +265,7 @@ public class Subsystems implements DashboardUpdater {
 	public double getVisionTurnAdjustment() {
 		if (!vision.isConnected()) return 0;
 		TargetDetails details = vision.getTargetDetails();
-		double now = clock.currentTime();
-		if (!details.targetFound) return 0;
-		if (now - details.seenAtSec > Constants.VISON_MAX_TARGET_AGE_SECS) return 0;
+		if (!details.isValid(clock.currentTime())) return 0;
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		Position waypoint = getVisionWaypoint();
@@ -268,14 +275,11 @@ public class Subsystems implements DashboardUpdater {
 	}
 
 	public double getVisionDriveSpeed(double maxSpeed, double stopAtDistance) {
-		if (vision == null) return 0;
 		if (!vision.isConnected())
 			return 0;
 		TargetDetails details = vision.getTargetDetails();
-		double now = clock.currentTime();
-		if (!details.targetFound)
-			return 0;
-		if (now - details.seenAtSec > Constants.VISON_MAX_TARGET_AGE_SECS)
+		
+		if (!details.isValid(clock.currentTime()))
 			return 0;
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();

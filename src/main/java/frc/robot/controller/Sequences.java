@@ -423,6 +423,25 @@ public class Sequences {
 		return seq;
 	}
 
+	public static Sequence visionAim(){
+		Sequence seq = new Sequence("vision aim");
+		seq.add().doVisionAim(); 
+		// seq.add().startShooter(); 
+		// seq.add().startFeeder();
+		// seq.add().startHopper();
+		return seq;
+	}
+
+	public static Sequence abortVisionAim(){
+		Sequence seq = new Sequence("abort vision aim");
+		seq.add().setDrivebasePower(0); 
+		// seq.add().stopShooter(); 
+		// seq.add().stoptFeeder();
+		// seq.add().stopHopper();
+		return seq;
+	}
+
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
 		getEmptySequence(), 
@@ -451,6 +470,8 @@ public class Sequences {
 		abortLevelStage(),
 		getMicroAdjustUpSequence(), 
 		getMicroAdjustDownSequence(), 
-		getDriveToWaypointSequence(0, 12, 0)
+		getDriveToWaypointSequence(0, 12, 0),
+		visionAim(),
+		abortVisionAim()
 	};	
 }

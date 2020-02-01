@@ -1,6 +1,8 @@
 package frc.robot.interfaces;
 
+import frc.robot.Constants;
 import frc.robot.lib.Position;
+//import jdk.vm.ci.meta.Constant;
 
 /**
  * The Vision Subsystem - handles all interaction with the roboRio and the external processor for vision
@@ -18,8 +20,13 @@ public interface VisionInterface extends DashboardUpdater {
 		public Position location = new Position(0, 0);  // Co-ordinates relative to the location subsystem.
 		public double height;  // How high the target is.
 		public double distance;
-		public double xOffset;
+		public double angle;
 		
+		public boolean isValid(double currentTime) {
+			double lockAgeSec = currentTime - seenAtSec;
+			return targetFound && lockAgeSec < Constants.VISON_MAX_TARGET_AGE_SECS;
+		}
+
 		@Override
 		public String toString() {
 			return String.format("found: %s, at %f, location %s", targetFound, seenAtSec, location);

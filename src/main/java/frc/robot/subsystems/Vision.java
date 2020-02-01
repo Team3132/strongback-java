@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import org.strongback.components.Clock;
 import frc.robot.interfaces.DashboardInterface;
@@ -44,10 +42,11 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 				//.register(true, () -> lastSeenTarget.location.x, "%s/curX", name)
 				//.register(true, () -> lastSeenTarget.location.y, "%s/curY", name)
 				//.register(true, () -> lastSeenTarget.location.heading, "%s/heading", name)
-				.register(true, () -> clock.currentTime() - lastSeenTarget.seenAtSec, "%s/seenAt", name)
+				//.register(true, () -> clock.currentTime() - lastSeenTarget.seenAtSec, "%s/seenAt", name)
+				.register(true, () -> lastSeenTarget.seenAtSec, "%s/seenAtSec", name)
 				.register(true, () -> lastSeenTarget.targetFound, "%s/targetFound", name)
 				.register(true, () -> lastSeenTarget.distance, "%s/distance", name)
-				.register(true, () -> lastSeenTarget.xOffset, "%s/xOffset", name);
+				.register(true, () -> lastSeenTarget.angle, "%s/angle", name);
 		// Start reading from the Jevois camera.
 		(new Thread(this)).start();
 	}
@@ -75,14 +74,13 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		try {
 			// Attempt to detect if there is a camera plugged in. It will throw an exception
 			// if not.
-			//log.sub(jevois.issueCommand("info"));
+			log.sub(jevois.issueCommand("info"));
 			connected = true;
+
 			// Update the HSV filter ranges from the config values.
 
 			// jevois.issueCommand(String.format("setHSVMin %.0f %.0f %.0f", visionHMin, visionSMin, visionVMin));
-			// log.sub("HSVMin set");
 			// jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax, visionSMax, visionVMax));
-			// log.sub("HSVMax set");
 			while (true){
 			processLine(jevois.readLine());
 			//log.sub("Passed this line...");
@@ -132,52 +130,51 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 			return;
 		}
 		log.sub("Vision::processLine(%s)\n", line);
-
-		// Specs for the Jevois camera: https://www.jevoisinc.com/pages/hardware
-		final double horizontalFOV = 65;
-		final double verticalFOV = horizontalFOV / (4.0/3.0);
 		
-		double seenAtSec = clock.currentTime() - 0.01; // when the image was taken
-		// A target was seen, update the TargetDetails in case it's asked for.
-		// Fill in a new TargetDetails so it can be returned if asked for and it won't
-		// change as the caller uses it.
-		TargetDetails latestTargetSeen = new TargetDetails();
-		//log.sub("Vision old pos = %s", robotPosition);
-		//log.sub("Vision: angle=%.1f, distance=%.1f", xAngle, distanceInches);
+		log.sub("parts[2] = " + parts[2]);
 
-		// When the target is flat with the camera the skew is inaccurate. Can be as bad as +-20 degrees
-		// Use a low pass filter to try and smooth these out
-		// TODO: since this is an issue when the skew is zero try to squash small skew values
-		
-		latestTargetSeen.seenAtSec = seenAtSec;
-		latestTargetSeen.targetFound = Boolean.parseBoolean(parts[2]);
-		latestTargetSeen.distance = Double.parseDouble(parts[3]);
-		latestTargetSeen.xOffset = Double.parseDouble(parts[4]);
-		synchronized (this) {
-			lastSeenTarget = latestTargetSeen;
+		if (!Boolean.parseBoolean(parts[2])){
+			// A target was seen, update the TargetDetails in case it's asked for.
+			// Fill in a new TargetDetails so it can be returned if asked for and it won't
+			// change as the caller uses it.
+			TargetDetails newTarget = new TargetDetails();
+			//log.sub("Vision old pos = %s", robotPosition);	
+			//log.sub("Vision: angle=%.1f, distance=%.1f", xAngle, distanceInches);
+
+			newTarget.seenAtSec = clock.currentTime() - Double.parseDouble(parts[1]);
+			newTarget.targetFound = Boolean.parseBoolean(parts[2]);
+			newTarget.distance = Double.parseDouble(parts[3]);
+			newTarget.angle = Double.parseDouble(parts[4]);
+			
+			Position robotPosition = location.getHistoricalLocation(newTarget.seenAtSec);			
+			newTarget.location = robotPosition.addVector(newTarget.distance, newTarget.angle);
+
+			log.sub("Location set.");
+			// newTarget.location.heading += newTarget.angle
+
+			synchronized (this) {
+				lastSeenTarget = newTarget;
+			}
+			//log.sub("Vision: Updated target %s", lastSeenTarget);
 		}
-		//log.sub("Vision: Updated target %s", lastSeenTarget);
+		
 	}
 
 	
 	@Override
 	public void updateDashboard() {
 		boolean targetFound = lastSeenTarget.targetFound;
-		double lockAgeSec = clock.currentTime() - lastSeenTarget.seenAtSec;
-		if (lockAgeSec > 2)
-			targetFound = false;
+		double lockAgeSec = (clock.currentTime() - lastSeenTarget.seenAtSec)/1000000000;
 		double angle = 0, distance = 0;
-		if (targetFound) {
+		if (lastSeenTarget.isValid(clock.currentTime())) {
 			Position robotPos = location.getCurrentLocation();
-			// Where is the target relative to the current robot position?
-			Position relativePos = lastSeenTarget.location.getRelativeToPosition(robotPos);
-			angle = relativePos.heading;
+			angle = -robotPos.bearingTo(lastSeenTarget.location);
 			distance = robotPos.distanceTo(lastSeenTarget.location);
 		}
 		dashboard.putBoolean("Vision camera found", connected);
-		dashboard.putNumber("Vision distance to target", lastSeenTarget.distance);
-		dashboard.putBoolean("Vision target found", lastSeenTarget.targetFound);
-		dashboard.putNumber("Vision xOffset", lastSeenTarget.xOffset);
+		dashboard.putNumber("Vision distance to target", distance);
+		dashboard.putNumber("Vision lockAgeSec", lockAgeSec);
+		dashboard.putNumber("Vision angle", angle);
 	
 	}
 
