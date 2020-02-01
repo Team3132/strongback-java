@@ -26,12 +26,6 @@ public class MockShooter implements ShooterInterface {
     public double getTargetSpeed() {
         return targetSpeed;
     }
-    /*  
-    @Override
-    public boolean hasCell() {
-        return false;
-    }
-    */
 
     @Override
     public ShooterInterface setFeederPower(double percent) {

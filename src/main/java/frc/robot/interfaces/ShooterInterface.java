@@ -10,5 +10,4 @@ public interface ShooterInterface extends SubsystemInterface, Executable, Dashbo
     
     public ShooterInterface setFeederPower(double percent);
     public double getFeederPower();
-    //public boolean hasCell();
 }

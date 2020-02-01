@@ -70,12 +70,6 @@ public class ShooterSimulator implements ShooterInterface{
         this.feederPower = percent;
         return this;
     }
-    /*
-    @Override
-    public boolean hasCell() {
-        return false;
-    }
-    */
 
     @Override
     public double getFeederPower() {
