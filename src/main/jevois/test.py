@@ -1,4 +1,28 @@
-import libjevois as jevois
+  def process(self, inframe, outframe):
+        inimg = inframe.get()
+
+        # Start measuring image processing time:
+        self.timer.start()
+        
+        # Convert input image to BGR24:
+        imgbgr = jevois.convertToCvBGR(inimg)
+        h, w, chans = imgbgr.shape
+
+        # Get pre-allocated but blank output image which we will send over USB:
+        outimg = outframe.get()
+        outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
+        jevois.paste(inimg, outimg, 0, 0)
+        jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
+
+        # Let camera know we are done using the input image:
+        inframe.done()
+
+        # Load camera calibration if needed:
+        if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
+
+        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
+        
+        import libjevois as jevois
 import cv2
 import numpy as np
 import math # for cos, sin, etc
@@ -184,7 +208,6 @@ class FirstPython:
     
         # Instantiate a JeVois Timer to measure our processing framerate:
         self.timer = jevois.Timer("FirstPython", 100, jevois.LOG_INFO)
-        
 
         # CAUTION: The constructor is a time-critical code section. Taking too long here could upset USB timings and/or
         # video capture software running on the host computer. Only init the strict minimum here, and do not use OpenCV,
@@ -212,7 +235,8 @@ class FirstPython:
         h = int(parts[1])
         s = int(parts[2])
         v = int(parts[3])
-        return (np.array([h, s, v], dtype=np.uint8), "HSV min set to {} {} {}".format(h, s, v))        
+        return (np.array([h, s, v], dtype=np.uint8), "HSV min set to {} {} {}".format(h, s, v))
+        
 
     # ###################################################################################################
     ## Load camera calibration from JeVois share directory
@@ -225,31 +249,6 @@ class FirstPython:
             jevois.LINFO("Loaded camera calibration from {}".format(cpf))
         else:
             jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
-    
-    def thresholding(self, imgbgr):
-        
-        h, w, chans = imgbgr.shape
-
-        # Convert input image to HSV:
-        imghsv = cv2.cvtColor(imgbgr, cv2.COLOR_BGR2HSV)
-        
-        # Isolate pixels inside our desired HSV range:
-        imgth = cv2.inRange(imghsv, self.HSVmin, self.HSVmax)
-
-        # Create structuring elements for morpho maths:
-        if not hasattr(self, 'erodeElement'):
-            self.erodeElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
-            self.dilateElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
-        
-        # Apply morphological operations to cleanup the image noise:
-        imgth = cv2.erode(imgth, self.erodeElement)
-        imgth = cv2.dilate(imgth, self.dilateElement)
-            
-        imgth = cv2.medianBlur(imgth,3)
-
-        
-
-        return imgth
 
     
     # ###################################################################################################
@@ -264,14 +263,29 @@ class FirstPython:
 
     def detect(self, imgbgr, outimg = None):
         maxn = 5 # max number of objects we will consider
-        h, w = imgbgr.shape
+        h, w, chans = imgbgr.shape
 
+        # Convert input image to HSV:
+        imghsv = cv2.cvtColor(imgbgr, cv2.COLOR_BGR2HSV)
+        
+        # Isolate pixels inside our desired HSV range:
+        imgth = cv2.inRange(imghsv, self.HSVmin, self.HSVmax)
         maskValues = "H={}-{} S={}-{} V={}-{} ".format(self.HSVmin[0], self.HSVmax[0], self.HSVmin[1],
                                                 self.HSVmax[1], self.HSVmin[2], self.HSVmax[2])    
         
+        # Create structuring elements for morpho maths:
+        if not hasattr(self, 'erodeElement'):
+            self.erodeElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
+            self.dilateElement = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
+        
+        # Apply morphological operations to cleanup the image noise:
+        imgth = cv2.erode(imgth, self.erodeElement)
+        imgth = cv2.dilate(imgth, self.dilateElement)
+            
+        imgth = cv2.medianBlur(imgth,3)
 
         # Detect objects by finding contours:
-        contours, hierarchy = cv2.findContours(imgbgr, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(imgth, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         maskValues += "N={} ".format(len(contours))
 
         # Only consider the 5 biggest objects by area:
@@ -360,16 +374,19 @@ class FirstPython:
         
         # Display any results requested by the users:
         if outimg is not None and outimg.valid():
-            if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgbgr, outimg, w, 0)
-            jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)     
+            if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgth, outimg, w, 0)
+            jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)
             
         return bestHull
  
     # ###################################################################################################
     ## Send serial messages, one per object
-    def sendAllSerial(self,imageAge, found, distance, x):
+    def sendAllSerial(self,found, distance, x):
+        # time, found, distance, center of goal 
+        now = time.time()
+        
         jevois.sendSerial("D3 {} {} {} {} FIRST".
-                            format(imageAge, found, distance,x)) 
+                            format(now,found, distance,x)) 
                               
     # ###################################################################################################
     ## Draw all detected objects in 3D
@@ -419,28 +436,28 @@ class FirstPython:
 
         # Start measuring image processing time:
         self.timer.start()
-        startTime = time.time()
         
         # Convert input image to BGR24:
         imgbgr = jevois.convertToCvBGR(inimg)
-        # Let camera know we are done using the input image:
-        inframe.done()
         h, w, chans = imgbgr.shape
-        
-        # Load camera calibration if needed:
-        if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
-
-        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
 
         # Get pre-allocated but blank output image which we will send over USB:
         outimg = outframe.get()
         outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
         jevois.paste(inimg, outimg, 0, 0)
-        #jevois.convertCvBGRtoRawImage(imgbgr, outimg, 0)
         jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
 
-        imgbgr = self.thresholding(imgbgr)
-   
+        # Let camera know we are done using the input image:
+        inframe.done()
+        
+        # Get a list of quadrilateral convex hulls for all good objects:
+        # bestHull = self.detect(imgbgr, outimg)
+
+        # Load camera calibration if needed:
+        if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
+
+        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
+        
         # Get a list of quadrilateral convex hulls for all good objects:
         bestHull = self.detect(imgbgr, outimg)
 
@@ -465,11 +482,9 @@ class FirstPython:
 
         except:
             print("target not found")
-
-        now = time.time()
-        imageAge = startTime - now 
+        
         # Send all serial messages:
-        self.sendAllSerial(imageAge, found, distance, angle)
+        self.sendAllSerial(found, distance, angle)
         
         #cv2.drawContours(outimg, [foundcontours], 0, (255, 0, 0), 2)
     
