@@ -78,10 +78,10 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       newSpeed = positionalControl(action.colour);
       break;
     case ADJUST_WHEEL_ANTICLOCKWISE:
-      newSpeed = -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      newSpeed = Constants.COLOUR_WHEEL_MOTOR_ADJUST;
       break;
     case ADJUST_WHEEL_CLOCKWISE:
-      newSpeed = Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      newSpeed = -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
       break;
     case NONE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
@@ -92,7 +92,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     }
     if (newSpeed != speed) {
       motor.set(ControlMode.PercentOutput, newSpeed);
-      log.info("set new speed %.2f", newSpeed);
+      log.info("%s: set new speed %.2f", name, newSpeed);
       speed = newSpeed;
     }
   }
@@ -173,6 +173,9 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * 
   */
   public double positionalControl(Colour desired) {
+    double newSpeed = (colour.id - desired.id) % 4; //Calculate new speed.
+    if (newSpeed > 1) newSpeed -= 4; //If above calculation is 3, set speed to 1.
+    newSpeed /= 2;
     if (colour == Colour.UNKNOWN) { //Colour is unknown, move in current direcion until colour identified.
       if(speed != 0) {
         return speed;
@@ -180,7 +183,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         return Constants.COLOUR_WHEEL_MOTOR_HALF;
       }
     }
-    if (desired == colour || desired == Colour.UNKNOWN) { //If correct colour found, move slowly to line up better and then stop.
+    if (desired == colour) { //If correct colour found, move slowly to line up better and then stop.
       if (firstLoop == true) {
         spinTime = System.currentTimeMillis(); //Check time when correct colour found.
         if (motor.get() > 0) { //Move at slow speed in current direction.
@@ -200,8 +203,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
     }
-    int newSpeed = (colour.id - desired.id) % 4 / 2; //Calculate new speed.
-    if (newSpeed > 1) newSpeed-=2; //If above calculation is 3, set speed to 1.
+    
     return newSpeed;
   }
 
@@ -231,11 +233,16 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    *          again after the wheel has moved.
    * 
   */
-  public Colour doubleCheck() {
+  private Colour doubleCheck() {
+    if (speed == 0 || colourPrev == Colour.UNKNOWN) {
+      colourPrev = colour;
+      return colour;
+    }
     if (colour == colourPrev) return colourPrev;
-    int direction = speed > 0 ? 1 : -1; //Get direction
+    int direction = speed < 0 ? 1 : -1; //Get direction
     int newColour = (colourPrev.id + direction) % 4;
     if (newColour == colour.id) colourPrev = colour;
+    log.sub("%s: p%d c%d a%b", name, colourPrev.id, colour.id, newColour == colour.id);
     return colourPrev;
   }
 
@@ -258,6 +265,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   @Override
 	public void updateDashboard() {
+    updateColour();
     dashboard.putString("Desired colour", action.colour.toString());
     dashboard.putString("Current colour", colour.toString());
     dashboard.putNumber("Colour wheel motor", motor.get());

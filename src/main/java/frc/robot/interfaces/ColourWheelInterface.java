@@ -3,15 +3,17 @@ import org.strongback.Executable;
 
 public interface ColourWheelInterface extends SubsystemInterface, Executable, DashboardUpdater {
     public enum Colour {
-        RED(0),
-        YELLOW(1),
-        BLUE(2),
-        GREEN(3),
-        UNKNOWN(-1);
+        RED(0, "red"),
+        YELLOW(1, "yellow"),
+        BLUE(2, "blue"),
+        GREEN(3, "green"),
+        UNKNOWN(-1, "unknown");
 
         public final int id;
-        Colour(int id) {
+        public final String name;
+        Colour(int id, String name) {
             this.id = id;
+            this.name = name;
         }
 
         public static Colour of(int id) {
@@ -27,6 +29,11 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
                 default:
                     return UNKNOWN;
             }
+        }
+
+        @Override
+        public String toString () {
+            return name + "(" + id + ")";
         }
     }
 

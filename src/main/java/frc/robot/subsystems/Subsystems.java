@@ -339,7 +339,7 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Colour Sensor not present, using a mock colour sensor instead");
 			return;
 		}
-		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, false, log);
+		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
 		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
