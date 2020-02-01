@@ -201,41 +201,68 @@ public class OI implements OIInterface {
 
  	@Override
 	public void configureDiagBox(InputDevice box) {
-		//Red1 and Red2 for both
-		//Yellow1 and Yellow2 for left
-		//Green1 and Green2 for right
+		//Red1 and Red2 for left
+		//Red3 to deploy climber
+		//Yellow3 to climb
+		//Yellow1 and Yellow2 for right
+		//Yellow4 and Yellow5 for both
 
-		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.startClimberUp());
+		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.startClimberLeftUp());
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.pauseClimber());
 
 		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.startClimberDown());
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.pauseClimber());
 
-		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3), Sequences.setClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3), Sequences.deployClimber());
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3), Sequences.pauseClimber());
 
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.startClimberLeftUp());
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.startClimberRightUp());
 		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.pauseClimber());
 
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.startClimberLeftDown());
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.startClimberRightDown());
 		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.pauseClimber());
 
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON3), Sequences.setClimberRight());
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON3), Sequences.climb());
 		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON3), Sequences.pauseClimber());
 
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), Sequences.startClimberRightDown());
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), Sequences.pauseClimber());
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON4), Sequences.startClimberUp());
+		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON4), Sequences.pauseClimber());
 
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), Sequences.startClimberRightUp());
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), Sequences.pauseClimber());
-				
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON5), Sequences.startClimberDown());
+		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON5), Sequences.pauseClimber());
+
 		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON5), Sequences.stopClimber());
+
+		//disabling stuff
+		onTriggered(box.getButton(OperatorBoxButtons.RED_MANUAL), Sequences.overrideClimberLeft());
+		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_MANUAL), Sequences.overrideClimberRight());
+
+		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;
+		// Get the interface that the diag box uses.
+		ClimberInterface climberIF = climberOverride.getOverrideInterface();
+		// Setup the switch for manual/auto/off modes.
+		mapOverrideSwitch(box, OperatorBoxButtons.RED_DISABLE, OperatorBoxButtons.RED_MANUAL, subsystems.climberOverride);
+	  // Override front stilts height.
+		whileTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), 
+			() -> climberIF.setDesiredAction(
+				new ClimberAction(ClimberAction.Type.SET_LEFT_HEIGHT,
+				scaleClimbPotHeight(box.getAxis(OperatorBoxButtons.YELLOW_POT).read()))));
+	  // Override rear stilts height.
+		whileTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), 
+			() -> climberIF.setDesiredAction(
+				new ClimberAction(ClimberAction.Type.SET_RIGHT_HEIGHT,
+				scaleClimbPotHeight(box.getAxis(OperatorBoxButtons.RED_POT).read()))));
+		// Override both front and rear stilts height.
+		whileTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON3),
+			() -> climberIF.setDesiredAction(
+				new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT,
+				scaleClimbPotHeight(box.getAxis(OperatorBoxButtons.GREEN_POT).read()))));	  
 
 	}
 
-	private double scaleStiltsPotHeight(double value) {
+	private double scaleClimbPotHeight(double value) {
 		// Pot has a value of -1 to 1. Scale to 0 - max_height.
-		return (value + 1) / 2 * Constants.CLIMBER_L3_CLIMB_HEIGHT;
+		return (value + 1) / 2 * Constants.CLIMBER_DEPLOY_HEIGHT;
 	}
 
 	private double scaleLiftPotHeight(double value) {
@@ -252,7 +279,8 @@ public class OI implements OIInterface {
 					() -> overrideableSubsystem.setAutomaticMode());
 
 	}
-    
+
+	
 	/**
 	 * Configure the rules for the user interfaces
 	 */

@@ -268,12 +268,8 @@ public class State {
 		return this;
 	}
 
+	
 	// Climber
-	public State setClimberPower(double speed) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_BOTH, speed);
-		return this;
-	}
-
 	public State setClimberPowerLeft(double speed) {
 		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_LEFT, speed);
 		return this;
@@ -281,6 +277,11 @@ public class State {
 
 	public State setClimberPowerRight(double speed) {
 		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_RIGHT, speed);
+		return this;
+	}
+
+	public State setClimberPower(double speed) {
+		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER, speed);
 		return this;
 	}
 
@@ -295,11 +296,6 @@ public class State {
 	}
 
 	//Auto-climber
-	public State setClimberBoth(double height) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
-		return this;
-	}
-
 	public State setClimberLeft(double height) {
 		climberAction = new ClimberAction(ClimberAction.Type.SET_LEFT_HEIGHT, height);
 		return this;
@@ -307,6 +303,11 @@ public class State {
 
 	public State setClimberRight(double height) {
 		climberAction = new ClimberAction(ClimberAction.Type.SET_RIGHT_HEIGHT, height);
+		return this;
+	}
+	
+	public State setClimberBoth(double height) {
+		climberAction = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
 		return this;
 	}
 

@@ -36,17 +36,27 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
         super("Climber", dashboard, log);   
         this.leftWinch = new Winch("climber:", leftWinchMotor, dashboard, log);
         this.rightWinch = new Winch("climber:", rightWinchMotor, dashboard, log);
-        rightPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
-                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
-        leftPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
-                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
         setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));  
         targetHeight = 0;
         oldTargetHeight = 0;
         climberDiffP = Constants.CLIMBER_POWER_NOT_LEVEL_P;
         climberDiffTime = 0;
     }
+@Override
+public void enable() {
+    rightPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
+                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
+    leftPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
+                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
+    super.enable();
+}
 
+@Override
+public void disable() {
+    leftWinch.setMotorPower(0);
+    rightWinch.setMotorPower(0);
+    super.disable();
+}
     
 
     @Override
@@ -65,7 +75,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
             case SET_CLIMBER_POWER_RIGHT:
                 rightWinch.setMotorPower(action.value);
                 break;
-            case SET_CLIMBER_POWER_BOTH:
+            case SET_CLIMBER_POWER:
                 leftWinch.setMotorPower(action.value);
                 rightWinch.setMotorPower(action.value);
                 break;
@@ -83,10 +93,10 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                 rightWinch.setMotorPower(0);
                 break;
             case SET_LEFT_HEIGHT:
-                leftWinch.setTargetHeight(action.value);
+                leftWinch.setTargetHeight(targetHeight);
                 break;
             case SET_RIGHT_HEIGHT:
-                leftWinch.setTargetHeight(action.value);
+                rightWinch.setTargetHeight(targetHeight);
                 break;
             case SET_BOTH_HEIGHT:
                 /*
@@ -136,22 +146,22 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                 // 4.  left > target, back < target
                 // 1 and 2 are the most common. Check them first.
 
-                leftMotorPower = MathUtil.clamp(leftPID.getOutput(rightHeight), -Constants.CLIMBER_LEFT_MAX_MOTOR_POWER, Constants.CLIMBER_LEFT_MAX_MOTOR_POWER);
-                rightMotorPower = MathUtil.clamp(leftPID.getOutput(rightHeight), -Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER, Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER);
+                leftMotorPower = MathUtil.clamp(leftPID.getOutput(leftHeight), -Constants.CLIMBER_MAX_MOTOR_POWER, Constants.CLIMBER_MAX_MOTOR_POWER);
+                rightMotorPower = MathUtil.clamp(rightPID.getOutput(rightHeight), -Constants.CLIMBER_MAX_MOTOR_POWER, Constants.CLIMBER_MAX_MOTOR_POWER);
                  
                 if (leftHeight > rightHeight) {
                 // left is too far up, speed up the right to try and compensate
                 rightMotorPower += (climberDiffP * (leftHeight - rightHeight));
-                if (rightMotorPower > Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER) {
-                    leftMotorPower -= (rightMotorPower - Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER);
-                    rightMotorPower = Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER;
+                if (rightMotorPower > Constants.CLIMBER_MAX_MOTOR_POWER) {
+                    leftMotorPower -= (rightMotorPower - Constants.CLIMBER_MAX_MOTOR_POWER);
+                    rightMotorPower = Constants.CLIMBER_MAX_MOTOR_POWER;
                 }
             } else {
                 // right is too far up, speed up the left to try and compensate
                 leftMotorPower += (climberDiffP * (rightHeight - leftHeight));
-                if (leftMotorPower > Constants.CLIMBER_RIGHT_MAX_MOTOR_POWER) {
-                    rightMotorPower -= (leftMotorPower - Constants.CLIMBER_LEFT_MAX_MOTOR_POWER);
-                    leftMotorPower = Constants.CLIMBER_LEFT_MAX_MOTOR_POWER;
+                if (leftMotorPower > Constants.CLIMBER_MAX_MOTOR_POWER) {
+                    rightMotorPower -= (leftMotorPower - Constants.CLIMBER_MAX_MOTOR_POWER);
+                    leftMotorPower = Constants.CLIMBER_MAX_MOTOR_POWER;
                 }
             }
 

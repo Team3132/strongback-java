@@ -307,8 +307,6 @@ public class Constants {
 	public static final int CLIMBER_REAR_CAN_ID = 47;
 	public static final int CLIMBER_DRIVE_MOTOR_CAN_ID = 48;
 	public static final double CLIMBER_HEIGHT = 2; //Temporary, unused
-	public static final double CLIMBER_L2_CLIMB_HEIGHT = 7.5;
-	public static final double CLIMBER_L3_CLIMB_HEIGHT = 21;
 	public static final double DRIVEBASE_CLIMBER_DRIVE_SPEED = -2.5; // inches/sec
 	//public static final double DRIVEBASE_CLIMBER_DRIVE_SLOW_POWER = -0.15;
 	public static final double CLIMBER_DRIVE_POWER = 1;
@@ -317,8 +315,10 @@ public class Constants {
 	public static final double CLIMBER_I = 0;
 	public static final double CLIMBER_D = 0;
 
-	public static final double CLIMBER_LEFT_MAX_MOTOR_POWER = 1;
-	public static final double CLIMBER_RIGHT_MAX_MOTOR_POWER = 1;
+	public static final double CLIMBER_DEPLOY_HEIGHT = 5;
+	public static final double CLIMBER_CLIMB_HEIGHT = 2;
+
+	public static final double CLIMBER_MAX_MOTOR_POWER = 1;
 
 	public static final double 	CLIMBER_POWER_NOT_LEVEL_P = 0;
 	

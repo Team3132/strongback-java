@@ -121,6 +121,12 @@ public class RobotConfiguration {
 	public int climberRightCanID = Constants.CLIMBER_RIGHT_CAN_ID;
 	public int climberDriveMotorCanID = Constants.CLIMBER_DRIVE_MOTOR_CAN_ID;
 
+	//climber PID
+	public double climberP = Constants.CLIMBER_P;
+	public double climberI = Constants.CLIMBER_I;
+	public double climberD = Constants.CLIMBER_D;
+	public double climberF = Constants.CLIMBER_F;
+
 
 	// Logging default is to not log anything to the graph, and to only log local information when we turn it on.
 	// These are the safest defaults.
@@ -255,6 +261,11 @@ public class RobotConfiguration {
 		climberLeftCanID = getAsInt("climber/leftCanID", Constants.CLIMBER_LEFT_CAN_ID);
 		climberRightCanID = getAsInt("climber/rightCanID", Constants.CLIMBER_RIGHT_CAN_ID);
 		climberDriveMotorCanID = getAsInt("climber/driveMotorCanID", Constants.CLIMBER_DRIVE_MOTOR_CAN_ID);
+
+		climberP = getAsDouble("climber/P", climberP);
+		climberI = getAsDouble("climber/I", climberI);
+		climberD = getAsDouble("climber/D", climberD);
+		climberF = getAsDouble("climber/F", climberF);
 			
 		// logging default is to not log anything to the graph, and to only log local information when we turn it on.
 		// These are the safest defaults.

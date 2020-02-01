@@ -328,39 +328,41 @@ public class Sequences {
 		return seq;
 	}
 
+	//climber
+
 	public static Sequence startClimberUp() {
 		Sequence seq = new Sequence("climber up");
-		seq.add().setClimberPower(1);
+		seq.add().setClimberPower(CLIMBER_MAX_MOTOR_POWER);
 		return seq;
 	}
 
 	public static Sequence startClimberDown() {
 		Sequence seq = new Sequence("climber down");
-		seq.add().setClimberPower(-1);
+		seq.add().setClimberPower(CLIMBER_MAX_MOTOR_POWER*-1);
 		return seq;
 	}
 
 	public static Sequence startClimberLeftUp() {
 		Sequence seq = new Sequence("left climber up");
-		seq.add().setClimberPowerLeft(1);
+		seq.add().setClimberPowerLeft(CLIMBER_MAX_MOTOR_POWER);
 		return seq;
 	}
 
 	public static Sequence startClimberLeftDown() {
 		Sequence seq = new Sequence("left climber down");
-		seq.add().setClimberPowerLeft(-1);
+		seq.add().setClimberPowerLeft(CLIMBER_MAX_MOTOR_POWER*-1);
 		return seq;
 	}
 
 	public static Sequence startClimberRightUp() {
 		Sequence seq = new Sequence("right climber up");
-		seq.add().setClimberPowerRight(1);
+		seq.add().setClimberPowerRight(CLIMBER_MAX_MOTOR_POWER);
 		return seq;
 	}
 
 	public static Sequence startClimberRightDown() {
 		Sequence seq = new Sequence("right climber down");
-		seq.add().setClimberPowerRight(-1);
+		seq.add().setClimberPowerRight(CLIMBER_MAX_MOTOR_POWER*-1);
 		return seq;
 	}
 
@@ -377,21 +379,29 @@ public class Sequences {
 	}
 
 	//Smart climber
-	public static Sequence setClimber() {
+
+	public static Sequence deployLeftClimber() {
+		Sequence seq = new Sequence("deploy left climb");
+		seq.add().setClimberLeft(CLIMBER_DEPLOY_HEIGHT);
+		return seq;
+	}
+
+	
+	public static Sequence deployRightClimber() {
+		Sequence seq = new Sequence("deploy right climb");
+		seq.add().setClimberRight(CLIMBER_DEPLOY_HEIGHT);
+		return seq;
+	}
+	
+	public static Sequence deployClimber() {
+		Sequence seq = new Sequence("deploy climb");
+		seq.add().setClimberBoth(CLIMBER_DEPLOY_HEIGHT);
+		return seq;
+	}
+
+	public static Sequence climb() {
 		Sequence seq = new Sequence("set climb");
-		seq.add().setClimberBoth(3);
-		return seq;
-	}
-
-	public static Sequence setClimberLeft() {
-		Sequence seq = new Sequence("set left climb");
-		seq.add().setClimberLeft(3);
-		return seq;
-	}
-
-	public static Sequence setClimberRight() {
-		Sequence seq = new Sequence("set right climb");
-		seq.add().setClimberRight(3);
+		seq.add().setClimberBoth(CLIMBER_CLIMB_HEIGHT);
 		return seq;
 	}
 
