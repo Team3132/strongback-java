@@ -78,7 +78,7 @@ public class State {
 		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
 		shooterTargetSpeed = subsystems.shooter.getTargetSpeed();
 		feederPower = subsystems.shooter.getFeederPower();
-		hasCargo = subsystems.shooter.hasCell();
+		//hasCargo = subsystems.shooter.hasCell();
 		climber = subsystems.climber.getDesiredAction();
 		hatchAction = subsystems.hatch.getAction();
 		hatchHolderEnabled = subsystems.hatch.getHeld();

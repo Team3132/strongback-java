@@ -215,7 +215,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitForClimber();
 		maybeWaitForShooter();
 		//waitForLiftDeployer();
-		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
+		/* waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter. */
 		
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
@@ -291,13 +291,14 @@ public class Controller implements Runnable, DashboardUpdater {
 			waitUntilOrAbort(() -> subsystems.shooter.isTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while spinning up shooter, stopping shooter");
-			subsystems.shooter.disable();
+			subsystems.shooter.setTargetSpeed(0);
 		}
 	}
 
 	/**
 	 * Blocks waiting till cargo is found, spat, or sequence is aborted.
 	 */
+	/*
 	private void waitForCargo(boolean expectCargo) {
 		if (subsystems.shooter.hasCell() == expectCargo) return;
 		logSub("Waiting for Cargo");
@@ -309,6 +310,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			return;
 		}
 	}
+	*/
 
 	/**
 	 * Blocks waiting till the hatch has moved into position.

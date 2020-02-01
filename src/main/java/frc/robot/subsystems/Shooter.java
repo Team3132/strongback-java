@@ -75,12 +75,12 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
         feederWheel.setPower(percent);
         return this;
     }
-
+    /*
     @Override
     public boolean hasCell(){
         return true; // Returns true by default for now
     }
-
+    */
 
     protected class ShooterWheel {
 
@@ -151,7 +151,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
     @Override
     public void updateDashboard() {
-        dashboard.putString("Shooter cell status", hasCell() ? "has cell" : "no cell");
+        //dashboard.putString("Shooter cell status", hasCell() ? "has cell" : "no cell");
         dashboard.putNumber("Shooter target speed", flyWheel.getTargetSpeed());
         dashboard.putNumber("Feeder power", feederWheel.getPower());
     }
