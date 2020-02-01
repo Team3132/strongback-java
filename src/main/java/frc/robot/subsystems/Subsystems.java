@@ -201,14 +201,14 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_ASSIST,
 				new PositionalPIDDrive("vision",
 				() -> getVisionDriveSpeed(10 /*maxSpeed*/, 40 /*(stopAtDistance*/),
-				() -> getVisionTurnAdjustment(),
+				() -> getVisionTurnWaypointAdjustment(),
 				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
 				new PositionalPIDDrive("visionAim",
-				() -> getVisionTurnAdjustment()<2, 
+				() -> Math.abs(getVisionTurnAdjustment())<2, 
 				() -> 0,
 				() -> getVisionTurnAdjustment(),
 				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
@@ -232,7 +232,7 @@ public class Subsystems implements DashboardUpdater {
 						leftDriveDistance, leftDriveSpeed, rightDriveDistance, rightDriveSpeed, clock, log));
 
 		// Log some useful values for debugging.
-		log.register(true, () -> getVisionTurnAdjustment(), "Drive/vision/turnAdj")
+		log.register(true, () -> getVisionTurnWaypointAdjustment(), "Drive/vision/turnAdj")
 		   .register(true, () -> getVisionDriveSpeed(10 /*maxSpeed*/, 40 /*(stopAtDistance*/), "Drive/vision/distance")
 		   .register(true, () -> getTurnToAngleTurnAdjustment(), "Drive/angle/turnAdj")
 		   .register(true, () -> getVisionWaypoint().x, "Drive/vision/waypointX")
@@ -252,7 +252,7 @@ public class Subsystems implements DashboardUpdater {
 	 * @return a Position to drive to which leads the robot to the vision target on a spline
 	 */
 	public Position getVisionWaypoint() {
-		if (!vision.isConnected()) return new Position(0,0);
+		if (vision == null || !vision.isConnected()) return new Position(0,0);
 		TargetDetails details = vision.getTargetDetails();
 		Position current = location.getCurrentLocation();
 		if (current.distanceTo(details.location) > Constants.VISION_SPLINE_MIN_DISTANCE) {
@@ -262,8 +262,8 @@ public class Subsystems implements DashboardUpdater {
 		}
 	}
 
-	public double getVisionTurnAdjustment() {
-		if (!vision.isConnected()) return 0;
+	public double getVisionTurnWaypointAdjustment() {
+		if (vision == null || !vision.isConnected()) return 0;
 		TargetDetails details = vision.getTargetDetails();
 		if (!details.isValid(clock.currentTime())) return 0;
 		// We have a recent target position relative to the robot starting position.
@@ -274,8 +274,22 @@ public class Subsystems implements DashboardUpdater {
 		return -current.bearingTo(waypoint);
 	}
 
+	public double getVisionTurnAdjustment() {
+		if (vision == null || !vision.isConnected()) return 0;
+		//log.sub("Vision is connected");
+		TargetDetails details = vision.getTargetDetails();
+		if (!details.isValid(clock.currentTime())) return 0;
+		//log.sub("Target is valid");
+		// We have a recent target position relative to the robot starting position.
+		Position current = location.getCurrentLocation();
+		//log.sub("curr pos=%s target = %s", current, details.location);
+		//log.sub("VISION: bearingToVision = %.1f", current.bearingTo(details.location));
+		return -current.bearingTo(details.location);
+	}
+	
+
 	public double getVisionDriveSpeed(double maxSpeed, double stopAtDistance) {
-		if (!vision.isConnected())
+		if (vision == null || !vision.isConnected())
 			return 0;
 		TargetDetails details = vision.getTargetDetails();
 		

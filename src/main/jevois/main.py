@@ -347,29 +347,54 @@ class FirstPython:
             
         TL,TR,BL,BR = cal_corners(bestHull)
         
+        if len(bestHull) != 0:
+            found = True
+        else:
+            found = False
+
+        distance = 0
+        angle = 0
+        
         try:
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
             distance = cal_distance(my)
             center_distance = cal_goal_center_distance(distance)
             skew = cal_goal_skew(TL,TR,BL,BR, center_distance)
-            goalCriteria += "ground dist = " + str(distance)
-            goalCriteria += "skew = " + str(skew)
-        except:
-            print("hi")
+            
+            p = cal_vert_dist_pixel_ratio(my)
+            cal_hori = cal_hori_dist_pixel_ratio(p)
+            xOffset = cal_x_offset(mx, cal_hori)
+
+            # angle = cal_angle(xOffset,distance) # calculated based on pixel:distance ratio
+            angle = cal_angle_test(mx) # calculated based on FOV, works better 
+            goalCriteria += " gdist=" + str(round(distance, 3))
+            goalCriteria += " angle=" + str(round(angle, 3))
+            goalCriteria += " skew=" + str(round(skew, 3))
+            goalCriteria += " found=" + str(found)
         
+        
+             
+
+        except:
+            print("target not found")
         # Display any results requested by the users:
+
         if outimg is not None and outimg.valid():
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgbgr, outimg, w, 0)
-            jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)     
+            jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)   
+            # Draw all detections in 3D:
+            self.drawDetections(outimg, bestHull)
+ 
+
             
-        return bestHull
+        return found, distance, angle
  
     # ###################################################################################################
     ## Send serial messages, one per object
-    def sendAllSerial(self,imageAge, found, distance, x):
+    def sendAllSerial(self,imageAge, found, distance, angle):
         jevois.sendSerial("D3 {} {} {} {} FIRST".
-                            format(imageAge, found, distance,x)) 
+                            format(imageAge, found, distance,angle)) 
                               
     # ###################################################################################################
     ## Draw all detected objects in 3D
@@ -427,7 +452,6 @@ class FirstPython:
         # Let camera know we are done using the input image:
         inframe.done()
         
-        
         # Load camera calibration if needed:
         
         h, w, chans = imgbgr.shape
@@ -447,39 +471,17 @@ class FirstPython:
         imgbgr = self.thresholding(imgbgr)
    
         # Get a list of quadrilateral convex hulls for all good objects:
-        bestHull = self.detect(imgbgr, outimg)
+        found, distance, angle = self.detect(imgbgr, outimg)
 
-        found = False
-        distance = 0
-        angle = 0
-
-        try: 
-            if(bestHull.any()):
-                found = True
-            TL,TR,BL,BR = cal_corners(bestHull)
+        #bestHull = self.detect(imgbgr)
         
-            mx = int((TL[0]+TR[0])/2)
-            my = int((TL[1]+TR[1])/2)
-                        
-            distance = cal_distance(my)
-            p = cal_vert_dist_pixel_ratio(my)
-            cal_hori = cal_hori_dist_pixel_ratio(p)
-            xOffset = cal_x_offset(mx, cal_hori)
-            # angle = cal_angle(xOffset,distance) # calculated based on pixel:distance ratio
-            angle = cal_angle_test(mx) # calculated based on FOV, works better 
-
-        except:
-            print("target not found")
-
         now = time.time()
-        imageAge = startTime - now 
+        imageAge = now - startTime 
         # Send all serial messages:
         self.sendAllSerial(imageAge, found, distance, angle)
         
         #cv2.drawContours(outimg, [foundcontours], 0, (255, 0, 0), 2)
     
-        # Draw all detections in 3D:
-        self.drawDetections(outimg, bestHull)
 
         # Write frames/s info from our timer into the edge map (NOTE: does not account for output conversion time):
         fps = self.timer.stop()

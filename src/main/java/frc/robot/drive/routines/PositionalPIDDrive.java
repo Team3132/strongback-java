@@ -21,6 +21,7 @@ import frc.robot.drive.util.PositionPID;
  */
 public class PositionalPIDDrive implements DriveRoutine {
 
+	private String name;
 	private final Log log;
 	private PositionPID leftPID, rightPID;
 	private BooleanSupplier finished;
@@ -32,7 +33,9 @@ public class PositionalPIDDrive implements DriveRoutine {
 	  	DoubleSupplier leftDistance, DoubleSupplier leftSpeed,
 	  	DoubleSupplier rightDistance, DoubleSupplier rightSpeed,
 		Clock clock, Log log) {
+		this.name = name;
 		this.log = log;
+		this.finished = finished;
 		log.info("Starting to drive positional PID");
 		// There is an issue here. If the targetSpeed increases too rapidly, then even with
 		// the amount of turn subtracted off, it may still exceed the maximum jerk, making
@@ -88,17 +91,20 @@ public class PositionalPIDDrive implements DriveRoutine {
 		rightPID.disable();
 	}
 
+	
+
 	@Override
 	public DriveMotion getMotion() {
 		// Calculate the new speeds for both left and right motors.
 		double leftPower = leftPID.getMotorPower();
 		double rightPower = rightPID.getMotorPower();
+		log.sub("%s: left=%f right=%f", name, leftPower, rightPower);
 		return new DriveMotion(leftPower, rightPower);
 	}
 
 	@Override
 	public String getName() {
-		return "PositionalPID";
+		return name;
 	}
 
 	@Override

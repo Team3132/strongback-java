@@ -277,7 +277,6 @@ public class Jevois implements JevoisInterface {
             throw new IOException("No camera connected"); // No connection, give up.
 
         }
-        log.sub("Beginning to read lines...");
         StringBuffer line = new StringBuffer(200);
         while (true) {
             synchronized (this) {
@@ -325,7 +324,6 @@ public class Jevois implements JevoisInterface {
             return "ERR: JeVois not connected";
 
         log.info(command);
-        log.sub(ostream.toString());
         ostream.write(command.getBytes());
         String newline = "\n";
         ostream.write(newline.getBytes());

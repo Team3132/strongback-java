@@ -218,8 +218,8 @@ public class OI implements OIInterface {
 		// 						  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
 		// });
 
-		whileTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.visionAim());
-		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.abortVisionAim());
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.visionAim());
+		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopDriveByVision());
 
 
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), () -> { 
