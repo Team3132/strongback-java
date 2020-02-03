@@ -280,7 +280,8 @@ public class Constants {
 	public static final double VISON_MAX_TARGET_AGE_SECS = 2;
 	public static final double VISION_MAX_VELOCITY_JERK = 10;
 	public static final double VISION_SPEED_SCALE = 2.5;
-	public static final double VISION_ANGLE_SCALE = 0.6;
+	public static final double VISION_ASSIST_ANGLE_SCALE = 0.6;
+	public static final double VISION_AIM_ASSIST_SCALE = 1;
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
 

@@ -202,7 +202,7 @@ public class Subsystems implements DashboardUpdater {
 				new PositionalPIDDrive("vision",
 				() -> getVisionDriveSpeed(10 /*maxSpeed*/, 40 /*(stopAtDistance*/),
 				() -> getVisionTurnWaypointAdjustment(),
-				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
+				Constants.VISION_SPEED_SCALE, Constants.VISION_ASSIST_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
 		// Vision aiming for shooter
@@ -211,7 +211,7 @@ public class Subsystems implements DashboardUpdater {
 				() -> Math.abs(getVisionTurnAdjustment())<2, 
 				() -> 0,
 				() -> getVisionTurnAdjustment(),
-				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
+				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_angle_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
 		// Driving using the tape on the floor to help with alignment. Overrides the

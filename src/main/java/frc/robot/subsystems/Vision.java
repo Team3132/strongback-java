@@ -138,8 +138,8 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 
 			newTarget.imageTimestamp = clock.currentTime() - Double.parseDouble(parts[1]);
 			newTarget.targetFound = Boolean.parseBoolean(parts[2]);
-			newTarget.distance = Double.parseDouble(parts[3]);
-			newTarget.angle = Double.parseDouble(parts[4]);
+			newTarget.distance = Double.parseDouble(parts[3]) * 1000 / 25.4 ;
+			newTarget.angle = -Double.parseDouble(parts[4]);
 
 			Position robotPosition = location.getHistoricalLocation(newTarget.imageTimestamp);
 			newTarget.location = robotPosition.addVector(newTarget.distance, newTarget.angle);

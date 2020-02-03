@@ -69,7 +69,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 		 DoubleSupplier distance, DoubleSupplier speed, Clock clock, Log log) {
 		PositionPID pid = new PositionPID(name, targetSpeed, maxJerk, distance, speed, clock, log);
 		double kV = 0.018;
-		double kA = 0, kP = 0.03, kI = 0, kD = 0;
+		double kA = 0, kP = 0.0003, kI = 0, kD = 0.001;
 		pid.setVAPID(kV, kA, kP, kI, kD);
 		return pid;
 	}
