@@ -57,13 +57,16 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public ColourWheel(Motor motor, ColorSensorV3 colourSensor, DashboardInterface dash, Log log) {
     super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_VALUE); //Adding colours to the colourMatcher
+    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_RED_TARGET);
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
     this.motor = motor;
     this.colourSensor = colourSensor;
+    log.register(false, () -> (double) colour.id, "%s/colour", name)
+       .register(false, () -> (double) rotCount, "%s/rotCount", name)
+       .register(false, () -> (double) motor.getOutputPercent(), "%s/motorspeed", name);
   }
 
   @Override
@@ -92,7 +95,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     }
     if (newSpeed != speed) {
       motor.set(ControlMode.PercentOutput, newSpeed);
-      log.info("%s: set new speed %.2f", name, newSpeed);
       speed = newSpeed;
     }
   }
@@ -210,18 +212,19 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public void updateColour() {
     Color detectedColor = colourSensor.getColor();
     ColorMatchResult match = colourMatcher.matchClosestColor(detectedColor);
-    if (match.color == Constants.COLOUR_WHEEL_BLUE_VALUE) {
-      colour = Colour.BLUE;
+    Colour sensedColour = Colour.UNKNOWN;
+    if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
+      sensedColour = Colour.BLUE;
     } else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
-      colour = Colour.RED;
+      sensedColour = Colour.RED;
     } else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
-      colour = Colour.GREEN;
+      sensedColour = Colour.GREEN;
     } else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
-      colour = Colour.YELLOW;
+      sensedColour = Colour.YELLOW;
     } else {
-      colour = Colour.UNKNOWN;
+      sensedColour = Colour.UNKNOWN;
     }
-    colour = doubleCheck();
+    colour = doubleCheck(sensedColour);
   }
 
   /**
@@ -233,16 +236,19 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    *          again after the wheel has moved.
    * 
   */
-  private Colour doubleCheck() {
+  private Colour doubleCheck(Colour sensedColour) {
     if (speed == 0 || colourPrev == Colour.UNKNOWN) {
-      colourPrev = colour;
-      return colour;
+      colourPrev = sensedColour;
+      return sensedColour;
     }
-    if (colour == colourPrev) return colourPrev;
+    if (sensedColour == colourPrev) {
+      return colourPrev;
+    }
     int direction = speed < 0 ? 1 : -1; //Get direction
     int newColour = (colourPrev.id + direction) % 4;
-    if (newColour == colour.id) colourPrev = colour;
-    log.sub("%s: p%d c%d a%b", name, colourPrev.id, colour.id, newColour == colour.id);
+    if (newColour == sensedColour.id) {
+      colourPrev = sensedColour;
+    }
     return colourPrev;
   }
 
@@ -265,7 +271,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   @Override
 	public void updateDashboard() {
-    updateColour();
     dashboard.putString("Desired colour", action.colour.toString());
     dashboard.putString("Current colour", colour.toString());
     dashboard.putNumber("Colour wheel motor", motor.get());
