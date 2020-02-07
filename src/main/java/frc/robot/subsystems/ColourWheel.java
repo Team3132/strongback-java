@@ -19,8 +19,8 @@ import frc.robot.lib.Subsystem;
 /**
  * This subsystem is made to spin the Colour Wheel on the control panel in the 2020 game.
  * It 5 seperate actions:
- *   1) Rotational control, spins the colour wheel 3.5 full rotations, or 14 quater turns.
- *      It uses the colour wheel as an encoder, checking for every second colour.
+ *   1) Rotational control, spins the colour wheel 3.5 full rotations, or 28 eighth turns.
+ *      It uses the colour wheel as an encoder, checking for every colour.
  *   2) Positional control, spins the colour wheel to the selected colour,
  *      choosing clockwise or anticlockwise depending on what is faster.
  *   3) Manual adjustment clockwise, moves the colour wheel clockwise at a slow speed incase it is off by a bit.
@@ -34,9 +34,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   private Colour colourPrev = Colour.UNKNOWN; //Used in doubleCheck to check for mistakes with colour detection.
   private Colour colour = Colour.UNKNOWN; //Variable for what the colour sensor currently sees.
-  private Colour startColour; 
-  private Colour pairColour; //Pair and start colour are used for rotational controls to see what colours to check for.
-  private int rotCount = -1; //Roation counter for rotation controls.
+  private Colour nextColour = Colour.UNKNOWN;
+  private int rotCount = 0; //Roation counter for rotation controls.
   private boolean firstLoop = true; //Variable to check if this is the first time the colour sensor saw the desired colour.
   private long spinTime; //Variable to store the time when the colour sensor sees the desired colour.
   private double speed = 0;
@@ -118,32 +117,32 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   *      \  /      |      \ /
   *       \/_______|______\/
   * 
-  * If colour wheel is on G, spin for 14 quater turns by checking when passing G and B.
-  * At 12 rotations, go to half speed to slow down in time.
+  * If colour wheel is on G, spin for 28 eighth turns by checking each colour
+  * At 27 eighth rotations, go to half speed to slow down in time.
   * 
   * If unknown, turn at slow speed and start again.
   * 
   */
   public double rotate3_5() {
-    if (rotCount < 0) { //First run through checks the current colour and sets the colour 2 tiles across to the pair colour.
-      startColour = colour;
-      if (startColour == Colour.UNKNOWN) {
-        return -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
-      }
-      pairColour = Colour.of((startColour.id + 2) % 4);
-      rotCount = 0;
+    if (firstLoop) {
+      nextColour = colour.next(speed);
+      log.info("%s: Next Colour is %s.", name, nextColour);
+      firstLoop = false;
     }
-    if ((rotCount % 2 == 0 && colour == pairColour) || (rotCount % 2 != 0 && colour == startColour)) {
-      rotCount += 1; //Checks if it is expecting the start or pair colour and adds one if it finds it.
+    if (colour.equals(nextColour)) {
+      log.info("%s: Found %s.", name, colour);
+      log.info("%s: Added one to rotations. %d", name, rotCount);
+      rotCount += 1;
+      firstLoop = true;
     }
-    if (rotCount < 14) { // 3.5 rotations == 14 quarter rotations
-      if (rotCount > 12) {
-        return -Constants.COLOUR_WHEEL_MOTOR_HALF; //Slows down with 0.5 full rotations left.
+    if (rotCount < 28) { // 28 eighth rotations = 3.5 full rotations.
+      if (rotCount == 27) {
+        return Constants.COLOUR_WHEEL_MOTOR_HALF;
       } else {
-        return -Constants.COLOUR_WHEEL_MOTOR_FULL;
+        return Constants.COLOUR_WHEEL_MOTOR_FULL;
       }
     } else {
-      rotCount = -1; //Reset rotation count and action.
+      rotCount = 0; //Reset rotation count and action.
       action = new ColourAction(Type.NONE, Colour.UNKNOWN);
       return Constants.COLOUR_WHEEL_MOTOR_OFF;
     }
@@ -178,14 +177,14 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     double newSpeed = (colour.id - desired.id) % 4; //Calculate new speed.
     if (newSpeed > 1) newSpeed -= 4; //If above calculation is 3, set speed to 1.
     newSpeed /= 2;
-    if (colour == Colour.UNKNOWN) { //Colour is unknown, move in current direcion until colour identified.
+    if (colour.equals(Colour.UNKNOWN)) { //Colour is unknown, move in current direcion until colour identified.
       if(speed != 0) {
         return speed;
       } else {
         return Constants.COLOUR_WHEEL_MOTOR_HALF;
       }
     }
-    if (desired == colour) { //If correct colour found, move slowly to line up better and then stop.
+    if (desired.equals(colour)) { //If correct colour found, move slowly to line up better and then stop.
       if (firstLoop == true) {
         spinTime = System.currentTimeMillis(); //Check time when correct colour found.
         if (motor.get() > 0) { //Move at slow speed in current direction.
@@ -237,16 +236,14 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    * 
   */
   private Colour doubleCheck(Colour sensedColour) {
-    if (speed == 0 || colourPrev == Colour.UNKNOWN) {
+    if (speed == 0 || colourPrev.equals(Colour.UNKNOWN)) {
       colourPrev = sensedColour;
       return sensedColour;
     }
-    if (sensedColour == colourPrev) {
+    if (sensedColour.equals(colourPrev)) {
       return colourPrev;
     }
-    int direction = speed < 0 ? 1 : -1; //Get direction
-    int newColour = (colourPrev.id + direction) % 4;
-    if (newColour == sensedColour.id) {
+    if (sensedColour.equals(colourPrev.next(speed))) {
       colourPrev = sensedColour;
     }
     return colourPrev;

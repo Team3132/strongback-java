@@ -8,7 +8,8 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         BLUE(2, "blue"),
         GREEN(3, "green"),
         UNKNOWN(-1, "unknown");
-
+        
+        private final int NUM_COLOURS = 4;
         public final int id;
         public final String name;
         Colour(int id, String name) {
@@ -29,6 +30,14 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
                 default:
                     return UNKNOWN;
             }
+        }
+
+        public boolean equals (Colour colour) {
+            return this.id == colour.id;
+        }
+
+        public Colour next (double direction) {
+            return Colour.of((this.id + NUM_COLOURS + (direction < 0 ? 1 : -1)) % NUM_COLOURS);
         }
 
         @Override
