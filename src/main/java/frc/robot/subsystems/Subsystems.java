@@ -352,7 +352,9 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Motor loaderMotor = MotorFactory.getLoaderMotor(config.loaderCanID, false, log);
-		loader = new Loader(config.teamNumber, loaderMotor, dashboard, log);
+		Solenoid loaderSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.LOADER_SOLENOID_PORT, 0.1, 0.1);
+		loader = new Loader(config.teamNumber, loaderMotor, loaderSolenoid, dashboard, log);
+		
 	}
 
 	public void createPassthrougOverride() {

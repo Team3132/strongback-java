@@ -11,4 +11,12 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
 
     public void setTargetMotorOutput(double current);
 
+    public LoaderInterface setExtended(boolean extended);
+
+	/**
+	 * @return the state of the intake solenoid. 
+	 * */
+	public boolean isExtended();
+	public boolean isRetracted();
+
 }

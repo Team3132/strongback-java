@@ -166,6 +166,7 @@ public class Constants {
 	*/
 	public static final int LOADER_MOTOR_TALON_CAN_ID = 20; //TODO: find canID for Loader motor
 	public static final double LOADER_MOTOR_CURRENT = 1.0;
+	public static final int LOADER_SOLENOID_PORT = 4;
 	
 	/*
 	 * Canifier 

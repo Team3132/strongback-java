@@ -8,6 +8,23 @@ public class MockLoader implements LoaderInterface {
 
     public MockLoader(Log log) {
     }
+    private boolean isExtended = false;
+
+    @Override
+	public LoaderInterface setExtended(boolean extended) {
+		isExtended = extended;
+		return this;
+	}
+
+	@Override
+	public boolean isExtended() {
+		return isExtended;
+	}
+
+	@Override
+	public boolean isRetracted() {
+		return !isExtended;
+    }
     
     @Override
     public double getTargetMotorOutput() {
