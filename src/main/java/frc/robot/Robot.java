@@ -19,6 +19,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.OIInterface;
 import frc.robot.lib.LogDygraph;
+import frc.robot.lib.OperatorBoxButtons;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
@@ -160,6 +161,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledPeriodic() {
+		//log.info("red pot: %.2f", operatorBox.getAxis(OperatorBoxButtons.RED_POT).read());
 	}
 
 	/**

@@ -12,7 +12,6 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
-import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.SimplePID;
 import frc.robot.lib.MathUtil;
 
@@ -32,32 +31,33 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     private double rightMotorPower;
     
 
-    public Climber(Motor leftWinchMotor, Motor rightWinchMotor, DashboardInterface dashboard, Log log) {
+    public Climber(Motor leftWinchMotor, Motor rightWinchMotor, DashboardInterface dashboard, Clock clock, Log log) {
         super("Climber", dashboard, log);   
+        this.clock = clock;
         this.leftWinch = new Winch("climber:", leftWinchMotor, dashboard, log);
         this.rightWinch = new Winch("climber:", rightWinchMotor, dashboard, log);
         setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));  
-        log.info("Climber() action = %s", action);
         targetHeight = 0;
         oldTargetHeight = 0;
         climberDiffP = Constants.CLIMBER_POWER_NOT_LEVEL_P;
         climberDiffTime = 0;
     }
-@Override
-public void enable() {
-    rightPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
-                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
-    leftPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I,
-                Constants.CLIMBER_D, Constants.CLIMBER_F, clock::currentTime);
-    super.enable();
-}
 
-@Override
-public void disable() {
-    leftWinch.setMotorPower(0);
-    rightWinch.setMotorPower(0);
-    super.disable();
-}
+    @Override
+    public void enable() {
+        rightPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I, Constants.CLIMBER_D, Constants.CLIMBER_F,
+                clock::currentTime);
+        leftPID = new SimplePID(Constants.CLIMBER_P, Constants.CLIMBER_I, Constants.CLIMBER_D, Constants.CLIMBER_F,
+                clock::currentTime);
+        super.enable();
+    }
+
+    @Override
+    public void disable() {
+        leftWinch.setMotorPower(0);
+        rightWinch.setMotorPower(0);
+        super.disable();
+    }
     
 
     @Override
@@ -77,14 +77,15 @@ public void disable() {
                 rightWinch.setMotorPower(action.value);
                 break;
             case SET_CLIMBER_POWER:
-                log.info("setting climber power to %.2f", action.value);
                 leftWinch.setMotorPower(action.value);
                 rightWinch.setMotorPower(action.value);
                 break;
             case HOLD_HEIGHT:
                 if (!holding) {
-                    leftWinch.setTargetHeight(leftWinch.getActualHeight());
-                    rightWinch.setTargetHeight(rightWinch.getActualHeight());
+                    leftWinch.setMotorPower(0);
+                    rightWinch.setMotorPower(0);
+                    //leftWinch.setTargetHeight(leftWinch.getActualHeight());
+                    //rightWinch.setTargetHeight(rightWinch.getActualHeight());
                 }
                 holding = true;
                 break;
@@ -260,12 +261,7 @@ public void disable() {
             dashboard.putNumber(name + " current", motor.getOutputCurrent());
             dashboard.putString(name + " hall effect", getHallEffectTriggered() ? "triggered" : "untriggered");
         }
-
-        
-        }
-    
-
-   
+    }
 
     @Override
     public void setDesiredAction(ClimberAction action) {
@@ -277,7 +273,6 @@ public void disable() {
 
     @Override
     public ClimberAction getDesiredAction() {
-        log.info("Climber::getDesiredAction = %s", action);
         return action;
     }
 }

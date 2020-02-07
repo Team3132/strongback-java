@@ -430,13 +430,11 @@ public class Subsystems implements DashboardUpdater {
 			climber = new MockClimber(log);
 			return;
 		}
-		Motor leftWinchMotor = MotorFactory.getClimberWinchMotor(config.climberLeftCanID, false, false, log);
+		Motor leftWinchMotor = MotorFactory.getClimberWinchMotor(config.climberLeftCanID, false, true, log);
 		Motor rightWinchMotor = MotorFactory.getClimberWinchMotor(config.climberRightCanID, false, false, log);
-		leftWinchMotor.setInverted(true);
-		rightWinchMotor.setInverted(true);
 		leftWinchMotor.setScale(Constants.CLIMBER_WINCH_LEFT_SCALE_FACTOR); // 18" ticks = 20208 ticks
 		rightWinchMotor.setScale(Constants.CLIMBER_WINCH_LEFT_SCALE_FACTOR); // 18" ticks = 20208 ticks
-		climber = new Climber(leftWinchMotor, rightWinchMotor, dashboard, log);
+		climber = new Climber(leftWinchMotor, rightWinchMotor, dashboard, clock, log);
 		Strongback.executor().register(climber, Priority.HIGH);
 	}
 

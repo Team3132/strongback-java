@@ -207,6 +207,7 @@ public class OI implements OIInterface {
 		//Yellow1 and Yellow2 for right
 		//Yellow4 and Yellow5 for both
 
+		/*
 		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.startClimberLeftUp());
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.pauseClimber());
 
@@ -236,28 +237,20 @@ public class OI implements OIInterface {
 		//disabling stuff
 		onTriggered(box.getButton(OperatorBoxButtons.RED_MANUAL), Sequences.overrideClimberLeft());
 		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_MANUAL), Sequences.overrideClimberRight());
+		*/
 
 		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;
 		// Get the interface that the diag box uses.
 		ClimberInterface climberIF = climberOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.RED_DISABLE, OperatorBoxButtons.RED_MANUAL, subsystems.climberOverride);
-	  // Override front stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON1), 
+	    // Override climber power.
+		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), 
 			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_LEFT_HEIGHT,
-				scaleClimbPotHeight(box.getAxis(OperatorBoxButtons.YELLOW_POT).read()))));
-	  // Override rear stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON2), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_RIGHT_HEIGHT,
-				scaleClimbPotHeight(box.getAxis(OperatorBoxButtons.RED_POT).read()))));
-		// Override both front and rear stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.GREEN_BUTTON3),
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT,
-				scaleClimbPotHeight(box.getAxis(OperatorBoxButtons.GREEN_POT).read()))));	  
-
+				new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER,
+				box.getAxis(OperatorBoxButtons.RED_POT).read())));
+		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1),
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
 	}
 
 	private double scaleClimbPotHeight(double value) {
