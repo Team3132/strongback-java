@@ -29,12 +29,12 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
 	@Override
 	public void enable() {
-		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
+		NetworkTablesHelper helper = new NetworkTablesHelper("shooter");
 		double shooterP = helper.get("p", Constants.SHOOTER_P);
 		double shooterI = helper.get("i", Constants.SHOOTER_I);
 		double shooterD = helper.get("d", Constants.SHOOTER_D);
 		double shooterF = helper.get("f", Constants.SHOOTER_F);
-		flyWheel.setPIDF(shooterP, shooterI, shooterD, shooterF);
+		flyWheel.setPIDF(shooterP, shooterI, shooterD, shooterF); 
 		super.enable();
 		log.info("Shooter PID values: %f %f %f %f", shooterP, shooterI, shooterD, shooterF);
 	}
