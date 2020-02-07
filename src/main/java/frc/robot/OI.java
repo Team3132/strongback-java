@@ -268,9 +268,9 @@ public class OI implements OIInterface {
 		onUntriggered(box.getButton(OperatorBoxButtons.RED2), Sequences.stopSpitterOnly());
 
 		
-		// Test passthrough (this is temporary)
-		onTriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.startPassthrough());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.stopPassthrough());
+		// Test loader (this is temporary)
+		onTriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.startLoader());
+		onUntriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.stopLoader());
 
 		
 		// Lift movement. Multiple presses move up through configured stops.
@@ -372,15 +372,15 @@ public class OI implements OIInterface {
 		whileTriggered(box.getButton(OperatorBoxButtons.SPARK_SET_SPEED), 
 			() -> sparkTestIF.setMotorOutput(outputScale * box.getAxis(OperatorBoxButtons.SPARK_POT).read()));
 
-		// Passthrough overrides.
-		OverridableSubsystem<PassthroughInterface> passthroughOverride = subsystems.passthroughOverride;
+		// Loader overrides.
+		OverridableSubsystem<LoaderInterface> loaderOverride = subsystems.loaderOverride;
 		// Get the interface that the diag box uses.
-		PassthroughInterface passthroughIF = passthroughOverride.getOverrideInterface();
+		LoaderInterface loaderIF = loaderOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.PASSTHRU_DISABLE, OperatorBoxButtons.PASSTHRU_MANUAL, passthroughOverride);
-	  // While the passthrough speed button is pressed, set the target speed. Does not turn off.
+		mapOverrideSwitch(box, OperatorBoxButtons.PASSTHRU_DISABLE, OperatorBoxButtons.PASSTHRU_MANUAL, loaderOverride);
+	  // While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.PASSTHRU_MOTOR), 
-			() -> passthroughIF.setTargetMotorOutput(box.getAxis(OperatorBoxButtons.PASSTHRU_POT).read()));
+			() -> loaderIF.setTargetMotorOutput(box.getAxis(OperatorBoxButtons.PASSTHRU_POT).read()));
 
 		// Hatch overrides.
 		OverridableSubsystem<HatchInterface> hatchOverride = subsystems.hatchOverride;

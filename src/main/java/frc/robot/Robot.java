@@ -102,7 +102,7 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.createDrivebaseLocation(createTrajectoryGenerator(), driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
 		subsystems.createClimber();
-		subsystems.createPassthrough();
+		subsystems.createLoader();
 		subsystems.createSpitter();
 		subsystems.createHatch();
 		subsystems.createLift();

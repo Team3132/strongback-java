@@ -1,12 +1,12 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.PassthroughInterface;
+import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.Log;
 
-public class MockPassthrough implements PassthroughInterface {
+public class MockLoader implements LoaderInterface {
     private double output = 0;
 
-    public MockPassthrough(Log log) {
+    public MockLoader(Log log) {
     }
     
     @Override

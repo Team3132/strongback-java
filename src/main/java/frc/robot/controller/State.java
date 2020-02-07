@@ -42,8 +42,8 @@ public class State {
 	public Double spitterDutyCycle = null;  // Power level to supply to spitter. -1..0..1
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
-	// Passthrough
-	public Double passthroughMotorOutput = null;
+	// Loader
+	public Double loaderMotorOutput = null;
 
 	// Hatch
 	public HatchAction hatchAction = null;  // How the hatch should be positioned.
@@ -74,7 +74,7 @@ public class State {
 		setLiftHeight(subsystems.lift.getTargetHeight());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
+		loaderMotorOutput = subsystems.loader.getTargetMotorOutput();
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
 		hasCargo = subsystems.spitter.hasCargo();
 		climber = subsystems.climber.getDesiredAction();
@@ -203,9 +203,9 @@ public class State {
 	}
 
 
-	// Passthrough
-	public State setPassthroughMotorOutput(double output) {
-		passthroughMotorOutput = Double.valueOf(output);
+	// Loader
+	public State setLoaderMotorOutput(double output) {
+		loaderMotorOutput = Double.valueOf(output);
 		return this;
 	}
 
@@ -421,7 +421,7 @@ public class State {
 		ArrayList<String> result = new ArrayList<String>();
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
+		maybeAdd("loaderMotorOutput", loaderMotorOutput, result);
 		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);

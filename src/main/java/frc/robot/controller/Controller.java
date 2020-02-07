@@ -197,7 +197,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
 
-		subsystems.passthrough.setTargetMotorOutput(desiredState.passthroughMotorOutput);
+		subsystems.loader.setTargetMotorOutput(desiredState.loaderMotorOutput);
 
 		subsystems.climber.setDesiredAction(desiredState.climber);
 

@@ -136,7 +136,7 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareTalonSRX getPassthroughMotor(int canID, boolean invert, Log log) {	
+	public static HardwareTalonSRX getLoaderMotor(int canID, boolean invert, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(.25, 10);
 		motor.configReverseSoftLimitEnable(false, 10);

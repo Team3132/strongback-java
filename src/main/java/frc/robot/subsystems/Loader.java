@@ -4,18 +4,18 @@ import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
-import frc.robot.interfaces.PassthroughInterface;
+import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
-public class Passthrough extends Subsystem implements PassthroughInterface, Executable, DashboardUpdater {
+public class Loader extends Subsystem implements LoaderInterface, Executable, DashboardUpdater {
     private Motor motor;
     private double targetCurrent = 0;
     
 
-    public Passthrough(int teamNumber, Motor passthroughMotor, DashboardInterface dashboard, Log log) {
+    public Loader(int teamNumber, Motor passthroughMotor, DashboardInterface dashboard, Log log) {
         super("Passthrough", dashboard, log);
         this.motor = passthroughMotor;
 

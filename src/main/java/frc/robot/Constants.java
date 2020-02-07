@@ -162,10 +162,10 @@ public class Constants {
 	public static final double HATCH_CALIBRATION_SPEED = -0.4; // Percentage of motor power needed for calibration.
 	
 	/*
-	* Passthrough
+	* Loader
 	*/
-	public static final int PASSTHROUGH_MOTOR_TALON_CAN_ID = 20; //TODO: find canID for Passthrough motor
-	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
+	public static final int LOADER_MOTOR_TALON_CAN_ID = 20; //TODO: find canID for Loader motor
+	public static final double LOADER_MOTOR_CURRENT = 1.0;
 	
 	/*
 	 * Canifier 
