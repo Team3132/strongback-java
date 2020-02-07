@@ -353,7 +353,8 @@ public class Subsystems implements DashboardUpdater {
 
 		Motor loaderMotor = MotorFactory.getLoaderMotor(config.loaderCanID, false, log);
 		Solenoid loaderSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.LOADER_SOLENOID_PORT, 0.1, 0.1);
-		loader = new Loader(config.teamNumber, loaderMotor, loaderSolenoid, dashboard, log);
+		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
+		loader = new Loader(config.teamNumber, loaderMotor, loaderSolenoid, paddleSolenoid, dashboard, log);
 		
 	}
 
