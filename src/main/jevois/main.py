@@ -136,7 +136,6 @@ def cal_distance(center_y):
     return distance
 
 def cal_vert_dist_pixel_ratio(y):
-    
     # h1 is the top of the screen to the center of goal
     # h2 is the  to (floor + robot height)
     # h2 = 98.25" - camera height
@@ -152,12 +151,7 @@ def cal_x_offset(mx, hori_ratio):
     x = mx - (SCREEN_WIDTH/2.0)
     return x * hori_ratio
 
-# def cal_angle(pixel, distance):
-#     angle = math.atan(pixel/distance)
-#     angle = rad_to_deg(angle)
-#     return angle
-
-def cal_angle_test(x): # this works better, uses FOV 
+def cal_angle(x): # based on  FOV 
     angle = ((x-(SCREEN_WIDTH/2))/(SCREEN_WIDTH/2))*(CAMERA_FOV/2)
     return angle
 
@@ -183,8 +177,7 @@ class FirstPython:
         self.margin = 5                    # Margin from from frame borders (pixels)
     
         # Instantiate a JeVois Timer to measure our processing framerate:
-        self.timer = jevois.Timer("FirstPython", 100, jevois.LOG_INFO)
-        
+        self.timer = jevois.Timer("FirstPython", 100, jevois.LOG_INFO)  
 
         # CAUTION: The constructor is a time-critical code section. Taking too long here could upset USB timings and/or
         # video capture software running on the host computer. Only init the strict minimum here, and do not use OpenCV,
@@ -226,8 +219,7 @@ class FirstPython:
         else:
             jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
     
-    def thresholding(self, imgbgr):
-        
+    def thresholding(self, imgbgr):       
         h, w, chans = imgbgr.shape
 
         # Convert input image to HSV:
@@ -246,8 +238,6 @@ class FirstPython:
         imgth = cv2.dilate(imgth, self.dilateElement)
             
         imgth = cv2.medianBlur(imgth,3)
-
-        
 
         return imgth
 
@@ -269,7 +259,6 @@ class FirstPython:
         maskValues = "H={}-{} S={}-{} V={}-{} ".format(self.HSVmin[0], self.HSVmax[0], self.HSVmin[1],
                                                 self.HSVmax[1], self.HSVmin[2], self.HSVmax[2])    
         
-
         # Detect objects by finding contours:
         contours, hierarchy = cv2.findContours(imgbgr, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         maskValues += "N={} ".format(len(contours))
@@ -298,7 +287,6 @@ class FirstPython:
             # Is it the right shape?
             if (hull.shape != (4,1,2)): continue # 4 vertices for the rectangular convex outline (shows as a trapezoid)
             goalCriteria += "H" # Hull is quadrilateral
-            
           
             huarea = cv2.contourArea(hull, oriented = False)
             if huarea < self.hullarea[0] or huarea > self.hullarea[1]: continue
@@ -311,9 +299,6 @@ class FirstPython:
             # Check object shape:
             peri = cv2.arcLength(c, closed = True)
             approx = cv2.approxPolyDP(c, epsilon = 0.015 * peri, closed = True)
-
-            for x in hull:
-                 jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),1 , jevois.YUYV.LightGreen)
                       
             # Reject the shape if any of its vertices gets within the margin of the image bounds. This is to avoid
             # getting grossly incorrect 6D pose estimates as the shape starts getting truncated as it partially exits
@@ -347,6 +332,7 @@ class FirstPython:
             
         TL,TR,BL,BR = cal_corners(bestHull)
         
+        # calculate values to send to rio (found, ground distance, angle)
         if len(bestHull) != 0:
             found = True
         else:
@@ -354,7 +340,6 @@ class FirstPython:
 
         distance = 0
         angle = 0
-        
         try:
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
@@ -366,28 +351,22 @@ class FirstPython:
             cal_hori = cal_hori_dist_pixel_ratio(p)
             xOffset = cal_x_offset(mx, cal_hori)
 
-            # angle = cal_angle(xOffset,distance) # calculated based on pixel:distance ratio
-            angle = cal_angle_test(mx) # calculated based on FOV, works better 
+            angle = cal_angle(mx)
             goalCriteria += " gdist=" + str(round(distance, 3))
             goalCriteria += " angle=" + str(round(angle, 3))
             goalCriteria += " skew=" + str(round(skew, 3))
-            goalCriteria += " found=" + str(found)
-        
-        
-             
+            goalCriteria += " found=" + str(found) 
 
         except:
             print("target not found")
+        
         # Display any results requested by the users:
-
         if outimg is not None and outimg.valid():
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgbgr, outimg, w, 0)
             jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)   
-            # Draw all detections in 3D:
+            # Draw corners and center of goal:
             self.drawDetections(outimg, bestHull)
- 
 
-            
         return found, distance, angle
  
     # ###################################################################################################
@@ -397,20 +376,21 @@ class FirstPython:
                             format(imageAge, found, distance,angle)) 
                               
     # ###################################################################################################
-    ## Draw all detected objects in 3D
+    ## Draw corners and center of goal
     def drawDetections(self, outimg, bestHull):
                    
         TL,TR,BL,BR = cal_corners(bestHull)
 
         try: 
+            for x in besthull:
+                jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),1 , jevois.YUYV.LightGreen)
+
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
             jevois.drawLine(outimg,mx,my,mx,my,2 , jevois.YUYV.LightGrey)
 
         except:
             print("hi")
-        
-        # center of goal
         
     # ###################################################################################################
     ## Process function with no USB output
@@ -462,26 +442,21 @@ class FirstPython:
         # Get pre-allocated but blank output image which we will send over USB:
         outimg = outframe.get()
         outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
-
         jevois.convertCvBGRtoRawImage(imgbgr, inimg, 0)
         jevois.paste(inimg, outimg, 0, 0)
-        
         jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
 
         imgbgr = self.thresholding(imgbgr)
    
         # Get a list of quadrilateral convex hulls for all good objects:
         found, distance, angle = self.detect(imgbgr, outimg)
-
-        #bestHull = self.detect(imgbgr)
         
+        # calculate age of image (time since it was originally taken)
         now = time.time()
         imageAge = now - startTime 
+
         # Send all serial messages:
-        self.sendAllSerial(imageAge, found, distance, angle)
-        
-        #cv2.drawContours(outimg, [foundcontours], 0, (255, 0, 0), 2)
-    
+        self.sendAllSerial(imageAge, found, distance, angle)  
 
         # Write frames/s info from our timer into the edge map (NOTE: does not account for output conversion time):
         fps = self.timer.stop()
