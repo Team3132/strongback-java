@@ -322,9 +322,7 @@ public class Constants {
 
 	public static final double 	CLIMBER_POWER_NOT_LEVEL_P = 0;
 	
-	public static final int CLIMBER_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
-	public static final int CLIMBER_PEAK_CURRENT_LIMIT = 43;
-	public static final int CLIMBER_CURRENT_TIMEOUT_MS = 100;
+	public static final int CLIMBER_PEAK_CURRENT_LIMIT = 38;
 	public static final double CLIMBER_WINCH_LEFT_SCALE_FACTOR = 9609/7.9529;     // 7.7953;	// 18" ticks = 20208 ticks
 	public static final double CLIMBER_WINCH_RIGHT_SCALE_FACTOR = 9634/7.9528;
 

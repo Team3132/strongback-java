@@ -251,6 +251,19 @@ public class OI implements OIInterface {
 				box.getAxis(OperatorBoxButtons.RED_POT).read())));
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1),
 				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
+
+		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), 
+			() -> climberIF.setDesiredAction(
+				new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_LEFT,
+				box.getAxis(OperatorBoxButtons.RED_POT).read())));
+		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2),
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
+		
+		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3),
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_RIGHT,
+						box.getAxis(OperatorBoxButtons.RED_POT).read())));
+		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3),
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
 	}
 
 	private double scaleClimbPotHeight(double value) {

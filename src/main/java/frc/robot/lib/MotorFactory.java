@@ -148,19 +148,11 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareSparkMAX getClimberWinchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+	public static HardwareSparkMAX getClimberWinchMotor(int canID, boolean invert, Log log) {
 		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log);
-		//motor.setSensorPhase(sensorPhase);
-		//motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		//motor.getSensorCollection().setQuadraturePosition(0, 10);			// reset the encoders on code start. We assume we are on the floor and the lifts are retracted on code restart.
 		motor.set(ControlMode.Position, 0);
-		//motor.configContinuousCurrentLimit(Constants.CLIMBER_CONTINUOUS_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
-		//motor.configPeakCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
+		motor.setSmartCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT);
 		motor.setPIDF(0, Constants.CLIMBER_P, Constants.CLIMBER_I, Constants.CLIMBER_D, Constants.CLIMBER_F);
-		//motor.configClosedloopRamp(0, 10);
-		// Set the deadband to zero.
-		//motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
-		//motor.configAllowableClosedloopError(1, 0, 10);
 		return motor;
 	}
 	
