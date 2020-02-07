@@ -352,7 +352,8 @@ public class Constants {
 	public static final int COLOUR_WHEEL_CAN_ID = 7;
 	// Values callibrated using vynl sticker for control panel.
 	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); //Values from the colour sensor used to match colours.
-	public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250);
+	//public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); //This is the real green value.
+	public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.209, 0.608, 0.182);
 	public static final Color COLOUR_WHEEL_RED_TARGET = ColorMatch.makeColor(0.484, 0.366, 0.150);
 	public static final Color COLOUR_WHEEL_YELLOW_TARGET = ColorMatch.makeColor(0.322, 0.546, 0.131);
 	public static final Color COLOUR_WHEEL_WHITE_TARGET = ColorMatch.makeColor(0.276, 0.587, 0.217);

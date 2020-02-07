@@ -117,8 +117,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   *      \  /      |      \ /
   *       \/_______|______\/
   * 
-  * If colour wheel is on G, spin for 28 eighth turns by checking each colour
-  * At 27 eighth rotations, go to half speed to slow down in time.
+  * If colour wheel is on G, spin for 26 eighth turns by checking each colour
   * 
   * If unknown, turn at slow speed and start again.
   * 
@@ -135,12 +134,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       rotCount += 1;
       firstLoop = true;
     }
-    if (rotCount < 28) { // 28 eighth rotations = 3.5 full rotations.
-      if (rotCount == 27) {
-        return Constants.COLOUR_WHEEL_MOTOR_HALF;
-      } else {
-        return Constants.COLOUR_WHEEL_MOTOR_FULL;
-      }
+    if (rotCount < (3*8 + 2)) {
+      return Constants.COLOUR_WHEEL_MOTOR_FULL;
     } else {
       rotCount = 0; //Reset rotation count and action.
       action = new ColourAction(Type.NONE, Colour.UNKNOWN);
@@ -168,34 +163,30 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   *       \/_______|______\/
   * 
   * If colour wheel is on G, turn anticlockwise at half speed,
-  * clockwise at half speed for B and clockwise at full speed for anything else. 
+  * clockwise at half speedhalf for B and clockwise at full speed for anything else. 
   * 
   * If unknown, turn at current speed and direction until correct colour is found.
   * 
   */
   public double positionalControl(Colour desired) {
     double newSpeed = (colour.id - desired.id) % 4; //Calculate new speed.
-    if (newSpeed > 1) newSpeed -= 4; //If above calculation is 3, set speed to 1.
-    newSpeed /= 2;
+    if (newSpeed == 3) newSpeed -= 4; //If above calculation is 3, set speed to -1.
+    if (newSpeed == -3) newSpeed += 4; //If above calculation is 3, set speed to -1.
+    newSpeed = Constants.COLOUR_WHEEL_MOTOR_FULL * Math.signum(newSpeed);
     if (colour.equals(Colour.UNKNOWN)) { //Colour is unknown, move in current direcion until colour identified.
       if(speed != 0) {
         return speed;
       } else {
-        return Constants.COLOUR_WHEEL_MOTOR_HALF;
+        return Constants.COLOUR_WHEEL_MOTOR_FULL;
       }
     }
     if (desired.equals(colour)) { //If correct colour found, move slowly to line up better and then stop.
       if (firstLoop == true) {
+
         spinTime = System.currentTimeMillis(); //Check time when correct colour found.
-        if (motor.get() > 0) { //Move at slow speed in current direction.
-          firstLoop = false;
-          return Constants.COLOUR_WHEEL_MOTOR_ADJUST;
-        } else {
-          firstLoop = false;
-          return -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
-        }
+        firstLoop = false;
       } 
-      if (System.currentTimeMillis() - spinTime < 500) { //Check if 0.5 seconds has passed.
+      if (System.currentTimeMillis() - spinTime < 50) { //Check if 50 milliseconds has passed.
         return motor.get();
       } else {
         action = new ColourAction(Type.NONE, Colour.UNKNOWN);
@@ -204,7 +195,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
     }
-    
     return newSpeed;
   }
 
@@ -252,6 +242,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   @Override
   public ColourWheelInterface setDesiredAction(ColourAction action) {
     this.action = action;
+    firstLoop = true;
     return this;
   }
 
