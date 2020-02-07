@@ -78,6 +78,7 @@ public class State {
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
 		hasCargo = subsystems.spitter.hasCargo();
 		climberAction = subsystems.climber.getDesiredAction();
+		subsystems.log.info("State() climberAction = %s", climberAction);
 		hatchAction = subsystems.hatch.getAction();
 		hatchHolderEnabled = subsystems.hatch.getHeld();
 		liftDeploy = subsystems.lift.shouldBeDeployed();

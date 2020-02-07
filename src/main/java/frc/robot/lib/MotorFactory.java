@@ -148,19 +148,19 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareTalonSRX getClimberWinchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.setSensorPhase(sensorPhase);
-		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.getSensorCollection().setQuadraturePosition(0, 10);			// reset the encoders on code start. We assume we are on the floor and the lifts are retracted on code restart.
+	public static HardwareSparkMAX getClimberWinchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
+		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log);
+		//motor.setSensorPhase(sensorPhase);
+		//motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		//motor.getSensorCollection().setQuadraturePosition(0, 10);			// reset the encoders on code start. We assume we are on the floor and the lifts are retracted on code restart.
 		motor.set(ControlMode.Position, 0);
-		motor.configContinuousCurrentLimit(Constants.CLIMBER_CONTINUOUS_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
-		motor.configPeakCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
-		motor.setPIDF(0, Constants.CLIMBER_POSITION_P, Constants.CLIMBER_POSITION_I, Constants.CLIMBER_POSITION_D, Constants.CLIMBER_POSITION_F);
-		motor.configClosedloopRamp(0, 10);
+		//motor.configContinuousCurrentLimit(Constants.CLIMBER_CONTINUOUS_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
+		//motor.configPeakCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
+		motor.setPIDF(0, Constants.CLIMBER_P, Constants.CLIMBER_I, Constants.CLIMBER_D, Constants.CLIMBER_F);
+		//motor.configClosedloopRamp(0, 10);
 		// Set the deadband to zero.
-		motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
-		motor.configAllowableClosedloopError(1, 0, 10);
+		//motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
+		//motor.configAllowableClosedloopError(1, 0, 10);
 		return motor;
 	}
 	
@@ -268,6 +268,12 @@ public class MotorFactory {
 		return leader;
 	}
 
+    private static HardwareSparkMAX getSparkMAX(int canID, boolean invert, NeutralMode mode, Log log) {
+		log.sub("%s: " + canID, " spark max");
+		int[] canIDs = new int[1];
+		canIDs[0] = canID;
+    	return getSparkMAX(canIDs, invert, mode, log);
+	}
 	
 	private static int abs(int value) {
 		return value >= 0 ? value : -value;

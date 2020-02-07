@@ -2,9 +2,11 @@ package frc.robot.mock;
 
 import frc.robot.interfaces.ClimberInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
 
 public class MockClimber implements ClimberInterface {
 
+    private ClimberAction action = new ClimberAction(Type.STOP_CLIMBER, 0);
     public MockClimber(Log log) {
     }
 
@@ -36,12 +38,12 @@ public class MockClimber implements ClimberInterface {
 
     @Override
     public void setDesiredAction(ClimberAction action) {
-
+        this.action = action;
     }
 
     @Override
     public ClimberAction getDesiredAction() {
-        return null;
+        return action;
     }
 
     @Override

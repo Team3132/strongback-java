@@ -204,6 +204,8 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.passthrough.setTargetMotorOutput(desiredState.passthroughMotorOutput);
 
+		log.info("climber %s", desiredState.climberAction);
+		log.info("climber doing action %s", desiredState.climberAction.toString());
 		subsystems.climber.setDesiredAction(desiredState.climberAction);
 
 		subsystems.hatch.setAction(desiredState.hatchAction);
