@@ -25,6 +25,7 @@ import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.*;
 import frc.robot.mock.*;
 import frc.robot.simulator.*;
+import jdk.vm.ci.meta.Constant;
 
 /**
  * Contains the subsystems for the robot.
@@ -207,11 +208,11 @@ public class Subsystems implements DashboardUpdater {
 				rightDriveSpeed, clock, log));
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
-				new PositionalPIDDrive("visionAim",
+				new FuzzyPositionalPIDDrive("visionAim",
 				() -> Math.abs(getVisionTurnAdjustment())<2, 
 				() -> 0,
 				() -> getVisionTurnAdjustment(),
-				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_angle_SCALE,
+				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
 		// Driving using the tape on the floor to help with alignment. Overrides the
@@ -236,7 +237,8 @@ public class Subsystems implements DashboardUpdater {
 		   .register(true, () -> getVisionDriveSpeed(10 /*maxSpeed*/, 40 /*(stopAtDistance*/), "Drive/vision/distance")
 		   .register(true, () -> getTurnToAngleTurnAdjustment(), "Drive/angle/turnAdj")
 		   .register(true, () -> getVisionWaypoint().x, "Drive/vision/waypointX")
-		   .register(true, () -> getVisionWaypoint().y, "Drive/vision/waypointY");
+		   .register(true, () -> getVisionWaypoint().y, "Drive/vision/waypointY")
+		   .register(true, () -> getVisionTurnAdjustment(), "Drive/vision/visionAim");	
 
 	}
 
