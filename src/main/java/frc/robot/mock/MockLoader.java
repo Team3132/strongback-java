@@ -8,22 +8,41 @@ public class MockLoader implements LoaderInterface {
 
     public MockLoader(Log log) {
     }
-    private boolean isExtended = false;
+    // Loader
+    private boolean isLoaderExtended = false;
 
     @Override
-	public LoaderInterface setExtended(boolean extended) {
-		isExtended = extended;
+	public LoaderInterface setLoaderExtended(boolean extended) {
+		isLoaderExtended = extended;
 		return this;
 	}
 
 	@Override
-	public boolean isExtended() {
-		return isExtended;
+	public boolean isLoaderExtended() {
+		return isLoaderExtended;
 	}
 
 	@Override
-	public boolean isRetracted() {
-		return !isExtended;
+	public boolean isLoaderRetracted() {
+		return !isLoaderExtended;
+    }
+    // Paddle
+    private boolean isPaddleExtended = false;
+
+    @Override
+	public LoaderInterface setPaddleExtended(boolean extended) {
+		isPaddleExtended = extended;
+		return this;
+	}
+
+	@Override
+	public boolean isPaddleExtended() {
+		return isPaddleExtended;
+	}
+
+	@Override
+	public boolean isPaddleRetracted() {
+		return !isPaddleExtended;
     }
     
     @Override
