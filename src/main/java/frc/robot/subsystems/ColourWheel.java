@@ -1,13 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorMatchResult;
-import com.revrobotics.ColorSensorV3;
+import java.util.function.Supplier;
 
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
-
-import edu.wpi.first.wpilibj.util.Color;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
@@ -42,25 +38,11 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   private ColourAction action = new ColourAction(Type.NONE, Colour.UNKNOWN); //Default action for colour wheel subsystem.
 
   private final Motor motor;
-  private final ColorSensorV3 colourSensor;
+  private final Supplier<Colour> colourSensor;
 
-  /**
-   * A Rev Color Match object is used to register and detect known colors. This
-   * can be calibrated ahead of time or during operation.
-   * 
-   * This object uses a simple euclidian distance to estimate the closest match
-   * with given confidence range.
-   */
-  private final ColorMatch colourMatcher = new ColorMatch();
-
-  public ColourWheel(Motor motor, ColorSensorV3 colourSensor, DashboardInterface dash, Log log) {
+  public ColourWheel(Motor motor, Supplier<Colour> colourSensor, DashboardInterface dash, Log log) {
     super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_RED_TARGET);
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
     this.motor = motor;
     this.colourSensor = colourSensor;
     log.register(false, () -> (double) colour.id, "%s/colour", name)
@@ -200,21 +182,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   }
 
   public void updateColour() {
-    Color detectedColor = colourSensor.getColor();
-    ColorMatchResult match = colourMatcher.matchClosestColor(detectedColor);
-    Colour sensedColour = Colour.UNKNOWN;
-    if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
-      sensedColour = Colour.BLUE;
-    } else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
-      sensedColour = Colour.RED;
-    } else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
-      sensedColour = Colour.GREEN;
-    } else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
-      sensedColour = Colour.YELLOW;
-    } else {
-      sensedColour = Colour.UNKNOWN;
-    }
-    colour = doubleCheck(sensedColour);
+    colour = doubleCheck(colourSensor.get());
   }
 
   /**
