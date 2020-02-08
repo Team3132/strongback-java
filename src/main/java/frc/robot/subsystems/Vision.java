@@ -140,9 +140,12 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 			newTarget.targetFound = Boolean.parseBoolean(parts[2]);
 			newTarget.distance = Double.parseDouble(parts[3]) * 1000 / 25.4 ;
 			newTarget.angle = -Double.parseDouble(parts[4]);
+			newTarget.skew = Double.parseDouble(parts[5]);
 
 			Position robotPosition = location.getHistoricalLocation(newTarget.imageTimestamp);
 			newTarget.location = robotPosition.addVector(newTarget.distance, newTarget.angle);
+		
+			newTarget.location.heading += newTarget.angle - newTarget.skew;
 
 			// log.sub("Location set.");
 			// newTarget.location.heading += newTarget.angle
@@ -159,11 +162,11 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	public void updateDashboard() {
 		boolean targetFound = lastSeenTarget.targetFound;
 		double lockAgeSec = (clock.currentTime() - lastSeenTarget.imageTimestamp);
-		double angle = 0, distance = 0;
+		double angle = 0, distance = 0,;
 		if (lastSeenTarget.isValid(clock.currentTime())) {
 			Position robotPos = location.getCurrentLocation();
 			angle = -robotPos.bearingTo(lastSeenTarget.location);
-			distance = robotPos.distanceTo(lastSeenTarget.location);
+			distance = robotPos.distanceTo(lastSe\enTarget.location);
 		}
 		dashboard.putBoolean("Vision camera connected", connected);
 		dashboard.putNumber("Vision distance to target", distance);
@@ -171,6 +174,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		dashboard.putNumber("Vision angle", angle);
 		dashboard.putBoolean("Vision targetFound", lastSeenTarget.targetFound);
 		dashboard.putBoolean("Vision is Valid", lastSeenTarget.isValid(clock.currentTime()));
+		dashboard.putNumber("Vision Skew", lastSeenTarget.location.heading);
 
 	}
 

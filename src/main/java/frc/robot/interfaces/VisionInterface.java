@@ -21,6 +21,7 @@ public interface VisionInterface extends DashboardUpdater {
 		public double height;  // How high the target is.
 		public double distance;
 		public double angle;
+		public double skew;
 		
 		public boolean isValid(double currentTime) {
 			double lockAgeSec = currentTime - imageTimestamp;
