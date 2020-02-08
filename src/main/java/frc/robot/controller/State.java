@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import org.strongback.components.Clock;
+
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.interfaces.LiftInterface.LiftAction;
@@ -60,6 +63,9 @@ public class State {
 
 	public Waypoint resetPosition = null;  // Reset where the location subsystem thinks the robot is
 
+	//Colour Wheel
+	public ColourAction colourWheel = null;
+
 	/**
 	 * Create a blank state
 	 */
@@ -82,6 +88,7 @@ public class State {
 		hatchHolderEnabled = subsystems.hatch.getHeld();
 		liftDeploy = subsystems.lift.shouldBeDeployed();
 		drive = subsystems.drivebase.getDriveRoutine();
+		colourWheel = subsystems.colourWheel.getDesiredAction();
 	}
 
 	// Time
@@ -295,6 +302,31 @@ public class State {
 		return this;
 	}
 
+	// Color Wheel
+	public State colourWheelRotational() {
+		colourWheel = new ColourAction(ColourAction.Type.ROTATION, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State colourWheelPositional(Colour colour) {
+		colourWheel = new ColourAction(ColourAction.Type.POSITION, colour);
+		return this;
+	}
+
+	public State stopColourWheel() {
+		colourWheel = new ColourAction(ColourAction.Type.NONE, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State colourWheelLeft() {
+		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State colourWheelRight() {
+		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
+		return this;
+	}
 
 	// Drive base
 	/**
@@ -432,6 +464,7 @@ public class State {
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
+		maybeAdd("colourwheelMode", colourWheel, result);
 	
 		return "[" + String.join(",", result) + "]";
 	}

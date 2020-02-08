@@ -125,6 +125,12 @@ public class MotorFactory {
 		return motor;
 	}
 
+	public static HardwareTalonSRX getColourWheelMotor(int canID, boolean invert, Log log) {
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		motor.configClosedloopRamp(.25, 10);
+		return motor;
+	}
+
 	public static HardwareSparkMAX getSparkTestMotor(int[] canIDs, boolean invert, Log log) {
 		HardwareSparkMAX motor = getSparkMAX(canIDs, invert, NeutralMode.Brake, log);
 		NetworkTablesHelper config = new NetworkTablesHelper("tunnable/sparkTest/");
