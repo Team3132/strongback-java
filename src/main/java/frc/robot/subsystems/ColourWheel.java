@@ -52,8 +52,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
        .register(false, () -> (double) spinTime, "%s/spinTime", name);
   }
 
-  @Override
-  public void execute(long timeInMillis) {
+  public void update() {
     double newSpeed = 0;
     updateColour();
     switch (action.type) {
@@ -221,6 +220,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public boolean isFinished() {
     //log.info("isFinished Colour Wheel Action: %s", action);
     return action.type == Type.NONE;
+  }
+
+  @Override
+  public void disable() {
+    motor.set(ControlMode.PercentOutput, 0);
+    action = new ColourAction(Type.NONE, Colour.UNKNOWN);
   }
 
   @Override

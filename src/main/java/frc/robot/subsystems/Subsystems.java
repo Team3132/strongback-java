@@ -102,6 +102,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.enable();
 		hatch.enable();
 		spark.enable();
+		colourWheel.enable();
 	}
 
 	public void disable() {
@@ -114,6 +115,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.disable();
 		hatch.disable();
 		spark.disable();
+		colourWheel.disable();
 	}
 
 	@Override

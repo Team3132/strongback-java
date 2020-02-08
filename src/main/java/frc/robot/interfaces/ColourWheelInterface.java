@@ -64,6 +64,20 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         }
 
         @Override
+        public boolean equals(Object obj) {
+            if(this == obj)
+                return true;
+            if(obj == null)
+                return false;
+            if(getClass() != obj.getClass())
+                return false;
+            ColourAction other = (ColourAction) obj;
+            if (other.colour != colour) return false;
+            if (other.type != type) return false;
+            return true;
+        }
+
+        @Override
         public String toString() {
             return String.format("%s: %s", type.toString().toLowerCase(), colour);
     }
