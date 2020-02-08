@@ -45,25 +45,20 @@ public class TestShooter {
 
     @Test
     public void testShooterSetTargetSpeed() {
-        shooter.enable();
         shooter.setTargetSpeed(SHOOTER_TARGET_SPEED);
         shooterStartTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - shooterStartTime) < 3000) {
         }
         assertEquals(SHOOTER_TARGET_SPEED, shooterMotor.getSpeed(), 0.1);
-        shooter.disable();
-        assertEquals(0, shooterMotor.getSpeed(), 0.01);
     }
 
     @Test
     public void testShooterSetFeederPower() {
-        shooter.enable();
         shooter.setFeederPower(SHOOTER_FEEDER_POWER);
         shooterStartTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - shooterStartTime) < 2000) {
+            continue;
         }
         assertEquals(SHOOTER_FEEDER_POWER, feederMotor.getSpeed(), 0.1);
-        shooter.disable();
-        assertEquals(0, feederMotor.getSpeed(), 0.01);
     }
 }

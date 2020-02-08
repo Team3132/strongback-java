@@ -33,6 +33,12 @@ public class MockMotor implements Motor {
     }
 
     @Override
+    public void set(ControlMode mode, double demand) {
+        // TODO Auto-generated method stub
+        speed = demand;
+    }
+
+    @Override
     public double getSpeed() {
         return speed;
     }
