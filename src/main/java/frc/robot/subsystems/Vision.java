@@ -166,7 +166,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		if (lastSeenTarget.isValid(clock.currentTime())) {
 			Position robotPos = location.getCurrentLocation();
 			angle = -robotPos.bearingTo(lastSeenTarget.location);
-			distance = robotPos.distanceTo(lastSe\enTarget.location);
+			distance = robotPos.distanceTo(lastSeenTarget.location);
 		}
 		dashboard.putBoolean("Vision camera connected", connected);
 		dashboard.putNumber("Vision distance to target", distance);
