@@ -19,7 +19,7 @@ import frc.robot.lib.Subsystem;
 /**
  * This subsystem is made to spin the Colour Wheel on the control panel in the 2020 game.
  * It 5 seperate actions:
- *   1) Rotational control, spins the colour wheel 3.5 full rotations, or 28 eighth turns.
+ *   1) Rotational control, spins the colour wheel 3.25 full rotations, or 26 eighth turns.
  *      It uses the colour wheel as an encoder, checking for every colour.
  *   2) Positional control, spins the colour wheel to the selected colour,
  *      choosing clockwise or anticlockwise depending on what is faster.
@@ -65,7 +65,9 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     this.colourSensor = colourSensor;
     log.register(false, () -> (double) colour.id, "%s/colour", name)
        .register(false, () -> (double) rotCount, "%s/rotCount", name)
-       .register(false, () -> (double) motor.getOutputPercent(), "%s/motorspeed", name);
+       .register(false, () -> (double) motor.getOutputPercent(), "%s/motorspeed", name)
+       .register(false, () -> (double) nextColour.id, "%s/nextColour", name)
+       .register(false, () -> (double) spinTime, "%s/spinTime", name);
   }
 
   @Override
@@ -74,7 +76,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     updateColour();
     switch (action.type) {
     case ROTATION:
-      newSpeed = rotate3_5();
+      newSpeed = rotationalControl();
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
@@ -122,7 +124,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * If unknown, turn at slow speed and start again.
   * 
   */
-  public double rotate3_5() {
+  public double rotationalControl() {
     if (firstLoop) {
       nextColour = colour.next(speed);
       log.info("%s: Next Colour is %s.", name, nextColour);
@@ -162,8 +164,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   *      \  /      |      \ /
   *       \/_______|______\/
   * 
-  * If colour wheel is on G, turn anticlockwise at half speed,
-  * clockwise at half speedhalf for B and clockwise at full speed for anything else. 
+  * If colour wheel is on G, turn anticlockwise for R,
+  * and clockwise at full speed for anything else.
   * 
   * If unknown, turn at current speed and direction until correct colour is found.
   * 
@@ -190,7 +192,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         return motor.get();
       } else {
         action = new ColourAction(Type.NONE, Colour.UNKNOWN);
-        firstLoop = true;
         log.info("ColourWheel: Desired colour found.");
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
@@ -230,9 +231,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       colourPrev = sensedColour;
       return sensedColour;
     }
-    if (sensedColour.equals(colourPrev)) {
-      return colourPrev;
-    }
     if (sensedColour.equals(colourPrev.next(speed))) {
       colourPrev = sensedColour;
     }
@@ -259,12 +257,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   @Override
 	public void updateDashboard() {
-    dashboard.putString("Desired colour", action.colour.toString());
-    dashboard.putString("Current colour", colour.toString());
-    dashboard.putNumber("Colour wheel motor", motor.get());
-    dashboard.putString("Colour wheel action", action.type.toString());
-    dashboard.putNumber("Colour wheel rotations", rotCount);
-    dashboard.putNumber("spinTime", spinTime);
-    dashboard.putNumber("realTime", System.currentTimeMillis());
+    dashboard.putString("Colourwheel Desired colour", action.colour.toString());
+    dashboard.putString("Colourwheel Current colour", colour.toString());
+    dashboard.putNumber("Colourwheel Motor", motor.get());
+    dashboard.putString("Colourwheel Action", action.type.toString());
+    dashboard.putNumber("Colourwheel Rotations", rotCount);
+    dashboard.putNumber("Colourwheel spinTime", spinTime);
+    dashboard.putNumber("Colourwheel realTime", System.currentTimeMillis());
 	}
 }
