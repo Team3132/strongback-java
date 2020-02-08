@@ -278,12 +278,14 @@ public class Constants {
 	public static final int CAMERA_FRAMES_PER_SECOND = 60;
 	// Vision (all need tuning)
 	public static final double VISON_MAX_TARGET_AGE_SECS = 2;
-	public static final double VISION_MAX_VELOCITY_JERK = 33; // in/s/s
-	public static final double VISION_SPEED_SCALE = 2.5;
+	public static final double VISION_MAX_VELOCITY_JERK = 40; // in/s/s
+	public static final double VISION_SPEED_SCALE = 2.4;
 	public static final double VISION_ASSIST_ANGLE_SCALE = 0.6;
-	public static final double VISION_AIM_ANGLE_SCALE = 0.5;
+	public static final double VISION_AIM_ANGLE_SCALE = 0.4;
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
+	public static final double VISION_STOP_DISTANCE = 230; // inches 
+	public static final double VISION_MAX_DRIVE_SPEED = 15;
 
 	// Vision filter parameters
 	public static final double VISION_H_MIN = 70;

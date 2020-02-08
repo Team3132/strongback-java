@@ -46,7 +46,7 @@ public class FuzzyPositionalPIDDrive implements DriveRoutine {
 		// the change in acceleration, but that is getting ugly.
 		// Instead, apply a low pass filter to the targetSpeed so that it can't change too
 		// quickly and then set a high jerk so the jerk doesn't limit the acceleration.
-		LowPassFilter filteredSpeed = new LowPassFilter(targetSpeed, 1.2);
+		LowPassFilter filteredSpeed = new LowPassFilter(targetSpeed, 0.2);
 		leftPID = createPID("Drive/"+name+"/left", () -> {
 			 	return speedScale * filteredSpeed.getAsDouble() + turnScale * targetTurn.getAsDouble();
 			},
@@ -54,7 +54,8 @@ public class FuzzyPositionalPIDDrive implements DriveRoutine {
 		rightPID = createPID("Drive/"+name+"/right", () -> {
 			 	return speedScale * filteredSpeed.getAsDouble() - turnScale * targetTurn.getAsDouble();
 	   		},
-		maxJerk, rightDistance, rightSpeed, clock, log);	
+		maxJerk, rightDistance, rightSpeed, clock, log);
+		log.sub("distance = %s", targetSpeed.getAsDouble());	
 	}
 
 	public FuzzyPositionalPIDDrive(
@@ -73,7 +74,7 @@ public class FuzzyPositionalPIDDrive implements DriveRoutine {
 		PositionPID pid = new PositionPID(name, targetSpeed, maxJerk, distance, speed, clock, log);
 		double kV = 0.018;
 		double kA = 0, kI = 0, kD = 1.05;
-		double kP = 0.25;		
+		double kP = 0.1; //0.25;	
 		pid.setVAPID(kV, kA, kP, kI, kD);
 		return pid;
 	}

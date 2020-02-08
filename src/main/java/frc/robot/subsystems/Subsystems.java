@@ -25,7 +25,6 @@ import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.*;
 import frc.robot.mock.*;
 import frc.robot.simulator.*;
-import jdk.vm.ci.meta.Constant;
 
 /**
  * Contains the subsystems for the robot.
@@ -209,8 +208,8 @@ public class Subsystems implements DashboardUpdater {
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
 				new FuzzyPositionalPIDDrive("visionAim",
-				() -> Math.abs(getVisionTurnAdjustment())<2, 
-				() -> 0,
+				() -> (Math.abs(getVisionTurnAdjustment())<2) && (Math.abs(getVisionDistance()) < 10), 
+				() -> getVisionDistance(),
 				() -> getVisionTurnAdjustment(),
 				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
@@ -238,7 +237,8 @@ public class Subsystems implements DashboardUpdater {
 		   .register(true, () -> getTurnToAngleTurnAdjustment(), "Drive/angle/turnAdj")
 		   .register(true, () -> getVisionWaypoint().x, "Drive/vision/waypointX")
 		   .register(true, () -> getVisionWaypoint().y, "Drive/vision/waypointY")
-		   .register(true, () -> getVisionTurnAdjustment(), "Drive/vision/visionAim");	
+		   .register(true, () -> getVisionTurnAdjustment(), "Drive/vision/visionAim")
+		   .register(true, () -> getVisionDistance(), "Drive/vision/visionAimDistance");	
 
 	}
 
@@ -286,9 +286,12 @@ public class Subsystems implements DashboardUpdater {
 		Position current = location.getCurrentLocation();
 		//log.sub("curr pos=%s target = %s", current, details.location);
 		//log.sub("VISION: bearingToVision = %.1f", current.bearingTo(details.location));
-		return -current.bearingTo(details.location);
+		
+		// Scale turnadjustment depending on distance from goal
+		double turnAdjustment = Math.max(0, Constants.VISION_MAX_DRIVE_SPEED - Math.abs(getVisionDistance())*4);
+		turnAdjustment = MathUtil.scale(turnAdjustment, 0, Constants.VISION_MAX_DRIVE_SPEED, 0, 1);
+		return turnAdjustment * -current.bearingTo(details.location);
 	}
-	
 
 	public double getVisionDriveSpeed(double maxSpeed, double stopAtDistance) {
 		if (vision == null || !vision.isConnected())
@@ -303,6 +306,22 @@ public class Subsystems implements DashboardUpdater {
 
 		// Cap it so that the robot quickly gets to max speed.
 		return Math.min(distance, maxSpeed);
+	}
+
+	public double getVisionDistance(){
+		if (vision == null || !vision.isConnected())
+			return 0;
+		TargetDetails details = vision.getTargetDetails();
+		
+		if (!details.isValid(clock.currentTime()))
+			return 0;
+		
+		// We have a recent target position relative to the robot starting position.
+		Position current = location.getCurrentLocation();
+
+		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
+		
+		return MathUtil.clamp(distance*0.25, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED); // needs to return how far it is from VISION_STOP_DISTANCE
 	}
 
 	public double getTapeTurnAdjustment() {
