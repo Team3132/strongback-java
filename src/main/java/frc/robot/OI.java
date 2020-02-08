@@ -13,6 +13,7 @@ import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
@@ -107,7 +108,7 @@ public class OI implements OIInterface {
 		onUntriggered(rightStick.getButton(5), Sequences.stopLevelNclimb());
 
 		// Level 3 sequence of buttons
-		onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
+		/*onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
 		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
 
 		onTriggered(rightStick.getButton(10), Sequences.startLevelDriveForward());
@@ -117,7 +118,7 @@ public class OI implements OIInterface {
 		onUntriggered(rightStick.getButton(8), Sequences.stopLevelNclimb());
 
 		onTriggered(leftStick.getButton(12), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());
+		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());*/
 
 		onTriggered(leftStick.getButton(10), Sequences.startFrontRaise());
 		onUntriggered(leftStick.getButton(10), Sequences.stopLevelNclimb());
@@ -173,12 +174,13 @@ public class OI implements OIInterface {
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
 
-		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
+		//onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
 		
 		// Deploy/retract lift. 
 		onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
 		onUntriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftRetract());
 
+		/*
 		// Spitter Sequence (cargoSpit) 
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startCargoSpit());
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
@@ -186,6 +188,7 @@ public class OI implements OIInterface {
 		// Reverse button
 		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
+		*/
 
 		// Hatch hold & release
 		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), () -> {
@@ -212,6 +215,7 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
 		
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
+<<<<<<< HEAD
 		// onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
 		// 	sysoutScoreMode();
 		// 	return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
@@ -221,6 +225,14 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.visionAim());
 		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopDriveByVision());
 
+=======
+		/* Using these buttons for colour wheel while testing.
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
+			sysoutScoreMode();
+			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
+								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
+		});
+>>>>>>> b4d54ac028e150d8e7a2a3f9d396704768ef14be
 
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), () -> { 
 			sysoutScoreMode();
@@ -240,8 +252,19 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), () -> {
 			scoreModeCargo = !scoreModeCargo;
 			sysoutScoreMode();
-		});
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.moveLift(LiftSetpoint.LIFT_BOTTOM_HEIGHT));
+		}); */
+
+		//Colour Wheel testing.
+		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(Colour.YELLOW));
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(Colour.BLUE));
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(Colour.RED));
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(Colour.GREEN));
+		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.colourWheelRotational());
+		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());
+		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelRight());
+		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
 
 		// Lift microadjust
 		whileTriggered(() -> {
