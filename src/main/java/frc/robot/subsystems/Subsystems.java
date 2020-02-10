@@ -222,8 +222,8 @@ public class Subsystems implements DashboardUpdater {
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
 				new FuzzyPositionalPIDDrive("visionAim",
-				() -> (Math.abs(getVisionTurnAdjustment())<2) && (Math.abs(getVisionDistance()) < 10), 
-				() -> getVisionDistance(),
+				() -> (Math.abs(getVisionTurnAdjustment())<2) && (Math.abs(getVisionDistance()) < 5), 
+				() -> MathUtil.clamp(getVisionDistance()*0.4, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED),
 				() -> getVisionTurnAdjustment(),
 				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
@@ -302,9 +302,20 @@ public class Subsystems implements DashboardUpdater {
 		//log.sub("VISION: bearingToVision = %.1f", current.bearingTo(details.location));
 		
 		// Scale turnadjustment depending on distance from goal
-		double turnAdjustment = Math.max(0, Constants.VISION_MAX_DRIVE_SPEED - Math.abs(getVisionDistance())*4);
-		turnAdjustment = MathUtil.scale(turnAdjustment, 0, Constants.VISION_MAX_DRIVE_SPEED, 0, 1);
+		double turnAdjustment = Math.max(0, Constants.VISION_MAX_DRIVE_SPEED - Math.abs(getVisionDistance())*2.5);
+		turnAdjustment = MathUtil.scale(turnAdjustment, 0, Constants.VISION_MAX_DRIVE_SPEED, 0.1, 1);
 		return turnAdjustment * -current.bearingTo(details.location);
+	}
+
+	public double getVisionDistance(){
+		if (vision == null || !vision.isConnected()) return 0;
+		TargetDetails details = vision.getTargetDetails();
+		if (!details.isValid(clock.currentTime())) return 0;
+		
+		// We have a recent target position relative to the robot starting position.
+		Position current = location.getCurrentLocation();
+		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
+		return distance; 
 	}
 
 	public double getVisionDriveSpeed(double maxSpeed, double stopAtDistance) {
@@ -322,21 +333,7 @@ public class Subsystems implements DashboardUpdater {
 		return Math.min(distance, maxSpeed);
 	}
 
-	public double getVisionDistance(){
-		if (vision == null || !vision.isConnected())
-			return 0;
-		TargetDetails details = vision.getTargetDetails();
-		
-		if (!details.isValid(clock.currentTime()))
-			return 0;
-		
-		// We have a recent target position relative to the robot starting position.
-		Position current = location.getCurrentLocation();
 
-		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
-		
-		return MathUtil.clamp(distance*0.25, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED); // needs to return how far it is from VISION_STOP_DISTANCE
-	}
 
 	public double getTapeTurnAdjustment() {
 		// TODO: Implement

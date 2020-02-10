@@ -138,7 +138,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 
 			newTarget.imageTimestamp = clock.currentTime() - Double.parseDouble(parts[1]);
 			newTarget.targetFound = Boolean.parseBoolean(parts[2]);
-			newTarget.distance = Double.parseDouble(parts[3]) * 1000 / 25.4 ;
+			newTarget.distance = Double.parseDouble(parts[3]);
 			newTarget.angle = -Double.parseDouble(parts[4]);
 			newTarget.skew = Double.parseDouble(parts[5]);
 
@@ -162,7 +162,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	public void updateDashboard() {
 		boolean targetFound = lastSeenTarget.targetFound;
 		double lockAgeSec = (clock.currentTime() - lastSeenTarget.imageTimestamp);
-		double angle = 0, distance = 0,;
+		double angle = 0, distance = 0;
 		if (lastSeenTarget.isValid(clock.currentTime())) {
 			Position robotPos = location.getCurrentLocation();
 			angle = -robotPos.bearingTo(lastSeenTarget.location);

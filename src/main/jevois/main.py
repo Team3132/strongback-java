@@ -4,14 +4,17 @@ import numpy as np
 import math # for cos, sin, etc
 import time
 
-GOAL_WIDTH = 1.0098 # width in meters
-GOAL_HEIGHT = 0.432 # height in meters
+GOAL_HEIGHT = 98.25 #inches
+GOAL_WIDTH = 39.25 #inches
 
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240 # pixels
 CAMERA_HEIGHT = 15 # center of camera height off the ground, in inches
 
-CAMERA_FOV = 65 #horizontal
+CAMERA_HORI_FOV = 65 #horizontal
+CAMERA_VERT_FOV = CAMERA_HORI_FOV * (3/4)
+
+CAMERA_ANGLE = 25 # degrees from horizontal
 
 def deg_to_rad(degrees):
     return degrees * (math.pi / 180)
@@ -43,6 +46,22 @@ def acos(ratio):
 # inverse tan function which returns degrees
 def atan(degrees):
     return rad_to_deg(math.atan(degrees))
+    
+def cal_point_distance(p, q):
+    x = math.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)
+    return x
+    
+# calculates the angle in a triangle of known lengths
+# adj1 and adj2 are the adjacent sides to the angle
+# opposite is the opposite angle to the the desired angle
+def cal_cosine_rule_deg(adj1, adj2, opposite):
+    adj1_sqrd = math.pow(adj1, 2)
+    adj2_sqrd = math.pow(adj2, 2)
+    opposite_sqrd = math.pow(opposite, 2)
+    if (abs((adj1_sqrd + adj2_sqrd - opposite_sqrd)/(2*adj1*adj2)) >1 ):
+        #print "error in cal_cosine_rule_deg() opposite_sqd = %f" %opposite_sqrd
+        return 0
+    return acos((adj1_sqrd + adj2_sqrd - opposite_sqrd)/(2*adj1*adj2))
 
 class Corner():
     def __init__(self):
@@ -71,30 +90,32 @@ def cal_corners(contour):
     BR = BR_corner.xy
     return TL, TR, BL, BR
 
+
+# Goal distance calculations
+
+def cal_distance(center_y): 
+    # angle between the bottom of FOV and horizontal
+    lowerAngle = CAMERA_ANGLE - CAMERA_VERT_FOV/2 
+    
+    # angle between the line to the goal and the horizontal
+    goalAngle = lowerAngle + (((SCREEN_HEIGHT-center_y)/SCREEN_HEIGHT) * CAMERA_VERT_FOV) 
+
+    distance = (GOAL_HEIGHT - CAMERA_HEIGHT)/tan(goalAngle)
+    return distance
+
+def cal_angle(x): # based on  FOV 
+    angle = ((x-(SCREEN_WIDTH/2))/(SCREEN_WIDTH/2))*(CAMERA_HORI_FOV/2)
+    return angle
+    
 def cal_goal_center_distance(distance):
-    opposite = (98.25 - CAMERA_HEIGHT) * 0.0254
+    opposite = (GOAL_HEIGHT - CAMERA_HEIGHT)
     hypotenuse = math.sqrt(pow(opposite,2) + pow(distance,2))
     return hypotenuse
-
-def cal_point_distance(p, q):
-    x = math.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)
-    return x
-
-
+    
 def cal_goal_skew(TL,TR,BL,BR, center_distance):
     # center_distance is the hypotenuse 
     HALF_WIDTH_GOAL = GOAL_WIDTH /2
 
-    # left_side_length = cal_point_distance(TL, BL)
-    # right_side_length = cal_point_distance(TR, BR)
-
-    # left_side_distance = cal_distance(left_side_length) # this is wrong pls fix
-    # left_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, left_side_distance)
-
-    # right_side_distance = cal_distance(right_side_length)
-    # right_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, right_side_distance)
-    # avg_angle = (left_acute_angle + (180 - right_acute_angle))/2
-    
     left_side_distance = cal_distance(TL[1])
     left_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, left_side_distance)
 
@@ -105,55 +126,6 @@ def cal_goal_skew(TL,TR,BL,BR, center_distance):
 
     return 90 - avg_angle
 
-# calculates the angle in a triangle of known lengths
-# adj1 and adj2 are the adjacent sides to the angle
-# opposite is the opposite angle to the the desired angle
-def cal_cosine_rule_deg(adj1, adj2, opposite):
-    adj1_sqrd = math.pow(adj1, 2)
-    adj2_sqrd = math.pow(adj2, 2)
-    opposite_sqrd = math.pow(opposite, 2)
-    if (abs((adj1_sqrd + adj2_sqrd - opposite_sqrd)/(2*adj1*adj2)) >1 ):
-        #print "error in cal_cosine_rule_deg() opposite_sqd = %f" %opposite_sqrd
-        return 0
-    return acos((adj1_sqrd + adj2_sqrd - opposite_sqrd)/(2*adj1*adj2))
-
-def cal_distance(center_y): 
-    # h1 is the top of the screen to the center of goal
-    # h2 is center of goal to (floor + robot height)
-    # h2 = 98.25" - camera height
-        
-    h2_pixels = (SCREEN_HEIGHT/2 - center_y) 
-    h1_pixels = center_y
-    
-    h2_actual = (98.25 - CAMERA_HEIGHT) * 0.0254
-
-    ratio = h2_actual / h2_pixels # metre / pixel
-
-    h1_actual = h1_pixels * ratio
-
-    distance = (h1_actual + h2_actual)/(tan(24.375))
-
-    return distance
-
-def cal_vert_dist_pixel_ratio(y):
-    # h1 is the top of the screen to the center of goal
-    # h2 is the  to (floor + robot height)
-    # h2 = 98.25" - camera height
-    h2_pixels = (SCREEN_HEIGHT/2 - y) 
-    h2_actual = (98.25 - CAMERA_HEIGHT) *0.0254
-    ratio = h2_actual / h2_pixels
-    return ratio
-    
-def cal_hori_dist_pixel_ratio(vert_ratio):
-    return vert_ratio * (4/3) # 4:3 aspect ratio
-
-def cal_x_offset(mx, hori_ratio):
-    x = mx - (SCREEN_WIDTH/2.0)
-    return x * hori_ratio
-
-def cal_angle(x): # based on  FOV 
-    angle = ((x-(SCREEN_WIDTH/2))/(SCREEN_WIDTH/2))*(CAMERA_FOV/2)
-    return angle
 
 class FirstPython:
     # ###################################################################################################
@@ -220,7 +192,6 @@ class FirstPython:
             jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
     
     def thresholding(self, imgbgr):       
-        h, w, chans = imgbgr.shape
 
         # Convert input image to HSV:
         imghsv = cv2.cvtColor(imgbgr, cv2.COLOR_BGR2HSV)
@@ -268,6 +239,8 @@ class FirstPython:
         bestHull = [] # best hull detection
         goalCriteria = ""
         bestgoalCriteria = ""
+
+        TL = TR = BL = BR = []
         
         # Identify the "good" objects:
         for c in contours:
@@ -322,16 +295,16 @@ class FirstPython:
             lratio = (BL[0] - TL[0])/(BL[1] - TL[1])
             rratio = (BR[0] - TR[0])/(BR[1] - TR[1])
 
-            if (top / bottom) < 1.3 or lratio > 0.6 or rratio < -1: continue
+            if (top / bottom) < 1.3 or lratio > 0.6 or rratio < -1: 
+                TL = TR = BL = BR = []
+                continue
             goalCriteria += "R" #ratio is good  
        
             # This detection is a keeper:
             goalCriteria += " OK"
             bestHull = hull
             break
-            
-        TL,TR,BL,BR = cal_corners(bestHull)
-        
+                    
         # calculate values to send to rio (found, ground distance, angle)
         if len(bestHull) != 0:
             found = True
@@ -340,17 +313,13 @@ class FirstPython:
 
         distance = 0
         angle = 0
+        skew = 0
         try:
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
             distance = cal_distance(my)
             center_distance = cal_goal_center_distance(distance)
             skew = cal_goal_skew(TL,TR,BL,BR, center_distance)
-            
-            p = cal_vert_dist_pixel_ratio(my)
-            cal_hori = cal_hori_dist_pixel_ratio(p)
-            xOffset = cal_x_offset(mx, cal_hori)
-
             angle = cal_angle(mx)
             goalCriteria += " gdist=" + str(round(distance, 3))
             goalCriteria += " angle=" + str(round(angle, 3))
@@ -365,24 +334,21 @@ class FirstPython:
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgbgr, outimg, w, 0)
             jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)   
             # Draw corners and center of goal:
-            self.drawDetections(outimg, bestHull)
+            self.drawDetections(outimg, TL,TR,BL,BR)
 
-        return found, distance, angle
+        return found, distance, angle, skew
  
     # ###################################################################################################
     ## Send serial messages, one per object
-    def sendAllSerial(self,imageAge, found, distance, angle):
-        jevois.sendSerial("D3 {} {} {} {} FIRST".
-                            format(imageAge, found, distance,angle)) 
+    def sendAllSerial(self,imageAge, found, distance, angle, skew):
+        jevois.sendSerial("D3 {} {} {} {} {} FIRST".
+                            format(imageAge, found, distance,angle,skew)) 
                               
     # ###################################################################################################
     ## Draw corners and center of goal
-    def drawDetections(self, outimg, bestHull):
-                   
-        TL,TR,BL,BR = cal_corners(bestHull)
-
+    def drawDetections(self, outimg, TL,TR,BL,BR):        
         try: 
-            for x in besthull:
+            for x in bestHull:
                 jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),1 , jevois.YUYV.LightGreen)
 
             mx = int((TL[0]+TR[0])/2)
@@ -449,14 +415,14 @@ class FirstPython:
         imgbgr = self.thresholding(imgbgr)
    
         # Get a list of quadrilateral convex hulls for all good objects:
-        found, distance, angle = self.detect(imgbgr, outimg)
+        found, distance, angle,skew = self.detect(imgbgr, outimg)
         
         # calculate age of image (time since it was originally taken)
         now = time.time()
         imageAge = now - startTime 
 
         # Send all serial messages:
-        self.sendAllSerial(imageAge, found, distance, angle)  
+        self.sendAllSerial(imageAge, found, distance, angle, skew)  
 
         # Write frames/s info from our timer into the edge map (NOTE: does not account for output conversion time):
         fps = self.timer.stop()
