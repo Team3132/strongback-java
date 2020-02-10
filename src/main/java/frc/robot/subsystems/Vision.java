@@ -127,15 +127,15 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 			return;
 		}
 		//log.sub("Vision::processLine(%s)\n", line);
+		TargetDetails newTarget = new TargetDetails();
+		newTarget.targetFound = Boolean.parseBoolean(parts[2]);
 
 		if (Boolean.parseBoolean(parts[2])) {
 			// A target was seen, update the TargetDetails in case it's asked for.
 			// Fill in a new TargetDetails so it can be returned if asked for and it won't
 			// change as the caller uses it.
-			TargetDetails newTarget = new TargetDetails();
 
 			newTarget.imageTimestamp = clock.currentTime() - Double.parseDouble(parts[1]);
-			newTarget.targetFound = Boolean.parseBoolean(parts[2]);
 			newTarget.distance = Double.parseDouble(parts[3]);
 			newTarget.angle = -Double.parseDouble(parts[4]);
 			newTarget.skew = Double.parseDouble(parts[5]);
