@@ -334,7 +334,7 @@ class FirstPython:
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgbgr, outimg, w, 0)
             jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)   
             # Draw corners and center of goal:
-            self.drawDetections(outimg, TL,TR,BL,BR)
+            self.drawDetections(outimg, bestHull, TL,TR,BL,BR)
 
         return found, distance, angle, skew
  
@@ -346,18 +346,18 @@ class FirstPython:
                               
     # ###################################################################################################
     ## Draw corners and center of goal
-    def drawDetections(self, outimg, TL,TR,BL,BR):        
+    def drawDetections(self, outimg, bestHull, TL,TR,BL,BR):        
         try: 
             for x in bestHull:
                 jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),1 , jevois.YUYV.LightGreen)
-
+            
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
-            jevois.drawLine(outimg,mx,my,mx,my,2 , jevois.YUYV.LightGrey)
 
+            jevois.drawLine(outimg,mx,my,mx,my,2 , jevois.YUYV.LightGrey)
         except:
-            print("hi")
-        
+            print("Unable to draw detections.")
+
     # ###################################################################################################
     ## Process function with no USB output
     def processNoUSB(self, inframe):
