@@ -44,14 +44,9 @@ public class MockLoader implements LoaderInterface {
 	public boolean isPaddleRetracted() {
 		return !isPaddleExtended;
     }
-    
-    @Override
-    public double getTargetMotorOutput() {
-        return output;
-    }
 
     @Override
-    public void setTargetMotorOutput(double percentPower) {
+    public void setTargetMotorVelocity(double percentPower) {
 
     }
 
@@ -85,20 +80,9 @@ public class MockLoader implements LoaderInterface {
 
     }
 
-    @Override
-    public double getTargetInMotorOutput() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
 
     @Override
-    public double getTargetOutMotorOutput() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void setTargetInMotorOutput(double InMotorCurrent) {
+    public void setTargetInMotorVelocity(double InMotorCurrent) {
         // TODO Auto-generated method stub
 
     }
@@ -107,6 +91,12 @@ public class MockLoader implements LoaderInterface {
     public void setTargetOutMotorOutput(double OutMotorCurrent) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public double getTargetOutMotorOutput() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

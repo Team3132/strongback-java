@@ -14,7 +14,7 @@ import frc.robot.lib.Subsystem;
 public class Loader extends Subsystem implements LoaderInterface, Executable, DashboardUpdater {
     private Motor motor, motorIn, motorOut;
     private Solenoid loaderS, paddleS;
-    private double targetCurrent, targetCurrentIn, targetCurrentOut = 0;
+    private double outCurrent = 0;
     
 
     public Loader(int teamNumber, Motor loaderMotor, Motor loaderInMotor, Motor loaderOutMotor, Solenoid loaderSolenoid, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
@@ -24,8 +24,9 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
         this.motorOut = loaderOutMotor;
         this.loaderS = loaderSolenoid;
         this.paddleS = paddleSolenoid;
-
-        log.register(true, () -> getTargetMotorOutput(), "%s/targetMotorOutput", name)
+        log.register(true, () -> getTargetOutMotorOutput(), "%s/targetOutMotorOutput", name)
+               .register(true, () -> motorIn.getVelocity(), "%s/targetInMotorOutput", name)
+               .register(true, () -> motor.getVelocity(), "%s/targetMainMotorOutput", name)
                .register(true, () -> isLoaderRetracted(), "%s/loaderRetracted", name)
                .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name)
 			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
@@ -34,39 +35,24 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     }
 
 	@Override
-	public double getTargetMotorOutput() {
-		return targetCurrent;
-	}
-	public double getTargetInMotorOutput() {
-		return targetCurrentIn;
-	}
 	public double getTargetOutMotorOutput() {
-		return targetCurrentOut;
+		return outCurrent;
 	}
 
 	@Override
-	public void setTargetMotorOutput(double current) {
-//        if (current == targetCurrent) return;
-        // TODO: Use current mode once the passthru hardware has been tested.
-        log.sub("Setting loader motor output to: %f", current);
-        motor.set(ControlMode.PercentOutput, current);
-        targetCurrent = current;
+	public void setTargetMotorVelocity(double velocity) {
+        log.sub("Setting loader motor velocity to: %f", velocity);
+        motor.set(ControlMode.Velocity, velocity);
     }
     @Override
-	public void setTargetInMotorOutput(double InMotorCurrent) {
-//        if (current == targetCurrent) return;
-        // TODO: Use current mode once the passthru hardware has been tested.
-        log.sub("Setting loader motor output to: %f", InMotorCurrent);
-        motorIn.set(ControlMode.PercentOutput, InMotorCurrent);
-        targetCurrentIn = InMotorCurrent;
+	public void setTargetInMotorVelocity(double velocity) {
+        log.sub("Setting loader motor velocity to: %f", velocity);
+        motorIn.set(ControlMode.Velocity, velocity);
     }
     @Override
-	public void setTargetOutMotorOutput(double OutMotorCurrent) {
-//        if (current == targetCurrent) return;
-        // TODO: Use current mode once the passthru hardware has been tested.
-        log.sub("Setting loader motor output to: %f", OutMotorCurrent);
-        motorOut.set(ControlMode.PercentOutput, OutMotorCurrent);
-        targetCurrentOut = OutMotorCurrent;
+	public void setTargetOutMotorOutput(double outCurrent) {
+        log.sub("Setting loader motor output to: %f", outCurrent);
+        motorOut.set(ControlMode.PercentOutput, outCurrent);
     }
 
     public LoaderInterface setLoaderExtended(boolean extend) {
@@ -116,12 +102,15 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     public void updateDashboard() {
         dashboard.putString("Loader position", isLoaderExtended() ? "extended" : isLoaderRetracted() ? "retracted" : "moving");
         dashboard.putString("Loader Paddle position", isPaddleExtended() ? "extended" : isPaddleRetracted() ? "retracted" : "moving");
-        dashboard.putNumber("Loader motor current", motor.getOutputCurrent());
-        dashboard.putNumber("Loader motor percent", motor.getOutputPercent());
+        dashboard.putNumber("Loader motor velocity", motor.getVelocity());
+        dashboard.putNumber("Loader motor velocity", motorIn.getVelocity());
+        dashboard.putNumber("Loader motor velocity", motorOut.getOutputCurrent());
     }
 
     @Override
     public void disable()  {
-        motor.set(ControlMode.PercentOutput, 0);
+        motor.set(ControlMode.Velocity, 0);
+        motorIn.set(ControlMode.Velocity, 0);
+        motorOut.set(ControlMode.PercentOutput, 0);
     }
 }

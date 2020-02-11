@@ -138,10 +138,24 @@ public class MotorFactory {
 
 	public static HardwareTalonSRX getLoaderMotor(int canID, boolean invert, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		// talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
+		NetworkTablesHelper config = new NetworkTablesHelper("loader/loadermotor/");
+		double p = config.get("p", 0.0);
+		double i = config.get("i", 0.0);
+		double d = config.get("d", 0.0);
+		double f = config.get("f", 0.1);
+		motor.setPIDF(0, p, i, d, f);
 		return motor;
 	}
 	public static HardwareTalonSRX getLoaderInMotor(int canID, boolean invert, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		// talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
+		NetworkTablesHelper config = new NetworkTablesHelper("loader/loaderinmotor/");
+		double p = config.get("p", 0.0);
+		double i = config.get("i", 0.0);
+		double d = config.get("d", 0.0);
+		double f = config.get("f", 0.1);
+		motor.setPIDF(0, p, i, d, f);
 		return motor;
 	}
 	public static HardwareTalonSRX getLoaderOutMotor(int canID, boolean invert, Log log) {	

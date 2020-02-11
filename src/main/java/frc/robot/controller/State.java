@@ -78,8 +78,6 @@ public class State {
 		setLiftHeight(subsystems.lift.getTargetHeight());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		loaderMotorOutput = subsystems.loader.getTargetMotorOutput();
-		loaderInMotorOutput = subsystems.loader.getTargetInMotorOutput();
 		loaderOutMotorOutput = subsystems.loader.getTargetOutMotorOutput();
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
 		hasCargo = subsystems.spitter.hasCargo();
