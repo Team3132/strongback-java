@@ -12,14 +12,16 @@ import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
 public class Loader extends Subsystem implements LoaderInterface, Executable, DashboardUpdater {
-    private Motor motor;
+    private Motor motor, motorIn, motorOut;
     private Solenoid loaderS, paddleS;
-    private double targetCurrent = 0;
+    private double targetCurrent, targetCurrentIn, targetCurrentOut = 0;
     
 
-    public Loader(int teamNumber, Motor loaderMotor, Solenoid loaderSolenoid, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
+    public Loader(int teamNumber, Motor loaderMotor, Motor loaderInMotor, Motor loaderOutMotor, Solenoid loaderSolenoid, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
         super("Passthrough", dashboard, log);
         this.motor = loaderMotor;
+        this.motorIn = loaderInMotor;
+        this.motorOut = loaderOutMotor;
         this.loaderS = loaderSolenoid;
         this.paddleS = paddleSolenoid;
 
@@ -35,6 +37,12 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
 	public double getTargetMotorOutput() {
 		return targetCurrent;
 	}
+	public double getTargetInMotorOutput() {
+		return targetCurrentIn;
+	}
+	public double getTargetOutMotorOutput() {
+		return targetCurrentOut;
+	}
 
 	@Override
 	public void setTargetMotorOutput(double current) {
@@ -43,6 +51,22 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
         log.sub("Setting loader motor output to: %f", current);
         motor.set(ControlMode.PercentOutput, current);
         targetCurrent = current;
+    }
+    @Override
+	public void setTargetInMotorOutput(double InMotorCurrent) {
+//        if (current == targetCurrent) return;
+        // TODO: Use current mode once the passthru hardware has been tested.
+        log.sub("Setting loader motor output to: %f", InMotorCurrent);
+        motorIn.set(ControlMode.PercentOutput, InMotorCurrent);
+        targetCurrentIn = InMotorCurrent;
+    }
+    @Override
+	public void setTargetOutMotorOutput(double OutMotorCurrent) {
+//        if (current == targetCurrent) return;
+        // TODO: Use current mode once the passthru hardware has been tested.
+        log.sub("Setting loader motor output to: %f", OutMotorCurrent);
+        motorOut.set(ControlMode.PercentOutput, OutMotorCurrent);
+        targetCurrentOut = OutMotorCurrent;
     }
 
     public LoaderInterface setLoaderExtended(boolean extend) {
@@ -92,8 +116,8 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     public void updateDashboard() {
         dashboard.putString("Loader position", isLoaderExtended() ? "extended" : isLoaderRetracted() ? "retracted" : "moving");
         dashboard.putString("Loader Paddle position", isPaddleExtended() ? "extended" : isPaddleRetracted() ? "retracted" : "moving");
-        dashboard.putNumber("Passthru motor current", motor.getOutputCurrent());
-        dashboard.putNumber("Passthru motor percent", motor.getOutputPercent());
+        dashboard.putNumber("Loader motor current", motor.getOutputCurrent());
+        dashboard.putNumber("Loader motor percent", motor.getOutputPercent());
     }
 
     @Override

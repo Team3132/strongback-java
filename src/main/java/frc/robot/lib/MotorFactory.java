@@ -138,11 +138,14 @@ public class MotorFactory {
 
 	public static HardwareTalonSRX getLoaderMotor(int canID, boolean invert, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.configClosedloopRamp(.25, 10);
-		motor.configReverseSoftLimitEnable(false, 10);
-		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
-		motor.configVoltageCompSaturation(12, 10);
-		motor.enableVoltageCompensation(true);
+		return motor;
+	}
+	public static HardwareTalonSRX getLoaderInMotor(int canID, boolean invert, Log log) {	
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		return motor;
+	}
+	public static HardwareTalonSRX getLoaderOutMotor(int canID, boolean invert, Log log) {	
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		return motor;
 	}
 

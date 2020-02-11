@@ -8,8 +8,12 @@ import org.strongback.Executable;
 public interface LoaderInterface extends SubsystemInterface, Executable, DashboardUpdater {
 
     public double getTargetMotorOutput();
+    public double getTargetInMotorOutput();
+    public double getTargetOutMotorOutput();
 
     public void setTargetMotorOutput(double current);
+    public void setTargetInMotorOutput(double InMotorCurrent);
+    public void setTargetOutMotorOutput(double OutMotorCurrent);
 
     public LoaderInterface setLoaderExtended(boolean extended);
 

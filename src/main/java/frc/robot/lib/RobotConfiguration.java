@@ -88,6 +88,8 @@ public class RobotConfiguration {
 
 	public boolean loaderIsPresent = false;
 	public int loaderCanID = Constants.LOADER_MOTOR_TALON_CAN_ID;
+	public int loaderInCanID = Constants.LOADER_IN_MOTOR_TALON_CAN_ID;
+	public int loaderOutCanID = Constants.LOADER_OUT_MOTOR_TALON_CAN_ID;
 
 	public boolean spitterIsPresent = false;
 	public int spitterRightCanID = Constants.SPITTER_RIGHT_TALON_CAN_ID;

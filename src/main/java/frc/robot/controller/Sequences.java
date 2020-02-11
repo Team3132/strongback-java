@@ -174,7 +174,27 @@ public class Sequences {
 		seq.add().setLiftHeight(setpoint.height);
 		return seq;
 	}
+	/**
+	 * Start Test Loader Sequence
+	 * 
+	 */
+	public static Sequence startLoaderTest() {
+		Sequence seq = new Sequence("Start Loader Test Sequence");
+		seq.add().setLoaderInMotorOutput(0.5);
+		seq.add().setLoaderMotorOutput(0.3);
+		seq.add().setDelayDelta(10);
+		seq.add().setLoaderInMotorOutput(0);
+		seq.add().setLoaderMotorOutput(0);
+		seq.add().setDelayDelta(5);
+		//Switch/Extend Occurs here
+		seq.add().setLoaderMotorOutput(0.2);
+		seq.add().setLoaderOutMotorOutput(0.5);
+		seq.add().setDelayDelta(5);
+		seq.add().setLoaderMotorOutput(0);
+		seq.add().setLoaderOutMotorOutput(0);
 
+		return seq;
+	}
 	/**
 	 * Move up to the next lift setpoint.
 	 */

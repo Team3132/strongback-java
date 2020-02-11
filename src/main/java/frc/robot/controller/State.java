@@ -44,6 +44,10 @@ public class State {
 
 	// Loader
 	public Double loaderMotorOutput = null;
+	public Double loaderInMotorOutput = null;
+	public Double loaderOutMotorOutput = null;
+	public Boolean loaderExtended = null;
+	public Boolean paddleExtended = null;
 
 	// Hatch
 	public HatchAction hatchAction = null;  // How the hatch should be positioned.
@@ -75,6 +79,8 @@ public class State {
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
 		loaderMotorOutput = subsystems.loader.getTargetMotorOutput();
+		loaderInMotorOutput = subsystems.loader.getTargetInMotorOutput();
+		loaderOutMotorOutput = subsystems.loader.getTargetOutMotorOutput();
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
 		hasCargo = subsystems.spitter.hasCargo();
 		climber = subsystems.climber.getDesiredAction();
@@ -208,7 +214,31 @@ public class State {
 		loaderMotorOutput = Double.valueOf(output);
 		return this;
 	}
+	public State setLoaderInMotorOutput(double output) {
+		loaderInMotorOutput = Double.valueOf(output);
+		return this;
+	}
+	public State setLoaderOutMotorOutput(double output) {
+		loaderOutMotorOutput = Double.valueOf(output);
+		return this;
+	}
+	public State engageLoaderPush() {
+		loaderExtended = Boolean.valueOf(false);
+		return this;
+	}
 
+	public State engageLoaderFly() {
+		loaderExtended = Boolean.valueOf(true);
+		return this;
+	}
+	public State setLoaderExtended(boolean extended) {
+		loaderExtended = Boolean.valueOf(extended);
+		return this;
+	}
+	public State setPaddleExtended(boolean extended) {
+		paddleExtended = Boolean.valueOf(extended);
+		return this;
+	}
 
 	// Hatch
 	/**

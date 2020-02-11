@@ -85,4 +85,28 @@ public class MockLoader implements LoaderInterface {
 
     }
 
+    @Override
+    public double getTargetInMotorOutput() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public double getTargetOutMotorOutput() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void setTargetInMotorOutput(double InMotorCurrent) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void setTargetOutMotorOutput(double OutMotorCurrent) {
+        // TODO Auto-generated method stub
+
+    }
+
 }
