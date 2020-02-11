@@ -301,11 +301,11 @@ public class Constants {
 
 
 	// Vision filter parameters
-	public static final double VISION_H_MIN = 70;
-	public static final double VISION_H_MAX = 90;
-	public static final double VISION_S_MIN = 10;
+	public static final double VISION_H_MIN = 40;
+	public static final double VISION_H_MAX = 100;
+	public static final double VISION_S_MIN = 20;
 	public static final double VISION_S_MAX = 255;
-	public static final double VISION_V_MIN = 100;
+	public static final double VISION_V_MIN = 40;
 	public static final double VISION_V_MAX = 255;
 
 	// Tape (all need tuning)

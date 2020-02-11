@@ -340,15 +340,15 @@ class FirstPython:
     ## Draw corners and center of goal
     def drawDetections(self, outimg, TL,TR,BL,BR):        
         try: 
-            drawPoint(outimg, TL)
-            drawPoint(outimg, TR)
-            drawPoint(outimg, BL)
-            drawPoint(outimg, BR)
+            self.drawPoint(outimg, TL)
+            self.drawPoint(outimg, TR)
+            self.drawPoint(outimg, BL)
+            self.drawPoint(outimg, BR)
             
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
 
-            drawPoint(outimg, [mx,my])
+            self.drawPoint(outimg, [mx,my])
 
         except:
             print("Unable to draw detections.")
@@ -356,7 +356,7 @@ class FirstPython:
     # Draws a dot for a given point
     def drawPoint(self, outimg, point):
         try:
-            jevois.drawLine(outimg,point[0], point[1], point[0], point[1], 1 , jevois.YUYV.LightGreen)
+            jevois.drawLine(outimg,int(point[0]), int(point[1]), int(point[0]), int(point[1]), 1 , jevois.YUYV.LightGreen)
         except:
             print("Unable to draw point.")
 
