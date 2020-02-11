@@ -106,21 +106,20 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * 
   */
   public double rotationalControl() {
-    if (firstLoop) {
-      nextColour = colour.next(speed);
-      log.info("%s: Next Colour is %s.", name, nextColour);
-      firstLoop = false;
-    }
     if (colour.equals(nextColour)) {
       log.info("%s: Found %s.", name, colour);
       log.info("%s: Added one to rotations. %d", name, rotCount);
       rotCount += 1;
       firstLoop = true;
     }
-    if (rotCount < (3*8 + 2)) {
+    if (firstLoop) {
+      nextColour = colour.next(speed);
+      log.info("%s: Next Colour is %s.", name, nextColour);
+      firstLoop = false;
+    }
+    if (rotCount < Constants.COLOUR_WHEEL_ROTATION_TARGET) {
       return Constants.COLOUR_WHEEL_MOTOR_FULL;
     } else {
-      rotCount = 0; //Reset rotation count and action.
       action = new ColourAction(Type.NONE, Colour.UNKNOWN);
       return Constants.COLOUR_WHEEL_MOTOR_OFF;
     }
@@ -164,7 +163,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       }
     }
     if (desired.equals(colour)) { //If correct colour found, move slowly to line up better and then stop.
-      if (firstLoop == true) {
+      if (firstLoop) {
 
         spinTime = System.currentTimeMillis(); //Check time when correct colour found.
         firstLoop = false;
@@ -208,6 +207,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public ColourWheelInterface setDesiredAction(ColourAction action) {
     this.action = action;
     firstLoop = true;
+    rotCount = 0;
+    nextColour = Colour.UNKNOWN;
     return this;
   }
 

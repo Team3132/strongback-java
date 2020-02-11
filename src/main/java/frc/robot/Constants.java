@@ -366,4 +366,5 @@ public class Constants {
 	public static final double COLOUR_WHEEL_MOTOR_ADJUST = 0.3;
 	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
 	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
+	public static final int COLOUR_WHEEL_ROTATION_TARGET = 3*8 + 2; //Counting in eights aiming for 3.25 full rotations.
 }

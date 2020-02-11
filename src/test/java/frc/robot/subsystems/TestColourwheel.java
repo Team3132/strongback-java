@@ -53,4 +53,23 @@ public class TestColourwheel {
         assertEquals(new ColourAction(Type.NONE, Colour.UNKNOWN), colourWheel.getDesiredAction());
     }
 
+    @Test
+    public void testRotational() {
+        for (int i = 0; i < 4; i++) {
+            doRotational(i);
+        }
+    }
+
+    public void doRotational(int x) {
+        colourWheel.enable();
+        colourWheel.setDesiredAction(new ColourAction(Type.ROTATION, Colour.UNKNOWN));
+        for (int i = 0; i < Constants.COLOUR_WHEEL_ROTATION_TARGET; i++) {
+            colour = Colour.of(3-((i+x) % 4));
+            colourWheel.execute(0);
+            assertEquals(Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+        }
+        colour = Colour.of(3-((Constants.COLOUR_WHEEL_ROTATION_TARGET + x) % 4));
+        colourWheel.execute(0);
+        assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
+    }
 }
