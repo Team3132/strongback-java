@@ -294,6 +294,11 @@ public class Constants {
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
 	public static final double VISION_STOP_DISTANCE = 230; // inches 
 	public static final double VISION_MAX_DRIVE_SPEED = 15;
+	public static final double VISION_AIM_ANGLE_RANGE = 2; //degrees
+	public static final double VISION_AIM_DISTANCE_RANGE = 5; //inches
+	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
+
+
 
 	// Vision filter parameters
 	public static final double VISION_H_MIN = 70;

@@ -284,27 +284,24 @@ public class Jevois implements JevoisInterface {
                 try {
                     int b = istream.read();
                     if (b < 0) {
-                        //log.sub("lines 288 flag!!!!!!!!!!!!!!");
                         connected = false;
                         throw new IOException(
                                 "End of file reached on serial port - was the camera disconnected / incorrect permissions?");
                     }
                     // Handle both \r\n and \n line endings.
                     if (b == '\r'){
-                        //log.sub("lines 295 flag!!!!!!!!!!!!!!");
                         continue;
                     }
                         
                     if (b == '\n') {
                         // Have a newline, return the current line.
-                        //log.sub("lines 301 flag!!!!!!!!!!!!!!");
                         String result = line.toString();
                         line.setLength(0);
                         return result;
                     }
                     line.append((char) b);
                 } catch (SerialPortTimeoutException e) {
-                    log.sub("There is serial port timeout!!!!!!!!!");
+                    log.sub("Jevois: There is serial port timeout!!!!!!!!!");
                     // Give up reading in case a command needs to be sent.
                 }
             }

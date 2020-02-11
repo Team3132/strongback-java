@@ -236,9 +236,8 @@ class FirstPython:
 
         # Only consider the 5 biggest objects by area:
         contours = sorted(contours, key = cv2.contourArea, reverse = True)[:maxn]
-        bestHull = [] # best hull detection
         goalCriteria = ""
-        bestgoalCriteria = ""
+        found = False
 
         TL = TR = BL = BR = []
         
@@ -246,7 +245,6 @@ class FirstPython:
         for c in contours:
             
             # Keep track of our best detection so far:
-            if len(goalCriteria) > len(bestgoalCriteria): bestgoalCriteria = goalCriteria
             goalCriteria = ""
 
             # Compute contour area:
@@ -302,14 +300,8 @@ class FirstPython:
        
             # This detection is a keeper:
             goalCriteria += " OK"
-            bestHull = hull
-            break
-                    
-        # calculate values to send to rio (found, ground distance, angle)
-        if len(bestHull) != 0:
             found = True
-        else:
-            found = False
+            break
 
         distance = 0
         angle = 0
@@ -334,7 +326,7 @@ class FirstPython:
             if (outimg.width == w * 2): jevois.pasteGreyToYUYV(imgbgr, outimg, w, 0)
             jevois.writeText(outimg, maskValues + goalCriteria, 3, h+1, jevois.YUYV.White, jevois.Font.Font6x10)   
             # Draw corners and center of goal:
-            self.drawDetections(outimg, bestHull, TL,TR,BL,BR)
+            self.drawDetections(outimg, TL,TR,BL,BR)
 
         return found, distance, angle, skew
  
@@ -346,17 +338,28 @@ class FirstPython:
                               
     # ###################################################################################################
     ## Draw corners and center of goal
-    def drawDetections(self, outimg, bestHull, TL,TR,BL,BR):        
+    def drawDetections(self, outimg, TL,TR,BL,BR):        
         try: 
-            for x in bestHull:
-                jevois.drawLine(outimg,int(x[0][0]),int(x[0][1]),int(x[0][0]),int(x[0][1]),1 , jevois.YUYV.LightGreen)
+            drawPoint(outimg, TL)
+            drawPoint(outimg, TR)
+            drawPoint(outimg, BL)
+            drawPoint(outimg, BR)
             
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
 
-            jevois.drawLine(outimg,mx,my,mx,my,2 , jevois.YUYV.LightGrey)
+            drawPoint(outimg, [mx,my])
+
         except:
             print("Unable to draw detections.")
+
+    # Draws a dot for a given point
+    def drawPoint(self, outimg, point):
+        try:
+            jevois.drawLine(outimg,point[0], point[1], point[0], point[1], 1 , jevois.YUYV.LightGreen)
+        except:
+            print("Unable to draw point.")
+
 
     # ###################################################################################################
     ## Process function with no USB output
@@ -369,13 +372,13 @@ class FirstPython:
         self.timer.start()
 
         # Get a list of quadrilateral convex hulls for all good objects:
-        bestHull = self.detect(imgbgr)
+        found, distance, angle,skew = self.detect(imgbgr)
 
         # Load camera calibration if needed:
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
         # Send all serial messages:
-        #self.sendAllSerial(w, h, bestHull, rvecs, tvecs)
+        self.sendAllSerial(imageAge, found, distance, angle, skew)  
 
         # Log frames/s info (will go to serlog serial port, default is None):
         self.timer.stop()

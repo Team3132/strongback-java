@@ -82,10 +82,11 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 
 				// Update the HSV filter ranges from the config values.
 
-				// jevois.issueCommand(String.format("setHSVMin %.0f %.0f %.0f", visionHMin,
-				// visionSMin, visionVMin));
-				// jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax,
-				// visionSMax, visionVMax));
+				jevois.issueCommand(String.format("setHSVMin %.0f %.0f %.0f", visionHMin,
+				visionSMin, visionVMin));
+				jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax,
+				visionSMax, visionVMax));
+
 				while (true) {
 					processLine(jevois.readLine());
 				}
@@ -106,18 +107,15 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	 * 0.28 0.175 1.0 0.994180288811222 0.0003884439751087179 0.09825181108672097
 	 * 0.04418126377428119 FIRST
 	 * 
-	 * Line format: D3 <x_pos,> <y pos> <dist> <target_width> <target_height> <1.0>
-	 * <i> <j> <k> <l> FIRST
+	 * Line format: D3 <imageAge> <found> <distance> <angle> <skew> FIRST
 	 * 
 	 * Where: D3: static string to indicate that this is a found vision target.
-	 * x_pos: horizontal position of the middle of the vision target on the image.
-	 * -1 is the very left of the image, 1 is the very right hand side. y_pos:
-	 * vertical position of the middle of the vision target on the image. -1 is the
-	 * very top image, 1 is the bottom. dist: the distance to the vision target in
-	 * metres. target_width: hard coded target width in metres. target_height: hard
-	 * coded target height in metres. 1.0: hard coded value. i: Some pose
-	 * measurement. j: Some pose measurement. k: The skew of the target (units
-	 * unknown...) l: Some pose measurement. FIRST: static string.
+	 * imageAge: time since image taken
+	 * found: boolean for if goal was detected
+	 * distance: horizontal distance from goal in inches
+	 * angle: degrees
+	 * skew: degrees
+	 * FIRST: static string.
 	 */
 	private void processLine(String line) {
 		// Split the line on whitespace.
