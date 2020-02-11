@@ -101,6 +101,10 @@ public class OperatorBoxButtons {
 	public static final int PASSTHRU_MOTOR = YELLOW_BUTTON2;
 	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
 	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
+	public static final int LOADER_PADDLE_RETRACT = 0; //Undecided/Unassigned Buttons
+	public static final int LOADER_PADDLE_EXTEND = 0;
+	public static final int LOADER_RETRACT = 0;
+	public static final int LOADER_EXTEND = 0;
 
 	// Hatch
 	public static final int HATCH_DISABLE = GREEN_DISABLE;

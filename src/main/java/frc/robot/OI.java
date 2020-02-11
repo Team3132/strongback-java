@@ -381,6 +381,14 @@ public class OI implements OIInterface {
 	  // While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.PASSTHRU_MOTOR), 
 			() -> loaderIF.setTargetMotorOutput(box.getAxis(OperatorBoxButtons.PASSTHRU_POT).read()));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
+			() -> loaderIF.setPaddleExtended(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
+			() -> loaderIF.setPaddleExtended(true));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_RETRACT), 
+			() -> loaderIF.setLoaderExtended(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_EXTEND), 
+			() -> loaderIF.setLoaderExtended(true));
 
 		// Hatch overrides.
 		OverridableSubsystem<HatchInterface> hatchOverride = subsystems.hatchOverride;
