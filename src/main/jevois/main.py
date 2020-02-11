@@ -4,7 +4,7 @@ import numpy as np
 import math # for cos, sin, etc
 import time
 
-GOAL_HEIGHT = 98.25 #inches
+GOAL_HEIGHT = 98.25 #inches to the center of goal
 GOAL_WIDTH = 39.25 #inches
 
 SCREEN_WIDTH = 320
@@ -107,20 +107,20 @@ def cal_angle(x): # based on  FOV
     angle = ((x-(SCREEN_WIDTH/2))/(SCREEN_WIDTH/2))*(CAMERA_HORI_FOV/2)
     return angle
     
-def cal_goal_center_distance(distance):
+def cal_goal_center_direct_distance(distance):
     opposite = (GOAL_HEIGHT - CAMERA_HEIGHT)
     hypotenuse = math.sqrt(pow(opposite,2) + pow(distance,2))
     return hypotenuse
     
-def cal_goal_skew(TL,TR,BL,BR, center_distance):
-    # center_distance is the hypotenuse 
+def cal_goal_skew(TL,TR,BL,BR, center_direct_distance):
+    # center_direct_distance is the hypotenuse 
     HALF_WIDTH_GOAL = GOAL_WIDTH /2
 
     left_side_distance = cal_distance(TL[1])
-    left_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, left_side_distance)
+    left_acute_angle = cal_cosine_rule_deg(center_direct_distance, HALF_WIDTH_GOAL, left_side_distance)
 
     right_side_distance = cal_distance(TR[1])
-    right_acute_angle = cal_cosine_rule_deg(center_distance, HALF_WIDTH_GOAL, right_side_distance)
+    right_acute_angle = cal_cosine_rule_deg(center_direct_distance, HALF_WIDTH_GOAL, right_side_distance)
 
     avg_angle = (left_acute_angle + (180 - right_acute_angle))/2
 
@@ -274,13 +274,13 @@ class FirstPython:
             # Reject the shape if any of its vertices gets within the margin of the image bounds. This is to avoid
             # getting grossly incorrect 6D pose estimates as the shape starts getting truncated as it partially exits
             # the camera field of view:
-            reject = 0
+            reject = False
             for v in c:
                 if v[0,0] < self.margin or v[0,0] >= w-self.margin or v[0,1] < self.margin or v[0,1] >= h-self.margin:
-                   reject = 1
+                   reject = True
                    break
                
-            if reject == 1: continue
+            if reject == True: continue
             goalCriteria += "M" # Margin ok
            
             TL, TR, BL, BR = cal_corners(c)
@@ -293,7 +293,7 @@ class FirstPython:
             lratio = (BL[0] - TL[0])/(BL[1] - TL[1])
             rratio = (BR[0] - TR[0])/(BR[1] - TR[1])
 
-            if (top / bottom) < 1.3 or lratio > 0.6 or rratio < -1: 
+            if (top / bottom) < 1.3 or (top / bottom) > 3 or lratio > 0.8 or lratio < 0 or rratio < -0.8 or rratio > 0: 
                 TL = TR = BL = BR = []
                 continue
             goalCriteria += "R" #ratio is good  
@@ -310,8 +310,8 @@ class FirstPython:
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
             distance = cal_distance(my)
-            center_distance = cal_goal_center_distance(distance)
-            skew = cal_goal_skew(TL,TR,BL,BR, center_distance)
+            center_direct_distance = cal_goal_center_direct_distance(distance)
+            skew = cal_goal_skew(TL,TR,BL,BR, center_direct_distance)
             angle = cal_angle(mx)
             goalCriteria += " gdist=" + str(round(distance, 3))
             goalCriteria += " angle=" + str(round(angle, 3))
