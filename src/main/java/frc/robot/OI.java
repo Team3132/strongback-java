@@ -184,8 +184,8 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
 
 		// Reverse button
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
-		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
+		// onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
+		// onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
 
 		// Hatch hold & release
 		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), () -> {
@@ -377,12 +377,12 @@ public class OI implements OIInterface {
 		// Get the interface that the diag box uses.
 		LoaderInterface loaderIF = loaderOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.PASSTHRU_DISABLE, OperatorBoxButtons.PASSTHRU_MANUAL, loaderOverride);
+		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, loaderOverride);
 	  // While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_MAIN_MOTOR), 
-			() -> loaderIF.setTargetMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_MAIN_POT).read()));
+			() -> loaderIF.setTargetSpinnerMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_MAIN_POT).read()));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_IN_MOTOR), 
-			() -> loaderIF.setTargetMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_IN_POT).read()));
+			() -> loaderIF.setTargetSpinnerMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_IN_POT).read()));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
 			() -> loaderIF.setPaddleExtended(false));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 

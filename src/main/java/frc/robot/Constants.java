@@ -170,8 +170,16 @@ public class Constants {
 	public static final double LOADER_MOTOR_CURRENT = 1.0;
 	public static final int LOADER_SOLENOID_PORT = 2; 
 	public static final int PADDLE_SOLENOID_PORT = 1;
-	public static final double LOADER_IN_MOTOR_POSITION_SCALE = 0; //ticks per rotation
-	public static final double LOADER_MAIN_MOTOR_POSITION_SCALE = 0; //ticks per rotation
+	public static final double LOADER_IN_MOTOR_SCALE = 0; //ticks per rotation
+	public static final double LOADER_MAIN_MOTOR_SCALE = 0; //ticks per rotation
+	public static final double LOADER_SPINNER_P = 0; //TODO: assign values to PIDF
+	public static final double LOADER_SPINNER_I = 0;
+	public static final double LOADER_SPINNER_D = 0;
+	public static final double LOADER_SPINNER_F = 0;
+	public static final double LOADER_PASSTHROUGH_P = 0;
+	public static final double LOADER_PASSTHROUGH_I = 0;
+	public static final double LOADER_PASSTHROUGH_D = 0;
+	public static final double LOADER_PASSTHROUGH_F = 0;
 	
 	/*
 	 * Canifier 

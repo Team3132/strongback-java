@@ -94,8 +94,8 @@ public class OperatorBoxButtons {
 	public static final int INTAKE_POT = YELLOW_POT;
 
 	// Passthru (shares with intake)
-	public static final int PASSTHRU_DISABLE = YELLOW_DISABLE;
-	public static final int PASSTHRU_MANUAL = YELLOW_MANUAL;
+	public static final int LOADER_DISABLE = YELLOW_DISABLE;
+	public static final int LOADER_MANUAL = YELLOW_MANUAL;
 	public static final int INTAKE_MOTOR = YELLOW_BUTTON1;
 	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
 	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;

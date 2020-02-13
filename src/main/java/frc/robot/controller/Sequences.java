@@ -107,20 +107,20 @@ public class Sequences {
  				 .setHatchPosition(HATCH_INTAKE_HOLD_POSITION);
 		// Waits for the lift to go to the set height before turning on to the motor
 		// The spitter speed should be set at a small speed.
-		seq.add().setLoaderMotorOutput(LOADER_MOTOR_CURRENT)
+		seq.add().setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT)
 				 .setSpitterDutyCycle(SPITTER_SPEED); 
 		seq.add().waitForCargo();
 		seq.add().setSpitterDutyCycle(0)
 				 .setIntakeMotorOutput(0)
-				 .setLoaderMotorOutput(0);
+				 .setLoaderSpinnerMotorOutput(0);
 		return seq;
 	}
 
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
 		seq.add().setSpitterDutyCycle(0)
-				 .setIntakeMotorOutput(0)
-				 .setLoaderMotorOutput(0);
+				 .setIntakeMotorOutput(0);
+				//  .setLoaderSpinnerMotorOutput(0);
 		seq.add().setDelayDelta(0.1);
 		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
 		return seq;
@@ -147,22 +147,6 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence startReverseCycle() {
-		Sequence seq = new Sequence("Start reverse cycle");
-		seq.add().setSpitterDutyCycle(-SPITTER_SPEED);
-		seq.add().setLoaderMotorOutput(-LOADER_MOTOR_CURRENT);
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
-		return seq;
-	}
-
-	public static Sequence stopReverseCycle() {
-		Sequence seq = new Sequence("Stop reverse cycle");
-		seq.add().setSpitterDutyCycle(0);
-		seq.add().setLoaderMotorOutput(0);
-		seq.add().setIntakeMotorOutput(0);
-		return seq;
-	}
-
 	public static Sequence moveLift(String name, double height) {
 		Sequence seq = new Sequence("Set lift to " + name);
 		seq.add().setLiftHeight(height);
@@ -180,18 +164,18 @@ public class Sequences {
 	 */
 	public static Sequence startLoaderTest() {
 		Sequence seq = new Sequence("Start Loader Test Sequence");
-		seq.add().setLoaderInMotorOutput(0.5);
-		seq.add().setLoaderMotorOutput(0.3);
+		seq.add().setLoaderPassthroughMotorOutput(0.5);
+		seq.add().setLoaderSpinnerMotorOutput(0.3);
 		seq.add().setDelayDelta(10);
-		seq.add().setLoaderInMotorOutput(0);
-		seq.add().setLoaderMotorOutput(0);
+		seq.add().setLoaderPassthroughMotorOutput(0);
+		seq.add().setLoaderSpinnerMotorOutput(0);
 		seq.add().setDelayDelta(5);
 		//Switch/Extend Occurs here
-		seq.add().setLoaderMotorOutput(0.2);
-		seq.add().setLoaderOutMotorOutput(0.5);
+		seq.add().setLoaderSpinnerMotorOutput(0.2);
+		seq.add().setLoaderFeederMotorOutput(0.5);
 		seq.add().setDelayDelta(5);
-		seq.add().setLoaderMotorOutput(0);
-		seq.add().setLoaderOutMotorOutput(0);
+		seq.add().setLoaderSpinnerMotorOutput(0);
+		seq.add().setLoaderFeederMotorOutput(0);
 
 		return seq;
 	}
@@ -253,13 +237,13 @@ public class Sequences {
 	// This is to test the Loader system
 	public static Sequence startLoader() {
 		Sequence seq = new Sequence("start Loader");
-		seq.add().setLoaderMotorOutput(LOADER_MOTOR_CURRENT);
+		seq.add().setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT);
 		return seq;
 	}
 
 	public static Sequence stopLoader() {
 		Sequence seq = new Sequence("stop Loader");
-		seq.add().setLoaderMotorOutput(0.0);
+		seq.add().setLoaderSpinnerMotorOutput(0.0);
 		return seq;
 	}
 

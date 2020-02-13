@@ -4,7 +4,6 @@ import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.Log;
 
 public class MockLoader implements LoaderInterface {
-    private double output = 0;
 
     public MockLoader(Log log) {
     }
@@ -46,7 +45,7 @@ public class MockLoader implements LoaderInterface {
     }
 
     @Override
-    public void setTargetMotorVelocity(double percentPower) {
+    public void setTargetSpinnerMotorVelocity(double percentPower) {
 
     }
 
@@ -82,21 +81,22 @@ public class MockLoader implements LoaderInterface {
 
 
     @Override
-    public void setTargetInMotorVelocity(double InMotorCurrent) {
+    public void setTargetPassthroughMotorVelocity(double InMotorCurrent) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
-    public void setTargetOutMotorOutput(double OutMotorCurrent) {
-        // TODO Auto-generated method stub
-
-    }
 
     @Override
-    public double getTargetOutMotorOutput() {
+    public double getTargetSpinnerMotorOutput() {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    public void setTargetFeederMotorOutput(double FeederMotorCurrent) {
+        // TODO Auto-generated method stub
+
     }
 
 }

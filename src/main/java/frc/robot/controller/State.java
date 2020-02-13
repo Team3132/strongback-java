@@ -43,9 +43,9 @@ public class State {
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
 	// Loader
-	public Double loaderMotorOutput = null;
-	public Double loaderInMotorOutput = null;
-	public Double loaderOutMotorOutput = null;
+	public Double loaderFeederMotorOutput = null;
+	public Double loaderPassthroughMotorOutput = null;
+	public Double loaderSpinnerMotorOutput = null;
 	public Boolean loaderExtended = null;
 	public Boolean paddleExtended = null;
 
@@ -78,7 +78,7 @@ public class State {
 		setLiftHeight(subsystems.lift.getTargetHeight());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		loaderOutMotorOutput = subsystems.loader.getTargetOutMotorOutput();
+		loaderSpinnerMotorOutput = subsystems.loader.getTargetSpinnerMotorOutput();
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
 		hasCargo = subsystems.spitter.hasCargo();
 		climber = subsystems.climber.getDesiredAction();
@@ -208,16 +208,16 @@ public class State {
 
 
 	// Loader
-	public State setLoaderMotorOutput(double output) {
-		loaderMotorOutput = Double.valueOf(output);
+	public State setLoaderSpinnerMotorOutput(double output) {
+		loaderSpinnerMotorOutput = Double.valueOf(output);
 		return this;
 	}
-	public State setLoaderInMotorOutput(double output) {
-		loaderInMotorOutput = Double.valueOf(output);
+	public State setLoaderPassthroughMotorOutput(double output) {
+		loaderPassthroughMotorOutput = Double.valueOf(output);
 		return this;
 	}
-	public State setLoaderOutMotorOutput(double output) {
-		loaderOutMotorOutput = Double.valueOf(output);
+	public State setLoaderFeederMotorOutput(double output) {
+		loaderFeederMotorOutput = Double.valueOf(output);
 		return this;
 	}
 	public State engageLoaderPush() {
@@ -449,7 +449,7 @@ public class State {
 		ArrayList<String> result = new ArrayList<String>();
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("loaderMotorOutput", loaderMotorOutput, result);
+		maybeAdd("loaderMotorOutput", loaderSpinnerMotorOutput, result);
 		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);
