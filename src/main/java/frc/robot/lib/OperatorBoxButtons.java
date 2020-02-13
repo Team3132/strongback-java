@@ -96,15 +96,18 @@ public class OperatorBoxButtons {
 	// Passthru (shares with intake)
 	public static final int PASSTHRU_DISABLE = YELLOW_DISABLE;
 	public static final int PASSTHRU_MANUAL = YELLOW_MANUAL;
-	public static final int PASSTHRU_POT = YELLOW_POT;
 	public static final int INTAKE_MOTOR = YELLOW_BUTTON1;
-	public static final int PASSTHRU_MOTOR = YELLOW_BUTTON2;
 	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
 	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
+	// Loader
 	public static final int LOADER_PADDLE_RETRACT = 0; //Undecided/Unassigned Buttons
 	public static final int LOADER_PADDLE_EXTEND = 0;
 	public static final int LOADER_RETRACT = 0;
 	public static final int LOADER_EXTEND = 0;
+	public static final int LOADER_IN_MOTOR = 0;
+	public static final int LOADER_IN_POT = 0; // Potentiometer needs to be assigned
+	public static final int LOADER_MAIN_MOTOR = YELLOW_BUTTON2;
+	public static final int LOADER_MAIN_POT = YELLOW_POT;
 
 	// Hatch
 	public static final int HATCH_DISABLE = GREEN_DISABLE;

@@ -379,8 +379,10 @@ public class OI implements OIInterface {
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.PASSTHRU_DISABLE, OperatorBoxButtons.PASSTHRU_MANUAL, loaderOverride);
 	  // While the loader speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.PASSTHRU_MOTOR), 
-			() -> loaderIF.setTargetMotorVelocity(box.getAxis(OperatorBoxButtons.PASSTHRU_POT).read()));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_MAIN_MOTOR), 
+			() -> loaderIF.setTargetMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_MAIN_POT).read()));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_IN_MOTOR), 
+			() -> loaderIF.setTargetMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_IN_POT).read()));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
 			() -> loaderIF.setPaddleExtended(false));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 

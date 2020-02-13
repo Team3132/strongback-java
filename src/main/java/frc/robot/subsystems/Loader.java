@@ -12,47 +12,48 @@ import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
 public class Loader extends Subsystem implements LoaderInterface, Executable, DashboardUpdater {
-    private Motor motor, motorIn, motorOut;
+    private Motor spinner, passthrough, feeder;
     private Solenoid loaderS, paddleS;
     private double outCurrent = 0;
     
 
     public Loader(int teamNumber, Motor loaderMotor, Motor loaderInMotor, Motor loaderOutMotor, Solenoid loaderSolenoid, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
         super("Passthrough", dashboard, log);
-        this.motor = loaderMotor;
-        this.motorIn = loaderInMotor;
-        this.motorOut = loaderOutMotor;
+        this.spinner = loaderMotor;
+        this.passthrough = loaderInMotor;
+        this.feeder = loaderOutMotor;
         this.loaderS = loaderSolenoid;
         this.paddleS = paddleSolenoid;
-        log.register(true, () -> getTargetOutMotorOutput(), "%s/targetOutMotorOutput", name)
-               .register(true, () -> motorIn.getVelocity(), "%s/targetInMotorOutput", name)
-               .register(true, () -> motor.getVelocity(), "%s/targetMainMotorOutput", name)
+        log.register(true, () -> feeder.getOutputCurrent(), "%s/motorOut/Current", name)
+               .register(true, () -> passthrough.getVelocity(), "%s/motorIn/Velocity", name)
+               .register(true, () -> passthrough.getOutputCurrent(), "%s/motorIn/Current", name)
+               .register(true, () -> passthrough.getOutputPercent(), "%s/motorIn/PercentOut", name)
+               .register(true, () -> spinner.getVelocity(), "%s/motorOut/Velocity", name)
+               .register(true, () -> spinner.getOutputCurrent(), "%s/motorOut/Current", name)
+               .register(true, () -> spinner.getOutputPercent(), "%s/motorOut/PercentOut", name)
                .register(true, () -> isLoaderRetracted(), "%s/loaderRetracted", name)
-               .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name)
-			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
-			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
-			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
+               .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name);
     }
 
 	@Override
 	public double getTargetOutMotorOutput() {
-		return outCurrent;
+		return spinner.getOutputPercent();
 	}
 
 	@Override
 	public void setTargetMotorVelocity(double velocity) {
         log.sub("Setting loader motor velocity to: %f", velocity);
-        motor.set(ControlMode.Velocity, velocity);
+        spinner.set(ControlMode.Velocity, velocity);
     }
     @Override
 	public void setTargetInMotorVelocity(double velocity) {
-        log.sub("Setting loader motor velocity to: %f", velocity);
-        motorIn.set(ControlMode.Velocity, velocity);
+        log.sub("Setting loader in motor velocity to: %f", velocity);
+        passthrough.set(ControlMode.Velocity, velocity);
     }
     @Override
 	public void setTargetOutMotorOutput(double outCurrent) {
-        log.sub("Setting loader motor output to: %f", outCurrent);
-        motorOut.set(ControlMode.PercentOutput, outCurrent);
+        log.sub("Setting loader out motor output to: %f", outCurrent);
+        feeder.set(ControlMode.PercentOutput, outCurrent);
     }
 
     public LoaderInterface setLoaderExtended(boolean extend) {
@@ -102,15 +103,15 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     public void updateDashboard() {
         dashboard.putString("Loader position", isLoaderExtended() ? "extended" : isLoaderRetracted() ? "retracted" : "moving");
         dashboard.putString("Loader Paddle position", isPaddleExtended() ? "extended" : isPaddleRetracted() ? "retracted" : "moving");
-        dashboard.putNumber("Loader motor velocity", motor.getVelocity());
-        dashboard.putNumber("Loader motor velocity", motorIn.getVelocity());
-        dashboard.putNumber("Loader motor velocity", motorOut.getOutputCurrent());
+        dashboard.putNumber("Loader motor velocity", spinner.getVelocity());
+        dashboard.putNumber("Loader motor in velocity", passthrough.getVelocity());
+        dashboard.putNumber("Loader motor out current", feeder.getOutputCurrent());
     }
 
     @Override
     public void disable()  {
-        motor.set(ControlMode.Velocity, 0);
-        motorIn.set(ControlMode.Velocity, 0);
-        motorOut.set(ControlMode.PercentOutput, 0);
+        spinner.set(ControlMode.Velocity, 0);
+        passthrough.set(ControlMode.Velocity, 0);
+        feeder.set(ControlMode.PercentOutput, 0);
     }
 }
