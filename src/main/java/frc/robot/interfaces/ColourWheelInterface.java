@@ -9,7 +9,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         GREEN(3, "green"),
         UNKNOWN(-1, "unknown");
         
-        private final int NUM_COLOURS = 4;
+        public static final int NUM_COLOURS = 4;
         public final int id;
         public final String name;
         Colour(int id, String name) {

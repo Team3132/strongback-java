@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -37,20 +38,42 @@ public class TestColourwheel {
         colourWheel.execute(0);
         assertEquals(0, motor.get(), 0.01);
         assertEquals(new ColourAction(Type.NONE, Colour.UNKNOWN), colourWheel.getDesiredAction());
+        assertTrue(colourWheel.isFinished());
         
         colourWheel.enable();
         colourWheel.execute(0);
         assertEquals(0, motor.get(), 0.01);
         assertEquals(new ColourAction(Type.NONE, Colour.UNKNOWN), colourWheel.getDesiredAction());
+        assertTrue(colourWheel.isFinished());
 
         colourWheel.setDesiredAction(new ColourAction(Type.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN));
         colourWheel.execute(0);
         assertEquals(-Constants.COLOUR_WHEEL_MOTOR_ADJUST, motor.get(), 0.01);
+        assertFalse(colourWheel.isFinished());
 
         colourWheel.disable();
         colourWheel.execute(0);
         assertEquals(0, motor.get(), 0.01);
         assertEquals(new ColourAction(Type.NONE, Colour.UNKNOWN), colourWheel.getDesiredAction());
+        assertTrue(colourWheel.isFinished());
+    }
+
+    @Test
+    public void testAdjustClockwise() {
+        colourWheel.enable();
+        colourWheel.setDesiredAction(new ColourAction(Type.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN));
+        colourWheel.execute(0);
+        assertEquals(-Constants.COLOUR_WHEEL_MOTOR_ADJUST, motor.get(), 0.01);
+        assertFalse(colourWheel.isFinished());
+    }
+
+    @Test
+    public void testAdjustAnticlockwise() {
+        colourWheel.enable();
+        colourWheel.setDesiredAction(new ColourAction(Type.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN));
+        colourWheel.execute(0);
+        assertEquals(Constants.COLOUR_WHEEL_MOTOR_ADJUST, motor.get(), 0.01);
+        assertFalse(colourWheel.isFinished());
     }
 
     @Test
@@ -60,6 +83,11 @@ public class TestColourwheel {
         }
     }
 
+    @Test
+    public void testPositionalGreenBlue() {
+        doPositional(Colour.GREEN, Colour.BLUE);
+    }
+
     public void doRotational(int x) {
         colourWheel.enable();
         colourWheel.setDesiredAction(new ColourAction(Type.ROTATION, Colour.UNKNOWN));
@@ -67,9 +95,28 @@ public class TestColourwheel {
             colour = Colour.of(3-((i+x) % 4));
             colourWheel.execute(0);
             assertEquals(Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+            assertFalse(colourWheel.isFinished());
         }
         colour = Colour.of(3-((Constants.COLOUR_WHEEL_ROTATION_TARGET + x) % 4));
         colourWheel.execute(0);
         assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
+        assertTrue(colourWheel.isFinished());
+    }
+
+    public void doPositional(Colour desired, Colour start) {
+        colourWheel.enable();
+        colourWheel.setDesiredAction(new ColourAction(Type.POSITION, desired));
+        colour = start;
+        colourWheel.execute(0);
+        if (desired.equals(start)) {
+            assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
+            assertTrue(colourWheel.isFinished());
+        } else {
+            assertEquals(Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+            if (Math.abs(motor.get()) > 0.3) {
+                colour = Colour.of(colour.id + Colour.NUM_COLOURS + (int) Math.signum(motor.get()) % Colour.NUM_COLOURS);
+            }
+            assertEquals(Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+        }
     }
 }
