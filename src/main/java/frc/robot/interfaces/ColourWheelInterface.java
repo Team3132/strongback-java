@@ -66,7 +66,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         @Override
         public String toString() {
             return String.format("%s: %s", type.toString().toLowerCase(), colour);
-    }
+        }
 
     }
     /** 

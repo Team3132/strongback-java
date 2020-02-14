@@ -23,12 +23,26 @@ public class MockLEDStrip extends Subsystem implements LEDStripInterface, Dashbo
         return this;
     }
 
+    public LEDStripInterface setProgressColour(int current, int total) {
+        return this;
+    }
+
+    public LEDStripInterface setDefault() {
+        return this;
+    }
+
     public LEDStripInterface setData() {
         return this;
     }
 
     public void updateDashboard() {
 		// do nothing by default
-	}
+    }
+    
+    @Override
+    public LEDStripInterface setDesiredAction(LEDAction action) {
+        //this.action = action;
+        return this;
+    }
     
 }
