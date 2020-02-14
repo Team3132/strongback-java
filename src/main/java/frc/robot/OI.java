@@ -13,6 +13,7 @@ import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
@@ -106,6 +107,24 @@ public class OI implements OIInterface {
 
 		whileTriggered(rightStick.getButton(4), Sequences.startClimberDown());
 		onUntriggered(rightStick.getButton(4), Sequences.stopClimber());
+		// Level 3 sequence of buttons
+		/*onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
+		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
+
+		onTriggered(rightStick.getButton(10), Sequences.startLevelDriveForward());
+		onUntriggered(rightStick.getButton(10), Sequences.stopLevelDrive());
+
+		onTriggered(rightStick.getButton(8), Sequences.startRearRaise());
+		onUntriggered(rightStick.getButton(8), Sequences.stopLevelNclimb());
+
+		onTriggered(leftStick.getButton(12), Sequences.startLevelDriveForward());
+		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());*/
+
+		//onTriggered(rightStick.getButton(9), Sequences.startFrontRaise());
+		//onUntriggered(rightStick.getButton(9), Sequences.stopLevelNclimb());
+
+		//onTriggered(rightStick.getButton(11), Sequences.startRearRaise());
+		//onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
 
 		onTriggered(leftStick.getButton(5), Sequences.deployClimber());
 		
@@ -128,12 +147,14 @@ public class OI implements OIInterface {
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
 
-		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
+		//onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
 		
 		// Deploy/retract lift. 
 	/*	onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
 		onUntriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftRetract());
 */
+
+		/*
 		// Spitter Sequence (cargoSpit) 
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startCargoSpit());
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
@@ -141,6 +162,7 @@ public class OI implements OIInterface {
 		// Reverse button
 		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
+		*/
 
 		// Hatch hold & release
 		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), () -> {
@@ -168,6 +190,8 @@ public class OI implements OIInterface {
 		
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
 		/*onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
+		/* Using these buttons for colour wheel while testing.
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
 			sysoutScoreMode();
 			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
 								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
@@ -187,12 +211,23 @@ public class OI implements OIInterface {
 			sysoutScoreMode();
 			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_CARGO_HEIGHT)
 								  : Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_HATCH_HEIGHT);
-		});*/
+		});
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), () -> {
 			scoreModeCargo = !scoreModeCargo;
 			sysoutScoreMode();
-		});
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_SOUTH), Sequences.moveLift(LiftSetpoint.LIFT_BOTTOM_HEIGHT));
+		}); */
+
+		//Colour Wheel testing.
+		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(Colour.YELLOW));
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(Colour.BLUE));
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(Colour.RED));
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(Colour.GREEN));
+		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.colourWheelRotational());
+		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());
+		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelRight());
+		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
 
 		// Lift microadjust
 		whileTriggered(() -> {
@@ -259,29 +294,29 @@ public class OI implements OIInterface {
 	    // Override climber power.
 		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), 
 			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER,
+				new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER,
 				box.getAxis(OperatorBoxButtons.RED_POT).read())));
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
 
 		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), 
 			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_LEFT,
+				new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_LEFT,
 				box.getAxis(OperatorBoxButtons.RED_POT).read())));
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
 		
 		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_RIGHT,
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_RIGHT,
 						box.getAxis(OperatorBoxButtons.RED_POT).read())));
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
 
 		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON4),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT,
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.SET_BOTH_HEIGHT,
 						box.getAxis(OperatorBoxButtons.RED_POT).read())));
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON4),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
 	}
 
 	private double scaleClimbPotHeight(double value) {

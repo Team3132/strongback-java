@@ -5,14 +5,15 @@ import java.util.function.BooleanSupplier;
 
 import org.strongback.components.Clock;
 import frc.robot.Constants;
-import frc.robot.interfaces.ClimberInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
-import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
+import frc.robot.interfaces.ClimberInterface.ClimberAction.ClimberType;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
 import frc.robot.lib.Position;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Subsystems;
 
 import jaci.pathfinder.Trajectory;
@@ -213,13 +214,16 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.spitter.setTargetDutyCycle(desiredState.spitterDutyCycle);
 
-		// subsystems.jevois.setCameraMode(desiredState.cameraMode);
+		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 
-		maybeWaitForLift(); // This be aborted, so the intake needs to be wary below.
+		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
+		
+		maybeWaitForLift();  // This be aborted, so the intake needs to be wary below.
 		waitForHatch();
 		waitForIntake();
 		maybeWaitForClimber();
-		// waitForLiftDeployer();
+		maybeWaitForColourWheel();
+		//waitForLiftDeployer();
 		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
 
 		// Wait for driving to finish if needed.
@@ -294,7 +298,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			waitUntilOrAbort(() -> subsystems.climber.isInPosition(), "climber");
 		} catch (SequenceChangedException e) {
 			logSub("Climber sequence aborted");
-			subsystems.climber.setDesiredAction(new ClimberAction(Type.HOLD_HEIGHT, 0));
+			subsystems.climber.setDesiredAction(new ClimberAction(ClimberType.HOLD_HEIGHT, 0));
 			
 		}
 			
@@ -327,6 +331,18 @@ public class Controller implements Runnable, DashboardUpdater {
 	 */
 	private void waitForLiftDeployer() {
 		waitUntil(() -> subsystems.lift.isDeployed() || !subsystems.lift.isDeployed(), "lift deployer to stop moving");
+	}
+
+
+	private void maybeWaitForColourWheel() {
+		try {
+			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while moving colour wheel");
+			// The sequence has changed, setting action to null.
+			subsystems.colourWheel.setDesiredAction(new ColourAction(Type.NONE, Colour.UNKNOWN));
+			logSub("Resetting colour wheel to no action.");
+		}
 	}
 
 	/**

@@ -63,7 +63,8 @@ public class HardwareSparkMAX implements Motor {
 
 	@Override
 	public Motor setInverted(boolean isInverted) {
-		spark.setInverted(isInverted);
+		// Not available in brushless mode.
+		// spark.setInverted(isInverted);
 		return this;
 	}
 
