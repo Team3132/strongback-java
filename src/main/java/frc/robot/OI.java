@@ -379,11 +379,21 @@ public class OI implements OIInterface {
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, loaderOverride);
 	  // While the loader speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_MAIN_MOTOR), 
-			() -> loaderIF.setTargetSpinnerMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_MAIN_POT).read()));
-		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_IN_MOTOR), 
-			() -> loaderIF.setTargetSpinnerMotorVelocity(box.getAxis(OperatorBoxButtons.LOADER_IN_POT).read()));
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
+			() -> loaderIF.setTargetSpinnerMotorVelocity(30*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
+			() -> loaderIF.setTargetSpinnerMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
+			() -> loaderIF.setTargetPassthroughMotorVelocity(25*box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
+			() -> loaderIF.setTargetPassthroughMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR), 
+			() -> loaderIF.setTargetFeederMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_FEEDER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR),
+			() -> loaderIF.setTargetFeederMotorOutput(0));
+		
+		
+			onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
 			() -> loaderIF.setPaddleExtended(false));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
 			() -> loaderIF.setPaddleExtended(true));

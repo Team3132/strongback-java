@@ -100,17 +100,19 @@ public class OperatorBoxButtons {
 	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
 	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
 	// Loader
-	public static final int LOADER_PADDLE_RETRACT = 0; //Undecided/Unassigned Buttons
-	public static final int LOADER_PADDLE_EXTEND = 0;
-	public static final int LOADER_RETRACT = 0;
-	public static final int LOADER_EXTEND = 0;
-	public static final int LOADER_IN_MOTOR = 0;
-	public static final int LOADER_IN_POT = 0; // Potentiometer needs to be assigned
-	public static final int LOADER_MAIN_MOTOR = YELLOW_BUTTON2;
-	public static final int LOADER_MAIN_POT = YELLOW_POT;
+	public static final int LOADER_PADDLE_RETRACT = YELLOW_BUTTON4; //Undecided/Unassigned Buttons
+	public static final int LOADER_PADDLE_EXTEND = YELLOW_BUTTON4;
+	public static final int LOADER_RETRACT = YELLOW_BUTTON4;
+	public static final int LOADER_EXTEND = YELLOW_BUTTON4;
+	public static final int LOADER_PASSTHROUGH_MOTOR = GREEN_BUTTON1;
+	public static final int LOADER_PASSTHROUGH_POT = GREEN_POT; // Potentiometer needs to be assigned
+	public static final int LOADER_SPINNER_MOTOR = YELLOW_BUTTON1;
+	public static final int LOADER_SPINNER_POT = YELLOW_POT;
+	public static final int LOADER_FEEDER_MOTOR = BLUE_BUTTON1;
+	public static final int LOADER_FEEDER_POT = BLUE_POT;
 
 	// Hatch
-	public static final int HATCH_DISABLE = GREEN_DISABLE;
+	public static final int HATCH_DISABLE = GREEN_DISABLE; //There is no hatch
 	public static final int HATCH_MANUAL = GREEN_MANUAL;
 	public static final int HATCH_POT = GREEN_POT;
 	public static final int HATCH_MOVE_LEFT = GREEN_BUTTON1;
