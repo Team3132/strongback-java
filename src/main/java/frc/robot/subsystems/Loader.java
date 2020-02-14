@@ -18,7 +18,7 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     
 
     public Loader(int teamNumber, Motor loaderSpinnerMotor, Motor loaderPassthroughMotor, Motor loaderFeederMotor, Solenoid loaderSolenoid, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
-        super("Passthrough", dashboard, log);
+        super("Loader", dashboard, log);
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
         this.feeder = loaderFeederMotor;
