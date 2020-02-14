@@ -162,7 +162,6 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledPeriodic() {
-		//log.info("red pot: %.2f", operatorBox.getAxis(OperatorBoxButtons.RED_POT).read());
 	}
 
 	/**

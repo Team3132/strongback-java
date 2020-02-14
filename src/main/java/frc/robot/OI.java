@@ -85,22 +85,6 @@ public class OI implements OIInterface {
 		// Left Stick's onTrigger drive slowly mode is handled in Robot.java, not here
 		// Hatch Vision
 		// Intaking is on this button.
-	/*	onTriggered(leftStick.getButton(1), Sequences.startDriveByVision());
-		onUntriggered(leftStick.getButton(1), Sequences.stopDriveByVision());
-
-		// Intake - Right Stick Button 2 (on/off)
-		onTriggered(rightStick.getButton(2), () -> {
-			scoreModeCargo = true;
-			sysoutScoreMode();
-			return Sequences.startIntaking();
-		}); 
-		onUntriggered(rightStick.getButton(2), Sequences.stopIntaking());
-
-		onTriggered(leftStick.getButton(6), Sequences.startSlowDriveForward());
-		onUntriggered(leftStick.getButton(6), Sequences.setDrivebaseToArcade());
-
-		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
-		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());*/
 
 		whileTriggered(rightStick.getButton(5), Sequences.startClimberUp());
 		onUntriggered(rightStick.getButton(5), Sequences.stopClimber());
