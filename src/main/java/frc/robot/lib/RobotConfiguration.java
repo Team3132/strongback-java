@@ -52,6 +52,7 @@ public class RobotConfiguration {
 
 	public int teamNumber = 3132;
 	public boolean drivebaseIsPresent = true;
+	public String drivebaseMotorControllerType = Constants.DRIVE_DEFAULT_CONTROLLER_TYPE;
 	public int[] drivebaseCanIdsLeftWithEncoders = Constants.DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST;
 	public int[] drivebaseCanIdsLeftWithoutEncoders = Constants.DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST;
 	public int[] drivebaseCanIdsRightWithEncoders = Constants.DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST;
@@ -74,6 +75,9 @@ public class RobotConfiguration {
 	
 	public boolean intakeIsPresent = false;
 	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
+
+	public boolean colourWheelIsPresent = false;
+	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;
 
 	public boolean sparkTestIsPresent = false;
 	public int[] sparkTestCanIds = Constants.TEST_SPARK_MOTOR_CAN_ID_LIST;
@@ -175,9 +179,10 @@ public class RobotConfiguration {
 			log.exception("Error loading configuration file " + path + ", using defaults", e);
 		}
 	}
-	
+
 	private void readParameters() {	
 		drivebaseIsPresent = getAsBoolean("drivebase/present", drivebaseIsPresent);
+		drivebaseMotorControllerType = getMotorControllerType("drivebase/motorControllerType", drivebaseMotorControllerType);
 		drivebaseCanIdsLeftWithEncoders = getAsIntArray("drivebase/left/canIDs/withEncoders", drivebaseCanIdsLeftWithEncoders);
 		drivebaseCanIdsLeftWithoutEncoders = getAsIntArray("drivebase/left/canIDs/withoutEncoders", drivebaseCanIdsLeftWithoutEncoders);
 		drivebaseCanIdsRightWithEncoders = getAsIntArray("drivebase/right/canIDs/withEncoders", drivebaseCanIdsRightWithEncoders);
@@ -198,7 +203,10 @@ public class RobotConfiguration {
 	
 		intakeIsPresent = getAsBoolean("intake/present", true);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
-		
+
+		colourWheelIsPresent = getAsBoolean("colourWheel/present", false);
+		colourWheelCanID = getAsInt("colourWheel/canID", Constants.COLOUR_WHEEL_CAN_ID);
+
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
@@ -260,6 +268,20 @@ public class RobotConfiguration {
 		log.info("RobotConfig finished loading parameters\n");
 	}
 	
+	private String getMotorControllerType(String parameterName, String defaultValue) {
+		String type = getAsString(parameterName, defaultValue);
+		switch(type) {	
+			default:
+			log.error("Invalid value '%s' for parameter '%s'.  Using TalonSRX.", type, parameterName);
+			// Falling through to TalonSRX.
+
+			case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX: 
+			return Constants.MOTOR_CONTROLLER_TYPE_TALONSRX;
+
+			case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: 
+			return Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX;
+		}
+	}
 
 	private <T> void appendExample(String key, T defaultValue) {
 		exampleText.add(key + " = " + defaultValue);

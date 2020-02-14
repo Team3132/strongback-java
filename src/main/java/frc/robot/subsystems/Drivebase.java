@@ -33,12 +33,14 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
 	private final Motor left;
 	private final Motor right;
+	private final Log log;
 	private DriveMotion currentMotion;
 
 	public Drivebase(Motor left, Motor right,	DashboardInterface dashboard, Log log) {
 		super("Drive", dashboard, log);
 		this.left = left;
 		this.right = right;
+		this.log = log;
 
 		currentMotion = new DriveMotion(0, 0);
 		routine = new ConstantDrive();
@@ -108,11 +110,21 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	@Override
 	public void enable() {
 		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
+		double leftP = helper.get("p", Constants.DRIVE_P);
+		double leftI = helper.get("i", Constants.DRIVE_I);
+		double leftD = helper.get("d", Constants.DRIVE_D);
+		double leftF = helper.get("f", Constants.DRIVE_F);
+		double rightP = helper.get("p", Constants.DRIVE_P);
+		double rightI = helper.get("i", Constants.DRIVE_I);
+		double rightD = helper.get("d", Constants.DRIVE_F);
+		double rightF = helper.get("f", Constants.DRIVE_P);
 		left.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
 				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
 		right.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
 				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
 		super.enable();
+		log.info("Drivebase LEFT PID values: %f %f %f %f", leftP, leftI, leftD, leftF);
+		log.info("Drivebase RIGHT PID values: %f %f %f %f", rightP, rightI, rightD, rightF);
 		if (routine != null) routine.enable();
 	}
 

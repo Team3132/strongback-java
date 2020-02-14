@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import com.revrobotics.ColorSensorV3;
+
 import org.strongback.Executor.Priority;
 import org.strongback.Strongback;
 import org.strongback.components.Clock;
@@ -16,6 +18,8 @@ import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
+
+import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
 import frc.robot.controller.Controller.TrajectoryGenerator;
 import frc.robot.drive.routines.*;
@@ -45,6 +49,7 @@ public class Subsystems implements DashboardUpdater {
 	public PassthroughInterface passthrough;
 	public OverridableSubsystem<PassthroughInterface> passthroughOverride;
 	public ClimberInterface climber;
+	public ColourWheelInterface colourWheel;
 	public OverridableSubsystem<ClimberInterface> climberOverride;
 	public PneumaticsModule compressor;
 	public VisionInterface vision;
@@ -54,6 +59,14 @@ public class Subsystems implements DashboardUpdater {
 	public DoubleSupplier rightDriveDistance;
 	public DoubleSupplier leftDriveSpeed;
 	public DoubleSupplier rightDriveSpeed;
+
+	private final I2C.Port i2cPort = I2C.Port.kOnboard;
+	/**
+	 * A Rev Color Sensor V3 object is constructed with an I2C port as a 
+	 * parameter. The device will be automatically initialized with default 
+	 * parameters.
+	 */
+	private final ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 
 	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log) {
 		this.dashboard = dashboard;
@@ -93,6 +106,7 @@ public class Subsystems implements DashboardUpdater {
 		location.updateDashboard();
 		passthrough.updateDashboard();
 		vision.updateDashboard();
+		colourWheel.updateDashboard();
 	}
 
 	/**
@@ -110,11 +124,11 @@ public class Subsystems implements DashboardUpdater {
 		}
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
-		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsLeftWithEncoders,
+		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsLeftWithEncoders,
 				config.drivebaseCanIdsLeftWithoutEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, 
 				config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
-		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseCanIdsRightWithEncoders,
+		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
 				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
 		leftDriveDistance = () -> leftMotor.getPosition();
@@ -294,6 +308,18 @@ public class Subsystems implements DashboardUpdater {
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
 	}
+
+	public void createColourWheel() {
+		if (!config.colourWheelIsPresent) {
+			colourWheel = new MockColourWheel(log);
+			log.sub("Colour Sensor not present, using a mock colour sensor instead");
+			return;
+		}
+		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
+		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
+		Strongback.executor().register(colourWheel, Priority.HIGH);
+	}
+
 
 	public void createPassthrough() {
 		if (!config.passthroughIsPresent) {
