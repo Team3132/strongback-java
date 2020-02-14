@@ -35,7 +35,8 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 		double shooterD = helper.get("d", Constants.SHOOTER_D);
 		double shooterF = helper.get("f", Constants.SHOOTER_F); 
 		flyWheel.setPIDF(shooterP, shooterI, shooterD, shooterF); */
-		super.enable();
+        super.enable();
+        flyWheel.setPIDF(Constants.SHOOTER_P, Constants.SHOOTER_I, Constants.SHOOTER_D, Constants.SHOOTER_F);
 		//log.info("Shooter PID values: %f %f %f %f", shooterP, shooterI, shooterD, shooterF);
 	}
 
