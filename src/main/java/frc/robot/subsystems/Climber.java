@@ -34,8 +34,8 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     public Climber(Motor leftWinchMotor, Motor rightWinchMotor, DashboardInterface dashboard, Clock clock, Log log) {
         super("Climber", dashboard, log);   
         this.clock = clock;
-        this.leftWinch = new Winch("climber:", leftWinchMotor, dashboard, log);
-        this.rightWinch = new Winch("climber:", rightWinchMotor, dashboard, log);
+        this.leftWinch = new Winch("leftClimber:", leftWinchMotor, dashboard, log);
+        this.rightWinch = new Winch("rightClimber:", rightWinchMotor, dashboard, log);
         setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));  
         targetHeight = 0;
         oldTargetHeight = 0;

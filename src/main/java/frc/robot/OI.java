@@ -84,7 +84,7 @@ public class OI implements OIInterface {
 		// Left Stick's onTrigger drive slowly mode is handled in Robot.java, not here
 		// Hatch Vision
 		// Intaking is on this button.
-		onTriggered(leftStick.getButton(1), Sequences.startDriveByVision());
+	/*	onTriggered(leftStick.getButton(1), Sequences.startDriveByVision());
 		onUntriggered(leftStick.getButton(1), Sequences.stopDriveByVision());
 
 		// Intake - Right Stick Button 2 (on/off)
@@ -99,7 +99,19 @@ public class OI implements OIInterface {
 		onUntriggered(leftStick.getButton(6), Sequences.setDrivebaseToArcade());
 
 		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
-		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
+		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());*/
+
+		whileTriggered(rightStick.getButton(5), Sequences.startClimberUp());
+		onUntriggered(rightStick.getButton(5), Sequences.stopClimber());
+
+		whileTriggered(rightStick.getButton(4), Sequences.startClimberDown());
+		onUntriggered(rightStick.getButton(4), Sequences.stopClimber());
+
+		onTriggered(leftStick.getButton(5), Sequences.deployClimber());
+		
+		onTriggered(leftStick.getButton(4), Sequences.climb());
+
+
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
@@ -263,6 +275,12 @@ public class OI implements OIInterface {
 				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_RIGHT,
 						box.getAxis(OperatorBoxButtons.RED_POT).read())));
 		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3),
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
+
+		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON4),
+				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT,
+						box.getAxis(OperatorBoxButtons.RED_POT).read())));
+		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON4),
 				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0)));
 	}
 

@@ -119,7 +119,6 @@ public class RobotConfiguration {
 	public boolean climberIsPresent = true;
 	public int climberLeftCanID = Constants.CLIMBER_LEFT_CAN_ID;
 	public int climberRightCanID = Constants.CLIMBER_RIGHT_CAN_ID;
-	public int climberDriveMotorCanID = Constants.CLIMBER_DRIVE_MOTOR_CAN_ID;
 
 	//climber PID
 	public double climberP = Constants.CLIMBER_P;
@@ -260,7 +259,6 @@ public class RobotConfiguration {
 		climberIsPresent = getAsBoolean("climber/present", false);
 		climberLeftCanID = getAsInt("climber/leftCanID", Constants.CLIMBER_LEFT_CAN_ID);
 		climberRightCanID = getAsInt("climber/rightCanID", Constants.CLIMBER_RIGHT_CAN_ID);
-		climberDriveMotorCanID = getAsInt("climber/driveMotorCanID", Constants.CLIMBER_DRIVE_MOTOR_CAN_ID);
 
 		climberP = getAsDouble("climber/P", climberP);
 		climberI = getAsDouble("climber/I", climberI);

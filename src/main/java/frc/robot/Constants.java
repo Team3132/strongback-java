@@ -300,23 +300,23 @@ public class Constants {
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
 
-	// Climber (both level 2 and level 3). Replaces L3.
+	// Climber
+	public static final int CLIMBER_LEFT_CAN_ID = 11;
+	public static final int CLIMBER_RIGHT_CAN_ID = 10;
+	public static final double NEO_TICKS_PER_TURN = 42;
+	public static final double CLIMBER_GEAR_RATIO = 13.5;
+	public static final double CLIMBER_DRUM_CIRCUMFRENCE_METRES = 0.039 * Math.PI;
+
 	public static final double CLIMBER_TOLERANCE = 0.5;
 	public static final double CLIMBER_MAX_DISTANCE_FROM_TOP = 0;
-	public static final int CLIMBER_FRONT_CAN_ID = 45;
-	public static final int CLIMBER_REAR_CAN_ID = 47;
-	public static final int CLIMBER_DRIVE_MOTOR_CAN_ID = 48;
 	public static final double CLIMBER_HEIGHT = 2; //Temporary, unused
-	public static final double DRIVEBASE_CLIMBER_DRIVE_SPEED = -2.5; // inches/sec
-	//public static final double DRIVEBASE_CLIMBER_DRIVE_SLOW_POWER = -0.15;
-	public static final double CLIMBER_DRIVE_POWER = 1;
 	public static final double CLIMBER_F = 0;
 	public static final double CLIMBER_P = 4;
 	public static final double CLIMBER_I = 0;
 	public static final double CLIMBER_D = 0;
 
 	public static final double CLIMBER_DEPLOY_HEIGHT = 5;
-	public static final double CLIMBER_CLIMB_HEIGHT = 2;
+	public static final double CLIMBER_CLIMB_HEIGHT = -5;
 
 	public static final double CLIMBER_MAX_MOTOR_POWER = 0.1;
 
@@ -345,6 +345,4 @@ public class Constants {
 	public static final double TIME_COMMAND_RUN_PERIOD = (1.0/50.0);		// run the commands 50 times a second
 	public static final double TIME_LOCATION_PERIOD = (1.0/(double)LOCATION_HISTORY_CYCLE_SPEED);	// update the location subsystem 100 times a second
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
-	public static final int CLIMBER_LEFT_CAN_ID = 11;
-	public static final int CLIMBER_RIGHT_CAN_ID = 10;
 }

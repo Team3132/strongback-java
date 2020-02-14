@@ -148,24 +148,18 @@ public class MotorFactory {
 
 		return motor;
 	}
-
+//sort stuff out here for motor types
 	public static HardwareSparkMAX getClimberWinchMotor(int canID, boolean invert, Log log) {
 		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log);
 		motor.set(ControlMode.Position, 0);
-		motor.setSmartCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT);
+		motor.setSmartCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT, 100);
+		motor.setScale(1.0 / Constants.CLIMBER_GEAR_RATIO
+				* Constants.CLIMBER_DRUM_CIRCUMFRENCE_METRES);
 		motor.setPIDF(0, Constants.CLIMBER_P, Constants.CLIMBER_I, Constants.CLIMBER_D, Constants.CLIMBER_F);
 		return motor;
 	}
-	
-	public static HardwareTalonSRX getClimberDriveMotor(int canID, boolean invert, Log log) {	
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.configClosedloopRamp(.25, 10);
-		motor.configVoltageCompSaturation(8, 10);
-		motor.enableVoltageCompensation(true);
-		return motor;
-	}
 
-    /**
+	/**
      * Code to allow us to log output current per talon using redundant talons so if a talon or encoder
      * fails, it will automatically log and switch to the next one.
      * @param canIDsWithEncoders list of talons that can be the leader due to having an encoder.
