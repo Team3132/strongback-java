@@ -103,11 +103,7 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.createIntake();
 		subsystems.createClimber();
 		subsystems.createPassthrough();
-		subsystems.createSpitter();
-		subsystems.createHatch();
-		subsystems.createLift();
 		subsystems.createVision();
-		subsystems.createSparkTest();
 		subsystems.createOverrides();
 
 		createPowerMonitor();
@@ -202,11 +198,6 @@ public class Robot extends IterativeRobot implements Executable {
 	 * or by the strongback scheduler.
 	 * No spaghetti code here!
 	 */
-	@Override
-	public void teleopPeriodic() {
-		// Set the speed of the spark to the left joystick for testing.
-		subsystems.spark.setMotorOutput(0.3 * driverLeftJoystick.getAxis(0).read());
-	}
 
 	/**
 	 * Called when the test mode is enabled.

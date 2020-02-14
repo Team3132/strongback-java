@@ -53,7 +53,6 @@ public class MotorFactory {
 	
 	public static HardwareTalonSRX getLiftMotor(int[] canIDs, boolean sensorPhase, boolean invert, Log log) {
     	HardwareTalonSRX motor = getTalon(canIDs, invert, NeutralMode.Brake, log);
-		motor.setScale(Constants.LIFT_SCALE);
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.Analog, 0, 10);
 		// Limit switches.
@@ -62,24 +61,14 @@ public class MotorFactory {
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at base
 		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 0x00, 0x00, 10); // This makes the lift set its height to 0 when it reaches the soft stop (hall effect)
 		motor.configSetParameter(ParamEnum.eClearPositionOnLimitF, 0, 0x00, 0x00, 10);
-		motor.configForwardSoftLimitThreshold(Constants.LIFT_FWD_SOFT_LIMIT, 10);
-		motor.configReverseSoftLimitThreshold(Constants.LIFT_REV_SOFT_LIMIT, 10);
 		motor.configForwardSoftLimitEnable(false, 10);
 		motor.configReverseSoftLimitEnable(false, 10);
 
-		motor.configContinuousCurrentLimit(Constants.LIFT_CONTINUOUS_CURRENT_LIMIT, Constants.LIFT_CURRENT_TIMEOUT_MS);
-		motor.configPeakCurrentLimit(Constants.LIFT_PEAK_CURRENT_LIMIT, Constants.LIFT_CURRENT_TIMEOUT_MS);
-		
-		motor.setPIDF(0, Constants.LIFT_P_UP, Constants.LIFT_I_UP, Constants.LIFT_D_UP, Constants.LIFT_F_UP);
-		motor.setPIDF(1, Constants.LIFT_P_DOWN, Constants.LIFT_I_DOWN, Constants.LIFT_D_DOWN, Constants.LIFT_F_DOWN);
-		
 		motor.configClosedloopRamp(0, 10);
 		// Set the deadband to zero.
 		motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
 		motor.configAllowableClosedloopError(1, 0, 10);
-		motor.configMotionAcceleration(Constants.LIFT_MOTION_ACCEL, 10);
-		motor.configMotionCruiseVelocity(Constants.LIFT_MOTION_MAX, 10);
-
+		
 		motor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, 10);
 		motor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, 10);
 		return motor;
@@ -133,9 +122,6 @@ public class MotorFactory {
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at top
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at base
-		motor.configContinuousCurrentLimit(Constants.HATCH_CONTINUOUS_CURRENT_LIMIT, Constants.HATCH_CURRENT_TIMEOUT_MS);
-		motor.configPeakCurrentLimit(Constants.HATCH_PEAK_CURRENT_LIMIT, Constants.HATCH_CURRENT_TIMEOUT_MS);
-		motor.setPIDF(0, Constants.HATCH_POSITION_P, Constants.HATCH_POSITION_I, Constants.HATCH_POSITION_D, Constants.HATCH_POSITION_F);
 		motor.configClosedloopRamp(0.1, 10);
 		double scaleFactor = 2456/13.15; // 13.15" for 2456 ticks
 		motor.setScale(scaleFactor);

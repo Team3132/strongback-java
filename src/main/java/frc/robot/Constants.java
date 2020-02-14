@@ -138,24 +138,6 @@ public class Constants {
 	public static final int OVER_THE_EDGE_VALUE = 2200;
 	public static final int MIDDLE_OF_CARPET = 13500;
 
-	/**
-	 * Hatch constants.
-	 */
-
-	public static final double HATCH_POSITION_F = 0;
-	public static final double HATCH_POSITION_P = 5;  // Not too high or the belt skips.
-	public static final double HATCH_POSITION_I = 0;
-	public static final double HATCH_POSITION_D = 0;
-	public static final int HATCH_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
-	public static final int HATCH_PEAK_CURRENT_LIMIT = 43;
-	public static final int HATCH_CURRENT_TIMEOUT_MS = 100;
-	public static final int HATCH_POSITION_MOTOR_CAN_ID = 25;
-	public static final double HATCH_STOWED_POSITION = 0;  //0;  // 2 while tuning PID
-	public static final double HATCH_READY_POSITION = 7;
-	public static final double HATCH_INTAKE_HOLD_POSITION = 2.5;
-	public static final double HATCH_POSITION_TOLERANCE = 0.5;
-	public static final double HATCH_CALIBRATION_SPEED = -0.4; // Percentage of motor power needed for calibration.
-	
 	/*
 	* Passthrough
 	*/
@@ -167,84 +149,11 @@ public class Constants {
 	 */
 	public static final int LED_CANIFIER_CAN_ID = 21;
 
-	/*
-	 * Lift
-	 */
-	public static final int[] LIFT_MOTOR_TALON_CAN_ID_LIST = {30, 31};
-	public static final int LIFT_SOLENOID_ID = 2;  // Listed as hatch mech in/out in the DDD.
-	public static final double LIFT_SOLENOID_RETRACT_TIME = 0.1;
-	public static  final double LEFT_SOLENOID_EXTEND_TIME = 0.1;
-
-	public static final double LIFT_P_UP = 40.0;
-	public static final double LIFT_I_UP = 0.0;
-	public static final double LIFT_D_UP = 0.0;
-	public static final double LIFT_F_UP = 0.0;
-
-	public static final double LIFT_P_DOWN = 25.0;
-	public static final double LIFT_I_DOWN = 0.0;
-	public static final double LIFT_D_DOWN = 0.0;
-	public static final double LIFT_F_DOWN = 0.0;
-
-	public static final int LIFT_MOTION_MAX = 40;  // was 100
-	public static final int LIFT_MOTION_ACCEL = 5 * LIFT_MOTION_MAX;
-
-	// public static final double LIFT_SCALE = 6.313;	// 638 ticks to 59.44 inches
-	public static final double LIFT_SCALE = ((638/59.44)*1.07);	// 638 ticks to 59.44 inches
-
-	public static final double LIFT_DEFAULT_TOLERANCE = 1.0;
-	public static final double LIFT_MICRO_ADJUST_HEIGHT = 0.5; // The smallest height by which the operator can raise the lift
-	public static final int LIFT_CONTINUOUS_CURRENT_LIMIT = 38;
-	public static final int LIFT_PEAK_CURRENT_LIMIT = 43;
-	public static final int LIFT_CURRENT_TIMEOUT_MS = 100;
-	public static final int LIFT_FWD_SOFT_LIMIT = 775;
-	public static final int LIFT_REV_SOFT_LIMIT = -10;
-
-	public enum LiftSetpoint {
-		LIFT_BOTTOM_HEIGHT(0),
-		LIFT_FEEDER_STATION_HEIGHT(0),
-		LIFT_CARGO_SHIP_HATCH_HEIGHT(0),
-		LIFT_CARGO_SHIP_CARGO_HEIGHT(16.0),
-		LIFT_ROCKET_BOTTOM_HATCH_HEIGHT(0),
-		LIFT_ROCKET_BOTTOM_CARGO_HEIGHT(7),
-		LIFT_ROCKET_MIDDLE_HATCH_HEIGHT(17),
-		LIFT_ROCKET_MIDDLE_CARGO_HEIGHT(22.5),
-		LIFT_ROCKET_TOP_HATCH_HEIGHT(32.5),
-		LIFT_ROCKET_TOP_CARGO_HEIGHT(38), // Was 38
-		LIFT_MAX_HEIGHT(39); // 39.3 inches
-
-		public final double height;
-		private LiftSetpoint(double height) {
-			this.height = height;
-		}
-	}
-																	
-	public static final List<LiftSetpoint> LIFT_SETPOINTS = Arrays.asList(
-		LiftSetpoint.LIFT_BOTTOM_HEIGHT, 
-		LiftSetpoint.LIFT_CARGO_SHIP_HATCH_HEIGHT, //Cargo ship, Lower Rocket and feeder station hatch heights are identical
-		LiftSetpoint.LIFT_CARGO_SHIP_CARGO_HEIGHT, 
-		LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_MIDDLE_HATCH_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_MIDDLE_CARGO_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_TOP_HATCH_HEIGHT, 
-		LiftSetpoint.LIFT_ROCKET_TOP_CARGO_HEIGHT,
-		LiftSetpoint.LIFT_MAX_HEIGHT
-	);
-
-
-	// Position Constants
-	public static final double LIFT_DEFAULT_MIN_HEIGHT = 0;
-	public static final double LIFT_DEFAULT_MAX_HEIGHT = 39; // 42
-	public static final double LIFT_DEPLOY_THRESHOLD_HEIGHT = 0; //18 / 25.4; // cannot deploy the spitter unless it is 18mm above the lift base height 
-
 	// Power distribution Panel (PDP)
 	public static final int PDP_CAN_ID = 62;
 	
 	// Pneumatic Control Modules (PCM)
 	public static final int PCM_CAN_ID = 61;
-
-	// Hatch Solenoids
-	public static final int HATCH_HOLDER_PORT = 1;
 
 	// Level two (step climb)
 	public static final int LEVEL_TWO_SOLENOID_ID = 3;

@@ -101,10 +101,7 @@ public class Sequences {
 	public static Sequence startIntaking() {
 		Sequence seq = new Sequence("Start intake");
 		// Wait for the intake to extend before turning motor
-		seq.add().deployIntake().retractLift();
-		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT);
-		seq.add().setLiftHeight(LIFT_DEFAULT_MIN_HEIGHT)
- 				 .setHatchPosition(HATCH_INTAKE_HOLD_POSITION);
+		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT);;
 		// Waits for the lift to go to the set height before turning on to the motor
 		// The spitter speed should be set at a small speed.
 		seq.add().setPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
@@ -122,7 +119,6 @@ public class Sequences {
 				 .setIntakeMotorOutput(0)
 				 .setPassthroughMotorOutput(0);
 		seq.add().setDelayDelta(0.1);
-		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
 		return seq;
 	}
 
@@ -134,7 +130,6 @@ public class Sequences {
 
 	public static Sequence startCargoSpit() {
 		Sequence seq = new Sequence("Start CargoSpit");
-		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
 		seq.add().setSpitterDutyCycle(SPITTER_SCORE_SPEED);
 		return seq;
 	}
@@ -160,59 +155,6 @@ public class Sequences {
 		seq.add().setSpitterDutyCycle(0);
 		seq.add().setPassthroughMotorOutput(0);
 		seq.add().setIntakeMotorOutput(0);
-		return seq;
-	}
-
-	public static Sequence moveLift(String name, double height) {
-		Sequence seq = new Sequence("Set lift to " + name);
-		seq.add().setLiftHeight(height);
-		return seq;
-	}
-
-	public static Sequence moveLift(LiftSetpoint setpoint) {
-		Sequence seq = new Sequence("Set lift to " + setpoint.toString());
-		seq.add().setLiftHeight(setpoint.height);
-		return seq;
-	}
-
-	/**
-	 * Move up to the next lift setpoint.
-	 */
-	public static Sequence liftSetpointUp() {
-		Sequence seq = new Sequence("lift setpoint up");
-		seq.add().setLiftSetpointUp();
-		return seq;	
-	}
-
-	/**
-	 * Move down to the next lift setpoint.
-	 */
-	public static Sequence liftSetpointDown() {
-		Sequence seq = new Sequence("lift setpoint down");
-		seq.add().setLiftSetpointDown();
-		return seq;	
-	}
-	
-	/**
-	 * Micro adjust lift up.
-	 */
-	public static Sequence getMicroAdjustUpSequence() {
-		return microAdjustUpSeq;
-	}
-
-	/**
-	 * Micro adjust lift down.
-	 */
-	public static Sequence getMicroAdjustDownSequence() {
-		return microAdjustDownSeq;
-	}
-
-	private static Sequence microAdjustUpSeq = getMicroAdjustSequence(LIFT_MICRO_ADJUST_HEIGHT);
-	private static Sequence microAdjustDownSeq = getMicroAdjustSequence(-LIFT_MICRO_ADJUST_HEIGHT);
-	
-	static public Sequence getMicroAdjustSequence(double delta) {
-		Sequence seq = new Sequence("micro adjust");
-		seq.add().setLiftHeightDelta(delta);
 		return seq;
 	}
 
@@ -245,7 +187,6 @@ public class Sequences {
 
 	/*public static Sequence startSpitterOnly() {
 		Sequence seq = new Sequence("Start Spitter");
-		seq.add().grabHatch(); //To allow the cargo ball to pass by the hatch mechanism unobstructed
 		seq.add().setSpitterDutyCycle(SPITTER_SPEED);
 		return seq;
 	}
@@ -253,57 +194,11 @@ public class Sequences {
 	public static Sequence stopSpitterOnly() {
 		Sequence seq = new Sequence("Stop Spitter");
 		seq.add().setSpitterDutyCycle(0.0);
-		seq.add().releaseHatch();
 		return seq;
 	}*/
 
-	public static Sequence holdHatch() { 
-		Sequence seq = new Sequence("Hatch hold");
-		seq.add().releaseHatch();
-		return seq;
-	}
-	public static Sequence releaseHatch() {
-		Sequence seq = new Sequence("Hatch release");
-		seq.add().grabHatch();
-		return seq;
-	}
 
-	public static Sequence getStowHatchSequence() {
-		Sequence seq = new Sequence("stow hatch");
-		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
-		return seq;
-	}
-
-	public static Sequence getReadyHatchSequence() {
-		Sequence seq = new Sequence("ready hatch");
-		seq.add().setHatchPosition(HATCH_READY_POSITION);
-		return seq;
-	}
-
-	public static Sequence getHatchDeltaPositionSequence(double delta) {
-		Sequence seq = new Sequence("set hatch position");
-		seq.add().setHatchPositionDelta(delta);
-		return seq;
-	}
-
-	public static Sequence setHatchPosition(double position) {
-		Sequence seq = new Sequence("move hatch to position");
-		seq.add().setHatchPosition(position);
-		return seq;
-	}
-
-	public static Sequence setHatchPower(double power) {
-		Sequence seq = new Sequence(String.format("set hatch power: %f", power));
-		seq.add().setHatchPower(power);
-		return seq;
-	}
-
-	public static Sequence hatchCalibrate() {
-		Sequence seq = new Sequence("calibrating hatch");
-		seq.add().calibrateHatch();
-		return seq;
-	}
-
+	
 	public static Sequence startDriveByVision() {
 		Sequence seq = new Sequence("start drive by vision");
 		seq.add().doVisionAssistDrive();
@@ -313,18 +208,6 @@ public class Sequences {
 	public static Sequence stopDriveByVision() {
 		Sequence seq = new Sequence("stop drive by vision");
 		seq.add().doArcadeDrive();
-		return seq;
-	}
-
-	public static Sequence liftDeploy() {
-		Sequence seq = new Sequence("lift deploy");
-		seq.add().deployLift();
-		return seq;
-	}
-
-	public static Sequence liftRetract() {
-		Sequence seq = new Sequence("lift retract");
-		seq.add().retractLift();
 		return seq;
 	}
 
@@ -356,8 +239,6 @@ public class Sequences {
 
 	public static Sequence startLevel2climb() { // Stage 1 of L2 Climb: Raise both winchs & drive towards platform (12)
 		Sequence seq = new Sequence("start level 2 climb");
-		seq.add().retractLift(); 
-		// seq.add().setLiftHeight(LIFT_BOTTOM_HEIGHT); // Need to be lowest lift height to climb
 		seq.add().setBothHeight(CLIMBER_L2_CLIMB_HEIGHT); // Front winch goes up to L2 height.
 		// Keep Climbing until the driver releases the button.
 		return seq;
@@ -365,8 +246,6 @@ public class Sequences {
 	
 	public static Sequence startLevel3climb() { // Stage 1 of L3 Climb: Raise both winchs & drive towards platform (10)
 		Sequence seq = new Sequence("start level 3 climb");
-		seq.add().retractLift(); 
-		// seq.add().setLiftHeight(LIFT_BOTTOM_HEIGHT); // Need to be lowest lift height to climb
 		seq.add().setBothHeight(CLIMBER_L3_CLIMB_HEIGHT); // Front winch goes up to L3 height.
 		// Keep Climbing until the driver releases the button.
 		return seq;
@@ -414,8 +293,6 @@ public class Sequences {
 	
 	public static Sequence abortLevelStage() { // Abort the climb - bring both winches back to home. Stop driving.
 		Sequence seq = new Sequence("abort level climb");
-		seq.add().retractLift(); 
-		seq.add().setLiftHeight(LIFT_DEFAULT_MIN_HEIGHT); // Need to be lowest lift height during climb
 		seq.add().setClimberDriveSpeed(0); // Turn off stilt driving.
 		seq.add().setDelayDelta(0.05);
 		seq.add().setDrivebasePower(0); // Stop drivebase just in case.
@@ -438,19 +315,11 @@ public class Sequences {
 		stopPassthrough(),
 		//startSpitterOnly(),
 		//stopSpitterOnly(),
-		holdHatch(),
-		releaseHatch(),
-		getStowHatchSequence(),
-		getReadyHatchSequence(),
-		liftDeploy(),
-		liftRetract(),
 		startLevel2climb(),
 		startLevelDriveForward(),
 		stopLevelDrive(),
 		startFrontRaise(),
-		abortLevelStage(),
-		getMicroAdjustUpSequence(), 
-		getMicroAdjustDownSequence(), 
+		abortLevelStage(), 
 		getDriveToWaypointSequence(0, 12, 0)
 	};	
 }

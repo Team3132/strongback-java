@@ -42,16 +42,8 @@ public class Subsystems implements DashboardUpdater {
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
-	public SparkTestInterface spark;
-	public OverridableSubsystem<SparkTestInterface> sparkTestOverride;
 	public PassthroughInterface passthrough;
 	public OverridableSubsystem<PassthroughInterface> passthroughOverride;
-	public SpitterInterface spitter;
-	public OverridableSubsystem<SpitterInterface> spitterOverride;
-	public HatchInterface hatch;
-	public OverridableSubsystem<HatchInterface> hatchOverride;
-	public LiftInterface lift;
-	public OverridableSubsystem<LiftInterface> liftOverride;
 	public ClimberInterface climber;
 	public OverridableSubsystem<ClimberInterface> climberOverride;
 	public PneumaticsModule compressor;
@@ -73,11 +65,7 @@ public class Subsystems implements DashboardUpdater {
 	public void createOverrides() {
 		createIntakeOverride();
 		createPassthrougOverride();
-		createSpitterOverride();
-		createHatchOverride();
 		createClimberOverride();
-		createLiftOverride();
-		createSparkTestOverride();
 	}
 
 	public void enable() {
@@ -86,11 +74,7 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.enable();
 		intake.enable();
 		passthrough.enable();
-		spitter.enable();
 		climber.enable();
-		lift.enable();
-		hatch.enable();
-		spark.enable();
 	}
 
 	public void disable() {
@@ -98,25 +82,17 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.disable();
 		intake.disable();
 		passthrough.disable();
-		spitter.disable();
 		climber.disable();
-		lift.disable();
-		hatch.disable();
-		spark.disable();
 	}
 
 	@Override
 	public void updateDashboard() {
 		drivebase.updateDashboard();
-		hatch.updateDashboard();
 		intake.updateDashboard();
 		climber.updateDashboard();
 		location.updateDashboard();
 		passthrough.updateDashboard();
-		spitter.updateDashboard();
-		lift.updateDashboard();
 		vision.updateDashboard();
-		spark.updateDashboard();
 	}
 
 	/**
@@ -319,31 +295,6 @@ public class Subsystems implements DashboardUpdater {
 		intake = intakeOverride.getNormalInterface();
 	}
 
-	public void createSparkTest() {
-		if (config.liftIsPresent && config.sparkTestIsPresent) {
-			// As the use the same buttons on the diag box, disable this
-			// subsystem if both subsystems are enabled.
-			log.error("Disabling Test spark subsystem as lift subsystem is enabled");
-			config.sparkTestIsPresent = false;
-		}
-		if (!config.sparkTestIsPresent) {
-			spark = new MockSparkTest(log);
-			log.sub("Test spark not present, using a mock instead");
-			return;
-		}
-
-		HardwareSparkMAX motor = MotorFactory.getSparkTestMotor(config.sparkTestCanIds, false, log);
-		spark = new SparkTest(motor, dashboard, log);
-	}
-
-	public void createSparkTestOverride() {
-		// Setup the diagBox so that it can take control.
-		MockSparkTest mock = new MockSparkTest(log);
-		sparkTestOverride = new OverridableSubsystem<SparkTestInterface>("spark", SparkTestInterface.class, spark, mock, mock, log);
-		// Plumb accessing the sparkTest through the override.
-		spark = sparkTestOverride.getNormalInterface();
-	}
-
 	public void createPassthrough() {
 		if (!config.passthroughIsPresent) {
 			passthrough = new MockPassthrough(log);
@@ -362,54 +313,6 @@ public class Subsystems implements DashboardUpdater {
 		passthroughOverride = new OverridableSubsystem<PassthroughInterface>("passthrough", PassthroughInterface.class, passthrough, simulator, mock, log);
 		// Plumb accessing the lift through the override.
 		passthrough = passthroughOverride.getNormalInterface();
-	}
-
-	public void createSpitter() {
-		if (!config.spitterIsPresent) {
-			spitter = new MockSpitter(log);
-			log.sub("Created a mock spitter!");
-			return;
-		}
-
-		Motor spitterLeftMotor = MotorFactory.getSpitterMotor(config.spitterLeftCanID, true, true, log);
-		Motor spitterRightMotor = MotorFactory.getSpitterMotor(config.spitterRightCanID, true, false, log);
-		BooleanSupplier cargoSupplier = () -> spitterLeftMotor.isAtForwardLimit();
-		spitter = new Spitter(cargoSupplier, spitterLeftMotor, spitterRightMotor, dashboard, log);
-	}
-
-	public void createSpitterOverride() {
-		// Setup the diagBox so that it can take control.
-		MockSpitter simulator = new MockSpitter(log);  // Nothing to simulate, use a mock instead.
-		MockSpitter mock = new MockSpitter(log);
-		spitterOverride = new OverridableSubsystem<SpitterInterface>("spitter", SpitterInterface.class, spitter, simulator, mock, log);
-		// Plumb accessing the spitter through the override.
-		spitter = spitterOverride.getNormalInterface();
-	}
-
-	public void createHatch() {
-		if (!config.hatchIsPresent) {
-			hatch = new MockHatch(log);
-			log.sub("Created a mock hatch");
-			return;
-		}
-
-		Motor motor = MotorFactory.getHatchMotor(config.hatchCanID, true, false, log);
-		Solenoid holder = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.HATCH_HOLDER_PORT);
-		hatch = new Hatch(motor, holder, dashboard, clock, log);
-		Strongback.executor().register(hatch, Priority.LOW);
-	}
-
-	public void createHatchOverride() {
-		// Setup the diagBox so that it can take control.
-		HatchSimulator simulator = new HatchSimulator(log);
-		MockHatch mock = new MockHatch(log);
-		hatchOverride = new OverridableSubsystem<HatchInterface>("hatch", HatchInterface.class, hatch, simulator, mock, log);
-		// Plumb accessing the hatch through the override.
-		hatch = hatchOverride.getNormalInterface();
-	}
-
-	public void createTape() {
-
 	}
 
 	/**
@@ -447,34 +350,6 @@ public class Subsystems implements DashboardUpdater {
 		climberOverride = new OverridableSubsystem<ClimberInterface>("climber", ClimberInterface.class, climber, simulator, mock, log);
 		// Plumb accessing the climber through the override.
 		climber = climberOverride.getNormalInterface();
-	}
-
-	/**
-	 * Create the lift subsystem.
-	 * Also plumb in the lift override, so the lift can be disconnected from the
-	 * main logic and controlled directly by the diag box.
-	 */
-	public void createLift() {
-		if (!config.liftIsPresent) {
-			lift = new MockLift(clock, log);
-			log.sub("Created a mock lift");
-			return;
-		}
-
-		Solenoid deploy = Hardware.Solenoids.singleSolenoid(config.pcmCanId, config.liftSolenoidID,
-				config.liftSolenoidRetractTime, config.liftSolenoidExtendTime);
-		Motor motor = MotorFactory.getLiftMotor(config.liftCanIds, false, false, log);
-		lift = new Lift(motor, deploy, dashboard, log);
-		Strongback.executor().register(lift, Priority.HIGH);
-	}
-
-	public void createLiftOverride() {
-		// Setup the diagBox so that it can take control.
-		LiftSimulator simulator = new LiftSimulator();
-		MockLift mock = new MockLift(clock, log);
-		liftOverride = new OverridableSubsystem<LiftInterface>("lift", LiftInterface.class, lift, simulator, mock, log);
-		// Plumb accessing the intake through the override.
-		lift = liftOverride.getNormalInterface();
 	}
 
 	public void createVision() {
