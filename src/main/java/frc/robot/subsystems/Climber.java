@@ -7,7 +7,7 @@ import org.strongback.components.Clock;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.ClimberInterface;
-import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
+import frc.robot.interfaces.ClimberInterface.ClimberAction.ClimberType;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
@@ -36,7 +36,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
         this.clock = clock;
         this.leftWinch = new Winch("leftClimber:", leftWinchMotor, dashboard, log);
         this.rightWinch = new Winch("rightClimber:", rightWinchMotor, dashboard, log);
-        setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));  
+        setDesiredAction(new ClimberAction(ClimberType.STOP_CLIMBER, 0));  
         targetHeight = 0;
         oldTargetHeight = 0;
         climberDiffP = Constants.CLIMBER_POWER_NOT_LEVEL_P;
@@ -66,7 +66,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     }
     @Override
     public void execute(long timeInMillis) {
-        if (action.type != Type.STOP_CLIMBER) {
+        if (action.type != ClimberType.STOP_CLIMBER) {
             holding = false;
         }
         switch (action.type) {
@@ -128,7 +128,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                     log.sub("%s: At holding height %f,%f setting target to %f", name, leftHeight, rightHeight, targetHeight);
                     leftWinch.setTargetHeight(targetHeight);
                     rightWinch.setTargetHeight(targetHeight);
-                    setDesiredAction(new ClimberAction(Type.STOP_CLIMBER, 0));  
+                    setDesiredAction(new ClimberAction(ClimberType.STOP_CLIMBER, 0));  
                     break;
                 }//
                 // We run a modified PID loop for both the left and back motors.

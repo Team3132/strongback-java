@@ -279,53 +279,53 @@ public class State {
 	
 	// Climber
 	public State setClimberPowerLeft(double speed) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_LEFT, speed);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_LEFT, speed);
 		return this;
 	}
 
 	public State setClimberPowerRight(double speed) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER_RIGHT, speed);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_RIGHT, speed);
 		return this;
 	}
 
 	public State setClimberPower(double speed) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_CLIMBER_POWER, speed);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER, speed);
 		return this;
 	}
 
 	public State holdClimber() {
-		climberAction = new ClimberAction(ClimberAction.Type.HOLD_HEIGHT, 0);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.HOLD_HEIGHT, 0);
 		return this;
 	}
 
 	public State stopClimber() {
-		climberAction = new ClimberAction(ClimberAction.Type.STOP_CLIMBER, 0);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0);
 		return this;
 	}
 
 	//Auto-climber
 	public State setClimberLeft(double height) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_LEFT_HEIGHT, height);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_LEFT_HEIGHT, height);
 		return this;
 	}
 
 	public State setClimberRight(double height) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_RIGHT_HEIGHT, height);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_RIGHT_HEIGHT, height);
 		return this;
 	}
 	
 	public State setClimberBoth(double height) {
-		climberAction = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_BOTH_HEIGHT, height);
 		return this;
 	}
 
 	public State leftClimberOverride(double height) {
-		climberAction = new ClimberAction(ClimberAction.Type.OVERRIDE_LEFT_PERCENT_OUTPUT, height);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.OVERRIDE_LEFT_PERCENT_OUTPUT, height);
 		return this;
 	}
 
 	public State rightClimberOverride(double height) {
-		climberAction = new ClimberAction(ClimberAction.Type.OVERRIDE_RIGHT_PERCENT_OUTPUT, height);
+		climberAction = new ClimberAction(ClimberAction.ClimberType.OVERRIDE_RIGHT_PERCENT_OUTPUT, height);
 		return this;
 	}
 

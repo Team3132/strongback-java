@@ -6,15 +6,15 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
 
     public class ClimberAction {
 
-        public final Type type;  // What should the climber do?
+        public final ClimberType type;  // What should the climber do?
         public final double value;  // What this is for depends on the type chosen.
 
-        public ClimberAction(Type type, double value) {
+        public ClimberAction(ClimberType type, double value) {
             this.type = type;
             this.value = value;
         }
 
-        public enum Type{
+        public enum ClimberType{
             HOLD_HEIGHT,
             STOP_CLIMBER, 
             SET_CLIMBER_POWER_LEFT,
