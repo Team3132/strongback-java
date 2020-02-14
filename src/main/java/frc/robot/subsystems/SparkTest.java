@@ -26,7 +26,7 @@ public class SparkTest extends Subsystem implements SparkTestInterface, Executab
 			   .register(false, motor::getVelocity, "%s/speed", name)
 			   .register(false, motor::getPosition, "%s/position", name)
 			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name)
-			   .register(false, this::getMotorOutput, "%s/target", name);
+               .register(false, this::getMotorOutput, "%s/target", name);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class SparkTest extends Subsystem implements SparkTestInterface, Executab
         //log.sub("Setting spark test motor output to %.1f", output);
         targetOutput = output;
         //motor.set(output, ControlType.kDutyCycle);
-        motor.set(ControlMode.Velocity ,output);
+        motor.set(ControlMode.PercentOutput ,output);
     }
 
     @Override

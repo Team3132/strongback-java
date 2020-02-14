@@ -2,6 +2,15 @@ package frc.robot.lib;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix.ParamEnum;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import org.strongback.components.Clock;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
@@ -12,43 +21,64 @@ import org.strongback.hardware.HardwareTalonSRX;
 import frc.robot.Constants;
 import frc.robot.interfaces.Log;
 
-import com.ctre.phoenix.ParamEnum;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 public class MotorFactory {
 
-	public static Motor getDriveMotor(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean leftMotor,
-			boolean sensorPhase, double rampRate, boolean doCurrentLimiting, int contCurrent, int peakCurrent,
-			double p, double i, double d, double f, Clock clock, Log log) {
-		HardwareTalonSRX motor = getTalon(canIDsWithEncoders, canIDsWithoutEncoders, leftMotor, NeutralMode.Brake, clock, log); // don't invert output
-	    motor.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
-		motor.setPIDF(0, p, i, d, f);
-		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setSensorPhase(sensorPhase);
-		motor.configClosedloopRamp(rampRate, 10);
-		motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
-		/*
-		 * Setup Current Limiting
-		 */
-		if (doCurrentLimiting) {
-			motor.configContinuousCurrentLimit(contCurrent, 0);		// limit to 35 Amps when current exceeds 40 amps for 100ms
-			motor.configPeakCurrentLimit(peakCurrent, 0);
-			motor.configPeakCurrentDuration(100, 0);
-			motor.enableCurrentLimit(true);
-		}
+	public static Motor getDriveMotor(String motorControllerType, int[] canIDsWithEncoders, int[] canIDsWithoutEncoders,
+			boolean leftMotor, boolean sensorPhase, double rampRate, boolean doCurrentLimiting, int contCurrent,
+			int peakCurrent, double p, double i, double d, double f, Clock clock, Log log) {
+
 		// Save PID values into Network Tables
 		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
 		helper.set("p", p);
 		helper.set("i", i);
 		helper.set("d", d);
 		helper.set("f", f);
-		return motor;
+
+		switch (motorControllerType) {
+		case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: {
+			HardwareSparkMAX spark = getSparkMAX(canIDsWithEncoders, leftMotor, NeutralMode.Brake, log);
+			spark.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE);
+			spark.setPIDF(0, p, i, d, f);
+			spark.setSensorPhase(sensorPhase);
+
+			/*
+			 * Setup Current Limiting
+			 */
+			if (doCurrentLimiting) {
+				spark.setSmartCurrentLimit(contCurrent, contCurrent); // limit to 35 Amps when current exceeds 40 amps
+																		// for 100ms
+				spark.setSecondaryCurrentLimit(peakCurrent);
+			}
+
+			return spark;
+		}
+
+		default:
+			log.error("Invalid drive motor controller '%s'. Please use 'TalonSRX' or 'SparkMAX'. Using TalonSRX.", motorControllerType);
+			// Falling through to TalonSRX.
+
+		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
+			HardwareTalonSRX talon = getTalon(canIDsWithEncoders, canIDsWithoutEncoders, leftMotor, NeutralMode.Brake,
+					clock, log); // don't invert output
+			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
+			talon.setPIDF(0, p, i, d, f);
+			talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+			talon.setSensorPhase(sensorPhase);
+			talon.configClosedloopRamp(rampRate, 10);
+			talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
+
+			/*
+			 * Setup Current Limiting
+			 */
+			if (doCurrentLimiting) {
+				talon.configContinuousCurrentLimit(contCurrent, 0); // limit to 35 Amps when current exceeds 40 amps for
+																	// 100ms
+				talon.configPeakCurrentLimit(peakCurrent, 0);
+				talon.configPeakCurrentDuration(100, 0);
+				talon.enableCurrentLimit(true);
+			}
+			return talon;
+		}
 	}
 	
 	public static HardwareTalonSRX getLiftMotor(int[] canIDs, boolean sensorPhase, boolean invert, Log log) {
@@ -92,6 +122,12 @@ public class MotorFactory {
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
 		motor.configVoltageCompSaturation(8, 10);
 		motor.enableVoltageCompensation(true);
+		return motor;
+	}
+
+	public static HardwareTalonSRX getColourWheelMotor(int canID, boolean invert, Log log) {
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		motor.configClosedloopRamp(.25, 10);
 		return motor;
 	}
 
