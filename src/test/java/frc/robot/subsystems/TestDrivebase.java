@@ -11,6 +11,7 @@ import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockLog;
+import frc.robot.mock.MockNetworkTableHelper;
 
 public class TestDrivebase {
 
@@ -20,23 +21,23 @@ public class TestDrivebase {
 		public double leftSpeed = 0;
 		public double rightSpeed = 0;
         
-        public MockDriveRoutine(String name) {
+        public MockDriveRoutine(final String name) {
             this.name = name;
         }
-        
-		@Override
-		public DriveMotion getMotion() {
-			callCount++;
-			return new DriveMotion(leftSpeed, rightSpeed);
-		}
 
-		@Override
-		public void enable() {
-		}
+        @Override
+        public DriveMotion getMotion() {
+            callCount++;
+            return new DriveMotion(leftSpeed, rightSpeed);
+        }
 
-		@Override
-		public void disable() {
-		}
+        @Override
+        public void enable() {
+        }
+
+        @Override
+        public void disable() {
+        }
 
         @Override
         public boolean hasFinished() {
@@ -47,30 +48,32 @@ public class TestDrivebase {
         public String getName() {
             return "mock";
         }
-	}
-	
+    }
+
     @Test
     public void testDriveRoutine() {
-    	MockMotor leftMotor = Mock.stoppedMotor();
-    	MockMotor rightMotor = Mock.stoppedMotor();
-    	MockDriveRoutine arcade = new MockDriveRoutine("MockArcade");
-        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor, new MockDashboard(), new MockLog(true));
+        final MockMotor leftMotor = Mock.stoppedMotor();
+        final MockMotor rightMotor = Mock.stoppedMotor();
+        final MockDriveRoutine arcade = new MockDriveRoutine("MockArcade");
+        final DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor,new MockNetworkTableHelper("drive"),new MockDashboard(), new MockLog(true));
         // Register this drive routine so it can be used.
         drive.registerDriveRoutine(DriveRoutineType.ARCADE, arcade);
         // Tell the drive subsystem to use it.
         drive.setDriveRoutine(new DriveRoutineParameters(DriveRoutineType.ARCADE));
         int expectedCallCount = 0;
 
-        // Subsystems should start disabled, so shouldn't be calling the DrivedriveRoutine.
+        // Subsystems should start disabled, so shouldn't be calling the
+        // DrivedriveRoutine.
         assertEquals(expectedCallCount, arcade.callCount);
         drive.execute(0);
         assertEquals(expectedCallCount, arcade.callCount);
         assertEquals(0, leftMotor.get(), 0.01);
-        assertEquals(0, rightMotor.get(), 0.01); 
+        assertEquals(0, rightMotor.get(), 0.01);
 
         // Enable the drivebase
         arcade.leftSpeed = 0.5;
         arcade.rightSpeed = 0.75;
+        //  Block of code to try
         drive.enable();
         drive.execute(0); // Should call getMotion() on driveRoutine.
         assertEquals(++expectedCallCount, arcade.callCount);
@@ -86,9 +89,9 @@ public class TestDrivebase {
         // Check that the motors now have power.
         assertEquals(arcade.leftSpeed, leftMotor.get(), 0.01);
         assertEquals(arcade.rightSpeed, rightMotor.get(), 0.01);
-        
+
         // Change driveRoutine and see if the outputs are different
-    	MockDriveRoutine cheesy = new MockDriveRoutine("MockCheesy");
+        final MockDriveRoutine cheesy = new MockDriveRoutine("MockCheesy");
     	cheesy.leftSpeed = 1;
     	cheesy.rightSpeed = -1;
         drive.registerDriveRoutine(DriveRoutineType.CHEESY, cheesy);

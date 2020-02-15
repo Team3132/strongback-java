@@ -14,24 +14,24 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
  */
 public class MockNetworkTableHelper implements NetworkTableHelperInterface {
 
-    @Override
-    public String NetworkTableHelper(String defaultName) {
-        return null;
+    
+    public MockNetworkTableHelper(String defaultName) {
+        
     }
 
     @Override
     public double get(String key, double defaultValue) {
-        return 0;
+        return defaultValue;
     }
 
     @Override
     public boolean get(String key, boolean defaultValue) {
-        return false;
+        return defaultValue;
     }
 
     @Override
     public String get(String key, String defaultValue) {
-        return null;
+        return defaultValue;
     }
 
 
