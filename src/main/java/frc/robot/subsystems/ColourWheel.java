@@ -10,7 +10,7 @@ import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.Subsystem;
 
 /**
@@ -36,7 +36,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   private boolean firstLoop = true; //Variable to check if this is the first time the colour sensor saw the desired colour.
   private long spinTime; //Variable to store the time when the colour sensor sees the desired colour.
   private double speed = 0;
-  private ColourAction action = new ColourAction(Type.NONE, Colour.UNKNOWN); //Default action for colour wheel subsystem.
+  private ColourAction action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN); //Default action for colour wheel subsystem.
 
   private Clock clock;
   private final Motor motor;
@@ -123,7 +123,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     if (rotCount < Constants.COLOUR_WHEEL_ROTATION_TARGET) {
       return Constants.COLOUR_WHEEL_MOTOR_FULL;
     } else {
-      action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+      action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN);
       return Constants.COLOUR_WHEEL_MOTOR_OFF;
     }
   }
@@ -173,7 +173,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       if (clock.currentTimeInMillis() - spinTime < 50) { //Check if 50 milliseconds has passed.
         return motor.get();
       } else {
-        action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+        action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN);
         log.info("ColourWheel: Desired colour found.");
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
@@ -222,13 +222,13 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   @Override
   public boolean isFinished() {
     //log.info("isFinished Colour Wheel Action: %s", action);
-    return action.type == Type.NONE;
+    return action.type == ColourWheelType.NONE;
   }
 
   @Override
   public void disable() {
     motor.set(ControlMode.PercentOutput, 0);
-    action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+    action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN);
   }
 
   @Override

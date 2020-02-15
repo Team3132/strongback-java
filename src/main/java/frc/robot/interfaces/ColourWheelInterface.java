@@ -47,15 +47,15 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
     }
 
     public class ColourAction {
-        public final Type type;
+        public final ColourWheelType type;
         public final Colour colour;
 
-        public ColourAction(Type type, Colour colour) {
+        public ColourAction(ColourWheelType type, Colour colour) {
             this.type = type;
             this.colour = colour;
         }
 
-        public enum Type {
+        public enum ColourWheelType {
             ROTATION,
             POSITION,
             ADJUST_WHEEL_ANTICLOCKWISE,
