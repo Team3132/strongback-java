@@ -49,6 +49,7 @@ public class LEDStrip extends Subsystem implements LEDStripInterface {
             log.error("%s: Unknown Type %s", name, action.type);
             break;
         }
+        setData();
     }
 
     public LEDStripInterface setColour(int index, int r, int g, int b) {
@@ -63,13 +64,22 @@ public class LEDStrip extends Subsystem implements LEDStripInterface {
         return this;
     }
 
+    // TODO: Set all
+}
+     public LEDStripInterface setColour(int index, int r, int g, int b) {
+         ledStripBuffer.setRGB(index, r, g, b);
+
+
+
+
+}
     public LEDStripInterface setProgressColour(int current, int total) {
         int leds = current/total*numberOfLEDs-1;
         if (current != total){
             setColour(0, leds, 255, 0, 0);
         } else {
             if (firstLoop) {
-                startTime = System.currentTimeMillis();
+                startTime = System.currentTimeMillis(); // TODO: use clock instead of system
                 firstLoop = false;
             }
             if ((System.currentTimeMillis() - startTime) < 1000) {
@@ -78,14 +88,14 @@ public class LEDStrip extends Subsystem implements LEDStripInterface {
                 setDefault();
             }
         }
-        setData();
+
         return this;
     }
 
     public LEDStripInterface setDefault() {
         ledStrip.stop();
         return this;
-    }
+    } 
 
     public LEDStripInterface setData() {
         ledStrip.setData(ledStripBuffer);
