@@ -366,7 +366,7 @@ public class Subsystems implements DashboardUpdater {
 				return sensedColour;
 			}
 			
-		}, dashboard, log);
+		}, clock, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 

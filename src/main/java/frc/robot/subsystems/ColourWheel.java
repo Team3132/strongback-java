@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import org.strongback.components.Clock;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
@@ -37,13 +38,15 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   private double speed = 0;
   private ColourAction action = new ColourAction(Type.NONE, Colour.UNKNOWN); //Default action for colour wheel subsystem.
 
+  private Clock clock;
   private final Motor motor;
   private final Supplier<Colour> colourSensor;
 
-  public ColourWheel(Motor motor, Supplier<Colour> colourSensor, DashboardInterface dash, Log log) {
+  public ColourWheel(Motor motor, Supplier<Colour> colourSensor, Clock clock, DashboardInterface dash, Log log) {
     super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
     this.motor = motor;
+    this.clock = clock;
     this.colourSensor = colourSensor;
     log.register(false, () -> (double) colour.id, "%s/colour", name)
        .register(false, () -> (double) rotCount, "%s/rotCount", name)
@@ -153,7 +156,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public double positionalControl(Colour desired) {
     double newSpeed = (colour.id - desired.id) % 4; //Calculate new speed.
     if (newSpeed == 3) newSpeed -= 4; //If above calculation is 3, set speed to -1.
-    if (newSpeed == -3) newSpeed += 4; //If above calculation is 3, set speed to -1.
+    if (newSpeed == -3) newSpeed += 4; //If above calculation is -3, set speed to 1.
     newSpeed = Constants.COLOUR_WHEEL_MOTOR_FULL * Math.signum(newSpeed);
     if (colour.equals(Colour.UNKNOWN)) { //Colour is unknown, move in current direcion until colour identified.
       if(speed != 0) {
@@ -164,11 +167,10 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     }
     if (desired.equals(colour)) { //If correct colour found, move slowly to line up better and then stop.
       if (firstLoop) {
-
-        spinTime = System.currentTimeMillis(); //Check time when correct colour found.
+        spinTime = clock.currentTimeInMillis(); //Check time when correct colour found.
         firstLoop = false;
       } 
-      if (System.currentTimeMillis() - spinTime < 50) { //Check if 50 milliseconds has passed.
+      if (clock.currentTimeInMillis() - spinTime < 50) { //Check if 50 milliseconds has passed.
         return motor.get();
       } else {
         action = new ColourAction(Type.NONE, Colour.UNKNOWN);
@@ -237,6 +239,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     dashboard.putString("Colourwheel Action", action.type.toString());
     dashboard.putNumber("Colourwheel Rotations", rotCount);
     dashboard.putNumber("Colourwheel spinTime", spinTime);
-    dashboard.putNumber("Colourwheel realTime", System.currentTimeMillis());
+    dashboard.putNumber("Colourwheel realTime", clock.currentTimeInMillis());
 	}
 }

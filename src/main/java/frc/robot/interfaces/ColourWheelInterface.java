@@ -37,7 +37,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         }
 
         public Colour next (double direction) {
-            return Colour.of((this.id + NUM_COLOURS + (direction < 0 ? 1 : -1)) % NUM_COLOURS);
+            return Colour.of((this.id + NUM_COLOURS + (direction < 0 ? 1 : -1)) % NUM_COLOURS); //Add number of colours to fix -1 % 4 returning -1 when it should return 3.
         }
 
         @Override

@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.mock.Mock;
+import org.strongback.mock.MockClock;
 import org.strongback.mock.MockMotor;
 
 import frc.robot.Constants;
@@ -22,13 +23,15 @@ public class TestColourwheel {
 
     Colour colour;
     MockMotor motor;
+    MockClock clock;
     ColourWheelInterface colourWheel;
 
     @Before
     public void setup() {
         colour = Colour.UNKNOWN;
         motor = Mock.stoppedMotor();
-        colourWheel = new ColourWheel(motor, () -> colour, new MockDashboard(), new MockLog());
+        clock = Mock.clock();
+        colourWheel = new ColourWheel(motor, () -> colour, clock, new MockDashboard(), new MockLog());
     }
 
 
@@ -84,8 +87,23 @@ public class TestColourwheel {
     }
 
     @Test
-    public void testPositionalGreenBlue() {
-        doPositional(Colour.GREEN, Colour.BLUE);
+    public void testPositional() {
+        doPositional(Colour.GREEN, Colour.GREEN, 0);
+        doPositional(Colour.GREEN, Colour.RED, 1);
+        doPositional(Colour.GREEN, Colour.BLUE, 1);
+        doPositional(Colour.GREEN, Colour.YELLOW, 2);
+        doPositional(Colour.BLUE, Colour.BLUE, 0);
+        doPositional(Colour.BLUE, Colour.GREEN, 1);
+        doPositional(Colour.BLUE, Colour.YELLOW, 1);
+        doPositional(Colour.BLUE, Colour.RED, 2);
+        doPositional(Colour.YELLOW, Colour.YELLOW, 0);
+        doPositional(Colour.YELLOW, Colour.BLUE, 1);
+        doPositional(Colour.YELLOW, Colour.GREEN, 2);
+        doPositional(Colour.YELLOW, Colour.RED, 1);
+        doPositional(Colour.RED, Colour.RED, 0);
+        doPositional(Colour.RED, Colour.YELLOW, 1);
+        doPositional(Colour.RED, Colour.BLUE, 2);
+        doPositional(Colour.RED, Colour.GREEN, 1);
     }
 
     public void doRotational(int x) {
@@ -103,20 +121,24 @@ public class TestColourwheel {
         assertTrue(colourWheel.isFinished());
     }
 
-    public void doPositional(Colour desired, Colour start) {
+    public void doPositional(Colour desired, Colour start, int amount) {
         colourWheel.enable();
         colourWheel.setDesiredAction(new ColourAction(Type.POSITION, desired));
         colour = start;
         colourWheel.execute(0);
-        if (desired.equals(start)) {
-            assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
-            assertTrue(colourWheel.isFinished());
-        } else {
-            assertEquals(Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
-            if (Math.abs(motor.get()) > 0.3) {
-                colour = Colour.of(colour.id + Colour.NUM_COLOURS + (int) Math.signum(motor.get()) % Colour.NUM_COLOURS);
+        if (!desired.equals(start)) {
+            assertEquals(Math.signum(motor.get())*Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+            assertFalse(colourWheel.isFinished());
+            for (int i = 0; i < amount; i++) {
+                colour = Colour.of((colour.id + Colour.NUM_COLOURS + -(int) Math.signum(motor.get())) % Colour.NUM_COLOURS);
+                colourWheel.execute(0);
+                assertEquals(Math.signum(motor.get())*Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+                assertFalse(colourWheel.isFinished());
             }
-            assertEquals(Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
         }
+        clock.incrementByMilliseconds(50);
+        colourWheel.execute(0);
+        assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
+        assertTrue(colourWheel.isFinished());
     }
 }
