@@ -141,7 +141,7 @@ public class MotorFactory {
 		motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_MAIN_MOTOR_SCALE); // number of ticks per rotation.
-		motor.configClosedloopRamp(1, 10);
+		motor.configClosedloopRamp(0, 10);
 		NetworkTablesHelper helper = new NetworkTablesHelper("loader/loadermotor/");
 		helper.set("p", p);
 		helper.set("i", i);
@@ -154,7 +154,7 @@ public class MotorFactory {
 		motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_IN_MOTOR_SCALE); // number of ticks per rotation
-		motor.configClosedloopRamp(1, 10);
+		motor.configClosedloopRamp(0.5, 10);
 		NetworkTablesHelper helper = new NetworkTablesHelper("loader/loaderinmotor/");
 		helper.set("p", p);
 		helper.set("i", i);
@@ -164,6 +164,7 @@ public class MotorFactory {
 	}
 	public static HardwareTalonSRX getLoaderFeederMotor(int canID, boolean invert, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		motor.configClosedloopRamp(0.5, 10);
 		return motor;
 	}
 

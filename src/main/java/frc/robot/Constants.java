@@ -172,7 +172,7 @@ public class Constants {
 	public static final int PADDLE_SOLENOID_PORT = 1;
 	public static final double LOADER_IN_MOTOR_SCALE = 4096/10;//1024*10; //ticks per rotation
 	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; //ticks per rotation
-	public static final double LOADER_SPINNER_P = 0.2; //TODO: assign values to PIDF
+	public static final double LOADER_SPINNER_P = 0.4; //TODO: assign values to PIDF
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 20;
 	public static final double LOADER_SPINNER_F = 0.225;
