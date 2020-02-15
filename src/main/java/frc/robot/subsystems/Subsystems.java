@@ -67,6 +67,7 @@ public class Subsystems implements DashboardUpdater {
 	public DoubleSupplier rightDriveDistance;
 	public DoubleSupplier leftDriveSpeed;
 	public DoubleSupplier rightDriveSpeed;
+	private NetworkTableHelperInterface networkTable;
 
 	private final I2C.Port i2cPort = I2C.Port.kOnboard;
 	/**
@@ -75,12 +76,15 @@ public class Subsystems implements DashboardUpdater {
 	 * parameters.
 	 */
 	private final ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
+	
 
-	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log) {
+	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log, NetworkTableHelperInterface networkTable) {
 		this.dashboard = dashboard;
 		this.config = config;
 		this.clock = clock;
 		this.log = log;
+		this.networkTable = networkTable;
+		
 	}
 
 	public void createOverrides() {
@@ -162,8 +166,12 @@ public class Subsystems implements DashboardUpdater {
 
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
-		location = new Location(leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
-		drivebase = new Drivebase(leftMotor, rightMotor, dashboard, log);
+		NetworkTableHelperInterface locationNetworkTable = new NetworkTablesHelper("Location");
+		locationNetworkTable.set("TEST", 1.0);
+		//NetworkTableHelperInterface drivebaseNetworkTable = new NetworkTablesHelper("drive");
+
+		location = new Location(leftDriveDistance, rightDriveDistance, gyro, clock, locationNetworkTable ,dashboard, log); // Encoders must return inches.
+		drivebase = new Drivebase(leftMotor, rightMotor, new NetworkTablesHelper("drive") , dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -358,7 +366,8 @@ public class Subsystems implements DashboardUpdater {
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
 		BooleanSupplier intakeSensor = () -> intakeMotor.isAtReverseLimit();
-		intake = new Intake(intakeMotor, intakeSensor, intakeSolenoid, dashboard, log);
+		NetworkTablesHelper intakeNetworkTable = new NetworkTablesHelper("Intake");
+		intake = new Intake(intakeMotor, intakeSensor, intakeSolenoid, intakeNetworkTable, dashboard, log);
 	}
 
 	public void createIntakeOverride() {
@@ -377,7 +386,8 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
-		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
+		NetworkTablesHelper colourWheelNetworkTable = new NetworkTablesHelper("Colourwheel");
+		colourWheel = new ColourWheel(motor, colourSensor, colourWheelNetworkTable, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 
@@ -393,9 +403,10 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Test spark not present, using a mock instead");
 			return;
 		}
-
+		
 		HardwareSparkMAX motor = MotorFactory.getSparkTestMotor(config.sparkTestCanIds, false, log);
-		spark = new SparkTest(motor, dashboard, log);
+		NetworkTablesHelper sparkTestNetworkTable = new NetworkTablesHelper("SparkTest");
+		spark = new SparkTest(motor, sparkTestNetworkTable, dashboard, log);
 	}
 
 	public void createSparkTestOverride() {
@@ -414,7 +425,8 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Motor passthroughMotor = MotorFactory.getPassthroughMotor(config.passthroughCanID, false, log);
-		passthrough = new Passthrough(config.teamNumber, passthroughMotor, dashboard, log);
+		NetworkTablesHelper passThroughNetworkTable = new NetworkTablesHelper("Passthrough");
+		passthrough = new Passthrough(config.teamNumber, passthroughMotor, passThroughNetworkTable, dashboard, log);
 	}
 
 	public void createPassthrougOverride() {
@@ -436,7 +448,7 @@ public class Subsystems implements DashboardUpdater {
 		Motor spitterLeftMotor = MotorFactory.getSpitterMotor(config.spitterLeftCanID, true, true, log);
 		Motor spitterRightMotor = MotorFactory.getSpitterMotor(config.spitterRightCanID, true, false, log);
 		BooleanSupplier cargoSupplier = () -> spitterLeftMotor.isAtForwardLimit();
-		spitter = new Spitter(cargoSupplier, spitterLeftMotor, spitterRightMotor, dashboard, log);
+		spitter = new Spitter(cargoSupplier, spitterLeftMotor, spitterRightMotor, networkTable, dashboard, log);
 	}
 
 	public void createSpitterOverride() {
@@ -457,7 +469,8 @@ public class Subsystems implements DashboardUpdater {
 
 		Motor motor = MotorFactory.getHatchMotor(config.hatchCanID, true, false, log);
 		Solenoid holder = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.HATCH_HOLDER_PORT);
-		hatch = new Hatch(motor, holder, dashboard, clock, log);
+		NetworkTablesHelper hatchNetworkTable = new NetworkTablesHelper("Hatch");
+		hatch = new Hatch(motor, holder, hatchNetworkTable, dashboard, clock, log);
 		Strongback.executor().register(hatch, Priority.LOW);
 	}
 
@@ -498,7 +511,8 @@ public class Subsystems implements DashboardUpdater {
 		Motor rearWinchMotor = MotorFactory.getClimberWinchMotor(config.climberRearCanID, false, false, log);
 		rearWinchMotor.setScale(Constants.CLIMBER_WINCH_REAR_SCALE_FACTOR); // 18" ticks = 20208 ticks
 		Motor driveMotor = MotorFactory.getClimberDriveMotor(config.climberDriveMotorCanID, true, log);
-		climber = new Climber(frontWinchMotor, rearWinchMotor, driveMotor, dashboard, log);
+		NetworkTablesHelper climberNetworkTable = new NetworkTablesHelper("Climber");
+		climber = new Climber(frontWinchMotor, rearWinchMotor, driveMotor, climberNetworkTable, dashboard, log);
 		Strongback.executor().register(climber, Priority.HIGH);
 	}
 
@@ -526,7 +540,8 @@ public class Subsystems implements DashboardUpdater {
 		Solenoid deploy = Hardware.Solenoids.singleSolenoid(config.pcmCanId, config.liftSolenoidID,
 				config.liftSolenoidRetractTime, config.liftSolenoidExtendTime);
 		Motor motor = MotorFactory.getLiftMotor(config.liftCanIds, false, false, log);
-		lift = new Lift(motor, deploy, dashboard, log);
+		NetworkTablesHelper liftNetworkTable = new NetworkTablesHelper("Lift");
+		lift = new Lift(motor, deploy, liftNetworkTable,  dashboard, log);
 		Strongback.executor().register(lift, Priority.HIGH);
 	}
 
@@ -547,7 +562,8 @@ public class Subsystems implements DashboardUpdater {
 		}
 		try {
 			jevois = new Jevois(log);
-			vision = new Vision(jevois, location, dashboard, clock, config.visionHMin, config.visionSMin, config.visionVMin, config.visionHMax, config.visionSMax, config.visionVMax, log);
+			NetworkTablesHelper visionNetworkTable = new NetworkTablesHelper("Vision");
+			vision = new Vision(jevois, location, visionNetworkTable, dashboard, clock, config.visionHMin, config.visionSMin, config.visionVMin, config.visionHMax, config.visionSMax, config.visionVMax, log);
 		} catch (IOException e) {
 			log.exception("Unable to create an instance of the jevois camera", e);
 			e.printStackTrace();

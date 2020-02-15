@@ -10,6 +10,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.LocationHistory;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.NavXGyroscope;
@@ -129,8 +130,8 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	 * @param gyro The gyro to get angles
 	 * @param log The log to store debug and other logging messages
 	 */
-    public Location(DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard, Log log) {
-		super("Location", dashboard, log);	// always present!
+    public Location(DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+		super("Location", networkTable, dashboard, log);	// always present!
 		leftDistanceDelta = new DoubleDelta(leftDistance);
 		rightDistanceDelta = new DoubleDelta(rightDistance);
 		this.gyro = gyro;

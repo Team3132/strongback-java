@@ -33,6 +33,9 @@ public class MockNetworkTableHelper implements NetworkTableHelperInterface {
     public String get(String key, String defaultValue) {
         return defaultValue;
     }
+    @Override
+    public void set(String key, double value){
+    }
 
 
 }

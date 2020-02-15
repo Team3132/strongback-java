@@ -11,4 +11,6 @@ public interface NetworkTableHelperInterface extends DashboardUpdater {
     public double get(String key, double defaultValue);
     public boolean get(String key, boolean defaultValue);
     public String get(String key, String defaultValue);
+    public void set(String key, double value);
+
 }

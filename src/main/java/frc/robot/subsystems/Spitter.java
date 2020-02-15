@@ -9,6 +9,7 @@ import org.strongback.components.Motor.ControlMode;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.SpitterInterface;
 import frc.robot.lib.Subsystem;
 
@@ -22,8 +23,8 @@ public class Spitter extends Subsystem implements SpitterInterface, Executable, 
     private SpitterWheel left;
     private SpitterWheel right;
 
-    public Spitter(BooleanSupplier cargoSupplier, Motor leftMotor, Motor rightMotor, DashboardInterface dashboard, Log log) {
-        super("Spitter", dashboard, log);
+    public Spitter(BooleanSupplier cargoSupplier, Motor leftMotor, Motor rightMotor, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+        super("Spitter", networkTable, dashboard, log);
         this.cargoSupplier = cargoSupplier;
         left = new SpitterWheel("left", leftMotor);
         right = new SpitterWheel("right", rightMotor);

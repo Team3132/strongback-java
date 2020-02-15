@@ -11,6 +11,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.IntakeInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
 
 /**
@@ -23,8 +24,8 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
     private BooleanSupplier sensor;
     private double targetCurrent;
 
-    public Intake(Motor motor, BooleanSupplier sensor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
-        super("Intake", dashboard, log);   
+    public Intake(Motor motor, BooleanSupplier sensor, Solenoid solenoid, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+        super("Intake", networkTable, dashboard, log);   
         this.motor = motor;
         this.solenoid = solenoid;
         this.sensor = sensor;

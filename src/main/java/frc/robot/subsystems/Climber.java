@@ -10,6 +10,7 @@ import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
 
 /**
@@ -36,9 +37,9 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     private ClimberAction action;
     private boolean holding = false;
 
-    public Climber(Motor frontWinchMotor, Motor rearWinchMotor,
-                      Motor wheelMotor, DashboardInterface dashboard, Log log) {
-        super("Climber", dashboard, log);   
+    public Climber(Motor frontWinchMotor, Motor rearWinchMotor, Motor wheelMotor, 
+            NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+        super("Climber", networkTable ,dashboard,log);   
         this.frontWinch = new Winch("climber:Front", frontWinchMotor, dashboard, log);
         this.rearWinch = new Winch("climber:Rear", rearWinchMotor, dashboard, log);
         this.wheelMotor = wheelMotor;
