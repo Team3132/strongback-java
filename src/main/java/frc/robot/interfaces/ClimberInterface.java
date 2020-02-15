@@ -2,6 +2,8 @@ package frc.robot.interfaces;
 
 import org.strongback.Executable;
 
+import frc.robot.subsystems.Climber;
+
 public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, Executable {
 
     public class ClimberAction {
@@ -31,6 +33,11 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
         public String toString() {
             return String.format("%s: %f", type.toString().toLowerCase(), value);
         }
+
+        @Override
+        public boolean equals(Object other) {
+            return this.toString().equals(other.toString());
+        }
     }
 
     /** 
@@ -38,6 +45,7 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
      * @param climberAction
      */
     public void setDesiredAction(ClimberAction climberAction);
+    
 
     /**
      * Gets the target action of the climber.
@@ -46,5 +54,6 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
     public ClimberAction getDesiredAction();
 
     public boolean isInPosition();
+    
+    
 }
-

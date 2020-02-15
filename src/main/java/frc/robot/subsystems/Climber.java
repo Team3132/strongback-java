@@ -56,6 +56,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     public void disable() {
         leftWinch.setMotorPower(0);
         rightWinch.setMotorPower(0);
+        action = new ClimberAction(ClimberType.STOP_CLIMBER, 0);
         super.disable();
     }
     
@@ -78,7 +79,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                 break;
             case SET_CLIMBER_POWER:
                 leftWinch.setMotorPower(action.value);
-                rightWinch.setMotorPower(action.value);
+                rightWinch.setMotorPower(-action.value);
                 break;
             case HOLD_HEIGHT:
                 if (!holding) {
@@ -273,6 +274,6 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
 
     @Override
     public ClimberAction getDesiredAction() {
-        return action;
+        return action;        
     }
 }

@@ -340,7 +340,7 @@ public class Sequences {
 
 	public static Sequence startClimberDown() {
 		Sequence seq = new Sequence("climber down");
-		seq.add().setClimberPower(CLIMBER_MAX_MOTOR_POWER*-1);
+		seq.add().setClimberPower(-CLIMBER_MAX_MOTOR_POWER);
 		return seq;
 	}
 
