@@ -20,7 +20,7 @@ import frc.robot.lib.MathUtil;
 public class Climber extends Subsystem implements ClimberInterface, Executable, DashboardUpdater {
     private Winch leftWinch; 
     private Winch rightWinch;
-    private ClimberAction action;
+    private ClimberAction action = new ClimberAction(ClimberType.STOP_CLIMBER, 0);
     private boolean holding = false;
     private SimplePID leftPID, rightPID;
     private Clock clock;
