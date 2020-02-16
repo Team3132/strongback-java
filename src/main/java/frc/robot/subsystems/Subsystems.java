@@ -221,7 +221,7 @@ public class Subsystems implements DashboardUpdater {
 				rightDriveSpeed, clock, log));
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
-				new FuzzyPositionalPIDDrive("visionAim",
+				new PositionalPIDDrive("visionAim",
 				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_RANGE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_RANGE), 
 				() -> MathUtil.clamp(getVisionDistance()*Constants.VISION_AIM_DISTANCE_SCALE, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED),
 				() -> getVisionTurnAdjustment(),

@@ -25,6 +25,8 @@ public class PositionalPIDDrive implements DriveRoutine {
 	private final Log log;
 	private PositionPID leftPID, rightPID;
 	private BooleanSupplier finished;
+	private Clock clock;
+	private double timestamp = 0;
 	    
 	public PositionalPIDDrive(
 		String name, BooleanSupplier finished, DoubleSupplier targetSpeed, DoubleSupplier targetTurn,
@@ -36,6 +38,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 		this.name = name;
 		this.log = log;
 		this.finished = finished;
+		this.clock = clock;
 		log.info("Starting to drive positional PID");
 		// There is an issue here. If the targetSpeed increases too rapidly, then even with
 		// the amount of turn subtracted off, it may still exceed the maximum jerk, making
@@ -43,7 +46,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 		// the change in acceleration, but that is getting ugly.
 		// Instead, apply a low pass filter to the targetSpeed so that it can't change too
 		// quickly and then set a high jerk so the jerk doesn't limit the acceleration.
-		LowPassFilter filteredSpeed = new LowPassFilter(targetSpeed, 1.2);
+		LowPassFilter filteredSpeed = new LowPassFilter(targetSpeed, 0.2);
 		leftPID = createPID("Drive/"+name+"/left", () -> {
 			 	return speedScale * filteredSpeed.getAsDouble() + turnScale * targetTurn.getAsDouble();
 			},
@@ -51,7 +54,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 		rightPID = createPID("Drive/"+name+"/right", () -> {
 			 	return speedScale * filteredSpeed.getAsDouble() - turnScale * targetTurn.getAsDouble();
 	   		},
-	    maxJerk, rightDistance, rightSpeed, clock, log);
+		maxJerk, rightDistance, rightSpeed, clock, log);
 	}
 
 	public PositionalPIDDrive(
@@ -69,13 +72,16 @@ public class PositionalPIDDrive implements DriveRoutine {
 		 DoubleSupplier distance, DoubleSupplier speed, Clock clock, Log log) {
 		PositionPID pid = new PositionPID(name, targetSpeed, maxJerk, distance, speed, clock, log);
 		double kV = 0.018;
-		double kA = 0, kP = 0.03, kI = 0, kD = 0;
+		double kA = 0, kI = 0, kD = 1.05;
+		double kP = 0.1;
+		// double kA = 0, kP = 0.03, kI = 0, kD = 0; // from offseason 
 		pid.setVAPID(kV, kA, kP, kI, kD);
 		return pid;
 	}
 
 	@Override
 	public void reset(DriveRoutineParameters parameters) {
+		timestamp = clock.currentTime();
 		leftPID.reset();
 		rightPID.reset();
 	}
@@ -98,6 +104,9 @@ public class PositionalPIDDrive implements DriveRoutine {
 		// Calculate the new speeds for both left and right motors.
 		double leftPower = leftPID.getMotorPower();
 		double rightPower = rightPID.getMotorPower();
+		if (!finished.getAsBoolean()) {
+			timestamp = clock.currentTime();
+		}
 		log.sub("%s: left=%f right=%f", name, leftPower, rightPower);
 		return new DriveMotion(leftPower, rightPower);
 	}
@@ -109,8 +118,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 
 	@Override
 	public boolean hasFinished() {
-		
-		return finished.getAsBoolean();  // Always ready for the next state.
+		return clock.currentTime() - timestamp > 1;  // Always ready for the next state.
 	}
 
 }
