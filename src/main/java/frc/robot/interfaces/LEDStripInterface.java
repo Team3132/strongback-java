@@ -1,44 +1,31 @@
 package frc.robot.interfaces;
 
-import org.strongback.Executable;
+public interface LEDStripInterface {
+    public enum Colour {
+        RED(255,0,0),
+        GREEN(0,255,0),
+        BLUE(0,0,255),
+        YELLOW(255,255,0),
+        ORANGE(255,128,0),
+        PINK(255,0,255),
+        GOLD(212,175,55),
+        PURPLE(102,51,153);
 
-public interface LEDStripInterface extends SubsystemInterface, Executable, DashboardUpdater {
-
-    public class LEDAction {
-        public final Type type;
         public final int r;
         public final int g;
         public final int b;
-
-        public enum Type {
-            SET_ALL,
-            
-            NONE
-        }
-
-        public LEDAction(Type type, int r, int g, int b) {
-            this.type = type;
+        Colour(int r, int g, int b) {
             this.r = r;
             this.g = g;
             this.b = b;
         }
     }
 
-    public LEDStripInterface setColour(int index, int r, int g, int b);
+    public void setColour(Colour c);
 
-    public LEDStripInterface setColour(int indexS, int indexE, int r, int g, int b);
+    public void setProgressColour(Colour c1, Colour c2, int percent);
 
-    public LEDStripInterface setColour(int r, int g, int b);
+    public void setIdle();
 
-    public LEDStripInterface setProgressColour(int current, int total);
-
-    public LEDStripInterface setDefault();
-
-    public LEDStripInterface setData();
-    
-    /** 
-     * Sets the desired action for the colour sensor.
-     * @param action
-     */
-    public LEDStripInterface setDesiredAction(LEDAction action);
+    public void setData();
 }

@@ -41,7 +41,7 @@ public class Subsystems implements DashboardUpdater {
 	public RobotConfiguration config;
 	public Clock clock;
 	public Log log;
-
+	public LEDStripInterface ledStrip;
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
@@ -340,7 +340,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
-		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
+		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log, ledStrip);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 

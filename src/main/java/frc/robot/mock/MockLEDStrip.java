@@ -1,48 +1,20 @@
 package frc.robot.mock;
-import frc.robot.lib.Subsystem;
 
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LEDStripInterface;
-import frc.robot.interfaces.Log;
 
 // LED Strip Subsystem 2020
 
-public class MockLEDStrip extends Subsystem implements LEDStripInterface, DashboardUpdater {
+public class MockLEDStrip implements LEDStripInterface {
 
-    public MockLEDStrip(int PWM_Port, int numberOfLEDs, DashboardInterface dashboard, Log log) {
-        super("LED Strip", dashboard, log);   
-
-    }
-
-    public LEDStripInterface setColour(int index, int r, int g, int b) {
-        return this;
-    }
-
-    public LEDStripInterface setColour(int indexS, int indexE, int r, int g, int b) {
-        return this;
-    }
-
-    public LEDStripInterface setProgressColour(int current, int total) {
-        return this;
-    }
-
-    public LEDStripInterface setDefault() {
-        return this;
-    }
-
-    public LEDStripInterface setData() {
-        return this;
-    }
-
-    public void updateDashboard() {
-		// do nothing by default
-    }
-    
     @Override
-    public LEDStripInterface setDesiredAction(LEDAction action) {
-        //this.action = action;
-        return this;
-    }
-    
+    public void setColour(Colour c) {}
+
+    @Override
+    public void setProgressColour(Colour c1, Colour c2, int percent) {}
+
+    @Override
+    public void setIdle() {}
+
+    @Override
+    public void setData() {}
 }

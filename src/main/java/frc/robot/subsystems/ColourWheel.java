@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
 import frc.robot.lib.Subsystem;
@@ -43,6 +44,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   private final Motor motor;
   private final ColorSensorV3 colourSensor;
+  private final LEDStripInterface ledStrip;
 
   /**
    * A Rev Color Match object is used to register and detect known colors. This
@@ -53,7 +55,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    */
   private final ColorMatch colourMatcher = new ColorMatch();
 
-  public ColourWheel(Motor motor, ColorSensorV3 colourSensor, DashboardInterface dash, Log log) {
+  public ColourWheel(Motor motor, ColorSensorV3 colourSensor, DashboardInterface dash, Log log, LEDStripInterface ledStrip) {
     super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
@@ -63,6 +65,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
     this.motor = motor;
     this.colourSensor = colourSensor;
+    this.ledStrip = ledStrip;
     log.register(false, () -> (double) colour.id, "%s/colour", name)
        .register(false, () -> (double) rotCount, "%s/rotCount", name)
        .register(false, () -> (double) motor.getOutputPercent(), "%s/motorspeed", name)
