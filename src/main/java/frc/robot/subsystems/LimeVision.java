@@ -96,7 +96,7 @@ public class LimeVision extends Subsystem implements VisionInterface, SubsystemI
     public TargetDetails getTargetDetails() {
         TargetDetails details = new TargetDetails();   
         details.location = new Position(lastXPos, lastYPos, 0);     
-        details.seenAtSec = lastSeen;
+        details.imageTimestamp = lastSeen;
         details.targetFound = isTargetFound;
         return details;
     }

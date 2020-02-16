@@ -11,6 +11,7 @@ import frc.robot.interfaces.Log;
 import frc.robot.interfaces.VisionInterface;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
+import frc.robot.lib.PrintStack;
 import frc.robot.lib.Subsystem;
 
 public class Vision extends Subsystem implements VisionInterface, DashboardUpdater, Runnable {
@@ -25,7 +26,8 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	private double prevSkew = 0;
 
 	public Vision(JevoisInterface jevois, LocationInterface location, DashboardInterface dashboard, Clock clock,
-		double visionHMin, double visionSMin, double visionVMin, double visionHMax, double visionSMax, double visionVMax, Log log) {
+			double visionHMin, double visionSMin, double visionVMin, double visionHMax, double visionSMax,
+			double visionVMax, Log log) {
 		super("Vision", dashboard, log);
 		this.jevois = jevois;
 		this.location = location;
@@ -36,12 +38,17 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 		this.visionHMax = visionHMax;
 		this.visionSMax = visionSMax;
 		this.visionVMax = visionVMax;
-	
+
 		log.register(true, () -> isConnected(), "%s/connected", name)
 				.register(true, () -> lastSeenTarget.location.x, "%s/curX", name)
 				.register(true, () -> lastSeenTarget.location.y, "%s/curY", name)
 				.register(true, () -> lastSeenTarget.location.heading, "%s/heading", name)
-				.register(true, () -> clock.currentTime() - lastSeenTarget.seenAtSec, "%s/seenAt", name);
+				// .register(true, () -> clock.currentTime() - lastSeenTarget.seenAtSec,
+				// "%s/seenAt", name)
+				.register(true, () -> lastSeenTarget.imageTimestamp, "%s/seenAtSec", name)
+				.register(true, () -> lastSeenTarget.targetFound, "%s/targetFound", name)
+				.register(true, () -> lastSeenTarget.distance, "%s/distance", name)
+				.register(true, () -> lastSeenTarget.angle, "%s/angle", name);
 		// Start reading from the Jevois camera.
 		(new Thread(this)).start();
 	}
@@ -60,125 +67,113 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	 */
 	@Override
 	public void run() {
-		log.sub("Vision waiting for the camera server to start up");
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {}
-		log.sub("Starting to read from Jevois camera\n");
-		try {
-			// Attempt to detect if there is a camera plugged in. It will throw an exception
-			// if not.
-			log.sub(jevois.issueCommand("info"));
-			connected = true;
-			// Update the HSV filter ranges from the config values.
-			jevois.issueCommand(String.format("setHSVMin %.0f %.0f %.0f", visionHMin, visionSMin, visionVMin));
-			jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax, visionSMax, visionVMax));
-			while (true) {
-				processLine(jevois.readLine());
+		while (true) {
+			log.sub("Vision waiting for the camera server to start up");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
 			}
-		} catch (IOException e) {
-			log.error("Failed to read from jevois, aborting vision processing\n");
-			connected = false;
-			e.printStackTrace();
+			log.sub("Starting to read from Jevois camera\n");
+			try {
+				// Attempt to detect if there is a camera plugged in. It will throw an exception
+				// if not.
+				log.sub(jevois.issueCommand("info"));
+				connected = true;
+
+				// Update the HSV filter ranges from the config values.
+
+				jevois.issueCommand(String.format("setHSVMin %.0f %.0f %.0f", visionHMin,
+				visionSMin, visionVMin));
+				jevois.issueCommand(String.format("setHSVMax %.0f %.0f %.0f", visionHMax,
+				visionSMax, visionVMax));
+
+				while (true) {
+					processLine(jevois.readLine());
+				}
+			} catch (IOException e) {
+				log.error("Failed to read from jevois, aborting vision processing\n");
+				connected = false;
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/**
 	 * Parses a line from the vision and calculates the target position on the field
-	 * based on where the robot was at that time.
-	 * No line is read when a target isn't seen.
+	 * based on where the robot was at that time. No line is read when a target
+	 * isn't seen.
 	 * 
-	 * Example line:
-	    D3 -0.3190665833627917 -0.16974943059054468 1.4929203902754815 0.28 0.175 1.0 0.994180288811222 0.0003884439751087179 0.09825181108672097 0.04418126377428119 FIRST
-
-	 * Line format:
-     *   D3 <x_pos,> <y pos> <dist> <target_width> <target_height> <1.0> <i> <j> <k> <l> FIRST
+	 * Example line: D3 -0.3190665833627917 -0.16974943059054468 1.4929203902754815
+	 * 0.28 0.175 1.0 0.994180288811222 0.0003884439751087179 0.09825181108672097
+	 * 0.04418126377428119 FIRST
 	 * 
-	 * Where:
-	 *   D3: static string to indicate that this is a found vision target.
-	 *   x_pos: horizontal position of the middle of the vision target on the image.
-	 *          -1 is the very left of the image, 1 is the very right hand side.
-	 *   y_pos: vertical position of the middle of the vision target on the image.
-	 *          -1 is the very top image, 1 is the bottom.
-	 *   dist: the distance to the vision target in metres.
-	 *   target_width: hard coded target width in metres.
-	 *   target_height: hard coded target height in metres.
-	 *   1.0: hard coded value.
-	 *   i: Some pose measurement.
-	 *   j: Some pose measurement.
-	 *   k: The skew of the target (units unknown...)
-	 *   l: Some pose measurement.
-	 *   FIRST: static string.
+	 * Line format: D3 <imageAge> <found> <distance> <angle> <skew> FIRST
+	 * 
+	 * Where: D3: static string to indicate that this is a found vision target.
+	 * imageAge: time since image taken
+	 * found: boolean for if goal was detected
+	 * distance: horizontal distance from goal in inches
+	 * angle: degrees
+	 * skew: degrees
+	 * FIRST: static string.
 	 */
 	private void processLine(String line) {
 		// Split the line on whitespace.
+		// "D3 timestamp found distance angle FIRST"
 		String[] parts = line.split("\\s+");
 
 		if (!parts[0].equals("D3")) {
 			log.info("Ignoring non-vision target line: %s", line);
 			return;
 		}
-		log.sub("Vision::processLine(%s)\n", line);
+		//log.sub("Vision::processLine(%s)\n", line);
+		TargetDetails newTarget = new TargetDetails();
+		newTarget.targetFound = Boolean.parseBoolean(parts[2]);
 
-		// Specs for the Jevois camera: https://www.jevoisinc.com/pages/hardware
-		final double horizontalFOV = 65;
-		final double verticalFOV = horizontalFOV / (4.0/3.0);
-		double xAngle = -Double.parseDouble(parts[1]) * horizontalFOV / 2;  // Parsed value is -1...1, so need to halve it.
-		double yAngle = Double.parseDouble(parts[2]) * verticalFOV / 2;
-		// All measurements on the robot are in inches for consistency with the game manual. /sigh
-		double distanceInches = MathUtil.metresToInches(Double.parseDouble(parts[3])); // distance of the camera relative to the goal
-		double height = distanceInches * Math.sin(yAngle);
-		double seenAtSec = clock.currentTime() - 0.01; // when the image was taken
-		// A target was seen, update the TargetDetails in case it's asked for.
-		// Fill in a new TargetDetails so it can be returned if asked for and it won't
-		// change as the caller uses it.
-		TargetDetails latestTargetSeen = new TargetDetails();
-		Position robotPosition = location.getHistoricalLocation(seenAtSec);
-		//log.sub("Vision old pos = %s", robotPosition);
-		//log.sub("Vision: angle=%.1f, distance=%.1f", xAngle, distanceInches);
-		latestTargetSeen.location = robotPosition.addVector(distanceInches, xAngle);
+		if (Boolean.parseBoolean(parts[2])) {
+			// A target was seen, update the TargetDetails in case it's asked for.
+			// Fill in a new TargetDetails so it can be returned if asked for and it won't
+			// change as the caller uses it.
 
-		// When the target is flat with the camera the skew is inaccurate. Can be as bad as +-20 degrees
-		// Use a low pass filter to try and smooth these out
-		// TODO: since this is an issue when the skew is zero try to squash small skew values
-		double skewRelRobot = -Double.parseDouble(parts[9])*360/Math.PI;
-		double skewAlpha = 0.6;
-		latestTargetSeen.location.heading += xAngle + skewRelRobot * skewAlpha + (1-skewAlpha)*prevSkew;
-		prevSkew = skewRelRobot;
+			newTarget.imageTimestamp = clock.currentTime() - Double.parseDouble(parts[1]);
+			newTarget.distance = Double.parseDouble(parts[3]);
+			newTarget.angle = -Double.parseDouble(parts[4]);
+			newTarget.skew = Double.parseDouble(parts[5]);
+
+			Position robotPosition = location.getHistoricalLocation(newTarget.imageTimestamp);
+			newTarget.location = robotPosition.addVector(newTarget.distance, newTarget.angle);
 		
-		latestTargetSeen.height = height;
-		latestTargetSeen.targetFound = true;
-		latestTargetSeen.seenAtSec = seenAtSec;
-		synchronized (this) {
-			lastSeenTarget = latestTargetSeen;
+			newTarget.location.heading += newTarget.angle - newTarget.skew;
+
+			// log.sub("Location set.");
+			// newTarget.location.heading += newTarget.angle
+
+			synchronized (this) {
+				lastSeenTarget = newTarget;
+			}
+			// log.sub("Vision: Updated target %s", lastSeenTarget);
 		}
-		//log.sub("Vision: Updated target %s", lastSeenTarget);
+
 	}
 
-	
 	@Override
 	public void updateDashboard() {
 		boolean targetFound = lastSeenTarget.targetFound;
-		double lockAgeSec = clock.currentTime() - lastSeenTarget.seenAtSec;
-		if (lockAgeSec > 2)
-			targetFound = false;
+		double lockAgeSec = (clock.currentTime() - lastSeenTarget.imageTimestamp);
 		double angle = 0, distance = 0;
-		if (targetFound) {
+		if (lastSeenTarget.isValid(clock.currentTime())) {
 			Position robotPos = location.getCurrentLocation();
-			// Where is the target relative to the current robot position?
-			Position relativePos = lastSeenTarget.location.getRelativeToPosition(robotPos);
-			angle = relativePos.heading;
+			angle = -robotPos.bearingTo(lastSeenTarget.location);
 			distance = robotPos.distanceTo(lastSeenTarget.location);
 		}
-		dashboard.putBoolean("Vision camera found", connected);
-		dashboard.putBoolean("Vision lock", targetFound);
-		dashboard.putNumber("Vision lock age", lockAgeSec);
-		dashboard.putNumber("Vision X", lastSeenTarget.location.x);
-		dashboard.putNumber("Vision Y", lastSeenTarget.location.y);
-		dashboard.putNumber("Vision Heading", lastSeenTarget.location.heading);
-		dashboard.putNumber("Vision height", lastSeenTarget.height);
-		dashboard.putNumber("Vision angle to target", angle);
+		dashboard.putBoolean("Vision camera connected", connected);
 		dashboard.putNumber("Vision distance to target", distance);
+		dashboard.putNumber("Vision lockAgeSec", lockAgeSec);
+		dashboard.putNumber("Vision angle", angle);
+		dashboard.putBoolean("Vision targetFound", lastSeenTarget.targetFound);
+		dashboard.putBoolean("Vision is Valid", lastSeenTarget.isValid(clock.currentTime()));
+		dashboard.putNumber("Vision Skew", lastSeenTarget.location.heading);
+
 	}
 
 	/**

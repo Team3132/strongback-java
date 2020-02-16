@@ -392,6 +392,13 @@ public class State {
 		return this;
 	}
 
+	public State doVisionAim(){
+		drive = new DriveRoutineParameters(DriveRoutineType.VISION_AIM);
+		return this;
+	}
+
+
+
 	/**
 	 * Add waypoints for the drive base to drive through.
 	 * Note: The robot will come to a complete halt after each list
