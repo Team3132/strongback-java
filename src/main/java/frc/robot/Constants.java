@@ -8,6 +8,8 @@ import java.util.List;
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
 
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
  * 
@@ -347,4 +349,35 @@ public class Constants {
 	public static final double TIME_COMMAND_RUN_PERIOD = (1.0/50.0);		// run the commands 50 times a second
 	public static final double TIME_LOCATION_PERIOD = (1.0/(double)LOCATION_HISTORY_CYCLE_SPEED);	// update the location subsystem 100 times a second
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
+
+	public static final class DriveConstants {
+		public static final double kTrackwidthMeters = 0.71;
+
+		public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
+				kTrackwidthMeters);
+
+		public static final double kWheelDiameterMeters = 0.15; // 6" wheels
+		public static final double kGearboxRatio = 11;
+		public static final double kEncoderDistancePerRev =
+				// Encoders are mounted on the motors. Wheels are by 11:1 gearbox
+				(kWheelDiameterMeters * Math.PI) / kGearboxRatio;
+
+		// The Robot Characterization Toolsuite provides a convenient tool for obtaining
+		// these values for your robot.
+		public static final double ksVolts = 0.177;
+		public static final double kvVoltSecondsPerMeter = 3.3;// Calculated value = 2.94;
+		public static final double kaVoltSecondsSquaredPerMeter = 0.4;// Calculated value = 0.368;
+
+		// Example value only - as above, this must be tuned for your drive!
+		public static final double kPDriveVel = 0;// 3//13.3; // should be 13.3
+		// kD should be 0
+
+		public static final double kMaxSpeedMetersPerSecond = 6;// 3;
+		public static final double kMaxAccelerationMetersPerSecondSquared = 2;// 1;
+
+		// Reasonable baseline values for a RAMSETE follower in units of meters and
+		// seconds
+		public static final double kRamseteB = 2;
+		public static final double kRamseteZeta = 0.7;
+	}
 }

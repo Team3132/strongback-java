@@ -17,7 +17,6 @@ import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
 import frc.robot.Constants;
-import frc.robot.controller.Controller.TrajectoryGenerator;
 import frc.robot.drive.routines.*;
 import frc.robot.interfaces.*;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
@@ -124,7 +123,7 @@ public class Subsystems implements DashboardUpdater {
 	 * Creates the motors and gyro as needed by both.
 	 * Registers all of the available drive routines that can be requested by the controller.
 	 */
-	public void createDrivebaseLocation(TrajectoryGenerator generator, InputDevice leftStick, InputDevice rightStick) {
+	public void createDrivebaseLocation(InputDevice leftStick, InputDevice rightStick) {
 		if (!config.drivebaseIsPresent) {
 			log.sub("Using mock drivebase");
 			drivebase = new MockDrivebase(log);
@@ -194,8 +193,8 @@ public class Subsystems implements DashboardUpdater {
 				leftStick.getButton(GamepadButtonsX.RIGHT_TRIGGER_AXIS), // Is quick turn
 				log));
 		// Drive through supplied waypoints using splines.
-		drivebase.registerDriveRoutine(DriveRoutineType.WAYPOINTS,
-				new SplineDrive(generator, leftDriveDistance, rightDriveDistance, location, clock, log));
+		drivebase.registerDriveRoutine(DriveRoutineType.TRAJECTORY,
+				new TrajectoryDrive(location, clock, log), ControlMode.Voltage);
 		// Driving using the vision targets to help with alignment. Overrides the
 		// steering but not the speed.
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_ASSIST,

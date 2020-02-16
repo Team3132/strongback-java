@@ -28,7 +28,7 @@ public class CurvatureDrive implements DriveRoutine {
 	}
 
 	@Override
-	public DriveMotion getMotion() {
+	public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
         double wheel = limit(this.wheelCR.read());
         double throttle = limit(this.throttleCR.read());
 

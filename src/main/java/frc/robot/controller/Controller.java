@@ -11,9 +11,6 @@ import frc.robot.interfaces.Log;
 import frc.robot.lib.Position;
 import frc.robot.subsystems.Subsystems;
 
-import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Waypoint;
-
 /**
  * The controller of State Sequences while ensuring the robot is safe at every step.
  * 
@@ -42,14 +39,6 @@ public class Controller implements Runnable, DashboardUpdater {
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
-
-	/**
-	 * The Pathfinder library can't be run on x86 without recompiling, which makes it
-	 * hard to unit test. Instead it's abstracted out.
-	 */
-	public interface TrajectoryGenerator {
-		Trajectory[] generate(Waypoint[] waypoints);
-	}
 
 	public Controller(Subsystems subsystems) {
 		this.subsystems = subsystems;
@@ -169,8 +158,6 @@ public class Controller implements Runnable, DashboardUpdater {
 			subsystems.lift.getTargetHeight()
 		);
 		
-		maybeResetPosition(desiredState.resetPosition, subsystems);
-		
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 		
@@ -221,17 +208,6 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		// Last thing: wait for the delay time if it's set.
 		waitForTime(endTime);
-	}
-
-	/**
-	 * If not null, reset the current location in the Location subsystem to be position.
-	 * Useful when starting autonomous.
-	 * @param position
-	 * @param subsystems
-	 */
-	private void maybeResetPosition(Waypoint position, Subsystems subsystems) {
-		if (position == null) return;
-		subsystems.location.setCurrentLocation(new Position(position.x, position.y, position.angle));
 	}
 
 	/**

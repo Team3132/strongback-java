@@ -68,7 +68,13 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
          * Disable Motor Controller
          * Not supported by Spark MAX
          */
-        Disabled(15, com.ctre.phoenix.motorcontrol.ControlMode.Disabled, com.revrobotics.ControlType.kDutyCycle);
+        Disabled(15, com.ctre.phoenix.motorcontrol.ControlMode.Disabled, com.revrobotics.ControlType.kDutyCycle),
+
+        /**
+         * Voltage
+         * Not natively supported by TalonSRX/Falon, so calculated in the wrapper class.
+         */
+        Voltage(20, com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput, com.revrobotics.ControlType.kVoltage);
 
         /**
          * Value of control mode

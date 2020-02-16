@@ -95,7 +95,9 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	synchronized public void update() {
 		// Query the drive routine for the desired wheel speed/power.
 		if (routine == null) return;  // No drive routine set yet.
-		DriveMotion motion = routine.getMotion();
+		// Ask for the power to supply to each side. Pass in the current wheel speeds.
+		// TODO: Ensure that this is in meters/sec (not inches/100ms). See comment above.
+		DriveMotion motion = routine.getMotion(left.getVelocity(), right.getVelocity());
 		//log.debug("drive subsystem motion = %.1f, %.1f", motion.left, motion.right);
 		if (motion.equals(currentMotion)) {
 			return; // No change.
