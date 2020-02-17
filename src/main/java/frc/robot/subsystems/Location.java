@@ -106,6 +106,8 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	private LocationHistory history; // history of points we have been on the field.
 	private boolean debug = false;
 
+	private Runnable resetEncoders;
+
 
 	// Odometry class for tracking robot pose
 	private final DifferentialDriveOdometry odometry;	
@@ -146,8 +148,9 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	 * @param gyro The gyro to get angles
 	 * @param log The log to store debug and other logging messages
 	 */
-    public Location(DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard, Log log) {
+    public Location(Runnable resetEncoders, DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard, Log log) {
 		super("Location", dashboard, log);	// always present!
+		this.resetEncoders = resetEncoders;
 		this.leftDistance = leftDistance;
 		this.rightDistance = rightDistance;
 		odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getAngle()));
@@ -186,8 +189,22 @@ public class Location extends Subsystem implements LocationInterface, Executable
     	((NavXGyroscope) gyro).setAngle(location.heading);
     	current.speed = 0;
     	current.timeSec = clock.currentTime();  // time of last update
-    	history.setInitial(current);
-    }
+		history.setInitial(current);
+		resetEncoders.run();
+		odometry.resetPosition(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)), Rotation2d.fromDegrees(0));
+	}
+	
+	/**
+	 * Resets the odometry to the specified pose.
+	 *
+	 * @param pose The pose to which to set the odometry.
+	 */
+	/*
+	public void resetOdometry(Pose2d pose) {
+		resetEncoders();
+		odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
+	}
+	*/
     
     /**
      * Return the location on the field at the current time.
@@ -226,19 +243,6 @@ public class Location extends Subsystem implements LocationInterface, Executable
 		return odometry.getPoseMeters();
 	}
 
-	/**
-	 * Resets the odometry to the specified pose.
-	 *
-	 * @param pose The pose to which to set the odometry.
-	 */
-	/*
-	TODO: Implement this!
-	public void resetOdometry(Pose2d pose) {
-		resetEncoders();
-		odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
-	}
-	*/
-
 	@Override
 	public void execute(long timeInMillis) {
 		update();
@@ -275,8 +279,6 @@ public class Location extends Subsystem implements LocationInterface, Executable
 		// odometry expects degrees and metres
 		odometry.update(Rotation2d.fromDegrees(gyro.getAngle()), leftDistance.getAsDouble() * Constants.INCHES_TO_METRES,
 				rightDistance.getAsDouble() * Constants.INCHES_TO_METRES);
-
-		log.info("Odometry: %s", odometry.getPoseMeters());
 
 		double newLeft = leftDistanceDelta.getAsDouble();  // The change in inches since last call.
 		double newRight = rightDistanceDelta.getAsDouble();

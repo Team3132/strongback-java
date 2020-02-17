@@ -145,9 +145,14 @@ public class Subsystems implements DashboardUpdater {
 		leftDriveSpeed = () -> leftMotor.getVelocity();
 		rightDriveSpeed = () -> rightMotor.getVelocity();
 
+		leftMotor.setPosition(0);
+		rightMotor.setPosition(0);
+
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
-		location = new Location(leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
+		location = new Location(() -> {	leftMotor.setPosition(0);
+									rightMotor.setPosition(0); },
+									leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
 		drivebase = new Drivebase(leftMotor, rightMotor, dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);

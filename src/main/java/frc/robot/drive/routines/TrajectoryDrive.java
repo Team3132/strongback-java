@@ -68,7 +68,7 @@ public class TrajectoryDrive implements DriveRoutine {
 
 		// TODO: Also log the error in the x & y position as the RamseteController was doing.
 		log.register(true, () -> m_timer.get(), "TrajectoryDrive/elapsedTime")
-				.register(true, () -> m_trajectory.getTotalTimeSeconds(), "TrajectoryDrive/totalTime")
+				.register(true, () -> m_trajectory == null ? 0 : m_trajectory.getTotalTimeSeconds(), "TrajectoryDrive/totalTime")
 				.register(true, () -> m_leftSpeedSetpoint, "TrajectoryDrive/trajectory/speed/leftSepoint")
 				.register(true, () -> m_rightSpeedSetpoint, "TrajectoryDrive/trajectory/speed/rightSepoint")
 				.register(true, () -> m_leftSpeedError, "TrajectoryDrive/trajectory/speed/leftError")

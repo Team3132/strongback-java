@@ -75,12 +75,10 @@ public class Sequences {
 	 * @param angle the final angle (relative to the inital angle) in degrees.
 	 */
 	public static Sequence getDriveToWaypointSequence(double x, double y, double angle) {
-		if (driveToWaypointSeq == null) {
-			Pose2d start = new Pose2d();
-			Pose2d end = new Pose2d(x, y, new Rotation2d(Math.toRadians(angle)));
-			driveToWaypointSeq = new Sequence(String.format("drive to %s", end));
-			driveToWaypointSeq.add().driveRelativeWaypoints(start, List.of(), end, true);
-		}
+		Pose2d start = new Pose2d();
+		Pose2d end = new Pose2d(x, y, new Rotation2d(Math.toRadians(angle)));
+		driveToWaypointSeq = new Sequence(String.format("drive to %s", end));
+		driveToWaypointSeq.add().driveRelativeWaypoints(start, List.of(), end, true);
 		return driveToWaypointSeq;
 	}	
 	private static Sequence driveToWaypointSeq = null;
