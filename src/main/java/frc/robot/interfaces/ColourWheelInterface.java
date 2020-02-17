@@ -9,7 +9,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         GREEN(3, "green"),
         UNKNOWN(-1, "unknown");
         
-        private final int NUM_COLOURS = 4;
+        public static final int NUM_COLOURS = 4;
         public final int id;
         public final String name;
         Colour(int id, String name) {
@@ -37,7 +37,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         }
 
         public Colour next (double direction) {
-            return Colour.of((this.id + NUM_COLOURS + (direction < 0 ? 1 : -1)) % NUM_COLOURS);
+            return Colour.of((this.id + NUM_COLOURS + (direction < 0 ? 1 : -1)) % NUM_COLOURS); //Add number of colours to fix -1 % 4 returning -1 when it should return 3.
         }
 
         @Override
@@ -47,15 +47,15 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
     }
 
     public class ColourAction {
-        public final Type type;
+        public final ColourWheelType type;
         public final Colour colour;
 
-        public ColourAction(Type type, Colour colour) {
+        public ColourAction(ColourWheelType type, Colour colour) {
             this.type = type;
             this.colour = colour;
         }
 
-        public enum Type {
+        public enum ColourWheelType {
             ROTATION,
             POSITION,
             ADJUST_WHEEL_ANTICLOCKWISE,
@@ -64,11 +64,26 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         }
 
         @Override
+        public boolean equals(Object obj) {
+            if(this == obj)
+                return true;
+            if(obj == null)
+                return false;
+            if(getClass() != obj.getClass())
+                return false;
+            ColourAction other = (ColourAction) obj;
+            if (other.colour != colour) return false;
+            if (other.type != type) return false;
+            return true;
+        }
+
+        @Override
         public String toString() {
             return String.format("%s: %s", type.toString().toLowerCase(), colour);
     }
 
     }
+
     /** 
      * Sets the desired action for the colour sensor.
      * @param action

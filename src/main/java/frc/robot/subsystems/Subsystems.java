@@ -3,7 +3,10 @@ package frc.robot.subsystems;
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 
 import org.strongback.Executor.Priority;
@@ -24,6 +27,7 @@ import frc.robot.Constants;
 import frc.robot.controller.Controller.TrajectoryGenerator;
 import frc.robot.drive.routines.*;
 import frc.robot.interfaces.*;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.*;
@@ -69,12 +73,6 @@ public class Subsystems implements DashboardUpdater {
 	public DoubleSupplier rightDriveSpeed;
 
 	private final I2C.Port i2cPort = I2C.Port.kOnboard;
-	/**
-	 * A Rev Color Sensor V3 object is constructed with an I2C port as a 
-	 * parameter. The device will be automatically initialized with default 
-	 * parameters.
-	 */
-	private final ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 
 	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log) {
 		this.dashboard = dashboard;
@@ -104,6 +102,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.enable();
 		hatch.enable();
 		spark.enable();
+		colourWheel.enable();
 	}
 
 	public void disable() {
@@ -116,6 +115,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.disable();
 		hatch.disable();
 		spark.disable();
+		colourWheel.disable();
 	}
 
 	@Override
@@ -377,7 +377,33 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
-		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
+
+		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
+		ColorMatch colourMatcher = new ColorMatch();
+		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_RED_TARGET);
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
+		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
+
+		colourWheel = new ColourWheel(motor, new Supplier<Colour>() {
+			@Override
+			public Colour get() {
+				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
+				Colour sensedColour = Colour.UNKNOWN;
+				if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
+					sensedColour = Colour.BLUE;
+				} else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
+					sensedColour = Colour.RED;
+				} else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
+					sensedColour = Colour.GREEN;
+				} else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
+					sensedColour = Colour.YELLOW;
+				}
+				return sensedColour;
+			}
+			
+		}, clock, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 
