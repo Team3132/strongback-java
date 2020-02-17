@@ -88,22 +88,11 @@ public class TestColourwheel {
 
     @Test
     public void testPositional() {
-        doPositional(Colour.GREEN, Colour.GREEN, 0);
-        doPositional(Colour.GREEN, Colour.RED, 1);
-        doPositional(Colour.GREEN, Colour.BLUE, 1);
-        doPositional(Colour.GREEN, Colour.YELLOW, 2);
-        doPositional(Colour.BLUE, Colour.BLUE, 0);
-        doPositional(Colour.BLUE, Colour.GREEN, 1);
-        doPositional(Colour.BLUE, Colour.YELLOW, 1);
-        doPositional(Colour.BLUE, Colour.RED, 2);
-        doPositional(Colour.YELLOW, Colour.YELLOW, 0);
-        doPositional(Colour.YELLOW, Colour.BLUE, 1);
-        doPositional(Colour.YELLOW, Colour.GREEN, 2);
-        doPositional(Colour.YELLOW, Colour.RED, 1);
-        doPositional(Colour.RED, Colour.RED, 0);
-        doPositional(Colour.RED, Colour.YELLOW, 1);
-        doPositional(Colour.RED, Colour.BLUE, 2);
-        doPositional(Colour.RED, Colour.GREEN, 1);
+        for (int i = 0; i < Colour.NUM_COLOURS; i++) {
+            for (int x = 0; x < Colour.NUM_COLOURS; x++) {
+                doPositional(Colour.of(i), Colour.of(x));
+            }
+        }
     }
 
     public void doRotational(int x) {
@@ -121,10 +110,11 @@ public class TestColourwheel {
         assertTrue(colourWheel.isFinished());
     }
 
-    public void doPositional(Colour desired, Colour start, int amount) {
+    public void doPositional(Colour desired, Colour start) {
         colourWheel.enable();
         colourWheel.setDesiredAction(new ColourAction(ColourWheelType.POSITION, desired));
         colour = start;
+        int amount = (desired.id - start.id + Colour.NUM_COLOURS) %  Colour.NUM_COLOURS;
         colourWheel.execute(0);
         if (!desired.equals(start)) {
             assertEquals(Math.signum(motor.get())*Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
