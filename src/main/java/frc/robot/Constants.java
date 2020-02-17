@@ -51,13 +51,14 @@ public class Constants {
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
 	public static final double ROBOT_WIDTH_INCHES = 20;
-	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1};
-	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {2};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5}; 
-	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {6};
+	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5,6};
+	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
-	public static final double DRIVE_WHEEL_DIAMETER         = 3.79;
+	public static final double DRIVE_WHEEL_DIAMETER         = 6; // inches 
 	public static final int DRIVE_ENCODER_CODES_PER_REV		= 4 * 360;
+	public static final double DRIVE_GEABOX_RATIO = 11;
 	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
@@ -66,7 +67,8 @@ public class Constants {
 	// distance the robot moves per revolution of the encoders. Gearing needs to be taken into account here.
 	// at full speed in a static environment the encoders are producing 2000 count differences per 100ms
 	public static final double DRIVE_DISTANCE_PER_REV = DRIVE_WHEEL_DIAMETER * Math.PI;
-	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
+	//public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
+	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_DISTANCE_PER_REV / DRIVE_GEABOX_RATIO;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder

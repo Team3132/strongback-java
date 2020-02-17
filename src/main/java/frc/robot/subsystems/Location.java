@@ -150,7 +150,7 @@ public class Location extends Subsystem implements LocationInterface, Executable
 		super("Location", dashboard, log);	// always present!
 		this.leftDistance = leftDistance;
 		this.rightDistance = rightDistance;
-		odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-gyro.getAngle()));
+		odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getAngle()));
 
 		leftDistanceDelta = new DoubleDelta(leftDistance);
 		rightDistanceDelta = new DoubleDelta(rightDistance);
@@ -272,8 +272,11 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	public void update() {
 		if (!enabled) return;			// The location subsystem should never be disabled.
 
-		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()), leftDistance.getAsDouble(),
-				rightDistance.getAsDouble());
+		// odometry expects degrees and metres
+		odometry.update(Rotation2d.fromDegrees(gyro.getAngle()), leftDistance.getAsDouble() * Constants.INCHES_TO_METRES,
+				rightDistance.getAsDouble() * Constants.INCHES_TO_METRES);
+
+		log.info("Odometry: %s", odometry.getPoseMeters());
 
 		double newLeft = leftDistanceDelta.getAsDouble();  // The change in inches since last call.
 		double newRight = rightDistanceDelta.getAsDouble();
