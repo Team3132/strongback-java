@@ -50,11 +50,15 @@ public class TrajectoryDrive implements DriveRoutine {
   
 	private static Pose2d m_targetPose = new Pose2d();
 	private static Pose2d m_actualPose = new Pose2d();
+	private static Pose2d m_errorPose = new Pose2d();
   
 	private Trajectory m_trajectory;
 	private Boolean enabled = false;
 
+	private Log log;
+
 	public TrajectoryDrive(LocationInterface location, Clock clock, Log log) {
+		this.log = log;
 		m_pose = location::getPose;
 		m_follower = new RamseteController(Constants.DriveConstants.kRamseteB, Constants.DriveConstants.kRamseteZeta);
 		m_kinematics = Constants.DriveConstants.kDriveKinematics;
@@ -77,14 +81,13 @@ public class TrajectoryDrive implements DriveRoutine {
 				.register(true, () -> m_rightPIDResult, "TrajectoryDrive/trajectory/speed/rightPIDResult")
 				.register(true, () -> m_leftOutput, "TrajectoryDrive/leftOutput")
 				.register(true, () -> m_rightOutput, "TrajectoryDrive/rightOutput")
-				.register(true, () -> m_targetSpeed, "TrajectoryDrive/targetSpeed");
-		/*
-		 * TODO: Fix the following so they are logged in the correct place
-		 * .register(true, () -> m_targetPose.getTranslation().getX(), "Location/desired/x")
-		 * .register(true, () -> m_targetPose.getTranslation().getY(), "Location/desired/y")
-		 * .register(true, () -> m_actualPose.getTranslation().getX(), "Location/actual/x")
-		 * .register(true, () -> m_actualPose.getTranslation().getY(), "Location/actual/y");
-		 */
+				.register(true, () -> m_targetSpeed, "TrajectoryDrive/targetSpeed")
+				.register(true, () -> m_targetPose.getTranslation().getX(), "TrajectoryDrive/desired/x")
+				.register(true, () -> m_targetPose.getTranslation().getY(), "TrajectoryDrive/desired/y")
+				.register(true, () -> m_actualPose.getTranslation().getX(), "TrajectoryDrive/actual/x")
+				.register(true, () -> m_actualPose.getTranslation().getY(), "TrajectoryDrive/actual/y")
+				.register(true, () -> m_errorPose.getTranslation().getX(), "TrajectoryDrive/error/x")
+				.register(true, () -> m_errorPose.getTranslation().getY(), "TrajectoryDrive/error/y");
 	}
 	
 	/**
@@ -108,8 +111,8 @@ public class TrajectoryDrive implements DriveRoutine {
 		m_leftController.reset();
 		m_rightController.reset();
 
-        // Allow it to run.
-        enabled = true;
+		// Allow it to run.
+		enabled = true;
 	}
 
 	@Override
@@ -122,7 +125,8 @@ public class TrajectoryDrive implements DriveRoutine {
 		enabled = false;
 		m_timer.stop();
 		m_leftSpeedSetpoint = 0;
-		m_rightSpeedSetpoint = 0;	}
+		m_rightSpeedSetpoint = 0;
+	}
 
 	/**
 	 * Query the followers to see what power level to give the motors
@@ -140,6 +144,8 @@ public class TrajectoryDrive implements DriveRoutine {
 		m_targetPose = m_trajectory.sample(curTime).poseMeters;
 		m_targetSpeed = m_trajectory.sample(curTime).velocityMetersPerSecond;
 		m_actualPose = m_pose.get();
+		m_errorPose = m_targetPose.relativeTo(m_actualPose);
+
 		var targetWheelSpeeds = m_kinematics
 				.toWheelSpeeds(m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
 
@@ -162,6 +168,7 @@ public class TrajectoryDrive implements DriveRoutine {
 
 		m_prevTime = curTime;
 		m_prevSpeeds = targetWheelSpeeds;
+
 		return new DriveMotion(m_leftOutput, m_rightOutput);
 	}
 	
