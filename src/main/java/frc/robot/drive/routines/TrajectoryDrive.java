@@ -61,6 +61,7 @@ public class TrajectoryDrive implements DriveRoutine {
 	public TrajectoryDrive(LocationInterface location, Clock clock, Log log) {
 		this.log = log;
 		this.clock = clock;
+		m_startTime = clock.currentTime();
 		m_pose = location::getPose;
 		m_follower = new RamseteController(Constants.DriveConstants.kRamseteB, Constants.DriveConstants.kRamseteZeta);
 		m_kinematics = Constants.DriveConstants.kDriveKinematics;
@@ -86,10 +87,13 @@ public class TrajectoryDrive implements DriveRoutine {
 				.register(true, () -> m_targetSpeed, "TrajectoryDrive/targetSpeed")
 				.register(true, () -> m_targetPose.getTranslation().getX(), "TrajectoryDrive/desired/x")
 				.register(true, () -> m_targetPose.getTranslation().getY(), "TrajectoryDrive/desired/y")
+				.register(true, () -> m_targetPose.getRotation().getDegrees(), "TrajectoryDrive/desired/a")
 				.register(true, () -> m_actualPose.getTranslation().getX(), "TrajectoryDrive/actual/x")
 				.register(true, () -> m_actualPose.getTranslation().getY(), "TrajectoryDrive/actual/y")
+				.register(true, () -> m_actualPose.getRotation().getDegrees(), "TrajectoryDrive/actual/a")
 				.register(true, () -> m_errorPose.getTranslation().getX(), "TrajectoryDrive/error/x")
-				.register(true, () -> m_errorPose.getTranslation().getY(), "TrajectoryDrive/error/y");
+				.register(true, () -> m_errorPose.getTranslation().getY(), "TrajectoryDrive/error/y")
+				.register(true, () -> m_errorPose.getRotation().getDegrees(), "TrajectoryDrive/error/a");
 	}
 	
 	/**
@@ -172,7 +176,11 @@ public class TrajectoryDrive implements DriveRoutine {
 	
 	@Override
 	public boolean hasFinished() {
-		return clock.currentTime() - m_startTime > m_trajectory.getTotalTimeSeconds();
+		if (clock.currentTime() - m_startTime > m_trajectory.getTotalTimeSeconds()){
+			log.sub("%s: Finished spline with %s error", getName(), m_errorPose);
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

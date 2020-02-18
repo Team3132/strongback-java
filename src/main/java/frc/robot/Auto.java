@@ -9,6 +9,7 @@ import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -38,6 +39,7 @@ public class Auto {
 		autoProgram.addOption("Drive forward 10in", Sequences.getDriveToWaypointSequence(10 * 0.0254, 0, 0));
 		addDriveTestSequence();
 		addDriveTestSplineSequence();
+		addDriveTestUSequence();
 	}
 	
 	private void addDriveTestSequence() {
@@ -63,6 +65,57 @@ public class Auto {
 		seq.add().driveRelativeWaypoints(start, List.of(), end, false);  // backwards.
 		autoProgram.addOption("Drive test spline 2mx1m", seq); 
 	}
+
+	private void addDriveTestUSequence() {
+		Sequence seq = new Sequence("Drive u-turn 2m"); 
+
+		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		Pose2d end1 = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		seq.add().driveRelativeWaypoints(start1, List.of(), end1, true);
+		seq.add().setDelayDelta(1);
+		Pose2d start = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		Pose2d end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(start, List.of(), end, false);  // backwards.
+		seq.add().setDelayDelta(1);
+
+		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		end1 = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		seq.add().driveRelativeWaypoints(start1, List.of(), end1, true);
+		seq.add().setDelayDelta(1);
+		start = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(start, List.of(), end, false);  // backwards.
+		seq.add().setDelayDelta(1);
+		
+		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		end1 = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		seq.add().driveRelativeWaypoints(start1, List.of(), end1, true);
+		seq.add().setDelayDelta(1);
+		start = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(start, List.of(), end, false);  // backwards.
+		seq.add().setDelayDelta(1);
+		
+		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		end1 = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		seq.add().driveRelativeWaypoints(start1, List.of(), end1, true);
+		seq.add().setDelayDelta(1);
+		start = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(start, List.of(), end, false);  // backwards.
+		seq.add().setDelayDelta(1);
+
+		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		end1 = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		seq.add().driveRelativeWaypoints(start1, List.of(), end1, true);
+		seq.add().setDelayDelta(1);
+		start = new Pose2d(0, 2, new Rotation2d(Math.toRadians(180)));
+		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(start, List.of(), end, false);  // backwards.
+		seq.add().setDelayDelta(1);
+		autoProgram.addOption("Drive u-turn 2m", seq); 
+	}
+
 	
 	private void addChooser() {
 		SmartDashboard.putData("Auto program", autoProgram);

@@ -371,7 +371,7 @@ public class Constants {
 		public static final double kaVoltSecondsSquaredPerMeter = 0.4;// Calculated value = 0.368;
 
 		// Example value only - as above, this must be tuned for your drive!
-		public static final double kPDriveVel = 0;// 3//13.3; // should be 13.3
+		public static final double kPDriveVel = 0.01;// 3//13.3; // should be 13.3
 		// kD should be 0
 
 		public static final double kMaxSpeedMetersPerSecond = 6;// 3;
