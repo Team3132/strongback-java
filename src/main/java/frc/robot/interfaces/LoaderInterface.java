@@ -3,11 +3,13 @@ package frc.robot.interfaces;
 import org.strongback.Executable;
 
 /**
- * This is a conveyor to move the ball from the intake through to the spitter (shooter).
+ * This is a system to store balls from the intake and then pass them to the shooter.
  */
 public interface LoaderInterface extends SubsystemInterface, Executable, DashboardUpdater {
 
-    public double getTargetSpinnerMotorOutput();
+    public double getTargetSpinnerMotorVelocity();
+    public double getTargetPassthroughMotorVelocity();
+    public double getTargetFeederMotorOutput();
 
     public void setTargetSpinnerMotorVelocity(double current);
     public void setTargetPassthroughMotorVelocity(double PassthroughMotorCurrent);
@@ -16,7 +18,7 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
     public LoaderInterface setLoaderExtended(boolean extended);
 
 	/**
-	 * @return the state of the intake solenoid. 
+	 * @return the state of the loader solenoid. 
 	 * */
 	public boolean isLoaderExtended();
 	public boolean isLoaderRetracted();
@@ -24,7 +26,7 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
     public LoaderInterface setPaddleExtended(boolean extended);
 
 	/**
-	 * @return the state of the intake solenoid. 
+	 * @return the state of the loader paddle solenoid. 
 	 * */
 	public boolean isPaddleExtended();
 	public boolean isPaddleRetracted();

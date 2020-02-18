@@ -38,11 +38,6 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     }
 
 	@Override
-	public double getTargetSpinnerMotorOutput() {
-		return spinner.getOutputPercent();
-	}
-
-	@Override
 	public void setTargetSpinnerMotorVelocity(double velocity) {
         NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/loadermotor/");
         spinnerHelper.set("targetRPM", velocity);

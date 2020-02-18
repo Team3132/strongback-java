@@ -121,8 +121,8 @@ public class Sequences {
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
 		seq.add().setSpitterDutyCycle(0)
-				 .setIntakeMotorOutput(0);
-				//  .setLoaderSpinnerMotorOutput(0);
+				 .setIntakeMotorOutput(0)
+				 .setLoaderSpinnerMotorOutput(0);
 		seq.add().setDelayDelta(0.1);
 		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
 		return seq;
