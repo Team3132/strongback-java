@@ -233,13 +233,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
 	}
 
-	
-	/**
-	 * Blocks until the lift deployer has stopped moving.
-	 */
-
-
-
 	private void maybeWaitForColourWheel() {
 		try {
 			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");

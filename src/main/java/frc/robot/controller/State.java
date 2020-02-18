@@ -35,10 +35,6 @@ public class State {
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
 	
-	// Spitter
-	public Double spitterDutyCycle = null;  // Power level to supply to spitter. -1..0..1
-	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
-
 	// Passthrough
 	public Double passthroughMotorOutput = null;
 
@@ -116,29 +112,6 @@ public class State {
 		intakeMotorOutput = Double.valueOf(output);
 		return this;
 	}
-
-
-	// Spitter
-	public State setSpitterDutyCycle(double dutyCycle) {
-		spitterDutyCycle = Double.valueOf(dutyCycle);
-		return this;
-	}
-
-	public State waitForCargo() {
-		hasCargo = Boolean.valueOf(true);
-		return this;
-	}
-
-	public State waitForCargoToLeave() {
-		hasCargo = Boolean.valueOf(false);
-		return this;
-	}
-
-	public State setHasCargo(boolean hasCargo) {
-		this.hasCargo = Boolean.valueOf(hasCargo);
-		return this;
-	}
-
 
 	// Passthrough
 	public State setPassthroughMotorOutput(double output) {
@@ -336,8 +309,6 @@ public class State {
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
-		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
-		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);

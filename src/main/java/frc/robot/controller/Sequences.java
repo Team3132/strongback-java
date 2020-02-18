@@ -105,20 +105,14 @@ public class Sequences {
 		// Wait for the intake to extend before turning motor
 		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT);;
 		// Waits for the lift to go to the set height before turning on to the motor
-		// The spitter speed should be set at a small speed.
-		seq.add().setPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
-				 .setSpitterDutyCycle(SPITTER_SPEED); 
-		seq.add().waitForCargo();
-		seq.add().setSpitterDutyCycle(0)
-				 .setIntakeMotorOutput(0)
-				 .setPassthroughMotorOutput(0);
+		seq.add().deployIntake();
+		seq.add().setPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
 		return seq;
 	}
 
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
-		seq.add().setSpitterDutyCycle(0)
-				 .setIntakeMotorOutput(0)
+		seq.add().setIntakeMotorOutput(0)
 				 .setPassthroughMotorOutput(0);
 		seq.add().setDelayDelta(0.1);
 		return seq;
@@ -130,23 +124,10 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence startCargoSpit() {
-		Sequence seq = new Sequence("Start CargoSpit");
-		seq.add().setSpitterDutyCycle(SPITTER_SCORE_SPEED);
-		return seq;
-	}
-
-	public static Sequence stopCargoSpit() {
-		Sequence seq = new Sequence("Stop CargoSpit");
-		seq.add().setSpitterDutyCycle(0);
-		// Doesn't lower the lift like startCargoSpit so that the lift doesn't drop
-		// every time the operator wishes to abort the cargo spit.
-		return seq;
-	}
+	
 
 	public static Sequence startReverseCycle() {
 		Sequence seq = new Sequence("Start reverse cycle");
-		seq.add().setSpitterDutyCycle(-SPITTER_SPEED);
 		seq.add().setPassthroughMotorOutput(-PASSTHROUGH_MOTOR_CURRENT);
 		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
 		return seq;
@@ -154,7 +135,6 @@ public class Sequences {
 
 	public static Sequence stopReverseCycle() {
 		Sequence seq = new Sequence("Stop reverse cycle");
-		seq.add().setSpitterDutyCycle(0);
 		seq.add().setPassthroughMotorOutput(0);
 		seq.add().setIntakeMotorOutput(0);
 		return seq;
@@ -186,20 +166,6 @@ public class Sequences {
 		seq.add().setPassthroughMotorOutput(0.0);
 		return seq;
 	}
-
-	/*public static Sequence startSpitterOnly() {
-		Sequence seq = new Sequence("Start Spitter");
-		seq.add().setSpitterDutyCycle(SPITTER_SPEED);
-		return seq;
-	}
-
-	public static Sequence stopSpitterOnly() {
-		Sequence seq = new Sequence("Stop Spitter");
-		seq.add().setSpitterDutyCycle(0.0);
-		return seq;
-	}*/
-
-
 	
 	public static Sequence startDriveByVision() {
 		Sequence seq = new Sequence("start drive by vision");
@@ -339,14 +305,10 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(), 
-		startCargoSpit(),
-		stopCargoSpit(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
 		startPassthrough(),
 		stopPassthrough(),
-		//startSpitterOnly(),
-		//stopSpitterOnly(),
 		startLevel2climb(),
 		startLevelDriveForward(),
 		stopLevelDrive(),

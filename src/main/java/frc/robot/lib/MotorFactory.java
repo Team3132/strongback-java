@@ -81,29 +81,6 @@ public class MotorFactory {
 		}
 	}
 	
-	public static HardwareTalonSRX getLiftMotor(int[] canIDs, boolean sensorPhase, boolean invert, Log log) {
-    	HardwareTalonSRX motor = getTalon(canIDs, invert, NeutralMode.Brake, log);
-		motor.setSensorPhase(sensorPhase);
-		motor.configSelectedFeedbackSensor(FeedbackDevice.Analog, 0, 10);
-		// Limit switches.
-		motor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at top
-		// Reverse limit switch completely stop motor from working.
-		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at base
-		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 0x00, 0x00, 10); // This makes the lift set its height to 0 when it reaches the soft stop (hall effect)
-		motor.configSetParameter(ParamEnum.eClearPositionOnLimitF, 0, 0x00, 0x00, 10);
-		motor.configForwardSoftLimitEnable(false, 10);
-		motor.configReverseSoftLimitEnable(false, 10);
-
-		motor.configClosedloopRamp(0, 10);
-		// Set the deadband to zero.
-		motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
-		motor.configAllowableClosedloopError(1, 0, 10);
-		
-		motor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, 10);
-		motor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, 10);
-		return motor;
-	}
-	
 	public static HardwareTalonSRX getIntakeMotor(int canID, boolean invert, Log log) {
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(.25, 10);
@@ -138,35 +115,6 @@ public class MotorFactory {
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
 		motor.configVoltageCompSaturation(12, 10);
 		motor.enableVoltageCompensation(true);
-		return motor;
-	}
-
-	public static HardwareTalonSRX getSpitterMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.setPIDF(0, Constants.SPITTER_SPEED_P, Constants.SPITTER_SPEED_I, Constants.SPITTER_SPEED_D, Constants.SPITTER_SPEED_F);
-		motor.setSensorPhase(sensorPhase);
-		// TODO: find out the configuration of this spitter motor.
-		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(36);
-		return motor;
-	}
-
-	public static HardwareTalonSRX getHatchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.setSensorPhase(sensorPhase);
-		// TODO: find out the configuration of this hatch motor.
-		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at top
-		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, 10);	// true when carriage is at base
-		motor.configClosedloopRamp(0.1, 10);
-		double scaleFactor = 2456/13.15; // 13.15" for 2456 ticks
-		motor.setScale(scaleFactor);
-		// Set the deadband to zero.
-		motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
-		motor.configAllowableClosedloopError(1, 0, 10);
-		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0x00, 0x00, 10); // This makes the hatch set its position to 0 when it reaches the soft stop (hall effect)
-		motor.configSetParameter(ParamEnum.eClearPositionOnLimitF, 0, 0x00, 0x00, 10);
-
 		return motor;
 	}
 

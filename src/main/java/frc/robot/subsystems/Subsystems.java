@@ -195,12 +195,6 @@ public class Subsystems implements DashboardUpdater {
 				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
-		// Driving using the tape on the floor to help with alignment. Overrides the
-		// steering but not the speed.
-		drivebase.registerDriveRoutine(DriveRoutineType.TAPE_ASSIST,
-				new PositionalPIDDrive("tape", () -> -leftStick.getAxis(1).read(), () -> getTapeTurnAdjustment(),
-						Constants.TAPE_JOYSTICK_SCALE, Constants.TAPE_ANGLE_SCALE, Constants.TAPE_MAX_VELOCITY_JERK,
-						leftDriveDistance, leftDriveSpeed, rightDriveDistance, rightDriveSpeed, clock, log));
 		// Turns on the spot to a specified angle.
 		drivebase.registerDriveRoutine(DriveRoutineType.TURN_TO_ANGLE,
 				new PositionalPIDDrive("angle", () -> 0, () -> getTurnToAngleTurnAdjustment(), 0,

@@ -104,7 +104,7 @@ public class Constants {
 	 */
 	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
 	
-	public static final double INTAKE_MOTOR_CURRENT = 0.5;  // Running at 0.6 with the PT and spitter can cause brownouts.s
+	public static final double INTAKE_MOTOR_CURRENT = 0.5;  
 	public static final double INTAKE_POSITION_F = 0;
 	public static final double INTAKE_POSITION_P = 0;
 	public static final double INTAKE_POSITION_I = 0;
@@ -116,36 +116,7 @@ public class Constants {
 
 	public static final int[] OUTTAKE_MOTOR_TALON_CAN_ID_LIST = {15};
 
-	/*
-	* Spitter Constant
-	* TODO: add the actual can Id values to the constants.
-	* TODO: Tune the Spitter F, P, I, D values.
-	* TODO: Find the tolerance and spitter_speed value.
-	*/
-	public static final int SPITTER_LEFT_TALON_CAN_ID = 40; 
-	public static final int SPITTER_RIGHT_TALON_CAN_ID = 41; 
-	public static final double SPITTER_SPEED = 0.15;  // Power 0...1
-	public static final double SPITTER_SCORE_SPEED = 1; //0.55; //was 0.75; 
-	public static final double SPITTER_SPEED_TOLERANCE = 0;
-	public static final double SPITTER_SPEED_F = 10.0/6;
-	public static final double SPITTER_SPEED_P = 1;
-	public static final double SPITTER_SPEED_I = 0;
-	public static final double SPITTER_SPEED_D = 0;
-
-	/**
-	 * Tape Constants
-	 */
-	public static final double COLOUR_SENSOR_TOLERANCE = 0; // TODO: Find the tolerance for the colour sensor.
-	public static final double GRADIENT_CONSTANT = 0;
-	public static final double Y_AXIS_CONSTANT = 0;
-	public static final double BAND_ON = 0;
-	public static final double BAND_OFF = 0;
-	public static final int COLOUR_SENSOR_LEFT = 0;
-	public static final int COLOUR_SENSOR_RIGHT = 1;
-	public static final int CENTER_OF_WHITE = 1450;
-	public static final int OVER_THE_EDGE_VALUE = 2200;
-	public static final int MIDDLE_OF_CARPET = 13500;
-
+	
 	/*
 	* Passthrough
 	*/
@@ -208,11 +179,6 @@ public class Constants {
 	public static final double VISION_S_MAX = 255;
 	public static final double VISION_V_MIN = 100;
 	public static final double VISION_V_MAX = 255;
-
-	// Tape (all need tuning)
-	public static final double TAPE_MAX_VELOCITY_JERK = 10;
-	public static final double TAPE_JOYSTICK_SCALE = 1;
-	public static final double TAPE_ANGLE_SCALE = 0.2;
 
 	// Turn to angle (all need tuning)
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;

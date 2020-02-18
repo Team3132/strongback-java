@@ -85,10 +85,6 @@ public class RobotConfiguration {
 	public boolean passthroughIsPresent = false;
 	public int passthroughCanID = Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID;
 
-	public boolean spitterIsPresent = false;
-	public int spitterRightCanID = Constants.SPITTER_RIGHT_TALON_CAN_ID;
-	public int spitterLeftCanID = Constants.SPITTER_LEFT_TALON_CAN_ID;
-
 	public boolean pdpIsPresent = false;
 	public int pdpCanId = Constants.PDP_CAN_ID;
 	public boolean pdpMonitor = false;  // by default we do NOT monitor the PDP
@@ -213,9 +209,6 @@ public class RobotConfiguration {
 		passthroughIsPresent = getAsBoolean("passthrough/present", true);
 		passthroughCanID = getAsInt("passthrough/canID", Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID);
 
-		spitterIsPresent = getAsBoolean("spitter/present", true);
-		spitterRightCanID = getAsInt("spitter/canID", Constants.SPITTER_RIGHT_TALON_CAN_ID);
-		spitterLeftCanID = getAsInt("spitter/canID", Constants.SPITTER_LEFT_TALON_CAN_ID);
 		
 		pdpIsPresent = getAsBoolean("pdp/present", true);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);
