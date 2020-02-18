@@ -8,11 +8,11 @@ import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import org.strongback.components.Clock;
 
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.interfaces.LiftInterface.LiftAction;
+import frc.robot.lib.Colour;
 import frc.robot.lib.TimeAction;
 import frc.robot.subsystems.Subsystems;
 

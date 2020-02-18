@@ -10,7 +10,7 @@ package frc.robot.controller;
 
 import static frc.robot.Constants.*;
 
-import frc.robot.interfaces.ColourWheelInterface.Colour;
+import frc.robot.lib.Colour;
 import frc.robot.lib.WaypointUtil;
 
 import jaci.pathfinder.Waypoint;

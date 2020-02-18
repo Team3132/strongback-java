@@ -8,9 +8,9 @@ import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
+import frc.robot.lib.Colour;
 import frc.robot.lib.Position;
 import frc.robot.subsystems.Subsystems;
 

@@ -366,4 +366,10 @@ public class Constants {
 	public static final double COLOUR_WHEEL_MOTOR_ADJUST = 0.3;
 	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
 	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
+
+	/*
+	 * LED Strip
+	 */
+	public static final int LED_STRIP_PWM_PORT = 9;
+	public static final int LED_STRIP_NUMBER_OF_LEDS = 30;
 }

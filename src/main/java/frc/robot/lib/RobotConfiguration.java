@@ -131,6 +131,8 @@ public class RobotConfiguration {
 	public boolean doLogging = false;
 	public boolean onlyLocal = true;
 
+	public boolean ledStripIsPresent = false;
+
 	public RobotConfiguration(String filePath, Log log) {
 		this(filePath, TeamNumber.get(), log);
 	}
@@ -271,6 +273,8 @@ public class RobotConfiguration {
 
 		canifierIsPresent = getAsBoolean("canifier/present", false);
 		canifierCanId = getAsInt("canifier/canID", Constants.LED_CANIFIER_CAN_ID);
+
+		ledStripIsPresent = getAsBoolean("ledStrip/present", true);
 
 		if (!ignoredEntries.isEmpty()) {
 			log.warning("WARNING: These config file lines weren't used:");

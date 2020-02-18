@@ -3,6 +3,7 @@ package frc.robot.mock;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
+import frc.robot.lib.Colour;
 
 public class MockColourWheel implements ColourWheelInterface {
     private ColourAction action = new ColourAction(Type.NONE, Colour.UNKNOWN);

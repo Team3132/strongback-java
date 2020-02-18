@@ -4,11 +4,12 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.lib.Colour;
 
 // LED Strip Subsystem 2020
 
 public class LEDStrip implements LEDStripInterface {
-    private int PWM_Port;
+    private int PWM_Port; // TODO: are these supposed to be here?
     private int numberOfLEDs;
     public AddressableLED ledStrip;
     public AddressableLEDBuffer ledStripBuffer;
@@ -62,8 +63,7 @@ public class LEDStrip implements LEDStripInterface {
         setData();
     } 
 
-    @Override
-    public void setData() {
+    private void setData() {
         ledStrip.setData(ledStripBuffer);
     }
 

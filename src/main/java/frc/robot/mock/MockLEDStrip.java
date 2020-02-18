@@ -1,6 +1,7 @@
 package frc.robot.mock;
 
 import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.lib.Colour;
 
 // LED Strip Subsystem 2020
 
@@ -14,7 +15,4 @@ public class MockLEDStrip implements LEDStripInterface {
 
     @Override
     public void setIdle() {}
-
-    @Override
-    public void setData() {}
 }

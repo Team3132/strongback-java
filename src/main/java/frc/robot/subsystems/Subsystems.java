@@ -344,6 +344,15 @@ public class Subsystems implements DashboardUpdater {
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 
+	public void createLEDStrip() {
+		if (!config.ledStripIsPresent) {
+			ledStrip = new MockLEDStrip();
+			log.sub("LED Strip not present, using a mock LED Strip instead.");
+			return;
+		}
+		ledStrip = new LEDStrip(Constants.LED_STRIP_PWM_PORT, Constants.LED_STRIP_NUMBER_OF_LEDS, log);
+	}
+
 	public void createSparkTest() {
 		if (config.liftIsPresent && config.sparkTestIsPresent) {
 			// As the use the same buttons on the diag box, disable this

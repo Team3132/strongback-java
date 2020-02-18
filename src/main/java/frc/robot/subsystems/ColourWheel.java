@@ -15,6 +15,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
+import frc.robot.lib.Colour;
 import frc.robot.lib.Subsystem;
 
 /**
@@ -80,18 +81,23 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     switch (action.type) {
     case ROTATION:
       newSpeed = rotationalControl();
+      ledStrip.setProgressColour(Colour.GREEN, Colour.GOLD, rotCount/(3*8 + 2));
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
+      ledStrip.setColour(colour);
       break;
     case ADJUST_WHEEL_ANTICLOCKWISE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      ledStrip.setColour(colour);
       break;
     case ADJUST_WHEEL_CLOCKWISE:
       newSpeed = -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      ledStrip.setColour(colour);
       break;
     case NONE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
+      ledStrip.setIdle();
       break;
     default:
       log.error("%s: Unknown Type %s", name, action.type);
