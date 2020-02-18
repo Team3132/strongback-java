@@ -3,6 +3,11 @@ package frc.robot.subsystems;
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
+import com.revrobotics.ColorSensorV3;
 
 import org.strongback.Executor.Priority;
 import org.strongback.Strongback;
@@ -16,10 +21,13 @@ import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
+
+import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
 import frc.robot.controller.Controller.TrajectoryGenerator;
 import frc.robot.drive.routines.*;
 import frc.robot.interfaces.*;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.*;
@@ -53,6 +61,7 @@ public class Subsystems implements DashboardUpdater {
 	public LiftInterface lift;
 	public OverridableSubsystem<LiftInterface> liftOverride;
 	public ClimberInterface climber;
+	public ColourWheelInterface colourWheel;
 	public OverridableSubsystem<ClimberInterface> climberOverride;
 	public PneumaticsModule compressor;
 	public VisionInterface vision;
@@ -62,6 +71,8 @@ public class Subsystems implements DashboardUpdater {
 	public DoubleSupplier rightDriveDistance;
 	public DoubleSupplier leftDriveSpeed;
 	public DoubleSupplier rightDriveSpeed;
+
+	private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
 	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log) {
 		this.dashboard = dashboard;
@@ -91,6 +102,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.enable();
 		hatch.enable();
 		spark.enable();
+		colourWheel.enable();
 	}
 
 	public void disable() {
@@ -103,6 +115,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.disable();
 		hatch.disable();
 		spark.disable();
+		colourWheel.disable();
 	}
 
 	@Override
@@ -117,6 +130,7 @@ public class Subsystems implements DashboardUpdater {
 		lift.updateDashboard();
 		vision.updateDashboard();
 		spark.updateDashboard();
+		colourWheel.updateDashboard();
 	}
 
 	/**
@@ -201,8 +215,17 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_ASSIST,
 				new PositionalPIDDrive("vision",
 				() -> getVisionDriveSpeed(10 /*maxSpeed*/, 40 /*(stopAtDistance*/),
+				() -> getVisionTurnWaypointAdjustment(),
+				Constants.VISION_SPEED_SCALE, Constants.VISION_ASSIST_ANGLE_SCALE,
+				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
+				rightDriveSpeed, clock, log));
+		// Vision aiming for shooter
+		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
+				new PositionalPIDDrive("visionAim",
+				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_RANGE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_RANGE), 
+				() -> MathUtil.clamp(getVisionDistance()*Constants.VISION_AIM_DISTANCE_SCALE, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED),
 				() -> getVisionTurnAdjustment(),
-				Constants.VISION_SPEED_SCALE, Constants.VISION_ANGLE_SCALE,
+				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
 		// Driving using the tape on the floor to help with alignment. Overrides the
@@ -223,11 +246,13 @@ public class Subsystems implements DashboardUpdater {
 						leftDriveDistance, leftDriveSpeed, rightDriveDistance, rightDriveSpeed, clock, log));
 
 		// Log some useful values for debugging.
-		log.register(true, () -> getVisionTurnAdjustment(), "Drive/vision/turnAdj")
+		log.register(true, () -> getVisionTurnWaypointAdjustment(), "Drive/vision/turnAdj")
 		   .register(true, () -> getVisionDriveSpeed(10 /*maxSpeed*/, 40 /*(stopAtDistance*/), "Drive/vision/distance")
 		   .register(true, () -> getTurnToAngleTurnAdjustment(), "Drive/angle/turnAdj")
 		   .register(true, () -> getVisionWaypoint().x, "Drive/vision/waypointX")
-		   .register(true, () -> getVisionWaypoint().y, "Drive/vision/waypointY");
+		   .register(true, () -> getVisionWaypoint().y, "Drive/vision/waypointY")
+		   .register(true, () -> getVisionTurnAdjustment(), "Drive/vision/visionAim")
+		   .register(true, () -> getVisionDistance(), "Drive/vision/visionAimDistance");	
 
 	}
 
@@ -242,8 +267,37 @@ public class Subsystems implements DashboardUpdater {
 	 * This effectively makes the robot drive on a spline.
 	 * @return a Position to drive to which leads the robot to the vision target on a spline
 	 */
+
+	public double getVisionTurnAdjustment() {
+		if (vision == null || !vision.isConnected()) return 0;
+		//log.sub("Vision is connected");
+		TargetDetails details = vision.getTargetDetails();
+		if (!details.isValid(clock.currentTime())) return 0;
+		//log.sub("Target is valid");
+		// We have a recent target position relative to the robot starting position.
+		Position current = location.getCurrentLocation();
+		//log.sub("curr pos=%s target = %s", current, details.location);
+		//log.sub("VISION: bearingToVision = %.1f", current.bearingTo(details.location));
+		
+		// Scale turnadjustment depending on distance from goal
+		double turnAdjustment = Math.max(0, Constants.VISION_MAX_DRIVE_SPEED - Math.abs(getVisionDistance())*2.5);
+		turnAdjustment = MathUtil.scale(turnAdjustment, 0, Constants.VISION_MAX_DRIVE_SPEED, 0.1, 1);
+		return turnAdjustment * -current.bearingTo(details.location);
+	}
+
+	public double getVisionDistance(){
+		if (vision == null || !vision.isConnected()) return 0;
+		TargetDetails details = vision.getTargetDetails();
+		if (!details.isValid(clock.currentTime())) return 0;
+		
+		// We have a recent target position relative to the robot starting position.
+		Position current = location.getCurrentLocation();
+		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
+		return distance; 
+	}
+	
 	public Position getVisionWaypoint() {
-		if (!vision.isConnected()) return new Position(0,0);
+		if (vision == null || !vision.isConnected()) return new Position(0,0);
 		TargetDetails details = vision.getTargetDetails();
 		Position current = location.getCurrentLocation();
 		if (current.distanceTo(details.location) > Constants.VISION_SPLINE_MIN_DISTANCE) {
@@ -253,12 +307,10 @@ public class Subsystems implements DashboardUpdater {
 		}
 	}
 
-	public double getVisionTurnAdjustment() {
-		if (!vision.isConnected()) return 0;
+	public double getVisionTurnWaypointAdjustment() {
+		if (vision == null || !vision.isConnected()) return 0;
 		TargetDetails details = vision.getTargetDetails();
-		double now = clock.currentTime();
-		if (!details.targetFound) return 0;
-		if (now - details.seenAtSec > Constants.VISON_MAX_TARGET_AGE_SECS) return 0;
+		if (!details.isValid(clock.currentTime())) return 0;
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		Position waypoint = getVisionWaypoint();
@@ -268,14 +320,11 @@ public class Subsystems implements DashboardUpdater {
 	}
 
 	public double getVisionDriveSpeed(double maxSpeed, double stopAtDistance) {
-		if (vision == null) return 0;
-		if (!vision.isConnected())
+		if (vision == null || !vision.isConnected())
 			return 0;
 		TargetDetails details = vision.getTargetDetails();
-		double now = clock.currentTime();
-		if (!details.targetFound)
-			return 0;
-		if (now - details.seenAtSec > Constants.VISON_MAX_TARGET_AGE_SECS)
+		
+		if (!details.isValid(clock.currentTime()))
 			return 0;
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
@@ -284,6 +333,8 @@ public class Subsystems implements DashboardUpdater {
 		// Cap it so that the robot quickly gets to max speed.
 		return Math.min(distance, maxSpeed);
 	}
+
+
 
 	public double getTapeTurnAdjustment() {
 		// TODO: Implement
@@ -317,6 +368,43 @@ public class Subsystems implements DashboardUpdater {
 		intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, intake, simulator, mock, log);
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
+	}
+
+	public void createColourWheel() {
+		if (!config.colourWheelIsPresent) {
+			colourWheel = new MockColourWheel(log);
+			log.sub("Colour Sensor not present, using a mock colour sensor instead");
+			return;
+		}
+		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
+
+		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
+		ColorMatch colourMatcher = new ColorMatch();
+		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_RED_TARGET);
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
+		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
+
+		colourWheel = new ColourWheel(motor, new Supplier<Colour>() {
+			@Override
+			public Colour get() {
+				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
+				Colour sensedColour = Colour.UNKNOWN;
+				if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
+					sensedColour = Colour.BLUE;
+				} else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
+					sensedColour = Colour.RED;
+				} else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
+					sensedColour = Colour.GREEN;
+				} else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
+					sensedColour = Colour.YELLOW;
+				}
+				return sensedColour;
+			}
+			
+		}, clock, dashboard, log);
+		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 
 	public void createSparkTest() {

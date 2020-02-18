@@ -27,7 +27,8 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		TAPE_ASSIST,  // Driver has speed control and tape subsystem has turn control.
 		TURN_TO_ANGLE,  // Turn to specified angle, relative to the angle the robot started.
 		POSITION_PID_ARCADE,
-		ARCADE_VELOCITY;  // Normal arcade drive.;
+		ARCADE_VELOCITY,// Normal arcade drive.;
+		VISION_AIM;  //Shooter things
 
 	}
 

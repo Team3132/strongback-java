@@ -9,6 +9,8 @@
 package frc.robot.controller;
 
 import static frc.robot.Constants.*;
+
+import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.lib.WaypointUtil;
 
 import jaci.pathfinder.Waypoint;
@@ -427,6 +429,46 @@ public class Sequences {
 		return seq;
 	}
 
+	public static Sequence visionAim(){
+		Sequence seq = new Sequence("vision aim");
+		seq.add().doVisionAim(); 
+		seq.add().doArcadeDrive();
+		// seq.add().startShooter(); 
+		// seq.add().startFeeder();
+		// seq.add().startHopper();
+		return seq;
+	}
+
+	public static Sequence colourWheelRotational() {
+		Sequence seq = new Sequence("start rotational control");
+		seq.add().colourWheelRotational();
+		return seq;
+	}
+	
+	public static Sequence colourWheelPositional(Colour colour) {
+		Sequence seq = new Sequence("start positional control");
+		seq.add().colourWheelPositional(colour);
+		return seq;
+	}
+
+	public static Sequence stopColourWheel() {
+		Sequence seq = new Sequence("stop colour wheel spinner");
+		seq.add().stopColourWheel();
+		return seq;
+	}
+
+	public static Sequence colourWheelLeft() {
+		Sequence seq = new Sequence("moving colour wheel left");
+		seq.add().colourWheelLeft();
+		return seq;
+	}
+
+	public static Sequence colourWheelRight() {
+		Sequence seq = new Sequence("moving colour wheel right");
+		seq.add().colourWheelRight();
+		return seq;
+	}
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
 		getEmptySequence(), 
@@ -455,6 +497,7 @@ public class Sequences {
 		abortLevelStage(),
 		getMicroAdjustUpSequence(), 
 		getMicroAdjustDownSequence(), 
-		getDriveToWaypointSequence(0, 12, 0)
+		getDriveToWaypointSequence(0, 12, 0),
+		visionAim(),
 	};	
 }

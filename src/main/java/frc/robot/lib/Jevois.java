@@ -183,7 +183,7 @@ public class Jevois implements JevoisInterface {
         visionMode.setSharpness(6);
         webcamMode.setAutogain(false);
         // The first mapping line in the file should be the FirstPython one.
-        visionMode.setModeString("setmapping 25");
+        visionMode.setModeString("setmapping 29");
         // 25 - OUT: YUYV 640x252 @ 60fps CAM: YUYV 320x240 @ 60fps MOD: JeVois:FirstPython Python
         //visionMode.setModeString("setmapping2 YUYV 320 240 60.0 JeVois FirstPython");
     }
@@ -272,12 +272,15 @@ public class Jevois implements JevoisInterface {
      */
     @Override
     public String readLine() throws IOException {
-        if (!isConnected())
+        if (!isConnected()){
+            log.sub("CAMERA NOT CONNECTED");
             throw new IOException("No camera connected"); // No connection, give up.
 
+        }
         StringBuffer line = new StringBuffer(200);
         while (true) {
             synchronized (this) {
+               //log.sub(line.toString());
                 try {
                     int b = istream.read();
                     if (b < 0) {
@@ -286,8 +289,10 @@ public class Jevois implements JevoisInterface {
                                 "End of file reached on serial port - was the camera disconnected / incorrect permissions?");
                     }
                     // Handle both \r\n and \n line endings.
-                    if (b == '\r')
+                    if (b == '\r'){
                         continue;
+                    }
+                        
                     if (b == '\n') {
                         // Have a newline, return the current line.
                         String result = line.toString();
@@ -296,6 +301,7 @@ public class Jevois implements JevoisInterface {
                     }
                     line.append((char) b);
                 } catch (SerialPortTimeoutException e) {
+                    log.sub("Jevois: There is serial port timeout!!!!!!!!!");
                     // Give up reading in case a command needs to be sent.
                 }
             }

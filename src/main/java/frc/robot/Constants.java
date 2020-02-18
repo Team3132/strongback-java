@@ -7,6 +7,9 @@ import java.util.List;
 
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
+import com.revrobotics.ColorMatch;
+
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
@@ -165,7 +168,7 @@ public class Constants {
 	* Loader
 	*/
 	public static final int LOADER_SPINNER_TALON_CAN_ID = 30; //TODO: find canID for Loader motor
-	public static final int LOADER_PASSTHROUGH_MOTOR_TALON_CAN_ID = 4; //TODO: find canID for Loader Input motor
+	public static final int LOADER_PASSTHROUGH_MOTOR_TALON_CAN_ID = 31; //TODO: find canID for Loader Input motor
 	public static final int LOADER_FEEDER_MOTOR_TALON_CAN_ID = 47; //TODO: find canID for Loader Output motor
 	public static final double LOADER_MOTOR_CURRENT = 1.0;
 	public static final int LOADER_SOLENOID_PORT = 2; 
@@ -297,18 +300,26 @@ public class Constants {
 	public static final int CAMERA_FRAMES_PER_SECOND = 60;
 	// Vision (all need tuning)
 	public static final double VISON_MAX_TARGET_AGE_SECS = 2;
-	public static final double VISION_MAX_VELOCITY_JERK = 10;
-	public static final double VISION_SPEED_SCALE = 2.5;
-	public static final double VISION_ANGLE_SCALE = 0.6;
+	public static final double VISION_MAX_VELOCITY_JERK = 40; // in/s/s
+	public static final double VISION_SPEED_SCALE = 2.4;
+	public static final double VISION_ASSIST_ANGLE_SCALE = 0.6;
+	public static final double VISION_AIM_ANGLE_SCALE = 0.4;
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
+	public static final double VISION_STOP_DISTANCE = 230; // inches 
+	public static final double VISION_MAX_DRIVE_SPEED = 15;
+	public static final double VISION_AIM_ANGLE_RANGE = 2; //degrees
+	public static final double VISION_AIM_DISTANCE_RANGE = 5; //inches
+	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
+
+
 
 	// Vision filter parameters
-	public static final double VISION_H_MIN = 70;
-	public static final double VISION_H_MAX = 90;
-	public static final double VISION_S_MIN = 10;
+	public static final double VISION_H_MIN = 40;
+	public static final double VISION_H_MAX = 100;
+	public static final double VISION_S_MIN = 20;
 	public static final double VISION_S_MAX = 255;
-	public static final double VISION_V_MIN = 100;
+	public static final double VISION_V_MIN = 40;
 	public static final double VISION_V_MAX = 255;
 
 	// Tape (all need tuning)
@@ -361,5 +372,21 @@ public class Constants {
 	public static final double TIME_COMMAND_RUN_PERIOD = (1.0/50.0);		// run the commands 50 times a second
 	public static final double TIME_LOCATION_PERIOD = (1.0/(double)LOCATION_HISTORY_CYCLE_SPEED);	// update the location subsystem 100 times a second
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
-	
+
+	/*
+	 * Colour Wheel
+	 */
+	public static final int COLOUR_WHEEL_CAN_ID = 7;
+	// Values callibrated using vynl sticker for control panel.
+	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); //Values from the colour sensor used to match colours.
+	//public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); //This is the real green value.
+	public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.209, 0.608, 0.182);
+	public static final Color COLOUR_WHEEL_RED_TARGET = ColorMatch.makeColor(0.484, 0.366, 0.150);
+	public static final Color COLOUR_WHEEL_YELLOW_TARGET = ColorMatch.makeColor(0.322, 0.546, 0.131);
+	public static final Color COLOUR_WHEEL_WHITE_TARGET = ColorMatch.makeColor(0.276, 0.587, 0.217);
+	public static final double COLOUR_WHEEL_MOTOR_OFF = 0;
+	public static final double COLOUR_WHEEL_MOTOR_ADJUST = 0.3;
+	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
+	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
+	public static final int COLOUR_WHEEL_ROTATION_TARGET = 3*8 + 2; //Counting in eights aiming for 3.25 full rotations.
 }
