@@ -188,7 +188,7 @@ public class Robot extends IterativeRobot implements Executable {
 	public void teleopInit() {
 		log.info("teleop has started");
 		subsystems.enable();
-		controller.doSequence(Sequences.getStartSequence());
+		controller.doSequence(Sequences.setDrivebaseToArcade());
 	}
 
 	/**

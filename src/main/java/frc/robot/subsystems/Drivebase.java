@@ -62,6 +62,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	@Override
 	public void setDriveRoutine(DriveRoutineParameters parameters) {
 		if (this.parameters != null && parameters.equals(this.parameters)) {
+			log.sub("%s: Parameters are identical not setting these", name);
 			return;
 		}
 		// Drive routine has changed.
@@ -74,15 +75,10 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		}
 		// Tell the drive routine to change what it is doing.
 		mode.routine.reset(parameters);
-		log.sub("%s: Switching to %s drive routine", name, mode.routine.getName());
+		log.sub("%s: Switching to %s drive routine using ControlMode %s", name, mode.routine.getName(), mode.controlMode);
 		if (routine != null) routine.disable();
 		mode.routine.enable();
 		routine = mode.routine;
-		if (mode.controlMode == ControlMode.PercentOutput) {
-			log.sub("%s: PercentOutput Control Mode", name);
-		} else {
-			log.sub("%s: Other Control Mode", name);
-		}
 		this.controlMode = mode.controlMode;
 	}
 

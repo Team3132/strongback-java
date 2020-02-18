@@ -82,7 +82,9 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 							.setReversed(!forward);
 
 			// An example trajectory to follow. All units in meters.
+			long t = System.currentTimeMillis();
 			p.trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
+			System.out.printf("Trajectory Generator: took %d milliseconds to generate this spline\n", System.currentTimeMillis() - t);
 
 			p.relative = relative;
 			return p;

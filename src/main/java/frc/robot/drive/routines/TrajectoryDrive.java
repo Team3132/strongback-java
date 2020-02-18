@@ -25,7 +25,6 @@ import frc.robot.interfaces.Log;
  */
 public class TrajectoryDrive implements DriveRoutine {
 
-	private final Timer m_timer = new Timer();
 	private final Supplier<Pose2d> m_pose;
 	private final RamseteController m_follower;
 	private final SimpleMotorFeedforward m_feedforward;
@@ -34,6 +33,7 @@ public class TrajectoryDrive implements DriveRoutine {
 	private final PIDController m_rightController;
 	private DifferentialDriveWheelSpeeds m_prevSpeeds;
 	private double m_prevTime;
+	private double m_startTime = 0;
   
 	// Variables extracted to support logging.
 	private double m_leftSpeedSetpoint = 0;
@@ -55,10 +55,12 @@ public class TrajectoryDrive implements DriveRoutine {
 	private Trajectory m_trajectory;
 	private Boolean enabled = false;
 
+	private Clock clock;
 	private Log log;
 
 	public TrajectoryDrive(LocationInterface location, Clock clock, Log log) {
 		this.log = log;
+		this.clock = clock;
 		m_pose = location::getPose;
 		m_follower = new RamseteController(Constants.DriveConstants.kRamseteB, Constants.DriveConstants.kRamseteZeta);
 		m_kinematics = Constants.DriveConstants.kDriveKinematics;
@@ -71,7 +73,7 @@ public class TrajectoryDrive implements DriveRoutine {
         m_rightController = new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0);
 
 		// TODO: Also log the error in the x & y position as the RamseteController was doing.
-		log.register(true, () -> m_timer.get(), "TrajectoryDrive/elapsedTime")
+		log.register(true, () -> clock.currentTime() - m_startTime, "TrajectoryDrive/elapsedTime")
 				.register(true, () -> m_trajectory == null ? 0 : m_trajectory.getTotalTimeSeconds(), "TrajectoryDrive/totalTime")
 				.register(true, () -> m_leftSpeedSetpoint, "TrajectoryDrive/trajectory/speed/leftSepoint")
 				.register(true, () -> m_rightSpeedSetpoint, "TrajectoryDrive/trajectory/speed/rightSepoint")
@@ -106,24 +108,20 @@ public class TrajectoryDrive implements DriveRoutine {
 				0,
 				initialState.curvatureRadPerMeter
 					* initialState.velocityMetersPerSecond));
-		m_timer.reset();
-		m_timer.start();
 		m_leftController.reset();
 		m_rightController.reset();
-
-		// Allow it to run.
-		enabled = true;
 	}
 
 	@Override
 	public void enable() {
-		// Do nothing on resume. Wait for the next reset().
+		// reset() does most of the work
+		enabled = true;
+		m_startTime = clock.currentTime();
 	}
 
 	@Override
 	synchronized public void disable() {
 		enabled = false;
-		m_timer.stop();
 		m_leftSpeedSetpoint = 0;
 		m_rightSpeedSetpoint = 0;
 	}
@@ -138,7 +136,7 @@ public class TrajectoryDrive implements DriveRoutine {
 			return new DriveMotion(0, 0);
 		}
 
-		double curTime = m_timer.get();
+		double curTime = clock.currentTime() - m_startTime;
 		double dt = curTime - m_prevTime;
 
 		m_targetPose = m_trajectory.sample(curTime).poseMeters;
@@ -174,7 +172,7 @@ public class TrajectoryDrive implements DriveRoutine {
 	
 	@Override
 	public boolean hasFinished() {
-		return m_timer.hasPeriodPassed(m_trajectory.getTotalTimeSeconds());
+		return clock.currentTime() - m_startTime > m_trajectory.getTotalTimeSeconds();
 	}
 	
 	@Override

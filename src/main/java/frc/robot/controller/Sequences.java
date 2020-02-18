@@ -38,7 +38,7 @@ public class Sequences {
 		if (startSeq == null) {
 			startSeq = new Sequence("start");
 		}
-		startSeq.add().doArcadeVelocityDrive();
+		//startSeq.add().doArcadeVelocityDrive();
 		return startSeq;
 	}
 	private static Sequence startSeq = null;
@@ -90,7 +90,7 @@ public class Sequences {
 	}
 
 	public static Sequence setDrivebaseToArcade() {
-		Sequence seq = new Sequence("Slow drive forward");
+		Sequence seq = new Sequence("Arcade");
 		seq.add().doArcadeDrive();
 		return seq;
 	}
