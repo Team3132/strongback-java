@@ -9,18 +9,15 @@ import frc.robot.lib.Colour;
 // LED Strip Subsystem 2020
 
 public class LEDStrip implements LEDStripInterface {
-    private int PWM_Port; // TODO: are these supposed to be here?
-    private int numberOfLEDs;
     public AddressableLED ledStrip;
     public AddressableLEDBuffer ledStripBuffer;
-    
+    private final int numberOfLEDs;
 
     public LEDStrip(int PWM_Port, int numberOfLEDs, Log log) {   
-        this.PWM_Port = PWM_Port;
         this.numberOfLEDs = numberOfLEDs;
 
-        ledStrip = new AddressableLED(this.PWM_Port);
-        ledStripBuffer = new AddressableLEDBuffer(this.numberOfLEDs);
+        ledStrip = new AddressableLED(PWM_Port);
+        ledStripBuffer = new AddressableLEDBuffer(numberOfLEDs);
         ledStrip.setLength(ledStripBuffer.getLength());
     
         // Set the data

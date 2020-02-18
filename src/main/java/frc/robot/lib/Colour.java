@@ -16,7 +16,8 @@ public enum Colour {
     public final int r;
     public final int g;
     public final int b;
-    public final int NUM_COLOURS = 4;
+    public static final int NUM_COLOURS = 4;
+
     Colour(int id, String name, int r, int g, int b) {
         this.id = id;
         this.name = name;

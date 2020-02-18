@@ -12,9 +12,10 @@ import org.strongback.mock.MockMotor;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
+import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
+import frc.robot.lib.Colour;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockLog;
 
@@ -25,13 +26,15 @@ public class TestColourwheel {
     MockMotor motor;
     MockClock clock;
     ColourWheelInterface colourWheel;
+    LEDStripInterface ledStrip;
 
     @Before
     public void setup() {
         colour = Colour.UNKNOWN;
         motor = Mock.stoppedMotor();
         clock = Mock.clock();
-        colourWheel = new ColourWheel(motor, () -> colour, clock, new MockDashboard(), new MockLog());
+        ledStrip = Mock.ledStrip();
+        colourWheel = new ColourWheel(motor, () -> colour, ledStrip, clock, new MockDashboard(), new MockLog());
     }
 
 

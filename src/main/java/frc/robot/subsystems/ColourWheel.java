@@ -65,7 +65,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     switch (action.type) {
     case ROTATION:
       newSpeed = rotationalControl();
-      ledStrip.setProgressColour(Colour.GREEN, Colour.GOLD, rotCount/(3*8 + 2));
+      ledStrip.setProgressColour(Colour.GREEN, Colour.GOLD, rotCount/Constants.COLOUR_WHEEL_ROTATION_TARGET);
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
