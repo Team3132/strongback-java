@@ -107,6 +107,10 @@ public class OI implements OIInterface {
 		onTriggered(rightStick.getButton(5), Sequences.abortLevelStage());
 		onUntriggered(rightStick.getButton(5), Sequences.stopLevelNclimb());
 
+		onTriggered(leftStick.getButton(3), Sequences.visionAim());
+		onUntriggered(leftStick.getButton(3), Sequences.stopDriveByVision());
+
+
 		// Level 3 sequence of buttons
 		/*onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
 		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
@@ -215,13 +219,18 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
 		
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
+		// onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
+		// 	sysoutScoreMode();
+		// 	return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
+		// 						  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
+		// });
+
 		/* Using these buttons for colour wheel while testing.
 		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
 			sysoutScoreMode();
 			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
 								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
 		});
-
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), () -> { 
 			sysoutScoreMode();
 			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_MIDDLE_CARGO_HEIGHT)

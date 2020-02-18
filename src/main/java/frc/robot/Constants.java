@@ -286,18 +286,26 @@ public class Constants {
 	public static final int CAMERA_FRAMES_PER_SECOND = 60;
 	// Vision (all need tuning)
 	public static final double VISON_MAX_TARGET_AGE_SECS = 2;
-	public static final double VISION_MAX_VELOCITY_JERK = 10;
-	public static final double VISION_SPEED_SCALE = 2.5;
-	public static final double VISION_ANGLE_SCALE = 0.6;
+	public static final double VISION_MAX_VELOCITY_JERK = 40; // in/s/s
+	public static final double VISION_SPEED_SCALE = 2.4;
+	public static final double VISION_ASSIST_ANGLE_SCALE = 0.6;
+	public static final double VISION_AIM_ANGLE_SCALE = 0.4;
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
+	public static final double VISION_STOP_DISTANCE = 230; // inches 
+	public static final double VISION_MAX_DRIVE_SPEED = 15;
+	public static final double VISION_AIM_ANGLE_RANGE = 2; //degrees
+	public static final double VISION_AIM_DISTANCE_RANGE = 5; //inches
+	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
+
+
 
 	// Vision filter parameters
-	public static final double VISION_H_MIN = 70;
-	public static final double VISION_H_MAX = 90;
-	public static final double VISION_S_MIN = 10;
+	public static final double VISION_H_MIN = 40;
+	public static final double VISION_H_MAX = 100;
+	public static final double VISION_S_MIN = 20;
 	public static final double VISION_S_MAX = 255;
-	public static final double VISION_V_MIN = 100;
+	public static final double VISION_V_MIN = 40;
 	public static final double VISION_V_MAX = 255;
 
 	// Tape (all need tuning)
@@ -366,6 +374,7 @@ public class Constants {
 	public static final double COLOUR_WHEEL_MOTOR_ADJUST = 0.3;
 	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
 	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
+	public static final int COLOUR_WHEEL_ROTATION_TARGET = 3*8 + 2; //Counting in eights aiming for 3.25 full rotations.
 
 	/*
 	 * LED Strip

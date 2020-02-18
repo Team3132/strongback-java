@@ -2,11 +2,11 @@ package frc.robot.mock;
 
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
 import frc.robot.lib.Colour;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 
 public class MockColourWheel implements ColourWheelInterface {
-    private ColourAction action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+    private ColourAction action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN);
 
     public MockColourWheel(Log log) {
     }

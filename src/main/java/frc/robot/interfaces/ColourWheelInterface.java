@@ -6,15 +6,15 @@ import frc.robot.lib.Colour;
 
 public interface ColourWheelInterface extends SubsystemInterface, Executable, DashboardUpdater {
     public class ColourAction {
-        public final Type type;
+        public final ColourWheelType type;
         public final Colour colour;
 
-        public ColourAction(Type type, Colour colour) {
+        public ColourAction(ColourWheelType type, Colour colour) {
             this.type = type;
             this.colour = colour;
         }
 
-        public enum Type {
+        public enum ColourWheelType {
             ROTATION,
             POSITION,
             ADJUST_WHEEL_ANTICLOCKWISE,
@@ -23,11 +23,26 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         }
 
         @Override
+        public boolean equals(Object obj) {
+            if(this == obj)
+                return true;
+            if(obj == null)
+                return false;
+            if(getClass() != obj.getClass())
+                return false;
+            ColourAction other = (ColourAction) obj;
+            if (other.colour != colour) return false;
+            if (other.type != type) return false;
+            return true;
+        }
+
+        @Override
         public String toString() {
             return String.format("%s: %s", type.toString().toLowerCase(), colour);
         }
 
     }
+
     /** 
      * Sets the desired action for the colour sensor.
      * @param action
