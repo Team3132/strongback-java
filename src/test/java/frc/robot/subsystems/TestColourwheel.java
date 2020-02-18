@@ -114,7 +114,9 @@ public class TestColourwheel {
         colourWheel.enable();
         colourWheel.setDesiredAction(new ColourAction(ColourWheelType.POSITION, desired));
         colour = start;
+        int rotations = 0;
         int amount = (desired.id - start.id + Colour.NUM_COLOURS) %  Colour.NUM_COLOURS;
+        if (amount == 3) amount = 1;
         colourWheel.execute(0);
         if (!desired.equals(start)) {
             assertEquals(Math.signum(motor.get())*Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
@@ -124,11 +126,14 @@ public class TestColourwheel {
                 colourWheel.execute(0);
                 assertEquals(Math.signum(motor.get())*Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
                 assertFalse(colourWheel.isFinished());
+                rotations++;
+                if (desired.equals(colour)) break;
             }
         }
         clock.incrementByMilliseconds(50);
         colourWheel.execute(0);
         assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
         assertTrue(colourWheel.isFinished());
+        assertEquals(amount, rotations);
     }
 }
