@@ -6,7 +6,6 @@ import frc.robot.interfaces.Log;
 public class MockShooter implements ShooterInterface {
 
     private double targetSpeed = 0;
-    private double feederPower = 0; 
 
     public MockShooter(Log log) {
     }
@@ -25,12 +24,6 @@ public class MockShooter implements ShooterInterface {
     @Override
     public double getTargetSpeed() {
         return targetSpeed;
-    }
-
-    @Override
-    public ShooterInterface setFeederPower(double percent) {
-        this.feederPower = percent;
-        return this;
     }
 
     @Override
@@ -57,10 +50,5 @@ public class MockShooter implements ShooterInterface {
 
     @Override
     public void cleanup() {
-    }
-
-    @Override
-    public double getFeederPower() {
-        return feederPower;
     }
 }

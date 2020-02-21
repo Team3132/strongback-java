@@ -223,14 +223,12 @@ public class Sequences {
 	public static Sequence startShooting() {
 		Sequence seq = new Sequence("start shooting");
 		seq.add().setShooterTargetSpeed(SHOOTER_TARGET_SPEED); //RPM
-		seq.add().setFeederPower(SHOOTER_FEEDER_POWER); //PercentOutput
 		return seq;
 	}
 
 	public static Sequence stopShooting() {
 		Sequence seq = new Sequence("stop shooting");
 		seq.add().setShooterTargetSpeed(0); //RPM
-		seq.add().setFeederPower(0); //PercentOutput
 		return seq;
 	}
 	
@@ -419,7 +417,6 @@ public class Sequences {
 		seq.add().doVisionAim(); 
 		seq.add().doArcadeDrive();
 		// seq.add().startShooter(); 
-		// seq.add().startFeeder();
 		// seq.add().startHopper();
 		return seq;
 	}

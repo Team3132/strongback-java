@@ -93,8 +93,8 @@ public class RobotConfiguration {
 	public int passthroughCanID = Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID;
 
 	public boolean shooterIsPresent = false;
-	public int shooterCanID = Constants.SHOOTER_TALON_CAN_ID;
-	public int shooterFeederCanID = Constants.SHOOTER_FEEDER_TALON_CAN_ID;
+	public int[] shooterCanIdsWithEncoders = Constants.SHOOTER_TALON_WITH_ENCODERS_CAN_ID_LIST;
+	public int[] shooterCanIdsWithoutEncoders = Constants.SHOOTER_TALON_WITHOUT_ENCODERS_CAN_ID_LIST;
 
 	public double shooterP = Constants.SHOOTER_P;
 	public double shooterI = Constants.SHOOTER_I;
@@ -236,8 +236,8 @@ public class RobotConfiguration {
 		passthroughCanID = getAsInt("passthrough/canID", Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID);
 
 		shooterIsPresent = getAsBoolean("shooter/present", true);
-		shooterCanID = getAsInt("shooter/shooterCanID", Constants.SHOOTER_TALON_CAN_ID);
-		shooterFeederCanID = getAsInt("shooter/feederCanID", Constants.SHOOTER_FEEDER_TALON_CAN_ID);
+		shooterCanIdsWithEncoders = getAsIntArray("shooter/shooterCanIdsWithEncoders", Constants.SHOOTER_TALON_WITH_ENCODERS_CAN_ID_LIST);
+		shooterCanIdsWithoutEncoders = getAsIntArray("shooter/shooterCanIdsWithoutEncoders", Constants.SHOOTER_TALON_WITHOUT_ENCODERS_CAN_ID_LIST);
 		
 		shooterP = getAsDouble("shooter/p", shooterP);
 		shooterI = getAsDouble("drivebase/i", shooterI);

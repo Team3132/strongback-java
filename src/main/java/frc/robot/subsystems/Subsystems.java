@@ -459,10 +459,10 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanID, true, false, config.shooterP, config.shooterI, config.shooterD, config.shooterF, log);
-		Motor feederMotor = MotorFactory.getFeederMotor(config.shooterFeederCanID, true, false, log);
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIdsWithEncoders, config.shooterCanIdsWithoutEncoders, 
+		false, config.shooterP, config.shooterI, config.shooterD, config.shooterF, clock, log);
 
-		shooter = new Shooter(shooterMotor, feederMotor, dashboard, log);
+		shooter = new Shooter(shooterMotor, dashboard, log);
 	}
 
 	public void createShooterOverride() {

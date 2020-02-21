@@ -152,12 +152,17 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareTalonSRX getShooterMotor(int canID, boolean sensorPhase, boolean invert, double p, double i, double d, double f, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+	public static HardwareTalonSRX getShooterMotor(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean sensorPhase, 
+	double p, double i, double d, double f,	Clock clock, Log log) {
+		HardwareTalonSRX motor = getTalon(canIDsWithEncoders, canIDsWithoutEncoders, false,
+				NeutralMode.Coast, clock, log); // don't invert output
 		motor.setPIDF(0, p, i, d, f);
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(36);
+		
+		motor.configClosedloopRamp(0.125, 10);
+		motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
 
 		// Save PID values into Network Tables
 		NetworkTablesHelper helper = new NetworkTablesHelper("shooter");
@@ -165,14 +170,6 @@ public class MotorFactory {
 		helper.set("i", i);
 		helper.set("d", d);
 		helper.set("f", f);
-		return motor;
-	}
-
-	public static HardwareTalonSRX getFeederMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.setSensorPhase(sensorPhase);
-		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(36);
 		return motor;
 	}
 

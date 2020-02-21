@@ -11,7 +11,6 @@ import frc.robot.interfaces.ShooterInterface;
 public class ShooterSimulator implements ShooterInterface{
 
     private double targetSpeed = 0;
-    private double feederPower = 0;
     private double shooterTime = 0;
 
     @Override
@@ -63,16 +62,5 @@ public class ShooterSimulator implements ShooterInterface{
             return true;
         }
         return false;
-    }
-
-    @Override
-    public ShooterInterface setFeederPower(double percent) {
-        this.feederPower = percent;
-        return this;
-    }
-
-    @Override
-    public double getFeederPower() {
-        return feederPower;
     }
 }

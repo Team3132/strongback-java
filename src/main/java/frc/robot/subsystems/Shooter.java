@@ -18,12 +18,10 @@ import frc.robot.lib.NetworkTablesHelper;
 public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
 
     private ShooterWheel flyWheel;
-    private FeederWheel feederWheel;
 
-    public Shooter(Motor shooterMotor, Motor feederMotor, DashboardInterface dashboard, Log log) {
+    public Shooter(Motor shooterMotor, DashboardInterface dashboard, Log log) {
         super("Shooter", dashboard, log);
         flyWheel = new ShooterWheel(shooterMotor);
-        feederWheel = new FeederWheel(feederMotor);
         //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
     }
 
@@ -43,7 +41,6 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 	public void disable() {
 		super.disable();
         flyWheel.setTargetSpeed(0);
-        feederWheel.setPower(0);
 	}
     
     /**
@@ -66,15 +63,6 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
             return true;
         }
         return false;
-    }
-
-    public double getFeederPower() {
-        return feederWheel.getPower();
-    }
-
-    public ShooterInterface setFeederPower(double percent) {
-        feederWheel.setPower(percent);
-        return this;
     }
 
     protected class ShooterWheel {
@@ -122,31 +110,8 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
         }
     }
 
-    protected class FeederWheel {
-
-        private final Motor motor;
-    
-        public FeederWheel(Motor motor) {
-            this.motor = motor;
-
-            log.register(false, () -> flyWheel.getTargetSpeed(), "Shooter/feederWheel/speed")
-            .register(false, motor::getOutputVoltage, "Shooter/feederWheel/outputVoltage")
-            .register(false, motor::getOutputPercent, "Shooter/feederWheel/outputPercent")
-            .register(false, motor::getOutputCurrent, "Shooter/feederWheel/outputCurrent");
-        }
-
-        public void setPower(double percent) {
-            motor.set(ControlMode.PercentOutput, percent);
-        }
-
-        public double getPower() {
-            return motor.get();
-        }
-    }
-
     @Override
     public void updateDashboard() {
         dashboard.putNumber("Shooter target speed", flyWheel.getTargetSpeed());
-        dashboard.putNumber("Feeder power", feederWheel.getPower());
     }
 }

@@ -43,7 +43,6 @@ public class State {
 	
 	// Shooter
 	public Double shooterTargetSpeed = null;  // Target speed in RPM to give to shooter.
-	public Double feederPower = null;  // Power level to supply to shooter feeder wheel. -1..0..1
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
 	// Passthrough
@@ -83,7 +82,6 @@ public class State {
 		intakeExtended = subsystems.intake.isExtended();
 		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
 		shooterTargetSpeed = subsystems.shooter.getTargetSpeed();
-		feederPower = subsystems.shooter.getFeederPower();
 		//hasCargo = subsystems.shooter.hasCell();
 		climber = subsystems.climber.getDesiredAction();
 		hatchAction = subsystems.hatch.getAction();
@@ -186,13 +184,6 @@ public class State {
 
 	public State setIntakeMotorOutput(double output) {
 		intakeMotorOutput = Double.valueOf(output);
-		return this;
-	}
-
-
-	// Shooter
-	public State setFeederPower(double power) {
-		feederPower = Double.valueOf(power);
 		return this;
 	}
 
@@ -471,7 +462,6 @@ public class State {
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
 		maybeAdd("shooterTargetRPM", shooterTargetSpeed, result);
-		maybeAdd("feederPower", feederPower, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);
 		maybeAdd("hatchHolderGrabbed", hatchHolderEnabled, result);

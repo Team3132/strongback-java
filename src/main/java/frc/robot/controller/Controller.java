@@ -208,7 +208,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.hatch.setHeld(desiredState.hatchHolderEnabled);
 		
 		subsystems.shooter.setTargetSpeed(desiredState.shooterTargetSpeed);
-		subsystems.shooter.setFeederPower(desiredState.feederPower);
 
 		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 
