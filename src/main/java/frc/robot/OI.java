@@ -292,9 +292,9 @@ public class OI implements OIInterface {
 		onUntriggered(box.getButton(OperatorBoxButtons.RED2), Sequences.stopSpitterOnly());
 
 		
-		// Test passthrough (this is temporary)
-		onTriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.startPassthrough());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.stopPassthrough());
+		// Test loader (this is temporary)
+		onTriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.startLoader());
+		onUntriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.stopLoader());
 
 		
 		// Lift movement. Multiple presses move up through configured stops.
@@ -396,15 +396,31 @@ public class OI implements OIInterface {
 		whileTriggered(box.getButton(OperatorBoxButtons.SPARK_SET_SPEED), 
 			() -> sparkTestIF.setMotorOutput(outputScale * box.getAxis(OperatorBoxButtons.SPARK_POT).read()));
 
-		// Passthrough overrides.
-		OverridableSubsystem<PassthroughInterface> passthroughOverride = subsystems.passthroughOverride;
+		// Loader overrides.
+		OverridableSubsystem<LoaderInterface> loaderOverride = subsystems.loaderOverride;
 		// Get the interface that the diag box uses.
-		PassthroughInterface passthroughIF = passthroughOverride.getOverrideInterface();
+		LoaderInterface loaderIF = loaderOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.PASSTHRU_DISABLE, OperatorBoxButtons.PASSTHRU_MANUAL, passthroughOverride);
-	  // While the passthrough speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.PASSTHRU_MOTOR), 
-			() -> passthroughIF.setTargetMotorOutput(box.getAxis(OperatorBoxButtons.PASSTHRU_POT).read()));
+		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, loaderOverride);
+	  // While the loader speed button is pressed, set the target speed. Does not turn off.
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
+			() -> loaderIF.setTargetSpinnerMotorVelocity(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
+			() -> loaderIF.setTargetSpinnerMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
+			() -> loaderIF.setTargetPassthroughMotorVelocity(25*box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
+			() -> loaderIF.setTargetPassthroughMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR), 
+			() -> loaderIF.setTargetFeederMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_FEEDER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR),
+			() -> loaderIF.setTargetFeederMotorOutput(0));
+		
+		
+			onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
+			() -> loaderIF.setPaddleExtended(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
+			() -> loaderIF.setPaddleExtended(true));
 
 		// Hatch overrides.
 		OverridableSubsystem<HatchInterface> hatchOverride = subsystems.hatchOverride;

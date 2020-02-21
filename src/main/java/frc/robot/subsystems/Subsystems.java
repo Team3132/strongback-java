@@ -52,8 +52,8 @@ public class Subsystems implements DashboardUpdater {
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
 	public SparkTestInterface spark;
 	public OverridableSubsystem<SparkTestInterface> sparkTestOverride;
-	public PassthroughInterface passthrough;
-	public OverridableSubsystem<PassthroughInterface> passthroughOverride;
+	public LoaderInterface loader;
+	public OverridableSubsystem<LoaderInterface> loaderOverride;
 	public SpitterInterface spitter;
 	public OverridableSubsystem<SpitterInterface> spitterOverride;
 	public HatchInterface hatch;
@@ -83,7 +83,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createOverrides() {
 		createIntakeOverride();
-		createPassthrougOverride();
+		createLoaderOverride();
 		createSpitterOverride();
 		createHatchOverride();
 		createClimberOverride();
@@ -96,7 +96,7 @@ public class Subsystems implements DashboardUpdater {
 		// location is always enabled.
 		drivebase.enable();
 		intake.enable();
-		passthrough.enable();
+		loader.enable();
 		spitter.enable();
 		climber.enable();
 		lift.enable();
@@ -109,7 +109,7 @@ public class Subsystems implements DashboardUpdater {
 		log.info("Disabling Subsystems");
 		drivebase.disable();
 		intake.disable();
-		passthrough.disable();
+		loader.disable();
 		spitter.disable();
 		climber.disable();
 		lift.disable();
@@ -125,7 +125,7 @@ public class Subsystems implements DashboardUpdater {
 		intake.updateDashboard();
 		climber.updateDashboard();
 		location.updateDashboard();
-		passthrough.updateDashboard();
+		loader.updateDashboard();
 		spitter.updateDashboard();
 		lift.updateDashboard();
 		vision.updateDashboard();
@@ -432,24 +432,29 @@ public class Subsystems implements DashboardUpdater {
 		spark = sparkTestOverride.getNormalInterface();
 	}
 
-	public void createPassthrough() {
-		if (!config.passthroughIsPresent) {
-			passthrough = new MockPassthrough(log);
-			log.sub("Created a mock passthrough!");
+	public void createLoader() {
+		if (!config.loaderIsPresent) {
+			loader = new MockLoader(log);
+			log.sub("Created a mock loader!");
 			return;
 		}
 
-		Motor passthroughMotor = MotorFactory.getPassthroughMotor(config.passthroughCanID, false, log);
-		passthrough = new Passthrough(config.teamNumber, passthroughMotor, dashboard, log);
+		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderCanID, false, config.loaderSpinnerP, config.loaderSpinnerI, config.loaderSpinnerD, config.loaderSpinnerF, log);
+		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderInCanID, false, config.loaderPassthroughP, config.loaderPassthroughI, config.loaderPassthroughD, config.loaderPassthroughF, log);
+		Motor loaderFeederMotor = MotorFactory.getLoaderFeederMotor(config.loaderOutCanID, false, log);
+		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
+		loader = new Loader(spinnerMotor, loaderPassthroughMotor, loaderFeederMotor, paddleSolenoid, dashboard, log);
+		Strongback.executor().register(loader, Priority.LOW);
+
 	}
 
-	public void createPassthrougOverride() {
+	public void createLoaderOverride() {
 		// Setup the diagBox so that it can take control.
-		MockPassthrough simulator = new MockPassthrough(log);  // Nothing to simulate, use the mock
-		MockPassthrough mock = new MockPassthrough(log);
-		passthroughOverride = new OverridableSubsystem<PassthroughInterface>("passthrough", PassthroughInterface.class, passthrough, simulator, mock, log);
+		MockLoader simulator = new MockLoader(log);  // Nothing to simulate, use the mock
+		MockLoader mock = new MockLoader(log);
+		loaderOverride = new OverridableSubsystem<LoaderInterface>("loader", LoaderInterface.class, loader, simulator, mock, log);
 		// Plumb accessing the lift through the override.
-		passthrough = passthroughOverride.getNormalInterface();
+		loader = loaderOverride.getNormalInterface();
 	}
 
 	public void createSpitter() {
