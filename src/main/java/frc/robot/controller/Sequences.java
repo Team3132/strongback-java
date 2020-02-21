@@ -174,10 +174,8 @@ public class Sequences {
 		seq.add().setDelayDelta(5);
 		//Switch/Extend Occurs here
 		seq.add().setLoaderSpinnerMotorOutput(0.2);
-		seq.add().setLoaderFeederMotorOutput(0.5);
 		seq.add().setDelayDelta(5);
 		seq.add().setLoaderSpinnerMotorOutput(0);
-		seq.add().setLoaderFeederMotorOutput(0);
 
 		return seq;
 	}
@@ -433,9 +431,6 @@ public class Sequences {
 		Sequence seq = new Sequence("vision aim");
 		seq.add().doVisionAim(); 
 		seq.add().doArcadeDrive();
-		// seq.add().startShooter(); 
-		// seq.add().startFeeder();
-		// seq.add().startHopper();
 		return seq;
 	}
 

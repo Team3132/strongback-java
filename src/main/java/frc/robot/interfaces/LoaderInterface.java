@@ -7,13 +7,11 @@ import org.strongback.Executable;
  */
 public interface LoaderInterface extends SubsystemInterface, Executable, DashboardUpdater {
 
-    public double getTargetSpinnerMotorVelocity();
-    public double getTargetPassthroughMotorVelocity();
-    public double getTargetFeederMotorOutput();
+    public double getTargetSpinnerMotorOutput();
+    public double getTargetPassthroughMotorOutput();
 
     public void setTargetSpinnerMotorVelocity(double current);
-    public void setTargetPassthroughMotorVelocity(double PassthroughMotorCurrent);
-    public void setTargetFeederMotorOutput(double FeederMotorCurrent);
+    public void setTargetPassthroughMotorOutput(double percentoutput);
 
 	/**
 	 * @return the state of the loader solenoid. 

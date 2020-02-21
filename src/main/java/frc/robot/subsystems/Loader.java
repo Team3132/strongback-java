@@ -13,22 +13,18 @@ import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Subsystem;
 
 public class Loader extends Subsystem implements LoaderInterface, Executable, DashboardUpdater {
-    private Motor spinner, passthrough, feeder;
+    private Motor spinner, passthrough;
     private Solenoid paddleSolenoid;
     private double spinnerVelocity = 0;
     private double passthroughVelocity = 0;
 
-    public Loader(Motor loaderSpinnerMotor, Motor loaderPassthroughMotor, Motor loaderFeederMotor, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
+    public Loader(Motor loaderSpinnerMotor, Motor loaderPassthroughMotor, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
         super("Loader", dashboard, log);
         
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
-        this.feeder = loaderFeederMotor;
         this.paddleSolenoid = paddleSolenoid;
-        log.register(true, () -> feeder.getOutputCurrent(), "%s/feeder/Current", name)
-               .register(true, () -> feeder.getOutputPercent(), "%s/feeder/PercentOut", name)
-               .register(true, () -> passthrough.getVelocity(), "%s/passthrough/Velocity", name)
-               .register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
+        log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
                .register(true, () -> spinner.getVelocity(), "%s/spinner/Velocity", name)
                .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
@@ -50,22 +46,11 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
         }
     }
     @Override
-	public void setTargetPassthroughMotorVelocity(double velocity) {
-        NetworkTablesHelper passthroughHelper = new NetworkTablesHelper("loader/passthroughmotor/");
-        passthroughHelper.set("targetRPM", velocity);
-        passthroughVelocity = velocity;
-        log.sub("%s: Setting loader in motor velocity to: %f", name, velocity);
+	public void setTargetPassthroughMotorOutput(double percent) {
+        log.sub("%s: Setting loader in motor percent output to: %f", name, percent);
         // If motor is zero in velocity the PID will try and reverse the motor in order to slow down
-        if(velocity == 0) {
-            passthrough.set(ControlMode.PercentOutput, 0);
-        } else {
-            passthrough.set(ControlMode.Velocity, velocity);
-        }
-    }
-    @Override
-	public void setTargetFeederMotorOutput(double outPercent) {
-        log.sub("%s: Setting loader feeder motor percentage output to: %f", name, outPercent);
-        feeder.set(ControlMode.PercentOutput, outPercent);
+            passthrough.set(ControlMode.PercentOutput, percent);
+        
     }
 
     public LoaderInterface setPaddleExtended(boolean extend) {
@@ -97,14 +82,6 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
         double f = spinnerHelper.get("f", 0);
         spinner.setPIDF(0, p, i, d, f);
         spinnerHelper.set("actualRPM", spinner.getVelocity());
-
-        NetworkTablesHelper passthroughHelper = new NetworkTablesHelper("loader/loaderinmotor/");
-        p = passthroughHelper.get("p", 0);
-        i = passthroughHelper.get("i", 0);
-        d = passthroughHelper.get("d", 0);
-        f = passthroughHelper.get("f", 0);
-        passthrough.setPIDF(0, p, i, d, f);
-        passthroughHelper.set("actualRPM", passthrough.getVelocity());
     }
 
     /**
@@ -114,29 +91,22 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     public void updateDashboard() {
         dashboard.putString("Loader Paddle position", isPaddleExtended() ? "extended" : isPaddleRetracted() ? "retracted" : "moving");
         dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
-        dashboard.putNumber("Loader passthrough velocity", passthrough.getVelocity());
-        dashboard.putNumber("Loader feeder current", feeder.getOutputCurrent());
+        dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
     }
 
     @Override
     public void disable()  {
-        spinner.set(ControlMode.Velocity, 0);
-        passthrough.set(ControlMode.Velocity, 0);
-        feeder.set(ControlMode.PercentOutput, 0);
+        spinner.set(ControlMode.PercentOutput, 0);
+        passthrough.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
-    public double getTargetFeederMotorOutput() {
-        return feeder.getOutputPercent();
+    public double getTargetSpinnerMotorOutput() {
+        return spinner.getOutputPercent();
     }
 
     @Override
-    public double getTargetSpinnerMotorVelocity() {
-        return spinnerVelocity;
-    }
-
-    @Override
-    public double getTargetPassthroughMotorVelocity() {
-        return passthroughVelocity;
+    public double getTargetPassthroughMotorOutput() {
+        return passthrough.getOutputPercent();
     }
 }

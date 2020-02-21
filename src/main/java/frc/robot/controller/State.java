@@ -46,8 +46,7 @@ public class State {
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
 	// Loader
-	public Double loaderFeederMotorOutput = null;
-	public Double loaderPassthroughMotorVelocity = null;
+	public Double loaderPassthroughMotorOutput = null;
 	public Double loaderSpinnerMotorVelocity = null;
 	public Boolean loaderPaddleExtended = null;
 
@@ -84,9 +83,8 @@ public class State {
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
 		// Loader
-		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
-		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
-		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
+		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorOutput();
+		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
 
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
@@ -224,11 +222,7 @@ public class State {
 		return this;
 	}
 	public State setLoaderPassthroughMotorOutput(double output) {
-		loaderPassthroughMotorVelocity = Double.valueOf(output);
-		return this;
-	}
-	public State setLoaderFeederMotorOutput(double output) {
-		loaderFeederMotorOutput = Double.valueOf(output);
+		loaderPassthroughMotorOutput = Double.valueOf(output);
 		return this;
 	}
 	public State setPaddleExtended(boolean extended) {
@@ -479,9 +473,8 @@ public class State {
 		ArrayList<String> result = new ArrayList<String>();
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("loaderPassthroughMotorVelocity", loaderPassthroughMotorVelocity, result);
+		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
-		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
 		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
 		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
 		maybeAdd("hasCargo", hasCargo, result);

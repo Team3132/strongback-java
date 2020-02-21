@@ -408,13 +408,9 @@ public class OI implements OIInterface {
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
 			() -> loaderIF.setTargetSpinnerMotorVelocity(0));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
-			() -> loaderIF.setTargetPassthroughMotorVelocity(25*box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+			() -> loaderIF.setTargetPassthroughMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
-			() -> loaderIF.setTargetPassthroughMotorVelocity(0));
-		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR), 
-			() -> loaderIF.setTargetFeederMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_FEEDER_POT).read()));
-		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR),
-			() -> loaderIF.setTargetFeederMotorOutput(0));
+			() -> loaderIF.setTargetPassthroughMotorOutput(0));
 		
 		
 			onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 

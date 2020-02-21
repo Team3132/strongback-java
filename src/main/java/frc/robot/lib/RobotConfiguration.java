@@ -92,15 +92,10 @@ public class RobotConfiguration {
 	public boolean loaderIsPresent = false;
 	public int loaderCanID = Constants.LOADER_SPINNER_CAN_ID;
 	public int loaderInCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
-	public int loaderOutCanID = Constants.LOADER_FEEDER_MOTOR_CAN_ID;
 	public double loaderSpinnerP = Constants.LOADER_SPINNER_P;
 	public double loaderSpinnerI = Constants.LOADER_SPINNER_I;
 	public double loaderSpinnerD = Constants.LOADER_SPINNER_D;
 	public double loaderSpinnerF = Constants.LOADER_SPINNER_F;
-	public double loaderPassthroughP = Constants.LOADER_PASSTHROUGH_P;
-	public double loaderPassthroughI = Constants.LOADER_PASSTHROUGH_I;
-	public double loaderPassthroughD = Constants.LOADER_PASSTHROUGH_D;
-	public double loaderPassthroughF = Constants.LOADER_PASSTHROUGH_F;
 
 	public boolean spitterIsPresent = false;
 	public int spitterRightCanID = Constants.SPITTER_RIGHT_TALON_CAN_ID;

@@ -108,8 +108,6 @@ public class OperatorBoxButtons {
 	public static final int LOADER_PASSTHROUGH_POT = GREEN_POT; // Potentiometer needs to be assigned
 	public static final int LOADER_SPINNER_MOTOR = YELLOW_BUTTON1;
 	public static final int LOADER_SPINNER_POT = YELLOW_POT;
-	public static final int LOADER_FEEDER_MOTOR = BLUE_BUTTON1;
-	public static final int LOADER_FEEDER_POT = BLUE_POT;
 
 	// Hatch
 	public static final int HATCH_DISABLE = GREEN_DISABLE; //There is no hatch
