@@ -11,9 +11,11 @@ package frc.robot.controller;
 import static frc.robot.Constants.*;
 
 import frc.robot.lib.WheelColour;
-import frc.robot.lib.WaypointUtil;
 
-import jaci.pathfinder.Waypoint;
+import java.util.List;
+
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 /**
  * Control sequences for most robot operations.
@@ -38,7 +40,7 @@ public class Sequences {
 		if (startSeq == null) {
 			startSeq = new Sequence("start");
 		}
-		startSeq.add().doArcadeVelocityDrive();
+		//startSeq.add().doArcadeVelocityDrive();
 		return startSeq;
 	}
 	private static Sequence startSeq = null;
@@ -72,13 +74,13 @@ public class Sequences {
 	
 	/**
 	 * Drive to a point on the field, relative to the starting point.
+	 * @param angle the final angle (relative to the field) in degrees.
 	 */
 	public static Sequence getDriveToWaypointSequence(double x, double y, double angle) {
-		if (driveToWaypointSeq == null) {
-			Waypoint waypoint = new Waypoint(x, y, angle);
-			driveToWaypointSeq = new Sequence(String.format("drive to %s", WaypointUtil.toString(waypoint)));
-			driveToWaypointSeq.add().driveRelativeWaypoints(new Waypoint[]{waypoint}, true);
-		}
+		Pose2d start = new Pose2d();
+		Pose2d end = new Pose2d(x, y, new Rotation2d(Math.toRadians(angle)));
+		driveToWaypointSeq = new Sequence(String.format("drive to %s", end));
+		driveToWaypointSeq.add().driveRelativeWaypoints(start, List.of(), end, true);
 		return driveToWaypointSeq;
 	}	
 	private static Sequence driveToWaypointSeq = null;
@@ -90,7 +92,7 @@ public class Sequences {
 	}
 
 	public static Sequence setDrivebaseToArcade() {
-		Sequence seq = new Sequence("Slow drive forward");
+		Sequence seq = new Sequence("Arcade");
 		seq.add().doArcadeDrive();
 		return seq;
 	}
@@ -109,12 +111,12 @@ public class Sequences {
  				 .setHatchPosition(HATCH_INTAKE_HOLD_POSITION);
 		// Waits for the lift to go to the set height before turning on to the motor
 		// The spitter speed should be set at a small speed.
-		seq.add().setPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
+		seq.add().setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT)
 				 .setSpitterDutyCycle(SPITTER_SPEED); 
 		seq.add().waitForCargo();
 		seq.add().setSpitterDutyCycle(0)
 				 .setIntakeMotorOutput(0)
-				 .setPassthroughMotorOutput(0);
+				 .setLoaderSpinnerMotorOutput(0);
 		return seq;
 	}
 
@@ -122,7 +124,7 @@ public class Sequences {
 		Sequence seq = new Sequence("Stop intake");
 		seq.add().setSpitterDutyCycle(0)
 				 .setIntakeMotorOutput(0)
-				 .setPassthroughMotorOutput(0);
+				 .setLoaderSpinnerMotorOutput(0);
 		seq.add().setDelayDelta(0.1);
 		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
 		return seq;
@@ -149,22 +151,6 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence startReverseCycle() {
-		Sequence seq = new Sequence("Start reverse cycle");
-		seq.add().setSpitterDutyCycle(-SPITTER_SPEED);
-		seq.add().setPassthroughMotorOutput(-PASSTHROUGH_MOTOR_CURRENT);
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
-		return seq;
-	}
-
-	public static Sequence stopReverseCycle() {
-		Sequence seq = new Sequence("Stop reverse cycle");
-		seq.add().setSpitterDutyCycle(0);
-		seq.add().setPassthroughMotorOutput(0);
-		seq.add().setIntakeMotorOutput(0);
-		return seq;
-	}
-
 	public static Sequence moveLift(String name, double height) {
 		Sequence seq = new Sequence("Set lift to " + name);
 		seq.add().setLiftHeight(height);
@@ -176,7 +162,27 @@ public class Sequences {
 		seq.add().setLiftHeight(setpoint.height);
 		return seq;
 	}
+	/**
+	 * Start Test Loader Sequence
+	 * 
+	 */
+	public static Sequence startLoaderTest() {
+		Sequence seq = new Sequence("Start Loader Test Sequence");
+		seq.add().setLoaderPassthroughMotorOutput(0.5);
+		seq.add().setLoaderSpinnerMotorOutput(0.3);
+		seq.add().setDelayDelta(10);
+		seq.add().setLoaderPassthroughMotorOutput(0);
+		seq.add().setLoaderSpinnerMotorOutput(0);
+		seq.add().setDelayDelta(5);
+		//Switch/Extend Occurs here
+		seq.add().setLoaderSpinnerMotorOutput(0.2);
+		seq.add().setLoaderFeederMotorOutput(0.5);
+		seq.add().setDelayDelta(5);
+		seq.add().setLoaderSpinnerMotorOutput(0);
+		seq.add().setLoaderFeederMotorOutput(0);
 
+		return seq;
+	}
 	/**
 	 * Move up to the next lift setpoint.
 	 */
@@ -232,16 +238,16 @@ public class Sequences {
 		seq.add().stowIntake();
 		return seq;
 	}
-	// This is to test the Passthrough system
-	public static Sequence startPassthrough() {
-		Sequence seq = new Sequence("start Passthrough");
-		seq.add().setPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
+	// This is to test the Loader system
+	public static Sequence startLoader() {
+		Sequence seq = new Sequence("start Loader");
+		seq.add().setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT);
 		return seq;
 	}
 
-	public static Sequence stopPassthrough() {
-		Sequence seq = new Sequence("stop Passthrough");
-		seq.add().setPassthroughMotorOutput(0.0);
+	public static Sequence stopLoader() {
+		Sequence seq = new Sequence("stop Loader");
+		seq.add().setLoaderSpinnerMotorOutput(0.0);
 		return seq;
 	}
 
@@ -476,8 +482,8 @@ public class Sequences {
 		stopCargoSpit(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
-		startPassthrough(),
-		stopPassthrough(),
+		startLoader(),
+		stopLoader(),
 		//startSpitterOnly(),
 		//stopSpitterOnly(),
 		holdHatch(),

@@ -11,6 +11,8 @@ import com.revrobotics.ColorMatch;
 
 import edu.wpi.first.wpilibj.util.Color;
 
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
  * 
@@ -52,13 +54,14 @@ public class Constants {
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
 	public static final double ROBOT_WIDTH_INCHES = 20;
-	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1};
-	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {2};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5}; 
-	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {6};
+	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5,6};
+	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
-	public static final double DRIVE_WHEEL_DIAMETER         = 3.79;
+	public static final double DRIVE_WHEEL_DIAMETER         = 6; // inches 
 	public static final int DRIVE_ENCODER_CODES_PER_REV		= 4 * 360;
+	public static final double DRIVE_GEABOX_RATIO = 11;
 	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
@@ -67,7 +70,8 @@ public class Constants {
 	// distance the robot moves per revolution of the encoders. Gearing needs to be taken into account here.
 	// at full speed in a static environment the encoders are producing 2000 count differences per 100ms
 	public static final double DRIVE_DISTANCE_PER_REV = DRIVE_WHEEL_DIAMETER * Math.PI;
-	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
+	//public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
+	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_DISTANCE_PER_REV / DRIVE_GEABOX_RATIO;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
@@ -165,10 +169,24 @@ public class Constants {
 	public static final double HATCH_CALIBRATION_SPEED = -0.4; // Percentage of motor power needed for calibration.
 	
 	/*
-	* Passthrough
+	* Loader
 	*/
-	public static final int PASSTHROUGH_MOTOR_TALON_CAN_ID = 20; //TODO: find canID for Passthrough motor
-	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
+	public static final int LOADER_SPINNER_CAN_ID = 30; //TODO: find canID for Loader motor
+	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 31; //TODO: find canID for Loader Input motor
+	public static final int LOADER_FEEDER_MOTOR_CAN_ID = 47; //TODO: find canID for Loader Output motor
+	public static final double LOADER_MOTOR_CURRENT = 1.0;
+	public static final int LOADER_SOLENOID_PORT = 2; 
+	public static final int PADDLE_SOLENOID_PORT = 1;
+	public static final double LOADER_IN_MOTOR_SCALE = 4096/10;//1024*10; //ticks per rotation
+	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; //ticks per rotation
+	public static final double LOADER_SPINNER_P = 0.4; //TODO: assign values to PIDF
+	public static final double LOADER_SPINNER_I = 0;
+	public static final double LOADER_SPINNER_D = 20;
+	public static final double LOADER_SPINNER_F = 0.225;
+	public static final double LOADER_PASSTHROUGH_P = 0.2;
+	public static final double LOADER_PASSTHROUGH_I = 0;
+	public static final double LOADER_PASSTHROUGH_D = 2.0;
+	public static final double LOADER_PASSTHROUGH_F = 0.1025;
 	
 	/*
 	 * Canifier 
@@ -359,6 +377,36 @@ public class Constants {
 	public static final double TIME_LOCATION_PERIOD = (1.0/(double)LOCATION_HISTORY_CYCLE_SPEED);	// update the location subsystem 100 times a second
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
 
+	public static final class DriveConstants {
+		public static final double kTrackwidthMeters = 0.71;
+
+		public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
+				kTrackwidthMeters);
+
+		public static final double kWheelDiameterMeters = 0.15; // 6" wheels
+		public static final double kGearboxRatio = 11;
+		public static final double kEncoderDistancePerRev =
+				// Encoders are mounted on the motors. Wheels are by 11:1 gearbox
+				(kWheelDiameterMeters * Math.PI) / kGearboxRatio;
+
+		// The Robot Characterization Toolsuite provides a convenient tool for obtaining
+		// these values for your robot.
+		public static final double ksVolts = 0.177;
+		public static final double kvVoltSecondsPerMeter = 3.3;// Calculated value = 2.94;
+		public static final double kaVoltSecondsSquaredPerMeter = 0.4;// Calculated value = 0.368;
+
+		// Example value only - as above, this must be tuned for your drive!
+		public static final double kPDriveVel = 0.01;// 3//13.3; // should be 13.3
+		// kD should be 0
+
+		public static final double kMaxSpeedMetersPerSecond = 6;// 3;
+		public static final double kMaxAccelerationMetersPerSecondSquared = 2;// 1;
+
+		// Reasonable baseline values for a RAMSETE follower in units of meters and
+		// seconds
+		public static final double kRamseteB = 2;
+		public static final double kRamseteZeta = 0.7;
+	}
 	/*
 	 * Colour Wheel
 	 */

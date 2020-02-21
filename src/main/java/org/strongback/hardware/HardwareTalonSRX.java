@@ -101,6 +101,11 @@ public class HardwareTalonSRX implements Motor {
 			demand *= scale;
 		}
 		lastMode = mode;
+		if (mode.equals(Motor.ControlMode.Voltage)) {
+			// TalonSRX doesn't support voltage as a control mode, so percent output is used instead.
+			mode = ControlMode.PercentOutput;
+			demand /= talon.getBusVoltage();
+		}
 		lastDemand = demand;
 		talon.set(mode.talonControlMode, demand);
 	}
