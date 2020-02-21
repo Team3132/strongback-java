@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
+import org.strongback.components.Solenoid;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
@@ -18,10 +19,15 @@ import frc.robot.lib.NetworkTablesHelper;
 public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
 
     private ShooterWheel flyWheel;
+    private Solenoid solenoid;
 
-    public Shooter(Motor shooterMotor, DashboardInterface dashboard, Log log) {
+    public Shooter(Motor shooterMotor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
         super("Shooter", dashboard, log);
+        this.solenoid = solenoid;
         flyWheel = new ShooterWheel(shooterMotor);
+
+        log.register(true, () -> isExtended(), "%s/extended", name)
+               .register(true, () -> isRetracted(), "%s/retracted", name);
         //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
     }
 
@@ -63,6 +69,27 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
             return true;
         }
         return false;
+    }
+
+    @Override
+    public ShooterInterface setExtended(boolean extend) {
+        if (extend) {
+            solenoid.extend();
+        } else {
+            solenoid.retract();
+        }
+        return this;
+    }
+
+    @Override
+    public boolean isExtended() {
+        //log.sub("Is intake extended: " +  solenoid.isExtended());
+        return solenoid.isExtended();
+    }
+
+    @Override
+    public boolean isRetracted() {
+        return solenoid.isRetracted();
     }
 
     protected class ShooterWheel {

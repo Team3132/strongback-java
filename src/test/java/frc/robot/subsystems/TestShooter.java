@@ -9,12 +9,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.strongback.mock.Mock;
 import org.strongback.mock.MockMotor;
+import org.strongback.mock.MockSolenoid;
+
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockLog;
+import frc.robot.mock.MockShooter;
 
 
 public class TestShooter {
     MockMotor shooterMotor;
+    MockSolenoid shooterSolenoid;
     ShooterInterface shooter;
 
 	public static final int SHOOTER_TARGET_SPEED = 6500;
@@ -23,7 +27,8 @@ public class TestShooter {
     @Before
     public void setUp() {
         shooterMotor = Mock.stoppedMotor();
-        shooter = new Shooter(shooterMotor, new MockDashboard(), new MockLog());
+        shooterSolenoid = Mock.Solenoids.singleSolenoid(0);
+        shooter = new Shooter(shooterMotor, shooterSolenoid, new MockDashboard(), new MockLog());
     }
 
     @Test

@@ -459,10 +459,11 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
+		Solenoid shooterSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIdsWithEncoders, config.shooterCanIdsWithoutEncoders, 
 		false, config.shooterP, config.shooterI, config.shooterD, config.shooterF, clock, log);
 
-		shooter = new Shooter(shooterMotor, dashboard, log);
+		shooter = new Shooter(shooterMotor, shooterSolenoid, dashboard, log);
 	}
 
 	public void createShooterOverride() {

@@ -3,6 +3,7 @@ package frc.robot.simulator;
 
 import java.lang.*;
 import frc.robot.interfaces.ShooterInterface;
+import frc.robot.lib.MovementSimulator;
 
 /**
  * Very basic intake simulator used for unit testing.
@@ -10,8 +11,14 @@ import frc.robot.interfaces.ShooterInterface;
  */
 public class ShooterSimulator implements ShooterInterface{
 
+	private final double kMaxSpeed = 180;  // degrees/sec
+	private final double kMaxAccel = 200;   // degrees/sec/sec
+	private final double kMinAngle = 0;
+	private final double kMaxAngle = 45;
+	private final double kMovementTolerance = 1;  // How close before it's classed as being in position.
     private double targetSpeed = 0;
     private double shooterTime = 0;
+	private MovementSimulator arm = new MovementSimulator("arm intake", kMaxSpeed, kMaxAccel, kMinAngle, kMaxAngle, kMovementTolerance);
 
     @Override
     public String getName() {
@@ -63,4 +70,20 @@ public class ShooterSimulator implements ShooterInterface{
         }
         return false;
     }
+
+	@Override
+	public ShooterInterface setExtended(boolean extend) {
+		arm.setTargetPos(kMaxAngle);
+		return this;
+	}
+
+	@Override
+	public boolean isExtended() {
+		return arm.getTargetPos() == kMaxAngle && arm.isInPosition();
+	}
+
+	@Override
+	public boolean isRetracted() {
+		return arm.getTargetPos() == kMinAngle && arm.isInPosition();
+	}
 }
