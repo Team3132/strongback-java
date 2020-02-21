@@ -69,7 +69,7 @@ public class MockLoader implements LoaderInterface {
 
 
     @Override
-    public double getTargetSpinnerMotorOutput() {
+    public double getTargetSpinnerMotorVelocity() {
         return spinnerVelocity;
        
     }

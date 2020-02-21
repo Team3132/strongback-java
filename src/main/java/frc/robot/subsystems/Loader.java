@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import org.strongback.Executable;
 import org.strongback.components.Solenoid;
 import org.strongback.components.Motor;
@@ -15,21 +17,73 @@ import frc.robot.lib.Subsystem;
 public class Loader extends Subsystem implements LoaderInterface, Executable, DashboardUpdater {
     private Motor spinner, passthrough;
     private Solenoid paddleSolenoid;
+    private BooleanSupplier inSensor, outSensor;
     private double spinnerVelocity = 0;
-    private double passthroughVelocity = 0;
+    private int ballsStored = 0;
+    private boolean inSensorPrev = false;
+    private boolean outSensorPrev = false;
 
-    public Loader(Motor loaderSpinnerMotor, Motor loaderPassthroughMotor, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
+    public Loader(Motor loaderSpinnerMotor,
+                Motor loaderPassthroughMotor, Solenoid paddleSolenoid,
+                BooleanSupplier inSensor,
+                BooleanSupplier outSensor,
+                DashboardInterface dashboard, Log log) {
         super("Loader", dashboard, log);
+
+        
         
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
         this.paddleSolenoid = paddleSolenoid;
+        this.inSensor = inSensor;
+        this.outSensor = outSensor;
+        
         log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
                .register(true, () -> spinner.getVelocity(), "%s/spinner/Velocity", name)
                .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
-               .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name);
+               .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name)
+               .register(true, () -> (double) getBallsStored(), "%s/ballsStored", name);
+    }
+
+    @Override
+    public void update() {
+        // Increments if the current state is not equal to the previous state (rising edge)
+        if(inSensor.getAsBoolean() && !inSensorPrev) {
+            ballsStored += 1;
+        }
+        if(outSensor.getAsBoolean() && !outSensorPrev) {
+            ballsStored -= 1;
+        }
+
+        // Updates the state of inSensorPrev if it's not equal to inSensor
+        if(inSensor.getAsBoolean() != inSensorPrev) {
+            inSensorPrev = inSensor.getAsBoolean();
+        }
+        // Updates the state of outSensorPrev if it's not equal to outSensor
+        if(outSensor.getAsBoolean() != outSensorPrev) {
+            outSensorPrev = outSensor.getAsBoolean();
+        }
+    }
+
+    public int getBallsStored() {
+        return ballsStored;
+    }
+
+    public boolean isLoaderFull() {
+        if(ballsStored >= 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public boolean isLoaderEmpty() {
+        if(ballsStored == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 	@Override
@@ -101,8 +155,8 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     }
 
     @Override
-    public double getTargetSpinnerMotorOutput() {
-        return spinner.getOutputPercent();
+    public double getTargetSpinnerMotorVelocity() {
+        return spinnerVelocity;
     }
 
     @Override

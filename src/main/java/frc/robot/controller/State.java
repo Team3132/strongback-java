@@ -83,7 +83,7 @@ public class State {
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
 		// Loader
-		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorOutput();
+		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
 
