@@ -97,17 +97,6 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareSparkMAX getSparkTestMotor(int[] canIDs, boolean invert, Log log) {
-		HardwareSparkMAX motor = getSparkMAX(canIDs, invert, NeutralMode.Brake, log);
-		NetworkTablesHelper config = new NetworkTablesHelper("tunnable/sparkTest/");
-		double p = config.get("p", 0.0);
-		double i = config.get("i", 0.0);
-		double d = config.get("d", 0.0);
-		double f = config.get("f", 0.1);
-		motor.setPIDF(0, p, i, d, f);
-		return motor;
-	}
-
 	public static HardwareTalonSRX getPassthroughMotor(int canID, boolean invert, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(.25, 10);

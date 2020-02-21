@@ -134,29 +134,6 @@ public class Constants {
 	// Pneumatic Control Modules (PCM)
 	public static final int PCM_CAN_ID = 61;
 
-	// Level two (step climb)
-	public static final int LEVEL_TWO_SOLENOID_ID = 3;
-	public static final double LEVEL_TWO_SOLENOID_RETRACT_TIME = 0.3;  // Faster to retract with the robot sitting on it.
-	public static final double LEVEL_TWO_SOLENOID_EXTEND_TIME = 0.5;
-	public static final double LEVEL_TWO_HEIGHT = 12; //Temporary
-
-	// Level three (higher step climb)
-	public static final int LEVEL_THREE_REAR_CAN_ID = 47;
-	public static final int LEVEL_THREE_DRIVE_MOTOR_CAN_ID = 48;
-	public static final double LEVEL_THREE_HEIGHT = 24; //Temporary
-	public static final double L3_CLIMB_HEIGHT = 10;
-	public static final double L3_DRIVE_POWER = 0.2;
-	public static final double DRIVEBASE_L3_DRIVE_POWER = 0.2;
-	public static final double DRIVEBASE_L3_DRIVE_SLOW_POWER = 0.25;
-	public static final double L3_POSITION_F = 0;  // TODO: Needs tuning.
-	public static final double L3_POSITION_P = 0.01;
-	public static final double L3_POSITION_I = 0;
-	public static final double L3_POSITION_D = 0;
-	public static final int L3_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
-	public static final int L3_PEAK_CURRENT_LIMIT = 43;
-	public static final int L3_CURRENT_TIMEOUT_MS = 100;
-
-
 	/*
 	 * Camera server constants
 	 * These are magic numbers to tell the Jevois which vision processor to load.

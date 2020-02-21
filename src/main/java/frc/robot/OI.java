@@ -83,9 +83,8 @@ public class OI implements OIInterface {
 		onUntriggered(leftStick.getButton(1), Sequences.stopDriveByVision());
 
 		// Intake - Right Stick Button 2 (on/off)
-		onTriggered(rightStick.getButton(2), () -> {
-			return Sequences.startIntaking();
-		}); 
+		onTriggered(rightStick.getButton(2), Sequences.startIntaking());
+		
 		onUntriggered(rightStick.getButton(2), Sequences.stopIntaking());
 
 		onTriggered(leftStick.getButton(6), Sequences.startSlowDriveForward());
@@ -93,63 +92,6 @@ public class OI implements OIInterface {
 
 		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
 		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
-
-		// tell the climber to go back down
-		// Right Stick
-		onTriggered(rightStick.getButton(5), Sequences.abortLevelStage());
-		onUntriggered(rightStick.getButton(5), Sequences.stopLevelNclimb());
-
-		// Level 3 sequence of buttons
-		/*onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
-		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
-
-		onTriggered(rightStick.getButton(10), Sequences.startLevelDriveForward());
-		onUntriggered(rightStick.getButton(10), Sequences.stopLevelDrive());
-
-		onTriggered(rightStick.getButton(8), Sequences.startRearRaise());
-		onUntriggered(rightStick.getButton(8), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(12), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());*/
-
-		onTriggered(leftStick.getButton(10), Sequences.startFrontRaise());
-		onUntriggered(leftStick.getButton(10), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(8), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(8), Sequences.stopLevelDrive());
-
-		// Level 2 sequence of buttons
-
-		onTriggered(rightStick.getButton(11), Sequences.startLevel2climb());
-		onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
-
-		onTriggered(rightStick.getButton(9), Sequences.startLevelDriveForward());
-		onUntriggered(rightStick.getButton(9), Sequences.stopLevelDrive());
-
-		onTriggered(rightStick.getButton(7), Sequences.startRearRaise());
-		onUntriggered(rightStick.getButton(7), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(11), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(11), Sequences.stopLevelDrive());
-
-		onTriggered(leftStick.getButton(9), Sequences.startFrontRaise());
-		onUntriggered(leftStick.getButton(9), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(7), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(7), Sequences.stopLevelDrive());
-
-		//onTriggered(rightStick.getButton(9), Sequences.startFrontRaise());
-		//onUntriggered(rightStick.getButton(9), Sequences.stopLevelNclimb());
-
-		//onTriggered(rightStick.getButton(11), Sequences.startRearRaise());
-		//onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
-
-
-		//onTriggered(leftStick.getButton(9), Sequences.startLevelDriveForward());
-		//onUntriggered(leftStick.getButton(9), Sequences.stopLevelDrive());
-
-		//onTriggered(leftStick.getButton(11), Sequences.startLevelDriveBackward());
-		//onUntriggered(leftStick.getButton(11), Sequences.stopLevelDrive());
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
@@ -163,11 +105,7 @@ public class OI implements OIInterface {
 			return Sequences.startIntaking();
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
-		
-		// Reverse button
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
-		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
-		
+	
 		
 		 
 		/* Using these buttons for colour wheel while testing.
@@ -215,6 +153,8 @@ public class OI implements OIInterface {
 
  	@Override
 	public void configureDiagBox(InputDevice box) {
+
+	}
 		/*
 		// Intake
 		onTriggered(box.getButton(OperatorBoxButtons.RED1), Sequences.startIntakingOnly());
@@ -223,31 +163,6 @@ public class OI implements OIInterface {
 		// Test passthrough (this is temporary)
 		onTriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.startPassthrough());
 		onUntriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.stopPassthrough());
-
-		// Level three
-		// Extend overrides
-		final double l3ExtendPower = 0.25;
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN1), Sequences.setL3LeftFrontStiltsPowerOverride(l3ExtendPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN1), Sequences.setL3LeftFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.BLUE2), Sequences.setL3RightFrontStiltsPowerOverride(l3ExtendPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.BLUE2), Sequences.setL3RightFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.CLEAR), Sequences.setL3RearStiltsPowerOverride(l3ExtendPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.CLEAR), Sequences.setL3RearStiltsPowerOverride(0));
-		// Retract overrides
-		final double l3RetractPower = -0.5;
-		onTriggered(box.getButton(OperatorBoxButtons.BLUE1), Sequences.setL3LeftFrontStiltsPowerOverride(l3RetractPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.BLUE1), Sequences.setL3LeftFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN2), Sequences.setL3RightFrontStiltsPowerOverride(l3RetractPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN2), Sequences.setL3RightFrontStiltsPowerOverride(0));
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN5), Sequences.setL3RearStiltsPowerOverride(l3RetractPower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN5), Sequences.setL3RearStiltsPowerOverride(0));
-		// L3 driving.
-		final double l3DrivePower = 0.3;
-		onTriggered(box.getButton(OperatorBoxButtons.BLUE4), Sequences.setL3DrivePower(l3DrivePower));
-		onUntriggered(box.getButton(OperatorBoxButtons.BLUE4), Sequences.setL3DrivePower(0));
-		onTriggered(box.getButton(OperatorBoxButtons.GREEN4), Sequences.setL3DrivePower(-l3DrivePower));
-		onUntriggered(box.getButton(OperatorBoxButtons.GREEN4), Sequences.setL3DrivePower(0));
-		*/
 
 		// Climber overrides.
 		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;
@@ -303,10 +218,6 @@ public class OI implements OIInterface {
 		
 }
 
-	private double scaleStiltsPotHeight(double value) {
-		// Pot has a value of -1 to 1. Scale to 0 - max_height.
-		return (value + 1) / 2 * Constants.CLIMBER_L3_CLIMB_HEIGHT;
-	}
 
 	private void mapOverrideSwitch(InputDevice box, int disableButton, int manualButton, OverridableSubsystem overrideableSubsystem) {
 		onTriggered(box.getButton(disableButton), () -> overrideableSubsystem.turnOff());

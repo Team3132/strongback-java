@@ -14,9 +14,6 @@ public interface IntakeInterface extends SubsystemInterface, Executable, Dashboa
 	 * */
 	public boolean isExtended();
 	public boolean isRetracted();
-	/**
-	 * Detects whether if the intake has the cargo.
-	 */
 
 	// Current control.
 	public void setMotorOutput(double current);
