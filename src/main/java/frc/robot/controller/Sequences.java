@@ -414,6 +414,16 @@ public class Sequences {
 		return seq;
 	}
 
+	public static Sequence visionAim(){
+		Sequence seq = new Sequence("vision aim");
+		seq.add().doVisionAim(); 
+		seq.add().doArcadeDrive();
+		// seq.add().startShooter(); 
+		// seq.add().startFeeder();
+		// seq.add().startHopper();
+		return seq;
+	}
+
 	public static Sequence colourWheelRotational() {
 		Sequence seq = new Sequence("start rotational control");
 		seq.add().colourWheelRotational();
@@ -470,6 +480,7 @@ public class Sequences {
 		abortLevelStage(),
 		getMicroAdjustUpSequence(), 
 		getMicroAdjustDownSequence(), 
-		getDriveToWaypointSequence(0, 12, 0)
+		getDriveToWaypointSequence(0, 12, 0),
+		visionAim(),
 	};	
 }  

@@ -313,27 +313,27 @@ public class State {
 
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.Type.ROTATION, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelPositional(Colour colour) {
-		colourWheel = new ColourAction(ColourAction.Type.POSITION, colour);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.Type.NONE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelLeft() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelRight() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
 		return this;
 	}
 
@@ -400,6 +400,13 @@ public class State {
 		drive.value = heading;
 		return this;
 	}
+
+	public State doVisionAim(){
+		drive = new DriveRoutineParameters(DriveRoutineType.VISION_AIM);
+		return this;
+	}
+
+
 
 	/**
 	 * Add waypoints for the drive base to drive through.

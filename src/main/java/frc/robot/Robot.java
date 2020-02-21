@@ -106,9 +106,9 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.createShooter();
 		subsystems.createHatch();
 		subsystems.createLift();
-		subsystems.createVision();
 		subsystems.createSparkTest();
 		subsystems.createOverrides();
+		subsystems.createVision();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();
