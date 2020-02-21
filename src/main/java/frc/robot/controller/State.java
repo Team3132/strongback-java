@@ -403,8 +403,8 @@ public class State {
 	 * Note: The robot will come to a complete halt after each list
 	 * of Waypoints, so each State will cause the robot to drive and then
 	 * halt ready for the next state. This should be improved.
-	 * Wayoints are relative to the robots position.
-	 * @param start the assumed starting point and angle.
+	 * Waypoints are relative to the robots position.
+	 * @param start the assumed starting point and angle. 
 	 * @param waypoints list of Waypoints to drive through.
 	 * @param end the end point and angle.
 	 * @param forward drive forward through waypoints.

@@ -74,7 +74,7 @@ public class Sequences {
 	
 	/**
 	 * Drive to a point on the field, relative to the starting point.
-	 * @param angle the final angle (relative to the inital angle) in degrees.
+	 * @param angle the final angle (relative to the field) in degrees.
 	 */
 	public static Sequence getDriveToWaypointSequence(double x, double y, double angle) {
 		Pose2d start = new Pose2d();
