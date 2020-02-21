@@ -210,10 +210,10 @@ public class OI implements OIInterface {
 		//whileTriggered(axisAsSwitch(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS)),
 		//		() -> { return Sequences.getHatchDeltaPositionSequence(-1 * stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read()); });
 				
-		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() >= 0.5;}, Sequences.setHatchPower(-0.5));
+		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() >= 0.5;}, Sequences.colourWheelRight());
 		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() < 0.5 &&
-			stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() > -0.5;}, Sequences.setHatchPower(0));
-		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() <= -0.5;}, Sequences.setHatchPower(0.5));
+			stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() > -0.5;}, Sequences.stopColourWheel());
+		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() <= -0.5;}, Sequences.colourWheelLeft());
 
 
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
