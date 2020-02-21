@@ -54,6 +54,6 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
     public ClimberAction getDesiredAction();
 
     public boolean isInPosition();
-    
-    
+
+
 }

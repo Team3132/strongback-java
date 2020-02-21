@@ -60,11 +60,12 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
         super.disable();
     }
     
-
     @Override
     public boolean isInPosition() {
         return leftWinch.isInPosition() && rightWinch.isInPosition();
     }
+
+
     @Override
     public void execute(long timeInMillis) {
         if (action.type != ClimberType.STOP_CLIMBER) {
