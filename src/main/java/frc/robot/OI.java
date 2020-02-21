@@ -14,9 +14,9 @@ import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
 import frc.robot.interfaces.HatchInterface.HatchAction;
-import frc.robot.lib.Colour;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.*;
 
 
@@ -252,10 +252,10 @@ public class OI implements OIInterface {
 		}); */
 
 		//Colour Wheel testing.
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(Colour.YELLOW));
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(Colour.BLUE));
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(Colour.RED));
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(Colour.GREEN));
+		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(WheelColour.YELLOW));
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(WheelColour.BLUE));
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(WheelColour.RED));
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(WheelColour.GREEN));
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.colourWheelRotational());
 		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.stopColourWheel());
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());

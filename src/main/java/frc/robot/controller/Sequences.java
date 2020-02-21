@@ -10,7 +10,7 @@ package frc.robot.controller;
 
 import static frc.robot.Constants.*;
 
-import frc.robot.lib.Colour;
+import frc.robot.lib.WheelColour;
 import frc.robot.lib.WaypointUtil;
 
 import jaci.pathfinder.Waypoint;
@@ -441,7 +441,7 @@ public class Sequences {
 		return seq;
 	}
 	
-	public static Sequence colourWheelPositional(Colour colour) {
+	public static Sequence colourWheelPositional(WheelColour colour) {
 		Sequence seq = new Sequence("start positional control");
 		seq.add().colourWheelPositional(colour);
 		return seq;

@@ -385,19 +385,19 @@ public class Subsystems implements DashboardUpdater {
     	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
 		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
 
-		colourWheel = new ColourWheel(motor, new Supplier<Colour>() {
+		colourWheel = new ColourWheel(motor, new Supplier<WheelColour>() {
 			@Override
-			public Colour get() {
+			public WheelColour get() {
 				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
-				Colour sensedColour = Colour.UNKNOWN;
+				WheelColour sensedColour = WheelColour.UNKNOWN;
 				if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
-					sensedColour = Colour.BLUE;
+					sensedColour = WheelColour.BLUE;
 				} else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
-					sensedColour = Colour.RED;
+					sensedColour = WheelColour.RED;
 				} else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
-					sensedColour = Colour.GREEN;
+					sensedColour = WheelColour.GREEN;
 				} else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
-					sensedColour = Colour.YELLOW;
+					sensedColour = WheelColour.YELLOW;
 				}
 				return sensedColour;
 			}

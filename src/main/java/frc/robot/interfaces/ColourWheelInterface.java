@@ -2,14 +2,14 @@ package frc.robot.interfaces;
 
 import org.strongback.Executable;
 
-import frc.robot.lib.Colour;
+import frc.robot.lib.WheelColour;
 
 public interface ColourWheelInterface extends SubsystemInterface, Executable, DashboardUpdater {
     public class ColourAction {
         public final ColourWheelType type;
-        public final Colour colour;
+        public final WheelColour colour;
 
-        public ColourAction(ColourWheelType type, Colour colour) {
+        public ColourAction(ColourWheelType type, WheelColour colour) {
             this.type = type;
             this.colour = colour;
         }
