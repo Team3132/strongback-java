@@ -28,7 +28,7 @@ public class ArcadeDrive implements DriveRoutine {
 	}
 	
 	@Override
-	public DriveMotion getMotion() {
+	public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
 		double m = move.read();
 		double t = turn.read();
 		//log.sub("%s: Move: %f, Turn: %f\n", name, m, t);

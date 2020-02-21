@@ -46,7 +46,7 @@ public class CheesyDpadDrive implements DriveRoutine {
 	}
 
 	@Override
-	public DriveMotion getMotion() {
+	public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
 		double turn = kTopHatSpeed;
 		double throttle = kTopHatSpeed;
 		boolean quickTurn = false;

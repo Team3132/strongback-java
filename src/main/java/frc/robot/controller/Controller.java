@@ -4,18 +4,13 @@ import java.util.Iterator;
 import java.util.function.BooleanSupplier;
 
 import org.strongback.components.Clock;
-import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
-import frc.robot.lib.Position;
 import frc.robot.subsystems.Subsystems;
-
-import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Waypoint;
 
 /**
  * The controller of State Sequences while ensuring the robot is safe at every step.
@@ -45,14 +40,6 @@ public class Controller implements Runnable, DashboardUpdater {
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
-
-	/**
-	 * The Pathfinder library can't be run on x86 without recompiling, which makes it
-	 * hard to unit test. Instead it's abstracted out.
-	 */
-	public interface TrajectoryGenerator {
-		Trajectory[] generate(Waypoint[] waypoints);
-	}
 
 	public Controller(Subsystems subsystems) {
 		this.subsystems = subsystems;
@@ -151,7 +138,6 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		logSub("Applying requested state: %s", desiredState);
 		//logSub("Waiting subsystems to finish moving before applying state");
-		// waitForLift();
 		waitForIntake();
 		
 		// Get the current state of the subsystems.
@@ -164,38 +150,13 @@ public class Controller implements Runnable, DashboardUpdater {
 		// The time beyond which we are allowed to move onto the next state
 		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());	
 
-		// Calculate the height that we want to use.
-		// We cannot just use desiredState.liftAction.value because it
-		// might not be of type SET_HEIGHT
-		double desiredLiftHeight = desiredState.liftAction.calculateHeight(
-			subsystems.lift.getHeight(),
-			subsystems.lift.getTargetHeight()
-		);
-		
-		maybeResetPosition(desiredState.resetPosition, subsystems);
 		
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
-		
-		// Retract the lift if the lift is going to the bottom so the spitter doesn't hit the bumpers.
-		// In updatedesiredState.liftAction was set to type SET_HEIGHT
-		if (desiredLiftHeight < Constants.LIFT_DEFAULT_MIN_HEIGHT) { // FIXME: This will never evaluate to true
-			if (subsystems.lift.isDeployed()) {
-				log.sub("Lift has been asked to move to 0, retracting spitter");
-			}
-			subsystems.lift.retract();
-			waitForLiftDeployer();
-		}
-		subsystems.lift.setTargetHeight(desiredLiftHeight);
+	
 		
 		// Do the next steps in parallel as they don't mechanically conflict with each other.
 		
-		if (desiredState.liftDeploy) {
-			subsystems.lift.deploy();
-			waitForLiftDeployer();
-		} else {
-			subsystems.lift.retract();
-		}
 
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
@@ -203,24 +164,17 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.loader.setTargetSpinnerMotorVelocity(desiredState.loaderSpinnerMotorVelocity);
 
 		subsystems.climber.setDesiredAction(desiredState.climber);
-
-		subsystems.hatch.setAction(desiredState.hatchAction);
-		subsystems.hatch.setHeld(desiredState.hatchHolderEnabled);
 		
-		subsystems.spitter.setTargetDutyCycle(desiredState.spitterDutyCycle);
-
+		
 		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		
-		maybeWaitForLift();  // This be aborted, so the intake needs to be wary below.
-		waitForHatch();
 		waitForIntake();
 		waitForClimber();
 		maybeWaitForColourWheel();
 		//waitForLiftDeployer();
-		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
-		
+
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
 		maybeWaitForAutoDriving();
@@ -229,37 +183,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitForTime(endTime);
 	}
 
-	/**
-	 * If not null, reset the current location in the Location subsystem to be position.
-	 * Useful when starting autonomous.
-	 * @param position
-	 * @param subsystems
-	 */
-	private void maybeResetPosition(Waypoint position, Subsystems subsystems) {
-		if (position == null) return;
-		subsystems.location.setCurrentLocation(new Position(position.x, position.y, position.angle));
-	}
-
-	/**
-	 * Blocks waiting till the lift is in position.
-	 * If the sequence changes it will stop the lift.
-	 */
-	private void maybeWaitForLift() {
-		try {
-			waitUntilOrAbort(() -> subsystems.lift.isInPosition(), "lift");
-		} catch (SequenceChangedException e) {
-			logSub("Sequence changed while moving lift, stopping lift");
-			// The sequence has changed, grab the current position
-			// and set that as the target so the lift quickly stops.
-			double height = subsystems.lift.getHeight();
-			subsystems.lift.setTargetHeight(height);
-			logSub("Resetting lift target height to " + height);
-			// Give it a chance to stop moving.
-			clock.sleepSeconds(0.1);
-		}
-	}
-
-
 	private void maybeWaitForAutoDriving() {
 		try {
 			waitUntilOrAbort(() -> subsystems.drivebase.hasFinished(), "auto driving");
@@ -267,13 +190,6 @@ public class Controller implements Runnable, DashboardUpdater {
 			logSub("Sequence changed while driving, switching drivebase back to arcade");
 			subsystems.drivebase.setArcadeDrive();
 		}
-	}
-
-	/**
-	 * Blocks waiting till the lift is in position.
-	 */
-	private void waitForLift() {
-		waitUntil(() -> subsystems.lift.isInPosition(), String.format("lift to move to %.0f", subsystems.lift.getTargetHeight()));
 	}
 
 	/**
@@ -289,36 +205,6 @@ public class Controller implements Runnable, DashboardUpdater {
 	private void waitForClimber() {
 		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
 	}
-
-	/**
-	 * Blocks waiting till cargo is found, spat, or sequence is aborted.
-	 */
-	private void waitForCargo(boolean expectCargo) {
-		if (subsystems.spitter.hasCargo() == expectCargo) return;
-		logSub("Waiting for Cargo");
-		try {
-			waitUntilOrAbort(() -> subsystems.spitter.hasCargo() == expectCargo, "cargo");
-		} catch (SequenceChangedException e) {
-			// Desired state has changed underneath us, give up waiting
-			//and return.
-			return;
-		}
-	}
-
-	/**
-	 * Blocks waiting till the hatch has moved into position.
-	 */
-	private void waitForHatch() {
-		waitUntil(() -> subsystems.hatch.isInPosition(), "hatch to finish moving");
-	}
-	
-	/**
-	 * Blocks until the lift deployer has stopped moving.
-	 */
-	private void waitForLiftDeployer() {
-		waitUntil(() -> subsystems.lift.isDeployed() || !subsystems.lift.isDeployed(), "lift deployer to stop moving");
-	}
-
 
 	private void maybeWaitForColourWheel() {
 		try {

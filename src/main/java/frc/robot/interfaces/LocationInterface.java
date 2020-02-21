@@ -1,6 +1,8 @@
 package frc.robot.interfaces;
 
 import org.strongback.Executable;
+
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import frc.robot.lib.Position;
 
 /**
@@ -56,6 +58,13 @@ public abstract interface LocationInterface extends Executable, DashboardUpdater
      */
 	public Position getHistoricalLocation(double timeSec);
     
+	/**
+	 * Returns the currently-estimated pose of the robot.
+	 *
+	 * @return The pose.
+	 */
+	public Pose2d getPose();
+	
 	/**
 	 * Update our location on the field.
 	 *
