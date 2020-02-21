@@ -1,5 +1,6 @@
 package frc.robot.interfaces;
 
+import frc.robot.Constants;
 import frc.robot.lib.Position;
 
 /**
@@ -14,13 +15,21 @@ public interface VisionInterface extends DashboardUpdater {
 	 */
 	public static class TargetDetails {
 		public boolean targetFound = false;  // Was a target seen.
-		public double seenAtSec; // What time this target was seen at in seconds since boot.
+		public double imageTimestamp; // What time this target was seen at in seconds since boot.
 		public Position location = new Position(0, 0);  // Co-ordinates relative to the location subsystem.
 		public double height;  // How high the target is.
+		public double distance;
+		public double angle;
+		public double skew;
 		
+		public boolean isValid(double currentTime) {
+			double lockAgeSec = currentTime - imageTimestamp;
+			return targetFound && lockAgeSec < Constants.VISON_MAX_TARGET_AGE_SECS;
+		}
+
 		@Override
 		public String toString() {
-			return String.format("found: %s, at %f, location %s", targetFound, seenAtSec, location);
+			return String.format("found: %s, at %f, location %s", targetFound, imageTimestamp, location);
 		}
 	}
 	

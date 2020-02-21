@@ -36,7 +36,8 @@ import frc.robot.interfaces.Log;
         this.encoderSpeed = encoderSpeed;
         calc = new PositionCalc(encoderPos.getAsDouble(), encoderSpeed.getAsDouble(), maxJerk, clock, log);
         log.register(true, () -> calc.getSpeed(), "%s/targetSpeed", name)
-           .register(true, () -> calc.getPosition(), "%s/targetPos", name);
+           .register(true, () -> calc.getPosition(), "%s/targetPos", name)
+           .register(true, () -> encoderPos.getAsDouble(), "%s/actualPos", name);
     }
 
     public void setVAPID(double kV, double kA, double kP, double kI, double kD) {

@@ -11,6 +11,8 @@ import org.strongback.components.Clock;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ColourWheelInterface.Colour;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.interfaces.LiftInterface.LiftAction;
@@ -60,6 +62,9 @@ public class State {
 	// Driving.
 	public DriveRoutineParameters drive = null;
 
+	//Colour Wheel
+	public ColourAction colourWheel = null;
+
 	/**
 	 * Create a blank state
 	 */
@@ -82,6 +87,7 @@ public class State {
 		hatchHolderEnabled = subsystems.hatch.getHeld();
 		liftDeploy = subsystems.lift.shouldBeDeployed();
 		drive = subsystems.drivebase.getDriveRoutine();
+		colourWheel = subsystems.colourWheel.getDesiredAction();
 	}
 
 	// Time
@@ -295,6 +301,31 @@ public class State {
 		return this;
 	}
 
+	// Color Wheel
+	public State colourWheelRotational() {
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State colourWheelPositional(Colour colour) {
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
+		return this;
+	}
+
+	public State stopColourWheel() {
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State colourWheelLeft() {
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
+		return this;
+	}
+
+	public State colourWheelRight() {
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
+		return this;
+	}
 
 	// Drive base
 	/**
@@ -359,6 +390,13 @@ public class State {
 		drive.value = heading;
 		return this;
 	}
+
+	public State doVisionAim(){
+		drive = new DriveRoutineParameters(DriveRoutineType.VISION_AIM);
+		return this;
+	}
+
+
 
 	/**
 	 * Add waypoints for the drive base to drive through.
@@ -434,6 +472,7 @@ public class State {
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
+		maybeAdd("colourwheelMode", colourWheel, result);
 	
 		return "[" + String.join(",", result) + "]";
 	}

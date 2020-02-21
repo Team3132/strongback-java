@@ -37,6 +37,7 @@ public class HardwareTalonSRX implements Motor {
 	private HardwareSensorCollection sensorCollection;
 	private com.ctre.phoenix.motorcontrol.can.TalonSRX talon;
 	private double scale = 1.0;
+	private double lastDemand = 0;
 	private ControlMode lastMode = ControlMode.Disabled;
 
 	private boolean scalable(ControlMode mode) {
@@ -105,7 +106,13 @@ public class HardwareTalonSRX implements Motor {
 			mode = ControlMode.PercentOutput;
 			demand /= talon.getBusVoltage();
 		}
+		lastDemand = demand;
 		talon.set(mode.talonControlMode, demand);
+	}
+
+	@Override
+	public double get() {
+		return lastDemand;
 	}
 
 	public void neutralOutput() {
