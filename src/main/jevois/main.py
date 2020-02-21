@@ -376,7 +376,7 @@ class FirstPython:
         h, w, chans = imgbgr.shape
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
 
-        #imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
+        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
         h, w, chans = imgbgr.shape
         # Get pre-allocated but blank output image which we will send over USB:
         outimg = outframe.get()
