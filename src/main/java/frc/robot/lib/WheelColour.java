@@ -39,6 +39,23 @@ public enum WheelColour {
         return WheelColour.of((this.id + NUM_COLOURS + (direction < 0 ? 1 : -1)) % NUM_COLOURS);
     }
 
+    public LEDColour convert() {
+        switch(this) {
+            case RED:
+                return LEDColour.RED;
+            case BLUE:
+                return LEDColour.BLUE;
+            case YELLOW:
+                return LEDColour.YELLOW;
+            case GREEN:
+                return LEDColour.GREEN;
+            case UNKNOWN:
+                return LEDColour.WHITE;
+            default:
+                return LEDColour.WHITE;
+        }
+    }
+
     @Override
     public String toString () {
         return name + "(" + id + ")";

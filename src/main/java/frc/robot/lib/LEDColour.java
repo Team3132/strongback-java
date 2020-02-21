@@ -9,6 +9,7 @@ public enum LEDColour {
     ORANGE(255,128,0),
     PINK(255,0,255),
     GOLD(212,175,55),
+    WHITE(255,255,255),
     PURPLE(102,51,153);
 
     public final int r;

@@ -70,15 +70,15 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
-      //ledStrip.setColour(colour);
+      ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_ANTICLOCKWISE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_ADJUST;
-      //ledStrip.setColour(colour);
+      ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_CLOCKWISE:
       newSpeed = -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
-      //ledStrip.setColour(colour);
+      ledStrip.setColour(colour.convert());
       break;
     case NONE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
