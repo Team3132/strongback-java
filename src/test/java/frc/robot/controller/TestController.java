@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.strongback.mock.MockClock;
 import org.strongback.mock.MockPneumaticsModule;
-import frc.robot.Constants;
-import frc.robot.interfaces.ClimberInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.mock.MockClimber;
@@ -17,7 +15,7 @@ import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLog;
-import frc.robot.mock.MockPassthrough;
+import frc.robot.mock.MockLoader;
 import frc.robot.simulator.IntakeSimulator;
 import frc.robot.subsystems.Subsystems;
 
@@ -55,7 +53,7 @@ public class TestController {
 		subsystems.climber = new MockClimber(log);
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase(log);
-		subsystems.passthrough = new MockPassthrough(log);
+		subsystems.loader = new MockLoader(log);
 		subsystems.location = new MockLocation();
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;

@@ -4,18 +4,13 @@ import java.util.Iterator;
 import java.util.function.BooleanSupplier;
 
 import org.strongback.components.Clock;
-import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
-import frc.robot.lib.Position;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.subsystems.Subsystems;
-
-import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Waypoint;
 
 /**
  * The controller of State Sequences while ensuring the robot is safe at every step.
@@ -45,14 +40,6 @@ public class Controller implements Runnable, DashboardUpdater {
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
-
-	/**
-	 * The Pathfinder library can't be run on x86 without recompiling, which makes it
-	 * hard to unit test. Instead it's abstracted out.
-	 */
-	public interface TrajectoryGenerator {
-		Trajectory[] generate(Waypoint[] waypoints);
-	}
 
 	public Controller(Subsystems subsystems) {
 		this.subsystems = subsystems;
@@ -164,8 +151,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());	
 
 		
-		maybeResetPosition(desiredState.resetPosition, subsystems);
-		
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 	
@@ -176,7 +161,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
 
-		subsystems.passthrough.setTargetMotorOutput(desiredState.passthroughMotorOutput);
+		subsystems.loader.setTargetSpinnerMotorVelocity(desiredState.loaderSpinnerMotorVelocity);
 
 		subsystems.climber.setDesiredAction(desiredState.climber);
 		
@@ -197,18 +182,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		// Last thing: wait for the delay time if it's set.
 		waitForTime(endTime);
 	}
-
-	/**
-	 * If not null, reset the current location in the Location subsystem to be position.
-	 * Useful when starting autonomous.
-	 * @param position
-	 * @param subsystems
-	 */
-	private void maybeResetPosition(Waypoint position, Subsystems subsystems) {
-		if (position == null) return;
-		subsystems.location.setCurrentLocation(new Position(position.x, position.y, position.angle));
-	}
-
 
 	private void maybeWaitForAutoDriving() {
 		try {
@@ -239,7 +212,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while moving colour wheel");
 			// The sequence has changed, setting action to null.
-			subsystems.colourWheel.setDesiredAction(new ColourAction(Type.NONE, Colour.UNKNOWN));
+			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN));
 			logSub("Resetting colour wheel to no action.");
 		}
 	}

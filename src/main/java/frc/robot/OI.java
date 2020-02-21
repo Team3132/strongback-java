@@ -11,7 +11,6 @@ import frc.robot.controller.Controller;
 import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
-import frc.robot.interfaces.ClimberInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
@@ -105,37 +104,8 @@ public class OI implements OIInterface {
 			return Sequences.startIntaking();
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
-	
-		
-		 
-		/* Using these buttons for colour wheel while testing.
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
-		});
 
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_MIDDLE_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_MIDDLE_HATCH_HEIGHT);
-		});
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_TOP_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_TOP_HATCH_HEIGHT);
-		});
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_HATCH_HEIGHT);
-		});
-		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), () -> {
-			scoreModeCargo = !scoreModeCargo;
-			sysoutScoreMode();
-		}); */
-
-		//Colour Wheel testing.
+		// Colour Wheel testing.
 		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(Colour.YELLOW));
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(Colour.BLUE));
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(Colour.RED));
@@ -153,51 +123,13 @@ public class OI implements OIInterface {
 
  	@Override
 	public void configureDiagBox(InputDevice box) {
-
-	}
-		/*
-		// Intake
-		onTriggered(box.getButton(OperatorBoxButtons.RED1), Sequences.startIntakingOnly());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED1), Sequences.stopIntakingOnly());
-		
-		// Test passthrough (this is temporary)
-		onTriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.startPassthrough());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED3), Sequences.stopPassthrough());
-
-		// Climber overrides.
-		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;
-		// Get the interface that the diag box uses.
-		ClimberInterface climberIF = climberOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.CLIMBER_DISABLE, OperatorBoxButtons.CLIMBER_MANUAL, climberOverride);
-	  // Override front stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_FRONT_HEIGHT), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_FRONT_HEIGHT,
-				scaleStiltsPotHeight(box.getAxis(OperatorBoxButtons.CLIMBER_POT).read()))));
-	  // Override rear stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_REAR_HEIGHT), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_REAR_HEIGHT,
-				scaleStiltsPotHeight(box.getAxis(OperatorBoxButtons.CLIMBER_POT).read()))));
-		// Override both front and rear stilts height.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_BOTH_HEIGHT),
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT,
-				scaleStiltsPotHeight(box.getAxis(OperatorBoxButtons.CLIMBER_POT).read()))));
-	  // Override stilts driving power.
-		whileTriggered(box.getButton(OperatorBoxButtons.CLIMBER_DRIVE_SPEED), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.Type.SET_DRIVE_SPEED,
-				box.getAxis(OperatorBoxButtons.CLIMBER_POT).read())));
-
 		// Intake overrides.
 		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
 		// Get the interface that the diag box uses.
 		IntakeInterface intakeIF = intakeOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.INTAKE_DISABLE, OperatorBoxButtons.INTAKE_MANUAL, intakeOverride);
-	  // While the intake speed button is pressed, set the target speed. Does not turn off.
+	    // While the intake speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
 			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_EXTEND), 
@@ -205,17 +137,29 @@ public class OI implements OIInterface {
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_RETRACT), 
 			() -> intakeIF.setExtended(false));
 
-		// Passthrough overrides.
-		OverridableSubsystem<PassthroughInterface> passthroughOverride = subsystems.passthroughOverride;
 		// Get the interface that the diag box uses.
-		PassthroughInterface passthroughIF = passthroughOverride.getOverrideInterface();
+		LoaderInterface loaderIF = subsystems.loaderOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.PASSTHRU_DISABLE, OperatorBoxButtons.PASSTHRU_MANUAL, passthroughOverride);
-	  // While the passthrough speed button is pressed, set the target speed. Does not turn off.
-		whileTriggered(box.getButton(OperatorBoxButtons.PASSTHRU_MOTOR), 
-			() -> passthroughIF.setTargetMotorOutput(box.getAxis(OperatorBoxButtons.PASSTHRU_POT).read()));
-
+		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
+	  // While the loader speed button is pressed, set the target speed. Does not turn off.
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
+			() -> loaderIF.setTargetSpinnerMotorVelocity(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
+			() -> loaderIF.setTargetSpinnerMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
+			() -> loaderIF.setTargetPassthroughMotorVelocity(25*box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
+			() -> loaderIF.setTargetPassthroughMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR), 
+			() -> loaderIF.setTargetFeederMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_FEEDER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR),
+			() -> loaderIF.setTargetFeederMotorOutput(0));
 		
+		
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
+			() -> loaderIF.setPaddleExtended(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
+			() -> loaderIF.setPaddleExtended(true));
 }
 
 

@@ -2,19 +2,20 @@ package frc.robot.controller;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import org.strongback.components.Clock;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.TimeAction;
 import frc.robot.subsystems.Subsystems;
-
-import jaci.pathfinder.Waypoint;
 
 /**
  * Top level class to hold / specify some sort of current or target state.
@@ -34,9 +35,12 @@ public class State {
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
-	
-	// Passthrough
-	public Double passthroughMotorOutput = null;
+
+	// Loader
+	public Double loaderFeederMotorOutput = null;
+	public Double loaderPassthroughMotorVelocity = null;
+	public Double loaderSpinnerMotorVelocity = null;
+	public Boolean loaderPaddleExtended = null;
 
 	// Vision
 	public CameraMode cameraMode = null;
@@ -46,8 +50,6 @@ public class State {
 
 	// Driving.
 	public DriveRoutineParameters drive = null;
-
-	public Waypoint resetPosition = null;  // Reset where the location subsystem thinks the robot is
 
 	//Colour Wheel
 	public ColourAction colourWheel = null;
@@ -65,7 +67,10 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
+		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
+		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
+		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
+		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
@@ -113,9 +118,22 @@ public class State {
 		return this;
 	}
 
-	// Passthrough
-	public State setPassthroughMotorOutput(double output) {
-		passthroughMotorOutput = Double.valueOf(output);
+
+	// Loader
+	public State setLoaderSpinnerMotorOutput(double output) {
+		loaderSpinnerMotorVelocity = Double.valueOf(output);
+		return this;
+	}
+	public State setLoaderPassthroughMotorOutput(double output) {
+		loaderPassthroughMotorVelocity = Double.valueOf(output);
+		return this;
+	}
+	public State setLoaderFeederMotorOutput(double output) {
+		loaderFeederMotorOutput = Double.valueOf(output);
+		return this;
+	}
+	public State setPaddleExtended(boolean extended) {
+		loaderPaddleExtended = Boolean.valueOf(extended);
 		return this;
 	}
 
@@ -159,27 +177,27 @@ public class State {
 
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.Type.ROTATION, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelPositional(Colour colour) {
-		colourWheel = new ColourAction(ColourAction.Type.POSITION, colour);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.Type.NONE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelLeft() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelRight() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
 		return this;
 	}
 
@@ -247,20 +265,29 @@ public class State {
 		return this;
 	}
 
+	public State doVisionAim(){
+		drive = new DriveRoutineParameters(DriveRoutineType.VISION_AIM);
+		return this;
+	}
+
+
+
 	/**
 	 * Add waypoints for the drive base to drive through.
 	 * Note: The robot will come to a complete halt after each list
 	 * of Waypoints, so each State will cause the robot to drive and then
 	 * halt ready for the next state. This should be improved.
-	 * Wayoints are relative to the robots position.
+	 * Waypoints are relative to the robots position.
+	 * @param start the assumed starting point and angle. 
 	 * @param waypoints list of Waypoints to drive through.
+	 * @param end the end point and angle.
 	 * @param forward drive forward through waypoints.
 	 */
-	public State driveRelativeWaypoints(Waypoint[] waypoints, boolean forward) {
-		drive = DriveRoutineParameters.getDriveWaypoints(waypoints, forward, true);
+	public State driveRelativeWaypoints(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end,
+			boolean forward) {
+		drive = DriveRoutineParameters.getDriveWaypoints(start, interiorWaypoints, end, forward, true);
 		return this;
-	}
-	
+	}	
 
 	/**
 	 * Creates a copy of desiredState whose null variables are replaced by values in currentState
@@ -308,7 +335,10 @@ public class State {
 		ArrayList<String> result = new ArrayList<String>();
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
+		maybeAdd("loaderPassthroughMotorVelocity", loaderPassthroughMotorVelocity, result);
+		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
+		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
+		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);

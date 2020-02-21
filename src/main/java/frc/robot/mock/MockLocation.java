@@ -1,5 +1,6 @@
 package frc.robot.mock;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import frc.robot.Constants;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.lib.MathUtil;
@@ -34,6 +35,16 @@ public class MockLocation implements LocationInterface {
 		return new Position(10*timeSec, 100*timeSec, timeSec % 360);
 	}
 
+	/**
+	 * Returns the currently-estimated pose of the robot.
+	 *
+	 * @return The pose.
+	 */
+	@Override
+	public Pose2d getPose() {
+		return new Pose2d();
+	}
+	
 	@Override
 	public void update() {
 	}

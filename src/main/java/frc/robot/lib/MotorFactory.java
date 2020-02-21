@@ -2,13 +2,11 @@ package frc.robot.lib;
 
 import java.util.ArrayList;
 
-import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.strongback.components.Clock;
@@ -97,13 +95,35 @@ public class MotorFactory {
 		return motor;
 	}
 
-	public static HardwareTalonSRX getPassthroughMotor(int canID, boolean invert, Log log) {	
+	public static HardwareTalonSRX getLoaderSpinnerMotor(int canID, boolean invert, double p, double i, double d, double f,Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.configClosedloopRamp(.25, 10);
-		motor.configReverseSoftLimitEnable(false, 10);
-		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
-		motor.configVoltageCompSaturation(12, 10);
-		motor.enableVoltageCompensation(true);
+		motor.setPIDF(0, p, i, d, f);
+		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		motor.setScale(Constants.LOADER_MAIN_MOTOR_SCALE); // number of ticks per rotation.
+		motor.configClosedloopRamp(0, 10);
+		NetworkTablesHelper helper = new NetworkTablesHelper("loader/spinnermotor/");
+		helper.set("p", p);
+		helper.set("i", i);
+		helper.set("d", d);
+		helper.set("f", f);
+		return motor;
+	}
+	public static HardwareTalonSRX getLoaderPassthroughMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {	
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		motor.setPIDF(0, p, i, d, f);
+		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		motor.setScale(Constants.LOADER_IN_MOTOR_SCALE); // number of ticks per rotation
+		motor.configClosedloopRamp(0.5, 10);
+		NetworkTablesHelper helper = new NetworkTablesHelper("loader/passthroughmotor/");
+		helper.set("p", p);
+		helper.set("i", i);
+		helper.set("d", d);
+		helper.set("f", f);
+		return motor;
+	}
+	public static HardwareTalonSRX getLoaderFeederMotor(int canID, boolean invert, Log log) {	
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		motor.configClosedloopRamp(0.5, 10);
 		return motor;
 	}
 
