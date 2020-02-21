@@ -11,9 +11,11 @@ package frc.robot.controller;
 import static frc.robot.Constants.*;
 
 import frc.robot.interfaces.ColourWheelInterface.Colour;
-import frc.robot.lib.WaypointUtil;
 
-import jaci.pathfinder.Waypoint;
+import java.util.List;
+
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 /**
  * Control sequences for most robot operations.
@@ -38,7 +40,7 @@ public class Sequences {
 		if (startSeq == null) {
 			startSeq = new Sequence("start");
 		}
-		startSeq.add().doArcadeVelocityDrive();
+		//startSeq.add().doArcadeVelocityDrive();
 		return startSeq;
 	}
 	private static Sequence startSeq = null;
@@ -72,13 +74,13 @@ public class Sequences {
 	
 	/**
 	 * Drive to a point on the field, relative to the starting point.
+	 * @param angle the final angle (relative to the field) in degrees.
 	 */
 	public static Sequence getDriveToWaypointSequence(double x, double y, double angle) {
-		if (driveToWaypointSeq == null) {
-			Waypoint waypoint = new Waypoint(x, y, angle);
-			driveToWaypointSeq = new Sequence(String.format("drive to %s", WaypointUtil.toString(waypoint)));
-			driveToWaypointSeq.add().driveRelativeWaypoints(new Waypoint[]{waypoint}, true);
-		}
+		Pose2d start = new Pose2d();
+		Pose2d end = new Pose2d(x, y, new Rotation2d(Math.toRadians(angle)));
+		driveToWaypointSeq = new Sequence(String.format("drive to %s", end));
+		driveToWaypointSeq.add().driveRelativeWaypoints(start, List.of(), end, true);
 		return driveToWaypointSeq;
 	}	
 	private static Sequence driveToWaypointSeq = null;
@@ -90,7 +92,7 @@ public class Sequences {
 	}
 
 	public static Sequence setDrivebaseToArcade() {
-		Sequence seq = new Sequence("Slow drive forward");
+		Sequence seq = new Sequence("Arcade");
 		seq.add().doArcadeDrive();
 		return seq;
 	}

@@ -24,7 +24,6 @@ import org.strongback.mock.Mock;
 
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
-import frc.robot.controller.Controller.TrajectoryGenerator;
 import frc.robot.drive.routines.*;
 import frc.robot.interfaces.*;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
@@ -138,7 +137,7 @@ public class Subsystems implements DashboardUpdater {
 	 * Creates the motors and gyro as needed by both.
 	 * Registers all of the available drive routines that can be requested by the controller.
 	 */
-	public void createDrivebaseLocation(TrajectoryGenerator generator, InputDevice leftStick, InputDevice rightStick) {
+	public void createDrivebaseLocation(InputDevice leftStick, InputDevice rightStick) {
 		if (!config.drivebaseIsPresent) {
 			log.sub("Using mock drivebase");
 			drivebase = new MockDrivebase(log);
@@ -160,9 +159,14 @@ public class Subsystems implements DashboardUpdater {
 		leftDriveSpeed = () -> leftMotor.getVelocity();
 		rightDriveSpeed = () -> rightMotor.getVelocity();
 
+		leftMotor.setPosition(0);
+		rightMotor.setPosition(0);
+
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
-		location = new Location(leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
+		location = new Location(() -> {	leftMotor.setPosition(0);
+									rightMotor.setPosition(0); },
+									leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
 		drivebase = new Drivebase(leftMotor, rightMotor, dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
@@ -208,8 +212,8 @@ public class Subsystems implements DashboardUpdater {
 				leftStick.getButton(GamepadButtonsX.RIGHT_TRIGGER_AXIS), // Is quick turn
 				log));
 		// Drive through supplied waypoints using splines.
-		drivebase.registerDriveRoutine(DriveRoutineType.WAYPOINTS,
-				new SplineDrive(generator, leftDriveDistance, rightDriveDistance, location, clock, log));
+		drivebase.registerDriveRoutine(DriveRoutineType.TRAJECTORY,
+				new TrajectoryDrive(location, clock, log), ControlMode.Voltage);
 		// Driving using the vision targets to help with alignment. Overrides the
 		// steering but not the speed.
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_ASSIST,

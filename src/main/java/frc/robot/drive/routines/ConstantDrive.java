@@ -16,7 +16,7 @@ public class ConstantDrive implements DriveRoutine {
 	}
 
 	@Override
-	public DriveMotion getMotion() {
+	public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
 		return motion;
 	}
 	

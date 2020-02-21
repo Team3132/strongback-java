@@ -8,8 +8,8 @@ public class Deadband implements DriveRoutine {
 	}
 	
 	@Override
-	public DriveMotion getMotion() {
-		DriveMotion dm = child.getMotion();
+	public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
+		DriveMotion dm = child.getMotion(leftSpeed, rightSpeed);
 		
 		if (Math.abs(dm.left) < 0.02) {
 			dm.left = 0;

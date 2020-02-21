@@ -2,11 +2,14 @@ package frc.robot.controller;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import org.strongback.components.Clock;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.ClimberInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
@@ -15,8 +18,6 @@ import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.interfaces.LiftInterface.LiftAction;
 import frc.robot.lib.TimeAction;
 import frc.robot.subsystems.Subsystems;
-
-import jaci.pathfinder.Waypoint;
 
 /**
  * Top level class to hold / specify some sort of current or target state.
@@ -63,8 +64,6 @@ public class State {
 
 	// Driving.
 	public DriveRoutineParameters drive = null;
-
-	public Waypoint resetPosition = null;  // Reset where the location subsystem thinks the robot is
 
 	//Colour Wheel
 	public ColourAction colourWheel = null;
@@ -423,15 +422,17 @@ public class State {
 	 * Note: The robot will come to a complete halt after each list
 	 * of Waypoints, so each State will cause the robot to drive and then
 	 * halt ready for the next state. This should be improved.
-	 * Wayoints are relative to the robots position.
+	 * Waypoints are relative to the robots position.
+	 * @param start the assumed starting point and angle. 
 	 * @param waypoints list of Waypoints to drive through.
+	 * @param end the end point and angle.
 	 * @param forward drive forward through waypoints.
 	 */
-	public State driveRelativeWaypoints(Waypoint[] waypoints, boolean forward) {
-		drive = DriveRoutineParameters.getDriveWaypoints(waypoints, forward, true);
+	public State driveRelativeWaypoints(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end,
+			boolean forward) {
+		drive = DriveRoutineParameters.getDriveWaypoints(start, interiorWaypoints, end, forward, true);
 		return this;
-	}
-	
+	}	
 
 	/**
 	 * Creates a copy of desiredState whose null variables are replaced by values in currentState
