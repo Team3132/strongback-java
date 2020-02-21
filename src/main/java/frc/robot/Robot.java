@@ -200,6 +200,11 @@ public class Robot extends IterativeRobot implements Executable {
 	 * No spaghetti code here!
 	 */
 
+	@Override
+	public void teleopPeriodic() {
+	
+	}
+
 	/**
 	 * Called when the test mode is enabled.
 	 */

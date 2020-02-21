@@ -31,7 +31,6 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
 
         log.register(true, () -> isExtended(), "%s/extended", name)
                .register(true, () -> isRetracted(), "%s/retracted", name)
-               .register(true, () -> hasCargo(), "%s/cargoOnBoard", name)
 			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
 			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
 			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
@@ -59,11 +58,6 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
     }
     
     @Override
-    public boolean hasCargo() {
-        return sensor.getAsBoolean();
-    }
-    
-    @Override
     public void setMotorOutput(double current) {
         // Prevent intake wheel from damaging the body of the robot
         if (!isExtended() && current != 0.0) {
@@ -88,7 +82,6 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
 	@Override
 	public void updateDashboard() {
         dashboard.putString("Intake position", isExtended() ? "extended" : isRetracted() ? "retracted" : "moving");
-        dashboard.putString("Intake cargo status", hasCargo() ? "has cargo" : "empty");
         dashboard.putNumber("Intake motor current", motor.getOutputCurrent());
 		dashboard.putNumber("Intake motor percent", motor.getOutputPercent());
 	}
