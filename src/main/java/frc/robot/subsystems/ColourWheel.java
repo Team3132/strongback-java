@@ -66,7 +66,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     switch (action.type) {
     case ROTATION:
       newSpeed = rotationalControl();
-      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.GOLD, rotCount/Constants.COLOUR_WHEEL_ROTATION_TARGET);
+      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.GOLD, (int) (rotCount/Constants.COLOUR_WHEEL_ROTATION_TARGET*100));
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
@@ -180,7 +180,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         spinTime = clock.currentTimeInMillis(); //Check time when correct colour found.
         firstLoop = false;
       } 
-      if (clock.currentTimeInMillis() - spinTime < 50) { //Check if 50 milliseconds has passed.
+      if (clock.currentTimeInMillis() - spinTime < 15) { //Check if 50 milliseconds has passed.
         return motor.get();
       } else {
         action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
