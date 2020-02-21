@@ -45,8 +45,11 @@ public class State {
 	public Double shooterTargetSpeed = null;  // Target speed in RPM to give to shooter.
 	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
-	// Passthrough
-	public Double passthroughMotorOutput = null;
+	// Loader
+	public Double loaderFeederMotorOutput = null;
+	public Double loaderPassthroughMotorVelocity = null;
+	public Double loaderSpinnerMotorVelocity = null;
+	public Boolean loaderPaddleExtended = null;
 
 	// Hatch
 	public HatchAction hatchAction = null;  // How the hatch should be positioned.
@@ -80,9 +83,14 @@ public class State {
 		setLiftHeight(subsystems.lift.getTargetHeight());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
+		// Loader
+		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
+		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
+		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
+		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
+
 		shooterTargetSpeed = subsystems.shooter.getTargetSpeed();
-		//hasCargo = subsystems.shooter.hasCell();
+		//hasCargo = subsystems.spitter.hasCargo();
 		climber = subsystems.climber.getDesiredAction();
 		hatchAction = subsystems.hatch.getAction();
 		hatchHolderEnabled = subsystems.hatch.getHeld();
@@ -210,12 +218,23 @@ public class State {
 	}
 
 
-	// Passthrough
-	public State setPassthroughMotorOutput(double output) {
-		passthroughMotorOutput = Double.valueOf(output);
+	// Loader
+	public State setLoaderSpinnerMotorOutput(double output) {
+		loaderSpinnerMotorVelocity = Double.valueOf(output);
 		return this;
 	}
-
+	public State setLoaderPassthroughMotorOutput(double output) {
+		loaderPassthroughMotorVelocity = Double.valueOf(output);
+		return this;
+	}
+	public State setLoaderFeederMotorOutput(double output) {
+		loaderFeederMotorOutput = Double.valueOf(output);
+		return this;
+	}
+	public State setPaddleExtended(boolean extended) {
+		loaderPaddleExtended = Boolean.valueOf(extended);
+		return this;
+	}
 
 	// Hatch
 	/**
@@ -460,8 +479,9 @@ public class State {
 		ArrayList<String> result = new ArrayList<String>();
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
-		maybeAdd("shooterTargetRPM", shooterTargetSpeed, result);
+		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
+		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
+		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);
 		maybeAdd("hatchHolderGrabbed", hatchHolderEnabled, result);

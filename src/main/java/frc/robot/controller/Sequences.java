@@ -108,13 +108,18 @@ public class Sequences {
 		seq.add().setLiftHeight(LIFT_DEFAULT_MIN_HEIGHT)
  				 .setHatchPosition(HATCH_INTAKE_HOLD_POSITION);
 		// Waits for the lift to go to the set height before turning on to the motor
+		// The spitter speed should be set at a small speed.
+		seq.add().setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT);
+		seq.add().waitForCargo();
+		seq.add().setIntakeMotorOutput(0)
+				 .setLoaderSpinnerMotorOutput(0);
 		return seq;
 	}
 
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
 		seq.add().setIntakeMotorOutput(0)
-				 .setPassthroughMotorOutput(0);
+				 .setLoaderSpinnerMotorOutput(0);
 		seq.add().setDelayDelta(0.1);
 		seq.add().setHatchPosition(HATCH_STOWED_POSITION);
 		return seq;
@@ -123,20 +128,6 @@ public class Sequences {
 	public static Sequence raiseIntake() {
 		Sequence seq = new Sequence("Raise intake");
 		seq.add().stowIntake();
-		return seq;
-	}
-
-	public static Sequence startReverseCycle() {
-		Sequence seq = new Sequence("Start reverse cycle");
-		seq.add().setPassthroughMotorOutput(-PASSTHROUGH_MOTOR_CURRENT);
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
-		return seq;
-	}
-
-	public static Sequence stopReverseCycle() {
-		Sequence seq = new Sequence("Stop reverse cycle");
-		seq.add().setPassthroughMotorOutput(0);
-		seq.add().setIntakeMotorOutput(0);
 		return seq;
 	}
 
@@ -151,7 +142,27 @@ public class Sequences {
 		seq.add().setLiftHeight(setpoint.height);
 		return seq;
 	}
+	/**
+	 * Start Test Loader Sequence
+	 * 
+	 */
+	public static Sequence startLoaderTest() {
+		Sequence seq = new Sequence("Start Loader Test Sequence");
+		seq.add().setLoaderPassthroughMotorOutput(0.5);
+		seq.add().setLoaderSpinnerMotorOutput(0.3);
+		seq.add().setDelayDelta(10);
+		seq.add().setLoaderPassthroughMotorOutput(0);
+		seq.add().setLoaderSpinnerMotorOutput(0);
+		seq.add().setDelayDelta(5);
+		//Switch/Extend Occurs here
+		seq.add().setLoaderSpinnerMotorOutput(0.2);
+		seq.add().setLoaderFeederMotorOutput(0.5);
+		seq.add().setDelayDelta(5);
+		seq.add().setLoaderSpinnerMotorOutput(0);
+		seq.add().setLoaderFeederMotorOutput(0);
 
+		return seq;
+	}
 	/**
 	 * Move up to the next lift setpoint.
 	 */
@@ -207,16 +218,16 @@ public class Sequences {
 		seq.add().stowIntake();
 		return seq;
 	}
-	// This is to test the Passthrough system
-	public static Sequence startPassthrough() {
-		Sequence seq = new Sequence("start Passthrough");
-		seq.add().setPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
+	// This is to test the Loader system
+	public static Sequence startLoader() {
+		Sequence seq = new Sequence("start Loader");
+		seq.add().setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT);
 		return seq;
 	}
 
-	public static Sequence stopPassthrough() {
-		Sequence seq = new Sequence("stop Passthrough");
-		seq.add().setPassthroughMotorOutput(0.0);
+	public static Sequence stopLoader() {
+		Sequence seq = new Sequence("stop Loader");
+		seq.add().setLoaderSpinnerMotorOutput(0.0);
 		return seq;
 	}
 
@@ -462,8 +473,8 @@ public class Sequences {
 		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
-		startPassthrough(),
-		stopPassthrough(),
+		startLoader(),
+		stopLoader(),
 		holdHatch(),
 		releaseHatch(),
 		getStowHatchSequence(),
