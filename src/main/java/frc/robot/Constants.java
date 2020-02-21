@@ -167,7 +167,7 @@ public class Constants {
 	/*
 	* Loader
 	*/
-	public static final int LOADER_SPINNER_CAN_ID = 30; //TODO: find canID for Loader motor
+	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 30; //TODO: find canID for Loader motor
 	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 31; //TODO: find canID for Loader Input motor
 	public static final double LOADER_MOTOR_CURRENT = 1.0;
 	public static final int LOADER_SOLENOID_PORT = 2; 
