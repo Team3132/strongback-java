@@ -148,7 +148,7 @@ public class MotorFactory {
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_MAIN_MOTOR_SCALE); // number of ticks per rotation.
 		motor.configClosedloopRamp(0, 10);
-		NetworkTablesHelper helper = new NetworkTablesHelper("loader/loadermotor/");
+		NetworkTablesHelper helper = new NetworkTablesHelper("loader/spinnermotor/");
 		helper.set("p", p);
 		helper.set("i", i);
 		helper.set("d", d);
@@ -161,7 +161,7 @@ public class MotorFactory {
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_IN_MOTOR_SCALE); // number of ticks per rotation
 		motor.configClosedloopRamp(0.5, 10);
-		NetworkTablesHelper helper = new NetworkTablesHelper("loader/loaderinmotor/");
+		NetworkTablesHelper helper = new NetworkTablesHelper("loader/passthroughmotor/");
 		helper.set("p", p);
 		helper.set("i", i);
 		helper.set("d", d);

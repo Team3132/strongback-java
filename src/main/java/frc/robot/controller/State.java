@@ -49,7 +49,6 @@ public class State {
 	public Double loaderFeederMotorOutput = null;
 	public Double loaderPassthroughMotorVelocity = null;
 	public Double loaderSpinnerMotorVelocity = null;
-	public Boolean loaderExtended = null;
 	public Boolean loaderPaddleExtended = null;
 
 	// Hatch
@@ -87,9 +86,8 @@ public class State {
 		// Loader
 		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
 		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
-		loaderFeederMotorOutput = subsystems.loader.setTargetFeederMotorOutput();
-		loaderExtended = subsystems.loader.isLoaderExtended();
-		loaderPaddleExtended = subsystems.loader.isPaddleRetracted();
+		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
+		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
 
 		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
 		hasCargo = subsystems.spitter.hasCargo();
@@ -231,10 +229,6 @@ public class State {
 	}
 	public State setLoaderFeederMotorOutput(double output) {
 		loaderFeederMotorOutput = Double.valueOf(output);
-		return this;
-	}
-	public State setLoaderExtended(boolean extended) {
-		loaderExtended = Boolean.valueOf(extended);
 		return this;
 	}
 	public State setPaddleExtended(boolean extended) {
@@ -489,7 +483,6 @@ public class State {
 		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
 		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
 		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
-		maybeAdd("loaderExtended", loaderExtended, result);
 		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
 		maybeAdd("hasCargo", hasCargo, result);
 		maybeAdd("hatchAction", hatchAction, result);

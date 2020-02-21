@@ -421,10 +421,6 @@ public class OI implements OIInterface {
 			() -> loaderIF.setPaddleExtended(false));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
 			() -> loaderIF.setPaddleExtended(true));
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_RETRACT), 
-			() -> loaderIF.setLoaderExtended(false));
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_EXTEND), 
-			() -> loaderIF.setLoaderExtended(true));
 
 		// Hatch overrides.
 		OverridableSubsystem<HatchInterface> hatchOverride = subsystems.hatchOverride;

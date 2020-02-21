@@ -14,42 +14,53 @@ import frc.robot.lib.Subsystem;
 
 public class Loader extends Subsystem implements LoaderInterface, Executable, DashboardUpdater {
     private Motor spinner, passthrough, feeder;
-    private Solenoid loaderS, paddleS;
-    
+    private Solenoid paddleSolenoid;
+    private double spinnerVelocity = 0;
+    private double passthroughVelocity = 0;
 
-    public Loader(int teamNumber, Motor loaderSpinnerMotor, Motor loaderPassthroughMotor, Motor loaderFeederMotor, Solenoid loaderSolenoid, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
+    public Loader(Motor loaderSpinnerMotor, Motor loaderPassthroughMotor, Motor loaderFeederMotor, Solenoid paddleSolenoid, DashboardInterface dashboard, Log log) {
         super("Loader", dashboard, log);
+        
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
         this.feeder = loaderFeederMotor;
-        this.loaderS = loaderSolenoid;
-        this.paddleS = paddleSolenoid;
+        this.paddleSolenoid = paddleSolenoid;
         log.register(true, () -> feeder.getOutputCurrent(), "%s/feeder/Current", name)
                .register(true, () -> feeder.getOutputPercent(), "%s/feeder/PercentOut", name)
-            //    .register(true, () -> feeder.getVelocity(), "%s/motorIn/Velocity", name)
                .register(true, () -> passthrough.getVelocity(), "%s/passthrough/Velocity", name)
                .register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
                .register(true, () -> spinner.getVelocity(), "%s/spinner/Velocity", name)
                .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
-               .register(true, () -> isLoaderRetracted(), "%s/loaderRetracted", name)
                .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name);
     }
 
 	@Override
 	public void setTargetSpinnerMotorVelocity(double velocity) {
-        NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/loadermotor/");
+        NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
         spinnerHelper.set("targetRPM", velocity);
+        spinnerVelocity = velocity;
         log.sub("%s: Setting loader motor velocity to: %f", name, velocity);
-        spinner.set(ControlMode.Velocity, velocity);
+        // If motor is zero in velocity the PID will try and reverse the motor in order to slow down
+        if(velocity == 0) {
+            spinner.set(ControlMode.PercentOutput, 0);
+        } else {
+            spinner.set(ControlMode.Velocity, velocity);
+        }
     }
     @Override
 	public void setTargetPassthroughMotorVelocity(double velocity) {
-        NetworkTablesHelper passthroughHelper = new NetworkTablesHelper("loader/loaderinmotor/");
+        NetworkTablesHelper passthroughHelper = new NetworkTablesHelper("loader/passthroughmotor/");
         passthroughHelper.set("targetRPM", velocity);
+        passthroughVelocity = velocity;
         log.sub("%s: Setting loader in motor velocity to: %f", name, velocity);
-        passthrough.set(ControlMode.Velocity, velocity);
+        // If motor is zero in velocity the PID will try and reverse the motor in order to slow down
+        if(velocity == 0) {
+            passthrough.set(ControlMode.PercentOutput, 0);
+        } else {
+            passthrough.set(ControlMode.Velocity, velocity);
+        }
     }
     @Override
 	public void setTargetFeederMotorOutput(double outPercent) {
@@ -57,50 +68,29 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
         feeder.set(ControlMode.PercentOutput, outPercent);
     }
 
-    public LoaderInterface setLoaderExtended(boolean extend) {
-        if (extend) {
-            loaderS.extend();
-        } else {
-            loaderS.retract();
-        }
-        return this;
-    }
-
     public LoaderInterface setPaddleExtended(boolean extend) {
         if (extend) {
-            paddleS.extend();
+            paddleSolenoid.extend();
         } else {
-            paddleS.retract();
+            paddleSolenoid.retract();
         }
         return this;
-    }
-
-
-    @Override
-    public boolean isLoaderExtended() {
-        //log.sub("Is intake extended: " +  solenoid.isExtended());
-        return loaderS.isExtended();
-    }
-
-    @Override
-    public boolean isLoaderRetracted() {
-        return loaderS.isRetracted();
     }
 
     @Override
     public boolean isPaddleExtended() {
         //log.sub("Is intake extended: " +  solenoid.isExtended());
-        return paddleS.isExtended();
+        return paddleSolenoid.isExtended();
     }
 
     @Override
     public boolean isPaddleRetracted() {
-        return paddleS.isRetracted();
+        return paddleSolenoid.isRetracted();
     }
 
     @Override
     public void execute(long timeInMillis) {
-        NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/loadermotor/");
+        NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
         double p = spinnerHelper.get("p", 0);
         double i = spinnerHelper.get("i", 0);
         double d = spinnerHelper.get("d", 0);
@@ -115,9 +105,6 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
         f = passthroughHelper.get("f", 0);
         passthrough.setPIDF(0, p, i, d, f);
         passthroughHelper.set("actualRPM", passthrough.getVelocity());
-
-
-
     }
 
     /**
@@ -125,7 +112,6 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
      */
     @Override
     public void updateDashboard() {
-        dashboard.putString("Loader position", isLoaderExtended() ? "extended" : isLoaderRetracted() ? "retracted" : "moving");
         dashboard.putString("Loader Paddle position", isPaddleExtended() ? "extended" : isPaddleRetracted() ? "retracted" : "moving");
         dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
         dashboard.putNumber("Loader passthrough velocity", passthrough.getVelocity());
@@ -137,5 +123,20 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
         spinner.set(ControlMode.Velocity, 0);
         passthrough.set(ControlMode.Velocity, 0);
         feeder.set(ControlMode.PercentOutput, 0);
+    }
+
+    @Override
+    public double getTargetFeederMotorOutput() {
+        return feeder.getOutputPercent();
+    }
+
+    @Override
+    public double getTargetSpinnerMotorVelocity() {
+        return spinnerVelocity;
+    }
+
+    @Override
+    public double getTargetPassthroughMotorVelocity() {
+        return passthroughVelocity;
     }
 }

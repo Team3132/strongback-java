@@ -4,26 +4,11 @@ import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.Log;
 
 public class MockLoader implements LoaderInterface {
+    private double spinnerVelocity = 0;
+    private double passthroughVelocity = 0;
+    private double feederVelocity = 0;
 
     public MockLoader(Log log) {
-    }
-    // Loader
-    private boolean isLoaderExtended = false;
-
-    @Override
-	public LoaderInterface setLoaderExtended(boolean extended) {
-		isLoaderExtended = extended;
-		return this;
-	}
-
-	@Override
-	public boolean isLoaderExtended() {
-		return isLoaderExtended;
-	}
-
-	@Override
-	public boolean isLoaderRetracted() {
-		return !isLoaderExtended;
     }
     // Paddle
     private boolean isPaddleExtended = false;
@@ -45,13 +30,13 @@ public class MockLoader implements LoaderInterface {
     }
 
     @Override
-    public void setTargetSpinnerMotorVelocity(double percentPower) {
-
+    public void setTargetSpinnerMotorVelocity(double velocity) {
+        spinnerVelocity = velocity;
     }
 
     @Override
     public String getName() {
-        return null;
+        return "MockLoader";
     }
 
     @Override
@@ -81,22 +66,31 @@ public class MockLoader implements LoaderInterface {
 
 
     @Override
-    public void setTargetPassthroughMotorVelocity(double InMotorCurrent) {
-        // TODO Auto-generated method stub
-
+    public void setTargetPassthroughMotorVelocity(double velocity) {
+        passthroughVelocity = velocity;
     }
 
 
     @Override
-    public double getTargetSpinnerMotorOutput() {
-        // TODO Auto-generated method stub
-        return 0;
+    public double getTargetSpinnerMotorVelocity() {
+        return spinnerVelocity;
+       
     }
 
     @Override
     public void setTargetFeederMotorOutput(double FeederMotorCurrent) {
         // TODO Auto-generated method stub
+        feederVelocity = FeederMotorCurrent;
 
     }
+    @Override
+    public double getTargetFeederMotorOutput() {
+        return feederVelocity;
 
+    }
+    @Override
+    public double getTargetPassthroughMotorVelocity() {
+        return passthroughVelocity;
+    }
+// 
 }

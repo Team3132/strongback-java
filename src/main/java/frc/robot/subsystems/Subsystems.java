@@ -83,7 +83,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createOverrides() {
 		createIntakeOverride();
-		createPassthrougOverride();
+		createLoaderOverride();
 		createSpitterOverride();
 		createHatchOverride();
 		createClimberOverride();
@@ -442,15 +442,13 @@ public class Subsystems implements DashboardUpdater {
 		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderCanID, false, config.loaderSpinnerP, config.loaderSpinnerI, config.loaderSpinnerD, config.loaderSpinnerF, log);
 		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderInCanID, false, config.loaderPassthroughP, config.loaderPassthroughI, config.loaderPassthroughD, config.loaderPassthroughF, log);
 		Motor loaderFeederMotor = MotorFactory.getLoaderFeederMotor(config.loaderOutCanID, false, log);
-		Solenoid loaderSolenoid = Mock.Solenoids.singleSolenoid(0);//Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.LOADER_SOLENOID_PORT, 0.1, 0.1);
-		Solenoid paddleSolenoid = Mock.Solenoids.singleSolenoid(0);
-		//Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
-		loader = new Loader(config.teamNumber, spinnerMotor, loaderPassthroughMotor, loaderFeederMotor, loaderSolenoid, paddleSolenoid, dashboard, log);
+		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
+		loader = new Loader(spinnerMotor, loaderPassthroughMotor, loaderFeederMotor, paddleSolenoid, dashboard, log);
 		Strongback.executor().register(loader, Priority.LOW);
 
 	}
 
-	public void createPassthrougOverride() {
+	public void createLoaderOverride() {
 		// Setup the diagBox so that it can take control.
 		MockLoader simulator = new MockLoader(log);  // Nothing to simulate, use the mock
 		MockLoader mock = new MockLoader(log);

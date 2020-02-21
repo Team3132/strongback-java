@@ -15,13 +15,9 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
     public void setTargetPassthroughMotorVelocity(double PassthroughMotorCurrent);
     public void setTargetFeederMotorOutput(double FeederMotorCurrent);
 
-    public LoaderInterface setLoaderExtended(boolean extended);
-
 	/**
 	 * @return the state of the loader solenoid. 
 	 * */
-	public boolean isLoaderExtended();
-	public boolean isLoaderRetracted();
 
     public LoaderInterface setPaddleExtended(boolean extended);
 
