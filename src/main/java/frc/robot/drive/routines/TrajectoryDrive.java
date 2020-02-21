@@ -73,7 +73,6 @@ public class TrajectoryDrive implements DriveRoutine {
 		m_leftController =  new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0);
         m_rightController = new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0);
 
-		// TODO: Also log the error in the x & y position as the RamseteController was doing.
 		log.register(true, () -> clock.currentTime() - m_startTime, "TrajectoryDrive/elapsedTime")
 				.register(true, () -> m_trajectory == null ? 0 : m_trajectory.getTotalTimeSeconds(), "TrajectoryDrive/totalTime")
 				.register(true, () -> m_leftSpeedSetpoint, "TrajectoryDrive/trajectory/speed/leftSepoint")

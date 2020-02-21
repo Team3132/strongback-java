@@ -36,7 +36,7 @@ public class Auto {
 
 	private void addAutoSequences() {
 		autoProgram.setDefaultOption("Nothing", Sequences.getEmptySequence());
-		autoProgram.addOption("Drive forward 10in", Sequences.getDriveToWaypointSequence(10 * 0.0254, 0, 0));
+		autoProgram.addOption("Drive forward 10in", Sequences.getDriveToWaypointSequence(10 * Constants.INCHES_TO_METRES, 0, 0));
 		addDriveTestSequence();
 		addDriveTestSplineSequence();
 		addDriveTestUSequence();
