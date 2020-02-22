@@ -14,7 +14,8 @@ import frc.robot.lib.Subsystem;
 import frc.robot.lib.NetworkTablesHelper;
 
 /**
- * On the 2020 robot there is one shooter wheel that are under PID control for speed control.
+ * On the 2020 robot, there are three shooter motors. 
+ * One with an encoder and the rest without, that are under PID control for speed control.
  */
 public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
 
@@ -28,7 +29,6 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
         log.register(true, () -> isHoodExtended(), "%s/extended", name)
                .register(true, () -> isHoodRetracted(), "%s/retracted", name);
-        //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
     }
 
 	@Override
@@ -83,7 +83,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
     @Override
     public boolean isHoodExtended() {
-        //log.sub("Is intake extended: " +  solenoid.isExtended());
+        //log.sub("Is hood extended: " +  solenoid.isExtended());
         return solenoid.isExtended();
     }
 

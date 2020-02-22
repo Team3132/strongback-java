@@ -22,7 +22,6 @@ public class TestShooter {
     ShooterInterface shooter;
 
 	public static final int SHOOTER_TARGET_SPEED = 6500;
-    private float shooterStartTime = 0;
 
     @Before
     public void setUp() {
@@ -46,9 +45,12 @@ public class TestShooter {
     @Test
     public void testShooterSetTargetSpeed() {
         shooter.setTargetSpeed(SHOOTER_TARGET_SPEED);
-        shooterStartTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - shooterStartTime) < 3000) {
-        }
         assertEquals(SHOOTER_TARGET_SPEED, shooterMotor.getSpeed(), 0.1);
+    }
+    @Test
+    public void testShooterSetTargetSpeedAndDisable() {
+        shooter.setTargetSpeed(SHOOTER_TARGET_SPEED);
+        shooter.disable();
+        assertEquals(0, shooterMotor.getSpeed(), 0.01);
     }
 }

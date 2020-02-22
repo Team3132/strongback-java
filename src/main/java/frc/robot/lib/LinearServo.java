@@ -10,9 +10,8 @@ public class LinearServo {
 	
 	protected final double SERVO_MIN_INCHES = 0.0;
 	public static final double SERVO_MIN = 1.0;					// REX: This is a constant and should be in Constants
-	public static final double INCHES_PER_SECOND = 0.275591;					// REX: This is a constant and should be in Constants
+	public static final double INCHES_PER_SECOND = 0.275591;	// REX: This is a constant and should be in Constants
 	public static final double SERVO_MAX = 2.0;					// REX: This is a constant and should be in Constants
-	//public static final double SPITTER_SERVO_IPS = 0.275591;	// REX: This is a constant and should be in Constants
 	protected double targetPos;
 	int SERVO_PORT;
 	final double SERVO_LENGTH_INCHES;
