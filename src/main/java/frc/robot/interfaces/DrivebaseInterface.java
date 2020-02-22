@@ -1,11 +1,19 @@
 package frc.robot.interfaces;
 
+import java.util.List;
+
 import org.strongback.Executable;
 import org.strongback.components.Motor.ControlMode;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import frc.robot.Constants;
 import frc.robot.drive.routines.DriveRoutine;
-
-import jaci.pathfinder.Waypoint;
 
 /**
  * The Drivebase subsystem is responsible for dealing with the drivebase.
@@ -22,7 +30,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		CONSTANT_SPEED,  // Set a constant speed to drive wheels.
 		ARCADE,  // Normal arcade drive.
 		CHEESY,  // Cheesy drive using the drivers joysticks.
-		WAYPOINTS,  // Drive through waypoints.
+		TRAJECTORY,  // Drive through waypoints.
 		VISION_ASSIST,  // Driver has speed control and vision has turn control.
 		TAPE_ASSIST,  // Driver has speed control and tape subsystem has turn control.
 		TURN_TO_ANGLE,  // Turn to specified angle, relative to the angle the robot started.
@@ -42,22 +50,47 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			p.value = power;
 			return p;
 		}
+
 		public static DriveRoutineParameters getConstantSpeed(double speed) {
 			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.CONSTANT_SPEED);
 			p.value = speed;
 			return p;
 		}
+
 		public static DriveRoutineParameters getArcade() {
 			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.ARCADE);
 			return p;
 		}
-		public static DriveRoutineParameters getDriveWaypoints(Waypoint[] waypoints, boolean forward, boolean relative) {
-			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.WAYPOINTS);
-			p.waypoints = waypoints;
-			p.forward = forward;
+
+		public static DriveRoutineParameters getDriveWaypoints(Pose2d start, List<Translation2d> interiorWaypoints,
+				Pose2d end, boolean forward, boolean relative) {
+			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.TRAJECTORY);
+			// Build the trajectory on start so that it's ready when needed.
+			// Create a voltage constraint to ensure we don't accelerate too fast
+			var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
+					new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
+							Constants.DriveConstants.kvVoltSecondsPerMeter,
+							Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+					Constants.DriveConstants.kDriveKinematics, 10);
+
+			// Create config for trajectory
+			TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
+					Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared)
+							// Add kinematics to ensure max speed is actually obeyed
+							.setKinematics(Constants.DriveConstants.kDriveKinematics)
+							// Apply the voltage constraint
+							.addConstraint(autoVoltageConstraint)
+							.setReversed(!forward);
+
+			// An example trajectory to follow. All units in meters.
+			long t = System.currentTimeMillis();
+			p.trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
+			System.out.printf("Trajectory Generator: took %d milliseconds to generate this spline\n", System.currentTimeMillis() - t);
+
 			p.relative = relative;
 			return p;
 		}
+
 		public static DriveRoutineParameters turnToAngle(double angle) {
 			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.TURN_TO_ANGLE);
 			p.value = angle;
@@ -71,8 +104,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		public DriveRoutineType type = DriveRoutineType.ARCADE;
 
 		// Waypoint parameters.
-		public Waypoint[] waypoints;
-		public boolean forward = true;
+		public Trajectory trajectory;
 		public boolean relative = true;
 
 		// Constant drive parameters
@@ -87,8 +119,8 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			if (obj == this)
 				return true;
 			DriveRoutineParameters other = (DriveRoutineParameters)obj;
-			return type == other.type && value == other.value && waypoints == other.waypoints && forward == other.forward
-					&& relative == other.relative;
+			// TODO: Check for an equals operator? Should we make this faster since it'll be called often?
+			return type == other.type && value == other.value && trajectory == other.trajectory && relative == other.relative;
 		}
 
 		@Override

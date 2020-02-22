@@ -7,13 +7,9 @@ import org.strongback.mock.Mock;
 import org.strongback.mock.MockClock;
 import org.strongback.mock.MockDoubleSupplier;
 import org.strongback.mock.MockGyroscope;
-
 import frc.robot.lib.MathUtil;
-import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Position;
-import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockLog;
-import frc.robot.mock.MockNetworkTableHelper;
 import frc.robot.subsystems.Location;
 
 /**
@@ -23,8 +19,6 @@ import frc.robot.subsystems.Location;
  *   ./gradlew test --tests "frc.robot.subsystems.TestLocation"
  */
 public class TestLocation {
-
-	private MockDashboard networkTable;
 
 	// Check that a pose matches expected values.
 	public void assertPosition(double x, double y, double h, Position actual) {
@@ -43,7 +37,7 @@ public class TestLocation {
     	MockDoubleSupplier rightDistance = Mock.doubleSupplier();
     	MockGyroscope gyro = Mock.gyroscope();
     	MockClock clock = Mock.clock();
-        Location location = new Location(leftDistance, rightDistance, gyro, clock, new MockDashboard(), new MockLog());
+        Location location = new Location(()->{},leftDistance, rightDistance, gyro, clock, null, new MockLog());
         
         // Initial location should always be 0,0,0
         gyro.setAngle(0); // Facing towards the opposing alliances wall.

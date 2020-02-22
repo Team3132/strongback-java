@@ -1,9 +1,8 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorMatchResult;
-import com.revrobotics.ColorSensorV3;
+import java.util.function.Supplier;
 
+import org.strongback.components.Clock;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
@@ -12,9 +11,11 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
+import frc.robot.lib.WheelColour;
+import frc.robot.lib.LEDColour;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.Subsystem;
 
 /**
@@ -33,28 +34,21 @@ import frc.robot.lib.Subsystem;
 
 public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
-  private Colour colourPrev = Colour.UNKNOWN; //Used in doubleCheck to check for mistakes with colour detection.
-  private Colour colour = Colour.UNKNOWN; //Variable for what the colour sensor currently sees.
-  private Colour nextColour = Colour.UNKNOWN;
+  private WheelColour colourPrev = WheelColour.UNKNOWN; //Used in doubleCheck to check for mistakes with colour detection.
+  private WheelColour colour = WheelColour.UNKNOWN; //Variable for what the colour sensor currently sees.
+  private WheelColour nextColour = WheelColour.UNKNOWN;
   private int rotCount = 0; //Roation counter for rotation controls.
   private boolean firstLoop = true; //Variable to check if this is the first time the colour sensor saw the desired colour.
   private long spinTime; //Variable to store the time when the colour sensor sees the desired colour.
   private double speed = 0;
-  private ColourAction action = new ColourAction(Type.NONE, Colour.UNKNOWN); //Default action for colour wheel subsystem.
+  private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN); //Default action for colour wheel subsystem.
 
+  private Clock clock;
   private final Motor motor;
-  private final ColorSensorV3 colourSensor;
+  private final LEDStripInterface ledStrip;
+  private final Supplier<WheelColour> colourSensor;
 
-  /**
-   * A Rev Color Match object is used to register and detect known colors. This
-   * can be calibrated ahead of time or during operation.
-   * 
-   * This object uses a simple euclidian distance to estimate the closest match
-   * with given confidence range.
-   */
-  private final ColorMatch colourMatcher = new ColorMatch();
-
-  public ColourWheel(Motor motor, ColorSensorV3 colourSensor, DashboardInterface dash, Log log) {
+  public ColourWheel(Motor motor, Supplier<WheelColour> colourSensor, LEDStripInterface ledStrip, Clock clock, DashboardInterface dash, Log log) {
     super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
@@ -63,7 +57,9 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
     this.motor = motor;
+    this.clock = clock;
     this.colourSensor = colourSensor;
+    this.ledStrip = ledStrip;
     log.register(false, () -> (double) colour.id, "%s/colour", name)
        .register(false, () -> (double) rotCount, "%s/rotCount", name)
        .register(false, () -> (double) motor.getOutputPercent(), "%s/motorspeed", name)
@@ -71,25 +67,29 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
        .register(false, () -> (double) spinTime, "%s/spinTime", name);
   }
 
-  @Override
-  public void execute(long timeInMillis) {
+  public void update() {
     double newSpeed = 0;
     updateColour();
     switch (action.type) {
     case ROTATION:
       newSpeed = rotationalControl();
+      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.GOLD, ((double) rotCount)/Constants.COLOUR_WHEEL_ROTATION_TARGET);
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
+      ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_ANTICLOCKWISE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_CLOCKWISE:
       newSpeed = -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      ledStrip.setColour(colour.convert());
       break;
     case NONE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
+      ledStrip.setIdle();
       break;
     default:
       log.error("%s: Unknown Type %s", name, action.type);
@@ -126,22 +126,21 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * 
   */
   public double rotationalControl() {
-    if (firstLoop) {
-      nextColour = colour.next(speed);
-      log.info("%s: Next Colour is %s.", name, nextColour);
-      firstLoop = false;
-    }
     if (colour.equals(nextColour)) {
       log.info("%s: Found %s.", name, colour);
       log.info("%s: Added one to rotations. %d", name, rotCount);
       rotCount += 1;
       firstLoop = true;
     }
-    if (rotCount < (3*8 + 2)) {
+    if (firstLoop) {
+      nextColour = colour.next(speed);
+      log.info("%s: Next Colour is %s.", name, nextColour);
+      firstLoop = false;
+    }
+    if (rotCount < Constants.COLOUR_WHEEL_ROTATION_TARGET) {
       return Constants.COLOUR_WHEEL_MOTOR_FULL;
     } else {
-      rotCount = 0; //Reset rotation count and action.
-      action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+      action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
       return Constants.COLOUR_WHEEL_MOTOR_OFF;
     }
   }
@@ -171,12 +170,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * If unknown, turn at current speed and direction until correct colour is found.
   * 
   */
-  public double positionalControl(Colour desired) {
+  public double positionalControl(WheelColour desired) {
     double newSpeed = (colour.id - desired.id) % 4; //Calculate new speed.
     if (newSpeed == 3) newSpeed -= 4; //If above calculation is 3, set speed to -1.
-    if (newSpeed == -3) newSpeed += 4; //If above calculation is 3, set speed to -1.
+    if (newSpeed == -3) newSpeed += 4; //If above calculation is -3, set speed to 1.
     newSpeed = Constants.COLOUR_WHEEL_MOTOR_FULL * Math.signum(newSpeed);
-    if (colour.equals(Colour.UNKNOWN)) { //Colour is unknown, move in current direcion until colour identified.
+    if (colour.equals(WheelColour.UNKNOWN)) { //Colour is unknown, move in current direcion until colour identified.
       if(speed != 0) {
         return speed;
       } else {
@@ -184,15 +183,14 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       }
     }
     if (desired.equals(colour)) { //If correct colour found, move slowly to line up better and then stop.
-      if (firstLoop == true) {
-
-        spinTime = System.currentTimeMillis(); //Check time when correct colour found.
+      if (firstLoop) {
+        spinTime = clock.currentTimeInMillis(); //Check time when correct colour found.
         firstLoop = false;
       } 
-      if (System.currentTimeMillis() - spinTime < 50) { //Check if 50 milliseconds has passed.
+      if (clock.currentTimeInMillis() - spinTime < Constants.COLOUR_WHEEL_DELAY) {
         return motor.get();
       } else {
-        action = new ColourAction(Type.NONE, Colour.UNKNOWN);
+        action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
         log.info("ColourWheel: Desired colour found.");
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
@@ -201,21 +199,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   }
 
   public void updateColour() {
-    Color detectedColor = colourSensor.getColor();
-    ColorMatchResult match = colourMatcher.matchClosestColor(detectedColor);
-    Colour sensedColour = Colour.UNKNOWN;
-    if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
-      sensedColour = Colour.BLUE;
-    } else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
-      sensedColour = Colour.RED;
-    } else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
-      sensedColour = Colour.GREEN;
-    } else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
-      sensedColour = Colour.YELLOW;
-    } else {
-      sensedColour = Colour.UNKNOWN;
-    }
-    colour = doubleCheck(sensedColour);
+    colour = doubleCheck(colourSensor.get());
   }
 
   /**
@@ -227,8 +211,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    *          again after the wheel has moved.
    * 
   */
-  private Colour doubleCheck(Colour sensedColour) {
-    if (speed == 0 || colourPrev.equals(Colour.UNKNOWN)) {
+  private WheelColour doubleCheck(WheelColour sensedColour) {
+    if (speed == 0 || colourPrev.equals(WheelColour.UNKNOWN)) {
       colourPrev = sensedColour;
       return sensedColour;
     }
@@ -242,6 +226,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public ColourWheelInterface setDesiredAction(ColourAction action) {
     this.action = action;
     firstLoop = true;
+    rotCount = 0;
+    nextColour = WheelColour.UNKNOWN;
     return this;
   }
 
@@ -253,7 +239,13 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   @Override
   public boolean isFinished() {
     //log.info("isFinished Colour Wheel Action: %s", action);
-    return action.type == Type.NONE;
+    return action.type == ColourWheelType.NONE;
+  }
+
+  @Override
+  public void disable() {
+    motor.set(ControlMode.PercentOutput, 0);
+    action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
   }
 
   @Override
@@ -264,6 +256,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     dashboard.putString("Colourwheel Action", action.type.toString());
     dashboard.putNumber("Colourwheel Rotations", rotCount);
     dashboard.putNumber("Colourwheel spinTime", spinTime);
-    dashboard.putNumber("Colourwheel realTime", System.currentTimeMillis());
+    dashboard.putNumber("Colourwheel realTime", clock.currentTimeInMillis());
 	}
 }

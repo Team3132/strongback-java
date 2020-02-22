@@ -72,14 +72,7 @@ public class RobotConfiguration {
 	public boolean drivebaseSwapLeftRight = false;
 	public boolean drivebaseSensorPhase = false;
 	public double drivebaseCount =  Constants.DRIVE_COUNT_100ms;
-
-
-	public boolean liftIsPresent = false;
-	public int[] liftCanIds = Constants.LIFT_MOTOR_TALON_CAN_ID_LIST;
-	public int liftSolenoidID = Constants.LIFT_SOLENOID_ID;
-	public double liftSolenoidRetractTime = Constants.LIFT_SOLENOID_RETRACT_TIME;
-	public double liftSolenoidExtendTime = Constants.LEFT_SOLENOID_EXTEND_TIME;
-
+	
 	public boolean intakeIsPresent = false;
 	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
 
@@ -89,12 +82,18 @@ public class RobotConfiguration {
 	public boolean sparkTestIsPresent = false;
 	public int[] sparkTestCanIds = Constants.TEST_SPARK_MOTOR_CAN_ID_LIST;
 
-	public boolean passthroughIsPresent = false;
-	public int passthroughCanID = Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID;
-
-	public boolean spitterIsPresent = false;
-	public int spitterRightCanID = Constants.SPITTER_RIGHT_TALON_CAN_ID;
-	public int spitterLeftCanID = Constants.SPITTER_LEFT_TALON_CAN_ID;
+	public boolean loaderIsPresent = false;
+	public int loaderCanID = Constants.LOADER_SPINNER_CAN_ID;
+	public int loaderInCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
+	public int loaderOutCanID = Constants.LOADER_FEEDER_MOTOR_CAN_ID;
+	public double loaderSpinnerP = Constants.LOADER_SPINNER_P;
+	public double loaderSpinnerI = Constants.LOADER_SPINNER_I;
+	public double loaderSpinnerD = Constants.LOADER_SPINNER_D;
+	public double loaderSpinnerF = Constants.LOADER_SPINNER_F;
+	public double loaderPassthroughP = Constants.LOADER_PASSTHROUGH_P;
+	public double loaderPassthroughI = Constants.LOADER_PASSTHROUGH_I;
+	public double loaderPassthroughD = Constants.LOADER_PASSTHROUGH_D;
+	public double loaderPassthroughF = Constants.LOADER_PASSTHROUGH_F;
 
 	public boolean pdpIsPresent = false;
 	public int pdpCanId = Constants.PDP_CAN_ID;
@@ -108,9 +107,6 @@ public class RobotConfiguration {
 	public int canifierCanId;
 
 	public boolean navxIsPresent = false;
-
-	public boolean hatchIsPresent = true;
-	public int hatchCanID = Constants.HATCH_POSITION_MOTOR_CAN_ID;
 
 	public boolean visionIsPresent = true;
 	public double visionHMin = Constants.VISION_H_MIN;
@@ -130,6 +126,8 @@ public class RobotConfiguration {
 	// These are the safest defaults.
 	public boolean doLogging = false;
 	public boolean onlyLocal = true;
+
+	public boolean ledStripIsPresent = false;
 
 	public RobotConfiguration(String filePath, Log log) {
 		this(filePath, TeamNumber.get(), log);
@@ -210,14 +208,7 @@ public class RobotConfiguration {
 		drivebaseSwapLeftRight = getAsBoolean("drivebase/swapLeftRight", drivebaseSwapLeftRight);
 		drivebaseSensorPhase = getAsBoolean("drivebase/sensor/phase", drivebaseSensorPhase);
 		drivebaseCount = getAsDouble("drivebase/count100ms", drivebaseCount);
-
-		liftIsPresent = getAsBoolean("lift/present", false);
-		liftCanIds = getAsIntArray("lift/canIDs", Constants.LIFT_MOTOR_TALON_CAN_ID_LIST);
-		liftSolenoidID = getAsInt("lift/solenoidID", Constants.LIFT_SOLENOID_ID);
-		liftSolenoidRetractTime = getAsDouble("lift/solenoidRetractTime", Constants.LIFT_SOLENOID_RETRACT_TIME);
-		liftSolenoidExtendTime = getAsDouble("lift/solenoidExtendTime", Constants.LEFT_SOLENOID_EXTEND_TIME);
 	
-		
 		intakeIsPresent = getAsBoolean("intake/present", true);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
 
@@ -227,12 +218,9 @@ public class RobotConfiguration {
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
-		passthroughIsPresent = getAsBoolean("passthrough/present", true);
-		passthroughCanID = getAsInt("passthrough/canID", Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID);
+		loaderIsPresent = getAsBoolean("loader/present", true);
+		loaderCanID = getAsInt("loader/canID", Constants.LOADER_SPINNER_CAN_ID);
 
-		spitterIsPresent = getAsBoolean("spitter/present", true);
-		spitterRightCanID = getAsInt("spitter/canID", Constants.SPITTER_RIGHT_TALON_CAN_ID);
-		spitterLeftCanID = getAsInt("spitter/canID", Constants.SPITTER_LEFT_TALON_CAN_ID);
 		
 		pdpIsPresent = getAsBoolean("pdp/present", true);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);
@@ -248,9 +236,7 @@ public class RobotConfiguration {
 		robotWidthWithBumpers = getAsDouble("dimensions/robot/widthWithBumpers", 0.0);
 		cameraFromFrontWithBumpers = getAsDouble("dimensions/cameraFromFrontWithBumpers", 0.0);
 		cameraFromLeftWithBumpers = getAsDouble("dimensions/cameraFromLeftWithBumpers", 0.0);
-	
-		hatchIsPresent = getAsBoolean("hatch/present", false);
-			
+		
 		visionIsPresent = getAsBoolean("vision/present", true);
 		visionHMin = getAsDouble("vision/hsvFilter/h/min", Constants.VISION_H_MIN);
 		visionHMax = getAsDouble("vision/hsvFilter/h/max", Constants.VISION_H_MAX);
@@ -271,6 +257,8 @@ public class RobotConfiguration {
 
 		canifierIsPresent = getAsBoolean("canifier/present", false);
 		canifierCanId = getAsInt("canifier/canID", Constants.LED_CANIFIER_CAN_ID);
+
+		ledStripIsPresent = getAsBoolean("ledStrip/present", false);
 
 		if (!ignoredEntries.isEmpty()) {
 			log.warning("WARNING: These config file lines weren't used:");
