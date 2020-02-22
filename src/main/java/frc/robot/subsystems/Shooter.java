@@ -26,8 +26,8 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
         this.solenoid = solenoid;
         flyWheel = new ShooterWheel(shooterMotor);
 
-        log.register(true, () -> isExtended(), "%s/extended", name)
-               .register(true, () -> isRetracted(), "%s/retracted", name);
+        log.register(true, () -> isHoodExtended(), "%s/extended", name)
+               .register(true, () -> isHoodRetracted(), "%s/retracted", name);
         //log.register(false, () -> hasCell(), "Shooter/beamBreakTripped");
     }
 
@@ -72,7 +72,7 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     }
 
     @Override
-    public ShooterInterface setExtended(boolean extend) {
+    public ShooterInterface setHoodExtended(boolean extend) {
         if (extend) {
             solenoid.extend();
         } else {
@@ -82,13 +82,13 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     }
 
     @Override
-    public boolean isExtended() {
+    public boolean isHoodExtended() {
         //log.sub("Is intake extended: " +  solenoid.isExtended());
         return solenoid.isExtended();
     }
 
     @Override
-    public boolean isRetracted() {
+    public boolean isHoodRetracted() {
         return solenoid.isRetracted();
     }
 

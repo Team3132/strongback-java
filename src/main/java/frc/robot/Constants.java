@@ -122,7 +122,6 @@ public class Constants {
 
 	/*
 	* Shooter Constant
-	* TODO: add the actual can Id values to the constants.
 	* TODO: Tune the Shooter F, P, I, D values.
 	* TODO: Find the tolerance and Shooter_speed value.
 	*/

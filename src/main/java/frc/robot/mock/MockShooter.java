@@ -28,18 +28,18 @@ public class MockShooter implements ShooterInterface {
     }
 
 	@Override
-	public ShooterInterface setExtended(boolean extended) {
+	public ShooterInterface setHoodExtended(boolean extended) {
 		isExtended = extended;
 		return this;
 	}
 
 	@Override
-	public boolean isExtended() {
+	public boolean isHoodExtended() {
 		return isExtended;
 	}
 
 	@Override
-	public boolean isRetracted() {
+	public boolean isHoodRetracted() {
 		return !isExtended;
 	}
 

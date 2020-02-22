@@ -8,11 +8,11 @@ public interface ShooterInterface extends SubsystemInterface, Executable, Dashbo
     public double getTargetSpeed();
     public boolean isTargetSpeed();
 
-	public ShooterInterface setExtended(boolean extended);
+	public ShooterInterface setHoodExtended(boolean extended);
 
 	/**
 	 * @return the state of the shooter solenoid. 
 	 * */
-	public boolean isExtended();
-	public boolean isRetracted();
+	public boolean isHoodExtended();
+	public boolean isHoodRetracted();
 }

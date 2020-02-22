@@ -18,7 +18,7 @@ public class ShooterSimulator implements ShooterInterface{
 	private final double kMovementTolerance = 1;  // How close before it's classed as being in position.
     private double targetSpeed = 0;
     private double shooterTime = 0;
-	private MovementSimulator arm = new MovementSimulator("arm intake", kMaxSpeed, kMaxAccel, kMinAngle, kMaxAngle, kMovementTolerance);
+	private MovementSimulator arm = new MovementSimulator("hood", kMaxSpeed, kMaxAccel, kMinAngle, kMaxAngle, kMovementTolerance);
 
     @Override
     public String getName() {
@@ -72,18 +72,18 @@ public class ShooterSimulator implements ShooterInterface{
     }
 
 	@Override
-	public ShooterInterface setExtended(boolean extend) {
+	public ShooterInterface setHoodExtended(boolean extend) {
 		arm.setTargetPos(kMaxAngle);
 		return this;
 	}
 
 	@Override
-	public boolean isExtended() {
+	public boolean isHoodExtended() {
 		return arm.getTargetPos() == kMaxAngle && arm.isInPosition();
 	}
 
 	@Override
-	public boolean isRetracted() {
+	public boolean isHoodRetracted() {
 		return arm.getTargetPos() == kMinAngle && arm.isInPosition();
 	}
 }
