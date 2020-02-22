@@ -8,7 +8,6 @@ import frc.robot.interfaces.PassthroughInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
 
 public class Passthrough extends Subsystem implements PassthroughInterface, Executable, DashboardUpdater {
@@ -16,8 +15,8 @@ public class Passthrough extends Subsystem implements PassthroughInterface, Exec
     private double targetCurrent = 0;
     
 
-    public Passthrough(int teamNumber, Motor passthroughMotor, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Log log) {
-        super("Passthrough", networkTable, dashboard, log);
+    public Passthrough(int teamNumber, Motor passthroughMotor, DashboardInterface dashboard, Log log) {
+        super("Passthrough", dashboard, log);
         this.motor = passthroughMotor;
 
         log.register(true, () -> getTargetMotorOutput(), "%s/targetMotorOutput", name)

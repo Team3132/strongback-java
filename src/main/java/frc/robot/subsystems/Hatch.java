@@ -11,7 +11,6 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.HatchInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.HatchInterface.HatchAction.Type;
 import frc.robot.lib.Subsystem;
 
@@ -54,8 +53,8 @@ public class Hatch extends Subsystem implements HatchInterface, Executable, Dash
     private final boolean kEnableResetHack = true;
 
 
-    public Hatch(Motor motor, Solenoid holder, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Clock clock, Log log) {
-        super("Hatch", networkTable ,dashboard, log);   
+    public Hatch(Motor motor, Solenoid holder, DashboardInterface dashboard, Clock clock, Log log) {
+        super("Hatch", dashboard, log);   
         this.motor = motor;
         this.holder = holder;
         this.clock = clock;

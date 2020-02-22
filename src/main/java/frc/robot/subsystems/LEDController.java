@@ -1,13 +1,11 @@
 package frc.robot.subsystems;
 
 import org.strongback.components.Clock;
-
 import frc.robot.Constants;
 import frc.robot.interfaces.LEDControllerInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Subsystem;
 
@@ -31,8 +29,8 @@ public class LEDController extends Subsystem implements LEDControllerInterface, 
 		IDLE_COLOUR_CYCLE;
 	}
 	
-	public LEDController(DashboardInterface dashboardx, CANifier canifier, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Clock clock, Log log) {
-		super("led", networkTable, dashboard, log);
+	public LEDController(DashboardInterface dashboardx, CANifier canifier, DashboardInterface dashboard, Clock clock, Log log) {
+		super("led", dashboard, log);
 		this.clock = clock;
 		this.canifier = canifier;
 	}

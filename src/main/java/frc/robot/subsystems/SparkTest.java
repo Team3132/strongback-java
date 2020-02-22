@@ -7,7 +7,6 @@ import org.strongback.components.Motor.ControlMode;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.SparkTestInterface;
 import frc.robot.lib.Subsystem;
 
@@ -19,8 +18,8 @@ public class SparkTest extends Subsystem implements SparkTestInterface, Executab
     private Motor motor;
     private double targetOutput = 0;
 
-    public SparkTest(Motor motor, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
-        super("SparkTest", networkTable,  dashboard, log);   
+    public SparkTest(Motor motor, DashboardInterface dashboard, Log log) {
+        super("SparkTest", dashboard, log);   
         this.motor = motor;
 
         log.register(false, motor::getOutputPercent, "%s/outputPercent", name)

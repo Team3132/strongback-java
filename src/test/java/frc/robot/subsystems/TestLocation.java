@@ -7,11 +7,9 @@ import org.strongback.mock.Mock;
 import org.strongback.mock.MockClock;
 import org.strongback.mock.MockDoubleSupplier;
 import org.strongback.mock.MockGyroscope;
-
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
 import frc.robot.mock.MockLog;
-import frc.robot.mock.MockNetworkTableHelper;
 import frc.robot.subsystems.Location;
 
 /**
@@ -39,7 +37,7 @@ public class TestLocation {
     	MockDoubleSupplier rightDistance = Mock.doubleSupplier();
     	MockGyroscope gyro = Mock.gyroscope();
     	MockClock clock = Mock.clock();
-        Location location = new Location(leftDistance, rightDistance, gyro, clock, new MockNetworkTableHelper("Location") ,null, new MockLog());
+        Location location = new Location(leftDistance, rightDistance, gyro, clock, null, new MockLog());
         
         // Initial location should always be 0,0,0
         gyro.setAngle(0); // Facing towards the opposing alliances wall.

@@ -4,7 +4,6 @@ import org.strongback.components.Clock;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.SubsystemInterface;
 import frc.robot.interfaces.VisionInterface;
 import frc.robot.lib.Position;
@@ -42,8 +41,8 @@ public class LimeVision extends Subsystem implements VisionInterface, SubsystemI
      * Refrences to networktables can be found at this link:
      * http://docs.limelightvision.io/en/latest/getting_started.html#basic-programming 
      */
-    public LimeVision(Location location, Clock clock, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
-        super("limevision", networkTable, dashboard, log);
+    public LimeVision(Location location, Clock clock, DashboardInterface dashboard, Log log) {
+        super("limevision", dashboard, log);
         this.location = location;
         this.clock = clock;
 

@@ -6,7 +6,6 @@ import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.TapeInterface;
 import frc.robot.lib.CanifierColourSensors;
 import frc.robot.lib.Subsystem;
@@ -33,8 +32,8 @@ public class Tape extends Subsystem implements TapeInterface, DashboardUpdater {
     private final double HIGH_THRESHOLD = OVER_THE_EDGE_VALUE + Constants.COLOUR_SENSOR_TOLERANCE;
     private final double LOW_THRESHOLD = OVER_THE_EDGE_VALUE - Constants.COLOUR_SENSOR_TOLERANCE;
 
-    public Tape(CANifier sensor, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {    
-        super("Tape", networkTable, dashboard, log);
+    public Tape(CANifier sensor, DashboardInterface dashboard, Log log) {    
+        super("Tape", dashboard, log);
         left = new TapeSensor(sensor, Constants.COLOUR_SENSOR_LEFT);
         right = new TapeSensor(sensor, Constants.COLOUR_SENSOR_RIGHT);
     }
