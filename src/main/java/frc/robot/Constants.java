@@ -188,8 +188,8 @@ public class Constants {
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
 
 	// Climber
-	public static final int CLIMBER_LEFT_CAN_ID = 11;
-	public static final int CLIMBER_RIGHT_CAN_ID = 10;
+	public static final int CLIMBER_PTOSOLENOID_CAN_ID = 11;
+	public static final int CLIMBER_BRAKESOLENOID_CAN_ID = 10;
 	public static final double NEO_TICKS_PER_TURN = 42;
 	public static final double CLIMBER_GEAR_RATIO = 13.5;
 	public static final double CLIMBER_DRUM_CIRCUMFRENCE_METRES = 0.039 * Math.PI;

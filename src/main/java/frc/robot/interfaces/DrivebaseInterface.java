@@ -178,6 +178,12 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	 */
 	public boolean hasFinished();
 
+	public boolean isPtoExtended();
+	public boolean isPtoRetracted();
+
+	public boolean isBrakeExtended();
+	public boolean isBrakeRetracted();
+
 	/**
 	 * Register with the drivebase a way to drive the requested mode by using the supplied routine.
 	 */

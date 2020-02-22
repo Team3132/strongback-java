@@ -227,11 +227,34 @@ public class Sequences {
 		return seq;
 	}
 
+	//climber
+	public static Sequence deployPto() {
+		Sequence seq = new Sequence("Deploying Pto - climb mode");
+		seq.add().deployPtoGearbox();
+		return seq;
+	}
+
+	public static Sequence stowPto() {
+		Sequence seq = new Sequence("Stowing Pto - drive mode");
+		seq.add().stowPtoGearbox();
+		return seq;
+	}
+
+	public static Sequence climberBrake() {
+		Sequence seq = new Sequence("Climber braking");
+		seq.add().deployBrake();
+		return seq;
+	}
+
+	public static Sequence climberStopBrake() {
+		Sequence seq = new Sequence("Climber no longer braking");
+		seq.add().deployBrake();
+		return seq;	
+	}
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
-		/*startClimberUp(),
-		pauseClimber(),
-		stopClimber(),*/
+		
 		getEmptySequence(), 
 		getStartSequence(), 
 		getResetSequence(),

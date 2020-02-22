@@ -31,7 +31,6 @@ import java.util.TreeMap;
 public class Drivebase extends Subsystem implements DrivebaseInterface, Executable, DashboardUpdater {
 	private DriveRoutineParameters parameters = DriveRoutineParameters.getConstantPower(0);
 	private DriveRoutine routine = null;
-	private ClimberAction action = new ClimberAction(ClimberAction.NONE);
 	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
 	private final Motor left;
 	private final Motor right;
@@ -89,25 +88,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	}
 
 
-	@Override
-    public void execute(long timeInMillis) {
-		switch(action.type) {
-			case GEARBOX_OUT:
-				ptoSolenoid.extend();
-				break;
-			case GEARBOX_IN:
-				ptoSolenoid.retract();
-				break;
-			case BRAKE:
-				brakeSolenoid.extend();
-				break;
-			case RELEASE_BRAKE:
-				brakeSolenoid.retract();
-				break;
-			default:
-				break;
-		}
-	}
+	
 	@Override
 	public DriveRoutineParameters getDriveRoutine() {
 		return parameters;
@@ -195,4 +176,16 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		log.sub("%s: Registered %s drive routine", name, routine.getName());
 		driveModes.put(mode, new DriveMode(routine, controlMode));
 	}
+
+	@Override
+    public boolean isPtoExtended() {
+        //log.sub("Is intake extended: " +  solenoid.isExtended());
+        return ptoSolenoid.isExtended();
+	}
+	
+	@Override
+    public boolean isBrakeExtended() {
+        //log.sub("Is intake extended: " +  solenoid.isExtended());
+        return brakeSolenoid.isExtended();
+    }
 }

@@ -6,6 +6,8 @@ import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+import frc.robot.interfaces.DrivebaseInterface.ClimberAction.ClimberType;
+
 import org.strongback.components.Clock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -46,7 +48,8 @@ public class State {
 	public CameraMode cameraMode = null;
 
 	// Climber
-	public ClimberAction climberAction = null;  // What the climber should do.
+	public Boolean ptoGearboxExtended = null;  // What the climber should do.
+	public Boolean brakeExtended = null;
 
 	// Driving.
 	public DriveRoutineParameters drive = null;
@@ -67,6 +70,8 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
+		ptoGearboxExtended = subsystems.drivebase.isPtoExtended();
+		brakeExtended = subsystems.drivebase.isBrakeExtended();
 		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
 		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
 		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
@@ -104,7 +109,7 @@ public class State {
 	}
 
 	public State stowIntake() {
-		intakeExtended = Boolean.valueOf(true);
+		intakeExtended = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -150,6 +155,25 @@ public class State {
 
 	
 	// Climber
+	public State deployPtoGearbox() {
+		ptoGearboxExtended = Boolean.valueOf(true);
+		return this;
+	}
+
+	public State stowPtoGearbox() {
+		intakeExtended = Boolean.valueOf(false);
+		return this;
+	}
+
+	public State deployBrake() {
+		brakeExtended = Boolean.valueOf(true);
+		return this;
+	}
+
+	public State stowBrake() {
+		brakeExtended = Boolean.valueOf(false);
+		return this;
+	}
 	/*public State setClimberPowerLeft(double speed) {
 		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_LEFT, speed);
 		return this;
@@ -294,6 +318,15 @@ public class State {
 	public State doVisionAim(){
 		drive = new DriveRoutineParameters(DriveRoutineType.VISION_AIM);
 		return this;
+	}
+
+	public State extendClimberGearbox(){
+		climberAction = new ClimberAction(ClimberType.GEARBOX_OUT, 0);
+		return this;
+	}
+
+	public State retractClimberGearbox(){
+		climberAction = new ClimberAction(ClimberType.GEARBOX_IN, 0)
 	}
 
 
