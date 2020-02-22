@@ -51,11 +51,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public ColourWheel(Motor motor, Supplier<WheelColour> colourSensor, LEDStripInterface ledStrip, Clock clock, DashboardInterface dash, Log log) {
     super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_RED_TARGET);
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
-    colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
     this.motor = motor;
     this.clock = clock;
     this.colourSensor = colourSensor;

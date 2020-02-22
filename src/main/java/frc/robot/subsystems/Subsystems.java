@@ -24,7 +24,6 @@ import org.strongback.mock.Mock;
 
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
-import frc.robot.controller.Controller.TrajectoryGenerator;
 import frc.robot.drive.routines.*;
 import frc.robot.interfaces.*;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
@@ -216,12 +215,6 @@ public class Subsystems implements DashboardUpdater {
 				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
-		// Driving using the tape on the floor to help with alignment. Overrides the
-		// steering but not the speed.
-		drivebase.registerDriveRoutine(DriveRoutineType.TAPE_ASSIST,
-				new PositionalPIDDrive("tape", () -> -leftStick.getAxis(1).read(), () -> getTapeTurnAdjustment(),
-						Constants.TAPE_JOYSTICK_SCALE, Constants.TAPE_ANGLE_SCALE, Constants.TAPE_MAX_VELOCITY_JERK,
-						leftDriveDistance, leftDriveSpeed, rightDriveDistance, rightDriveSpeed, clock, log));
 		// Turns on the spot to a specified angle.
 		drivebase.registerDriveRoutine(DriveRoutineType.TURN_TO_ANGLE,
 				new PositionalPIDDrive("angle", () -> 0, () -> getTurnToAngleTurnAdjustment(), 0,
@@ -365,9 +358,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
-		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
-		Strongback.executor().register(colourWheel, Priority.HIGH);
-	}
+	
 
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 		ColorMatch colourMatcher = new ColorMatch();
