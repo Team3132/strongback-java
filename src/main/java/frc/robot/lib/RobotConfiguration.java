@@ -72,14 +72,7 @@ public class RobotConfiguration {
 	public boolean drivebaseSwapLeftRight = false;
 	public boolean drivebaseSensorPhase = false;
 	public double drivebaseCount =  Constants.DRIVE_COUNT_100ms;
-
-
-	public boolean liftIsPresent = false;
-	public int[] liftCanIds = Constants.LIFT_MOTOR_TALON_CAN_ID_LIST;
-	public int liftSolenoidID = Constants.LIFT_SOLENOID_ID;
-	public double liftSolenoidRetractTime = Constants.LIFT_SOLENOID_RETRACT_TIME;
-	public double liftSolenoidExtendTime = Constants.LEFT_SOLENOID_EXTEND_TIME;
-
+	
 	public boolean intakeIsPresent = false;
 	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
 
@@ -123,9 +116,6 @@ public class RobotConfiguration {
 	public int canifierCanId;
 
 	public boolean navxIsPresent = false;
-
-	public boolean hatchIsPresent = true;
-	public int hatchCanID = Constants.HATCH_POSITION_MOTOR_CAN_ID;
 
 	public boolean visionIsPresent = true;
 	public double visionHMin = Constants.VISION_H_MIN;
@@ -225,14 +215,7 @@ public class RobotConfiguration {
 		drivebaseSwapLeftRight = getAsBoolean("drivebase/swapLeftRight", drivebaseSwapLeftRight);
 		drivebaseSensorPhase = getAsBoolean("drivebase/sensor/phase", drivebaseSensorPhase);
 		drivebaseCount = getAsDouble("drivebase/count100ms", drivebaseCount);
-
-		liftIsPresent = getAsBoolean("lift/present", false);
-		liftCanIds = getAsIntArray("lift/canIDs", Constants.LIFT_MOTOR_TALON_CAN_ID_LIST);
-		liftSolenoidID = getAsInt("lift/solenoidID", Constants.LIFT_SOLENOID_ID);
-		liftSolenoidRetractTime = getAsDouble("lift/solenoidRetractTime", Constants.LIFT_SOLENOID_RETRACT_TIME);
-		liftSolenoidExtendTime = getAsDouble("lift/solenoidExtendTime", Constants.LEFT_SOLENOID_EXTEND_TIME);
 	
-		
 		intakeIsPresent = getAsBoolean("intake/present", true);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
 
@@ -268,9 +251,7 @@ public class RobotConfiguration {
 		robotWidthWithBumpers = getAsDouble("dimensions/robot/widthWithBumpers", 0.0);
 		cameraFromFrontWithBumpers = getAsDouble("dimensions/cameraFromFrontWithBumpers", 0.0);
 		cameraFromLeftWithBumpers = getAsDouble("dimensions/cameraFromLeftWithBumpers", 0.0);
-	
-		hatchIsPresent = getAsBoolean("hatch/present", false);
-			
+		
 		visionIsPresent = getAsBoolean("vision/present", true);
 		visionHMin = getAsDouble("vision/hsvFilter/h/min", Constants.VISION_H_MIN);
 		visionHMax = getAsDouble("vision/hsvFilter/h/max", Constants.VISION_H_MAX);
