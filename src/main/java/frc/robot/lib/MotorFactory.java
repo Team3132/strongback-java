@@ -27,13 +27,6 @@ public class MotorFactory {
 			boolean leftMotor, boolean sensorPhase, double rampRate, boolean doCurrentLimiting, int contCurrent,
 			int peakCurrent, double p, double i, double d, double f, Clock clock, Log log) {
 
-		// Save PID values into Network Tables
-		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
-		helper.set("p", p);
-		helper.set("i", i);
-		helper.set("d", d);
-		helper.set("f", f);
-
 		switch (motorControllerType) {
 		case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: {
 			HardwareSparkMAX spark = getSparkMAX(canIDsWithEncoders, leftMotor, NeutralMode.Brake, log);

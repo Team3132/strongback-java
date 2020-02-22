@@ -41,7 +41,6 @@ public class Subsystems implements DashboardUpdater {
 	public RobotConfiguration config;
 	public Clock clock;
 	public Log log;
-	public NetworkTableHelperInterface networkTable;
 
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
@@ -79,12 +78,11 @@ public class Subsystems implements DashboardUpdater {
 	private final ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 	
 
-	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log, NetworkTableHelperInterface networkTable) {
+	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log) {
 		this.dashboard = dashboard;
 		this.config = config;
 		this.clock = clock;
 		this.log = log;
-		this.networkTable = networkTable;
 	}
 
 	public void createOverrides() {
@@ -164,10 +162,18 @@ public class Subsystems implements DashboardUpdater {
 		leftDriveSpeed = () -> leftMotor.getVelocity();
 		rightDriveSpeed = () -> rightMotor.getVelocity();
 
+
+		// Save PID values into Network Tables
+		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
+		driveHelper.set("p", config.drivebaseP);
+		driveHelper.set("i", config.drivebaseI);
+		driveHelper.set("d", config.drivebaseD);
+		driveHelper.set("f", config.drivebaseF);
+
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
-		location = new Location(leftDriveDistance, rightDriveDistance, gyro, clock, networkTable, dashboard, log); // Encoders must return inches		
-		drivebase = new Drivebase(leftMotor, rightMotor, networkTable, dashboard, log);
+		location = new Location(leftDriveDistance, rightDriveDistance, gyro, clock , dashboard, log); // Encoders must return inches		
+		drivebase = new Drivebase(leftMotor, rightMotor, driveHelper, dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 

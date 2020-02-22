@@ -71,7 +71,7 @@ public class Robot extends IterativeRobot implements Executable {
 		clock = Strongback.timeSystem();
 		log = new LogDygraph(Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION, Constants.LOG_DATE_EXTENSION, Constants.LOG_NUMBER_FILE, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
-		networkTable = new NetworkTablesHelper("drive");
+		networkTable = new NetworkTablesHelper("");
 		startWebServer();
 		log.info("Waiting for driver's station to connect before setting up UI");
 		// Do the reset of the initialization in init().
@@ -102,7 +102,7 @@ public class Robot extends IterativeRobot implements Executable {
 		createInputDevices();
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
-		subsystems = new Subsystems(createDashboard(), config, clock, log, new NetworkTablesHelper("drive"));
+		subsystems = new Subsystems(createDashboard(), config, clock, log);
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(createTrajectoryGenerator(), driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();

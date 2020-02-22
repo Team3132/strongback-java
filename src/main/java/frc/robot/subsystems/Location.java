@@ -130,8 +130,8 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	 * @param gyro The gyro to get angles
 	 * @param log The log to store debug and other logging messages
 	 */
-    public Location(DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, NetworkTableHelperInterface networkTable,DashboardInterface dashboard, Log log) {
-		super("Location", networkTable, dashboard, log);	// always present!
+    public Location(DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock,DashboardInterface dashboard, Log log) {
+		super("Location", dashboard, log);	// always present!
 		leftDistanceDelta = new DoubleDelta(leftDistance);
 		rightDistanceDelta = new DoubleDelta(rightDistance);
 		this.gyro = gyro;
