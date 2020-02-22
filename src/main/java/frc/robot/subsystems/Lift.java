@@ -9,6 +9,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LiftInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Subsystem;
 
@@ -31,8 +32,8 @@ public class Lift extends Subsystem implements LiftInterface, DashboardUpdater {
 	private boolean deployed = false;
 	private Solenoid deploySolenoid;
 	
-	public Lift(Motor liftMotor, Solenoid deploy, DashboardInterface dashboard, Log log) {
-		super("Lift", dashboard, log);
+	public Lift(Motor liftMotor, Solenoid deploy, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Log log) {
+		super("Lift", networkTable ,dashboard, log);
 		this.liftMotor = liftMotor;
 		this.deploySolenoid = deploy;
 		
