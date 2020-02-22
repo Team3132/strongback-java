@@ -11,7 +11,7 @@ public class MockLEDStrip implements LEDStripInterface {
     public void setColour(LEDColour c) {}
 
     @Override
-    public void setProgressColour(LEDColour c1, LEDColour c2, int percent) {}
+    public void setProgressColour(LEDColour c1, LEDColour c2, double percent) {}
 
     @Override
     public void setIdle() {}
