@@ -15,7 +15,6 @@ public enum LEDColour {
     public final int r;
     public final int g;
     public final int b;
-    public static final int NUM_COLOURS = 4;
 
     LEDColour(int r, int g, int b) {
         this.r = r;

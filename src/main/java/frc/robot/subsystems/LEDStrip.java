@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.LEDColour;
+import frc.robot.lib.MathUtil;
 
 // LED Strip Subsystem 2020
 
@@ -36,15 +37,10 @@ public class LEDStrip implements LEDStripInterface {
         setData();
     }
 
-    /**
-     * Input 2 colours and an int from 0-100 like a percentage.
-     * The first colour will fill in that percentage of the led strip and the rest will be filled in
-     * with the second colour.
-     */
     @Override
-    public void setProgressColour(LEDColour c1, LEDColour c2, int percent) {
-        percent = cap(percent, 0, 100); //Capping range from 0 - 100
-        int leds = (percent * numberOfLEDs) / 100;
+    public void setProgressColour(LEDColour c1, LEDColour c2, double percent) {
+        percent = MathUtil.clamp(percent, 0, 1);
+        int leds = (int) (percent * numberOfLEDs);
         for (int i = 0; i < leds; i++) {
             setLEDColour(i, c1); 
         }
@@ -68,9 +64,5 @@ public class LEDStrip implements LEDStripInterface {
 
     private void setLEDColour(int index, LEDColour c) {
         ledStripBuffer.setRGB(index, c.r, c.g, c.b);
-    }
-
-    private int cap(int value, int min, int max) {
-        return Math.max(0, Math.min(100, value));
     }
 }

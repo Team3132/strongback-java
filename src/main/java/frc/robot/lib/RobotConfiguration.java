@@ -284,7 +284,7 @@ public class RobotConfiguration {
 		canifierIsPresent = getAsBoolean("canifier/present", false);
 		canifierCanId = getAsInt("canifier/canID", Constants.LED_CANIFIER_CAN_ID);
 
-		ledStripIsPresent = getAsBoolean("ledStrip/present", true);
+		ledStripIsPresent = getAsBoolean("ledStrip/present", false);
 
 		if (!ignoredEntries.isEmpty()) {
 			log.warning("WARNING: These config file lines weren't used:");
