@@ -2,21 +2,20 @@ package frc.robot.controller;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import org.strongback.components.Clock;
 
-import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import frc.robot.interfaces.DrivebaseInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
-import frc.robot.interfaces.LiftInterface.LiftAction;
 import frc.robot.lib.TimeAction;
 import frc.robot.subsystems.Subsystems;
-
-import jaci.pathfinder.Waypoint;
 
 /**
  * Top level class to hold / specify some sort of current or target state.
@@ -33,24 +32,15 @@ public class State {
 	// Time
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
 
-	// Lift
-	public LiftAction liftAction = null;  // Lift position.
-	public Boolean liftDeploy = null;
-
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
-	
-	// Spitter
-	public Double spitterDutyCycle = null;  // Power level to supply to spitter. -1..0..1
-	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
 
-	// Passthrough
-	public Double passthroughMotorOutput = null;
-
-	// Hatch
-	public HatchAction hatchAction = null;  // How the hatch should be positioned.
-	public Boolean hatchHolderEnabled = null;
+	// Loader
+	public Double loaderFeederMotorOutput = null;
+	public Double loaderPassthroughMotorVelocity = null;
+	public Double loaderSpinnerMotorVelocity = null;
+	public Boolean loaderPaddleExtended = null;
 
 	// Vision
 	public CameraMode cameraMode = null;
@@ -60,8 +50,6 @@ public class State {
 
 	// Driving.
 	public DriveRoutineParameters drive = null;
-
-	public Waypoint resetPosition = null;  // Reset where the location subsystem thinks the robot is
 
 	//Colour Wheel
 	public ColourAction colourWheel = null;
@@ -77,17 +65,13 @@ public class State {
 	 */
 	public State(Subsystems subsystems, Clock clock) {
 		setDelayUntilTime(clock.currentTime());
-		setLiftHeight(subsystems.lift.getTargetHeight());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
-		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
-		hasCargo = subsystems.spitter.hasCargo();
-		climberAction = subsystems.climber.getDesiredAction();
-		subsystems.log.info("State() climberAction = %s", climberAction);
-		hatchAction = subsystems.hatch.getAction();
-		hatchHolderEnabled = subsystems.hatch.getHeld();
-		liftDeploy = subsystems.lift.shouldBeDeployed();
+		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
+		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
+		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
+		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
+		//climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
 	}
@@ -113,60 +97,6 @@ public class State {
 		return this;
 	}
 
-
-
-	// Lift
-	/**
-	 * Set absolute lift height.
-	 * @param height in inches from the bottom of the lift.
-	 */
-	public State setLiftHeight(double height) {
-		liftAction = new LiftAction(LiftAction.Type.START_CLIMBER_UP, height);
-		return this;
-	}
-
-	/**
-	 * Adjust the current lift height by delta.
-	 * @param delta to apply to the current height.
-	 */
-	public State setLiftHeightDelta(double delta) {
-		liftAction = new LiftAction(LiftAction.Type.ADJUST_HEIGHT, delta);
-		return this;
-	}
-
-	/**
-	 * Move the lift down a setpoint
-	 */
-	public State setLiftSetpointUp() {
-		liftAction = new LiftAction(LiftAction.Type.SETPOINT_UP, 0); // the zero does nothing
-		return this;
-	}
-
-	/**
-	 * Move the lift down a setpoint
-	 */
-	public State setLiftSetpointDown() {
-		liftAction = new LiftAction(LiftAction.Type.SETPOINT_DOWN, 0); // the zero does nothing
-		return this;
-	}
-
-
-	public State deployLift() {
-		liftDeploy = Boolean.valueOf(true);
-		return this;
-	}
-
-	public State retractLift() {
-		liftDeploy = Boolean.valueOf(false);
-		return this;
-	}
-
-	public State setLiftDeployer(boolean state) {
-		liftDeploy = Boolean.valueOf(state);
-		return this;
-	}
-
-
 	// Intake
 	public State deployIntake() {
 		intakeExtended = Boolean.valueOf(true);
@@ -189,81 +119,23 @@ public class State {
 	}
 
 
-	// Spitter
-	public State setSpitterDutyCycle(double dutyCycle) {
-		spitterDutyCycle = Double.valueOf(dutyCycle);
+	// Loader
+	public State setLoaderSpinnerMotorOutput(double output) {
+		loaderSpinnerMotorVelocity = Double.valueOf(output);
 		return this;
 	}
-
-	public State waitForCargo() {
-		hasCargo = Boolean.valueOf(true);
+	public State setLoaderPassthroughMotorOutput(double output) {
+		loaderPassthroughMotorVelocity = Double.valueOf(output);
 		return this;
 	}
-
-	public State waitForCargoToLeave() {
-		hasCargo = Boolean.valueOf(false);
+	public State setLoaderFeederMotorOutput(double output) {
+		loaderFeederMotorOutput = Double.valueOf(output);
 		return this;
 	}
-
-	public State setHasCargo(boolean hasCargo) {
-		this.hasCargo = Boolean.valueOf(hasCargo);
+	public State setPaddleExtended(boolean extended) {
+		loaderPaddleExtended = Boolean.valueOf(extended);
 		return this;
 	}
-
-
-	// Passthrough
-	public State setPassthroughMotorOutput(double output) {
-		passthroughMotorOutput = Double.valueOf(output);
-		return this;
-	}
-
-
-	// Hatch
-	/**
-	 * Sets the target position of the hatch in inches from
-	 * the right side of the robot. zero is stowed.
-	 */
-	public State setHatchPosition(double position) {
-		hatchAction = new HatchAction(HatchAction.Type.SET_POSITION, position);
-		return this;
-	}
-
-	/**
-	 * [Micro]adjust the position of the hatch relative to it's current target.
-	 */
-	public State setHatchPositionDelta(double delta) {
-		hatchAction = new HatchAction(HatchAction.Type.ADJUST_POSITION, delta);
-		return this;
-	}
-
-	/**
-	 * Set the hatch motor power to the nominated power value.
-	 */
-	public State setHatchPower(double power) {
-		hatchAction = new HatchAction(HatchAction.Type.SET_MOTOR_POWER, power);
-		return this;
-	}
-
-	public State calibrateHatch() {
-		hatchAction = new HatchAction(HatchAction.Type.CALIBRATE, 0);
-		return this;
-	}
-
-	public State grabHatch() {
-		hatchHolderEnabled = Boolean.valueOf(true);
-		return this;
-	}
-
-	public State releaseHatch() {
-		hatchHolderEnabled = Boolean.valueOf(false);
-		return this;
-	}
-
-	public State setHatchHolderEnabled(boolean grabbed) {
-		hatchHolderEnabled = Boolean.valueOf(grabbed);
-		return this;
-	}
-
 
 	// Vision
 	public State doCameraWebcam() {
@@ -278,7 +150,7 @@ public class State {
 
 	
 	// Climber
-	public State setClimberPowerLeft(double speed) {
+	/*public State setClimberPowerLeft(double speed) {
 		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_LEFT, speed);
 		return this;
 	}
@@ -327,31 +199,31 @@ public class State {
 	public State rightClimberOverride(double height) {
 		climberAction = new ClimberAction(ClimberAction.ClimberType.OVERRIDE_RIGHT_PERCENT_OUTPUT, height);
 		return this;
-	}
+	}*/
 
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.Type.ROTATION, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelPositional(Colour colour) {
-		colourWheel = new ColourAction(ColourAction.Type.POSITION, colour);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.Type.NONE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelLeft() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelRight() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
 		return this;
 	}
 
@@ -419,20 +291,29 @@ public class State {
 		return this;
 	}
 
+	public State doVisionAim(){
+		drive = new DriveRoutineParameters(DriveRoutineType.VISION_AIM);
+		return this;
+	}
+
+
+
 	/**
 	 * Add waypoints for the drive base to drive through.
 	 * Note: The robot will come to a complete halt after each list
 	 * of Waypoints, so each State will cause the robot to drive and then
 	 * halt ready for the next state. This should be improved.
-	 * Wayoints are relative to the robots position.
+	 * Waypoints are relative to the robots position.
+	 * @param start the assumed starting point and angle. 
 	 * @param waypoints list of Waypoints to drive through.
+	 * @param end the end point and angle.
 	 * @param forward drive forward through waypoints.
 	 */
-	public State driveRelativeWaypoints(Waypoint[] waypoints, boolean forward) {
-		drive = DriveRoutineParameters.getDriveWaypoints(waypoints, forward, true);
+	public State driveRelativeWaypoints(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end,
+			boolean forward) {
+		drive = DriveRoutineParameters.getDriveWaypoints(start, interiorWaypoints, end, forward, true);
 		return this;
-	}
-	
+	}	
 
 	/**
 	 * Creates a copy of desiredState whose null variables are replaced by values in currentState
@@ -480,13 +361,10 @@ public class State {
 		ArrayList<String> result = new ArrayList<String>();
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
-		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
-		maybeAdd("hasCargo", hasCargo, result);
-		maybeAdd("hatchAction", hatchAction, result);
-		maybeAdd("hatchHolderGrabbed", hatchHolderEnabled, result);
-		maybeAdd("liftDeploy", liftDeploy, result);
-		maybeAdd("liftAction", liftAction, result);
+		maybeAdd("loaderPassthroughMotorVelocity", loaderPassthroughMotorVelocity, result);
+		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
+		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
+		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climberAction, result);
 		maybeAdd("timeAction", timeAction, result);

@@ -50,12 +50,6 @@ public class IntakeSimulator implements IntakeInterface, Executable {
 	}
 
 	@Override
-	public boolean hasCargo() {
-		// TODO: it is unknown that cargo sensor is needed
-		return false;
-	}
-
-	@Override
 	public String getName() {
 		return "IntakeSimulator";
 	}

@@ -125,7 +125,7 @@ public class Position {
 			// Special case. The heading to the same point stays as the current heading
 			return MathUtil.normalise(target.heading, Constants.FULL_CIRCLE);
 		}
-		return MathUtil.radiansToDegrees(Math.atan2(diffY, diffX)) - heading;
+		return MathUtil.normalise(MathUtil.radiansToDegrees(Math.atan2(diffY, diffX)) - heading, Constants.FULL_CIRCLE);
 	}
 
 	public double distanceTo(Position dest) {

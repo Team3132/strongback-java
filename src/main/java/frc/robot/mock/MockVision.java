@@ -8,7 +8,7 @@ public class MockVision implements VisionInterface {
 
 	public MockVision() {
 		details.targetFound = false;
-		details.seenAtSec = 0;
+		details.imageTimestamp = 0;
 	}
 
 	@Override

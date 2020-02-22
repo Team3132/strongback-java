@@ -39,10 +39,6 @@ public class MockIntake implements IntakeInterface {
 		return output;
 	}
 
-	@Override
-	public boolean hasCargo() {
-		return false;
-	}
 	
 	@Override
 	public String getName() {

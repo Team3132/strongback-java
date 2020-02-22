@@ -60,21 +60,25 @@ public class TestLogFileWriter {
 			assertThat("world!", is(equalTo(br.readLine())));
 			br.close();
 		}
-		// Check that the "Latest" symbolic link can be read.
-		{
-			Path expectedFile = Paths.get(tempDir.toString(), "Latest_name.extn");
-			BufferedReader br = Files.newBufferedReader(expectedFile);
-			assertThat("Hello", is(equalTo(br.readLine())));
-			assertThat("world!", is(equalTo(br.readLine())));
-			br.close();
-		}
-		// Check that the "date/20180303" symbolic link can be read.
-		{
-			Path expectedFile = Paths.get(tempDir.toString(), "date", "20180303_name.extn");
-			BufferedReader br = Files.newBufferedReader(expectedFile);
-			assertThat("Hello", is(equalTo(br.readLine())));
-			assertThat("world!", is(equalTo(br.readLine())));
-			br.close();
+		
+		//Is Windows?
+		if(System.getProperty("os.name").startsWith("Windows") == false) {
+			// Check that the "Latest" symbolic link can be read.
+			{
+				Path expectedFile = Paths.get(tempDir.toString(), "Latest_name.extn");
+				BufferedReader br = Files.newBufferedReader(expectedFile);
+				assertThat("Hello", is(equalTo(br.readLine())));
+				assertThat("world!", is(equalTo(br.readLine())));
+				br.close();
+			}
+			// Check that the "date/20180303" symbolic link can be read.
+			{
+				Path expectedFile = Paths.get(tempDir.toString(), "date", "20180303_name.extn");
+				BufferedReader br = Files.newBufferedReader(expectedFile);
+				assertThat("Hello", is(equalTo(br.readLine())));
+				assertThat("world!", is(equalTo(br.readLine())));
+				br.close();
+			}
 		}
 	}
 }

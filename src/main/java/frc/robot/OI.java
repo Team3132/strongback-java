@@ -7,14 +7,11 @@ import org.strongback.SwitchReactor;
 import org.strongback.components.Switch;
 import org.strongback.components.ui.FlightStick;
 import org.strongback.components.ui.InputDevice;
-import frc.robot.Constants.LiftSetpoint;
 import frc.robot.controller.Controller;
 import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
-import frc.robot.interfaces.ClimberInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
-import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
 import frc.robot.subsystems.*;
@@ -27,15 +24,11 @@ public class OI implements OIInterface {
 	private Log log;
 	private Subsystems subsystems;
 
-	// Used to switch the lift position buttons between setting to 
-	// hatch positions or to cargo positions
-	private boolean scoreModeCargo;
 
 	public OI(Controller controller, Subsystems subsystems, Log log) {
 		this.exec = controller;
 		this.subsystems = subsystems;
 		this.log = log;
-		this.scoreModeCargo = false;
 
 	}
     
@@ -86,35 +79,16 @@ public class OI implements OIInterface {
 		// Hatch Vision
 		// Intaking is on this button.
 
-		whileTriggered(rightStick.getButton(5), Sequences.startClimberUp());
-		onUntriggered(rightStick.getButton(5), Sequences.stopClimber());
-
-		whileTriggered(rightStick.getButton(4), Sequences.startClimberDown());
-		onUntriggered(rightStick.getButton(4), Sequences.stopClimber());
-		// Level 3 sequence of buttons
-		/*onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
-		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
-
-		onTriggered(rightStick.getButton(10), Sequences.startLevelDriveForward());
-		onUntriggered(rightStick.getButton(10), Sequences.stopLevelDrive());
-
-		onTriggered(rightStick.getButton(8), Sequences.startRearRaise());
-		onUntriggered(rightStick.getButton(8), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(12), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());*/
-
-		//onTriggered(rightStick.getButton(9), Sequences.startFrontRaise());
-		//onUntriggered(rightStick.getButton(9), Sequences.stopLevelNclimb());
-
-		//onTriggered(rightStick.getButton(11), Sequences.startRearRaise());
-		//onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(5), Sequences.deployClimber());
+		// Intake - Right Stick Button 2 (on/off)
+		onTriggered(rightStick.getButton(2), Sequences.startIntaking());
 		
-		onTriggered(leftStick.getButton(4), Sequences.climb());
+		onUntriggered(rightStick.getButton(2), Sequences.stopIntaking());
 
+		onTriggered(leftStick.getButton(6), Sequences.startSlowDriveForward());
+		onUntriggered(leftStick.getButton(6), Sequences.setDrivebaseToArcade());
 
+		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
+		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
@@ -125,83 +99,11 @@ public class OI implements OIInterface {
 		// Intake
 		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD),
 		() -> {
-			scoreModeCargo = true;
-			sysoutScoreMode();
 			return Sequences.startIntaking();
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
 
-		//onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
-		
-		// Deploy/retract lift. 
-	/*	onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
-		onUntriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftRetract());
-*/
-
-		/*
-		// Spitter Sequence (cargoSpit) 
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startCargoSpit());
-		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
-
-		// Reverse button
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
-		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
-		*/
-
-		// Hatch hold & release
-		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), () -> {
-			scoreModeCargo = false;
-			sysoutScoreMode();
-			return Sequences.releaseHatch();
-		});
-		onUntriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.holdHatch());
-
-		// Hatch deploy/stow buttons.
-/*		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_WEST), Sequences.getReadyHatchSequence());			
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_EAST), Sequences.getStowHatchSequence());
-		*/
-		// Microadjust hatch left and right
-		//whileTriggered(axisAsSwitch(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS)),
-		//		() -> { return Sequences.getHatchDeltaPositionSequence(-1 * stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read()); });
-				
-		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() >= 0.5;}, Sequences.setHatchPower(-0.5));
-		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() < 0.5 &&
-			stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() > -0.5;}, Sequences.setHatchPower(0));
-		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() <= -0.5;}, Sequences.setHatchPower(0.5));
-
-
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
-		
-		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
-		/*onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
-		/* Using these buttons for colour wheel while testing.
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT);
-		});
-
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_MIDDLE_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_MIDDLE_HATCH_HEIGHT);
-		});
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_TOP_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_ROCKET_TOP_HATCH_HEIGHT);
-		});
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), () -> { 
-			sysoutScoreMode();
-			return scoreModeCargo ? Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_CARGO_HEIGHT)
-								  : Sequences.moveLift(LiftSetpoint.LIFT_CARGO_SHIP_HATCH_HEIGHT);
-		});
-		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), () -> {
-			scoreModeCargo = !scoreModeCargo;
-			sysoutScoreMode();
-		}); */
-
-		//Colour Wheel testing.
+		// Colour Wheel testing.
 		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(Colour.YELLOW));
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(Colour.BLUE));
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(Colour.RED));
@@ -213,105 +115,51 @@ public class OI implements OIInterface {
 		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelRight());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
 
-		// Lift microadjust
-		whileTriggered(() -> {
-			return stick.getAxis(GamepadButtonsX.RIGHT_Y_AXIS).read() > 0.8;
-		}, Sequences.getMicroAdjustDownSequence());
-		whileTriggered(() -> {
-			return stick.getAxis(GamepadButtonsX.RIGHT_Y_AXIS).read() < -0.8;
-		}, Sequences.getMicroAdjustUpSequence());
+
 	}
 
-	private void sysoutScoreMode() {
-		if (scoreModeCargo) {
-			System.out.println("||||||||||||||| CARGO MODE |||||||||||||||");
-		} else {
-			System.out.println("+++++++++++++++ HATCH MODE +++++++++++++++");
-		}
-	}
 
  	@Override
 	public void configureDiagBox(InputDevice box) {
-		//Red1 and Red2 for left
-		//Red3 to deploy climber
-		//Yellow3 to climb
-		//Yellow1 and Yellow2 for right
-		//Yellow4 and Yellow5 for both
-
-		/*
-		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.startClimberLeftUp());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.startClimberDown());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3), Sequences.deployClimber());
-		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.startClimberRightUp());
-		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON1), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.startClimberRightDown());
-		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON2), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON3), Sequences.climb());
-		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON3), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON4), Sequences.startClimberUp());
-		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON4), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON5), Sequences.startClimberDown());
-		onUntriggered(box.getButton(OperatorBoxButtons.YELLOW_BUTTON5), Sequences.pauseClimber());
-
-		onTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON5), Sequences.stopClimber());
-
-		//disabling stuff
-		onTriggered(box.getButton(OperatorBoxButtons.RED_MANUAL), Sequences.overrideClimberLeft());
-		onTriggered(box.getButton(OperatorBoxButtons.YELLOW_MANUAL), Sequences.overrideClimberRight());
-		*/
-
-		OverridableSubsystem<ClimberInterface> climberOverride = subsystems.climberOverride;
+		// Intake overrides.
+		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
 		// Get the interface that the diag box uses.
-		ClimberInterface climberIF = climberOverride.getOverrideInterface();
+		IntakeInterface intakeIF = intakeOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.RED_DISABLE, OperatorBoxButtons.RED_MANUAL, subsystems.climberOverride);
-	    // Override climber power.
-		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER,
-				box.getAxis(OperatorBoxButtons.RED_POT).read())));
-		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON1),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
+		mapOverrideSwitch(box, OperatorBoxButtons.INTAKE_DISABLE, OperatorBoxButtons.INTAKE_MANUAL, intakeOverride);
+	    // While the intake speed button is pressed, set the target speed. Does not turn off.
+		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
+			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
+		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_EXTEND), 
+			() -> intakeIF.setExtended(true));
+		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_RETRACT), 
+			() -> intakeIF.setExtended(false));
 
-		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2), 
-			() -> climberIF.setDesiredAction(
-				new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_LEFT,
-				box.getAxis(OperatorBoxButtons.RED_POT).read())));
-		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON2),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
+		// Get the interface that the diag box uses.
+		LoaderInterface loaderIF = subsystems.loaderOverride.getOverrideInterface();
+		// Setup the switch for manual/auto/off modes.
+		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
+	  // While the loader speed button is pressed, set the target speed. Does not turn off.
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
+			() -> loaderIF.setTargetSpinnerMotorVelocity(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
+			() -> loaderIF.setTargetSpinnerMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
+			() -> loaderIF.setTargetPassthroughMotorVelocity(25*box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
+			() -> loaderIF.setTargetPassthroughMotorVelocity(0));
+		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR), 
+			() -> loaderIF.setTargetFeederMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_FEEDER_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR),
+			() -> loaderIF.setTargetFeederMotorOutput(0));
 		
-		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_RIGHT,
-						box.getAxis(OperatorBoxButtons.RED_POT).read())));
-		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON3),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
+		
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
+			() -> loaderIF.setPaddleExtended(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
+			() -> loaderIF.setPaddleExtended(true));
+}
 
-		whileTriggered(box.getButton(OperatorBoxButtons.RED_BUTTON4),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.SET_BOTH_HEIGHT,
-						box.getAxis(OperatorBoxButtons.RED_POT).read())));
-		onUntriggered(box.getButton(OperatorBoxButtons.RED_BUTTON4),
-				() -> climberIF.setDesiredAction(new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0)));
-	}
-
-	private double scaleClimbPotHeight(double value) {
-		// Pot has a value of -1 to 1. Scale to 0 - max_height.
-		return (value + 1) / 2 * Constants.CLIMBER_DEPLOY_HEIGHT;
-	}
-
-	private double scaleLiftPotHeight(double value) {
-		// Pot has a value of -1 to 1. Scale to 0 - max_height.
-		return (value + 1) / 2 * Constants.LIFT_DEFAULT_MAX_HEIGHT;
-	}
 
 	private void mapOverrideSwitch(InputDevice box, int disableButton, int manualButton, OverridableSubsystem overrideableSubsystem) {
 		onTriggered(box.getButton(disableButton), () -> overrideableSubsystem.turnOff());
