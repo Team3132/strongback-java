@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+/*package frc.robot.subsystems;
 
 import org.strongback.Executable;
 import org.strongback.components.Motor;
@@ -112,7 +112,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
                 // We look at the location of the two heights and work out the difference. If the difference is beyond the threshold
                 // we adjust power to make sure that they are moving up in parallel.
                 */
-                targetHeight = action.value;
+/*                targetHeight = action.value;
 
                 double leftHeight = leftWinch.getActualHeight();
                 double rightHeight = rightWinch.getActualHeight();
@@ -194,7 +194,7 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     /**
      * Update the operator console with the status of the subsystem.
      */
-	@Override
+/*	@Override
 	public void updateDashboard() {
         leftWinch.updateDashboard();
         rightWinch.updateDashboard();        
@@ -277,4 +277,4 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     public ClimberAction getDesiredAction() {
         return action;        
     }
-}
+}*/

@@ -16,7 +16,6 @@ import jaci.pathfinder.Waypoint;
  * control algorithms needed to co-ordinate actions on these devices.
  */
 public abstract interface DrivebaseInterface extends Executable, SubsystemInterface, DashboardUpdater {
-	
 	public enum DriveRoutineType {
 		CONSTANT_POWER,  // Set a constant power to drive wheels.
 		CONSTANT_SPEED,  // Set a constant speed to drive wheels.
@@ -30,6 +29,24 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		ARCADE_VELOCITY;  // Normal arcade drive.;
 
 	}
+	public class ClimberAction{	
+		public final ClimberType type;
+		public final double value;
+
+		public ClimberAction(ClimberType type, double value) {
+            this.type = type;
+            this.value = value;
+        }
+
+		public enum ClimberType {
+			GEARBOX_IN,
+			GEARBOX_OUT,
+			BRAKE,
+			RELEASE_BRAKE,
+			NONE
+		}
+	}
+
 
 	public class DriveRoutineParameters {
 		public DriveRoutineParameters(DriveRoutineType type) {

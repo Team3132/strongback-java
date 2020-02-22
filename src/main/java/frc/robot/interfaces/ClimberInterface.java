@@ -1,4 +1,4 @@
-package frc.robot.interfaces;
+/*package frc.robot.interfaces;
 
 import org.strongback.Executable;
 
@@ -43,17 +43,19 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
     /** 
      * Sets the desired action for the climber.
      * @param climberAction
-     */
+     *
     public void setDesiredAction(ClimberAction climberAction);
     
 
     /**
      * Gets the target action of the climber.
      * @return the desired action of the climber.
-     */
+     
     public ClimberAction getDesiredAction();
 
     public boolean isInPosition();
 
 
 }
+
+*/

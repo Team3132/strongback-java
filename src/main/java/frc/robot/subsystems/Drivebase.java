@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
+import org.strongback.components.Solenoid;
 
 import frc.robot.Constants;
 import frc.robot.drive.routines.ConstantDrive;
@@ -30,16 +31,21 @@ import java.util.TreeMap;
 public class Drivebase extends Subsystem implements DrivebaseInterface, Executable, DashboardUpdater {
 	private DriveRoutineParameters parameters = DriveRoutineParameters.getConstantPower(0);
 	private DriveRoutine routine = null;
+	private ClimberAction action = new ClimberAction(ClimberAction.NONE);
 	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
 	private final Motor left;
 	private final Motor right;
+	private Solenoid ptoSolenoid;
+	private Solenoid brakeSolenoid;
 	private final Log log;
 	private DriveMotion currentMotion;
 
-	public Drivebase(Motor left, Motor right,	DashboardInterface dashboard, Log log) {
+	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, DashboardInterface dashboard, Log log) {
 		super("Drive", dashboard, log);
 		this.left = left;
 		this.right = right;
+		this.ptoSolenoid = ptoSolenoid;
+		this.brakeSolenoid = brakeSolenoid;
 		this.log = log;
 
 		currentMotion = new DriveMotion(0, 0);
@@ -86,6 +92,26 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		this.controlMode = mode.controlMode;
 	}
 
+
+	@Override
+    public void execute(long timeInMillis) {
+		switch(action.type) {
+			case GEARBOX_OUT:
+				ptoSolenoid.extend();
+				break;
+			case GEARBOX_IN:
+				ptoSolenoid.retract();
+				break;
+			case BRAKE:
+				brakeSolenoid.extend();
+				break;
+			case RELEASE_BRAKE:
+				brakeSolenoid.retract();
+				break;
+			default:
+				break;
+		}
+	}
 	@Override
 	public DriveRoutineParameters getDriveRoutine() {
 		return parameters;
