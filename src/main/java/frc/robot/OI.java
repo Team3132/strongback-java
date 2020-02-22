@@ -82,11 +82,9 @@ public class OI implements OIInterface {
 	
 	public void configureDriverJoystick(FlightStick leftStick, FlightStick rightStick, String name) {
 
-		// Left Stick's onTrigger drive slowly mode is handled in Robot.java, not here
-		// Hatch Vision
-		// Intaking is on this button.
-		onTriggered(leftStick.getButton(1), Sequences.startDriveByVision());
-		onUntriggered(leftStick.getButton(1), Sequences.stopDriveByVision());
+	// Deploy/retract lift. 
+	onTriggered(rightStick.getButton(12), Sequences.liftDeploy());
+	onUntriggered(rightStick.getButton(12), Sequences.liftRetract());
 
 		// Intake - Right Stick Button 2 (on/off)
 		onTriggered(rightStick.getButton(2), () -> {
@@ -96,33 +94,17 @@ public class OI implements OIInterface {
 		}); 
 		onUntriggered(rightStick.getButton(2), Sequences.stopIntaking());
 
-		onTriggered(leftStick.getButton(6), Sequences.startSlowDriveForward());
-		onUntriggered(leftStick.getButton(6), Sequences.setDrivebaseToArcade());
+		onTriggered(leftStick.getButton(1), Sequences.startSlowDriveForward());
+		onUntriggered(leftStick.getButton(1), Sequences.setDrivebaseToArcade());
 
-		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
-		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
-
-		// tell the climber to go back down
-		// Right Stick
-		onTriggered(rightStick.getButton(5), Sequences.abortLevelStage());
-		onUntriggered(rightStick.getButton(5), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(3), Sequences.visionAim());
-		onUntriggered(leftStick.getButton(3), Sequences.stopDriveByVision());
+		// i dont think this is used this year? 
+		//onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
+		//onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
 
 
-		// Level 3 sequence of buttons
-		/*onTriggered(rightStick.getButton(12), Sequences.startLevel3climb());
-		onUntriggered(rightStick.getButton(12), Sequences.stopLevelNclimb());
+		onTriggered(rightStick.getButton(1), Sequences.visionAim());
+		onUntriggered(rightStick.getButton(1), Sequences.setDrivebaseToArcade());
 
-		onTriggered(rightStick.getButton(10), Sequences.startLevelDriveForward());
-		onUntriggered(rightStick.getButton(10), Sequences.stopLevelDrive());
-
-		onTriggered(rightStick.getButton(8), Sequences.startRearRaise());
-		onUntriggered(rightStick.getButton(8), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(12), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(12), Sequences.stopLevelDrive());*/
 
 		onTriggered(leftStick.getButton(10), Sequences.startFrontRaise());
 		onUntriggered(leftStick.getButton(10), Sequences.stopLevelNclimb());
@@ -130,39 +112,8 @@ public class OI implements OIInterface {
 		onTriggered(leftStick.getButton(8), Sequences.startLevelDriveForward());
 		onUntriggered(leftStick.getButton(8), Sequences.stopLevelDrive());
 
-		// Level 2 sequence of buttons
 
-		onTriggered(rightStick.getButton(11), Sequences.startLevel2climb());
-		onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
-
-		onTriggered(rightStick.getButton(9), Sequences.startLevelDriveForward());
-		onUntriggered(rightStick.getButton(9), Sequences.stopLevelDrive());
-
-		onTriggered(rightStick.getButton(7), Sequences.startRearRaise());
-		onUntriggered(rightStick.getButton(7), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(11), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(11), Sequences.stopLevelDrive());
-
-		onTriggered(leftStick.getButton(9), Sequences.startFrontRaise());
-		onUntriggered(leftStick.getButton(9), Sequences.stopLevelNclimb());
-
-		onTriggered(leftStick.getButton(7), Sequences.startLevelDriveForward());
-		onUntriggered(leftStick.getButton(7), Sequences.stopLevelDrive());
-
-		//onTriggered(rightStick.getButton(9), Sequences.startFrontRaise());
-		//onUntriggered(rightStick.getButton(9), Sequences.stopLevelNclimb());
-
-		//onTriggered(rightStick.getButton(11), Sequences.startRearRaise());
-		//onUntriggered(rightStick.getButton(11), Sequences.stopLevelNclimb());
-
-
-		//onTriggered(leftStick.getButton(9), Sequences.startLevelDriveForward());
-		//onUntriggered(leftStick.getButton(9), Sequences.stopLevelDrive());
-
-		//onTriggered(leftStick.getButton(11), Sequences.startLevelDriveBackward());
-		//onUntriggered(leftStick.getButton(11), Sequences.stopLevelDrive());
-	}
+			}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
 		// Reset robot: intake stowed and lift at bottom.
@@ -180,43 +131,21 @@ public class OI implements OIInterface {
 
 		//onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
 		
-		// Deploy/retract lift. 
-		onTriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftDeploy());
-		onUntriggered(stick.getDPad(0, GamepadButtonsX.DPAD_NORTH), Sequences.liftRetract());
+		
 
 		/*
-		// Spitter Sequence (cargoSpit) 
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startCargoSpit());
-		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopCargoSpit());
-
 		// Reverse button
 		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startReverseCycle());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopReverseCycle());
 		*/
 
-		// Hatch hold & release
-		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), () -> {
-			scoreModeCargo = false;
-			sysoutScoreMode();
-			return Sequences.releaseHatch();
-		});
-		onUntriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.holdHatch());
-
-		// Hatch deploy/stow buttons.
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_WEST), Sequences.getReadyHatchSequence());			
-		onTriggered(stick.getDPad(0,GamepadButtonsX.DPAD_EAST), Sequences.getStowHatchSequence());
-		
-		// Microadjust hatch left and right
-		//whileTriggered(axisAsSwitch(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS)),
-		//		() -> { return Sequences.getHatchDeltaPositionSequence(-1 * stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read()); });
-				
+	
 		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() >= 0.5;}, Sequences.colourWheelRight());
 		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() < 0.5 &&
 			stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() > -0.5;}, Sequences.stopColourWheel());
 		onTriggered(() -> { return stick.getAxis(GamepadButtonsX.LEFT_X_AXIS).read() <= -0.5;}, Sequences.colourWheelLeft());
 
 
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_THUMBSTICK_CLICK), Sequences.hatchCalibrate());		
 		
 		// Lift movement. The position is set by whether the OI is in cargo mode or hatch mode 
 		// onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), () -> { 
@@ -252,10 +181,7 @@ public class OI implements OIInterface {
 		}); */
 
 		//Colour Wheel testing.
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(Colour.YELLOW));
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(Colour.BLUE));
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(Colour.RED));
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(Colour.GREEN));
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(Colour.UNKNOWN));
 		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.colourWheelRotational());
 		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.stopColourWheel());
 		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());
@@ -422,28 +348,7 @@ public class OI implements OIInterface {
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
 			() -> loaderIF.setPaddleExtended(true));
 
-		// Hatch overrides.
-		OverridableSubsystem<HatchInterface> hatchOverride = subsystems.hatchOverride;
-		// Get the interface that the diag box uses.
-		HatchInterface hatchIF = hatchOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.HATCH_DISABLE, OperatorBoxButtons.HATCH_MANUAL, hatchOverride);
-	  // Run the motor left while the move left button is pressed.
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_LEFT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, 0.2)));
-		onUntriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_LEFT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, 0)));
-		// Run the motor right while the move right button is pressed.
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_RIGHT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, -0.2)));
-		onUntriggered(box.getButton(OperatorBoxButtons.HATCH_MOVE_RIGHT), 
-			() -> hatchIF.setAction(new HatchAction(HatchAction.Type.SET_MOTOR_POWER, 0)));
-		// Hatch grabber.
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_HOLD), 
-			() -> hatchIF.setHeld(true));
-		onTriggered(box.getButton(OperatorBoxButtons.HATCH_RELEASE), 
-			() -> hatchIF.setHeld(false));
-
+		
 		// Lift overrides. Buttons shared with the Spark Test override, disable it before enabling lift.
 		OverridableSubsystem<LiftInterface> liftOverride = subsystems.liftOverride;
 		// Get the interface that the diag box uses.
