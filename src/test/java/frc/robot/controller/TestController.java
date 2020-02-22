@@ -57,7 +57,7 @@ public class TestController {
 	public void setUp() {
 		System.out.println("\n******************************");
 		clock = new MockClock();
-		subsystems = new Subsystems(new MockDashboard(), null, clock, log, null);
+		subsystems = new Subsystems(new MockDashboard(), null, clock, log);
 
 		subsystems.intake = intake = new IntakeSimulator();
 		subsystems.lift = lift = new LiftSimulator();

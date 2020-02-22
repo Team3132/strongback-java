@@ -43,7 +43,7 @@ public class TestLocation {
     	MockDoubleSupplier rightDistance = Mock.doubleSupplier();
     	MockGyroscope gyro = Mock.gyroscope();
     	MockClock clock = Mock.clock();
-        Location location = new Location(leftDistance, rightDistance, gyro, clock, new MockNetworkTableHelper("Location") ,new MockDashboard() ,new MockLog());
+        Location location = new Location(leftDistance, rightDistance, gyro, clock, new MockDashboard(), new MockLog());
         
         // Initial location should always be 0,0,0
         gyro.setAngle(0); // Facing towards the opposing alliances wall.
