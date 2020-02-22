@@ -54,8 +54,8 @@ public class Hatch extends Subsystem implements HatchInterface, Executable, Dash
     private final boolean kEnableResetHack = true;
 
 
-    public Hatch(Motor motor, Solenoid holder, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Clock clock, Log log) {
-        super("Hatch", networkTable, dashboard, log);   
+    public Hatch(Motor motor, Solenoid holder, DashboardInterface dashboard, Clock clock, Log log) {
+        super("Hatch", dashboard, log);   
         this.motor = motor;
         this.holder = holder;
         this.clock = clock;

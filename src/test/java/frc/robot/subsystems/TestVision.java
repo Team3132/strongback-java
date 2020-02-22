@@ -40,7 +40,7 @@ public class TestVision {
 
     DashboardInterface dashboard = new MockDashboard();
     // Listen on a port assigned by the operating system.
-    Vision vision = new Vision(jevois, location, new MockNetworkTableHelper("Vision"),dashboard, clock, 0, 0, 0, 255, 255, 255, log);
+    Vision vision = new Vision(jevois, location, dashboard, clock, 0, 0, 0, 255, 255, 255, log);
     // Shouldn't have a target lock.
     assertThat(vision.getTargetDetails().targetFound, is(equalTo(false)));
 

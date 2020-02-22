@@ -54,8 +54,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    */
   private final ColorMatch colourMatcher = new ColorMatch();
 
-  public ColourWheel(Motor motor, ColorSensorV3 colourSensor, NetworkTableHelperInterface networkTable,DashboardInterface dash, Log log) {
-    super("ColourWheel", networkTable, dash, log);
+  public ColourWheel(Motor motor, ColorSensorV3 colourSensor, DashboardInterface dash, Log log) {
+    super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
     colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);

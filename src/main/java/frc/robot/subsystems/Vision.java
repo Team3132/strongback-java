@@ -26,10 +26,10 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 
 	private double prevSkew = 0;
 
-	public Vision(JevoisInterface jevois, LocationInterface location, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Clock clock,
+	public Vision(JevoisInterface jevois, LocationInterface location, DashboardInterface dashboard, Clock clock,
 			double visionHMin, double visionSMin, double visionVMin, double visionHMax, double visionSMax,
 			double visionVMax, Log log) {
-		super("Vision", networkTable ,dashboard, log);
+		super("Vision", dashboard, log);
 		this.jevois = jevois;
 		this.location = location;
 		this.clock = clock;

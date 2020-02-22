@@ -38,8 +38,8 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     private boolean holding = false;
 
     public Climber(Motor frontWinchMotor, Motor rearWinchMotor,
-                      Motor wheelMotor, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Log log) {
-        super("Climber", networkTable ,dashboard, log);   
+                      Motor wheelMotor, DashboardInterface dashboard, Log log) {
+        super("Climber", dashboard, log);   
         this.frontWinch = new Winch("climber:Front", frontWinchMotor, dashboard, log);
         this.rearWinch = new Winch("climber:Rear", rearWinchMotor, dashboard, log);
         this.wheelMotor = wheelMotor;

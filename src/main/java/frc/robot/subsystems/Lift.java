@@ -32,8 +32,8 @@ public class Lift extends Subsystem implements LiftInterface, DashboardUpdater {
 	private boolean deployed = false;
 	private Solenoid deploySolenoid;
 	
-	public Lift(Motor liftMotor, Solenoid deploy, NetworkTableHelperInterface networkTable ,DashboardInterface dashboard, Log log) {
-		super("Lift", networkTable ,dashboard, log);
+	public Lift(Motor liftMotor, Solenoid deploy, DashboardInterface dashboard, Log log) {
+		super("Lift", dashboard, log);
 		this.liftMotor = liftMotor;
 		this.deploySolenoid = deploy;
 		

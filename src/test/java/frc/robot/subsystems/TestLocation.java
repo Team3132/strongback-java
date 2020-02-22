@@ -8,7 +8,6 @@ import org.strongback.mock.MockClock;
 import org.strongback.mock.MockDoubleSupplier;
 import org.strongback.mock.MockGyroscope;
 
-
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Position;

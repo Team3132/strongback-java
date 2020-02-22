@@ -16,8 +16,8 @@ public class Passthrough extends Subsystem implements PassthroughInterface, Exec
     private double targetCurrent = 0;
     
 
-    public Passthrough(int teamNumber, Motor passthroughMotor, NetworkTableHelperInterface networkTable,DashboardInterface dashboard, Log log) {
-        super("Passthrough", networkTable ,dashboard, log);
+    public Passthrough(int teamNumber, Motor passthroughMotor, DashboardInterface dashboard, Log log) {
+        super("Passthrough", dashboard, log);
         this.motor = passthroughMotor;
 
         log.register(true, () -> getTargetMotorOutput(), "%s/targetMotorOutput", name)
