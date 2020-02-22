@@ -15,10 +15,12 @@ import org.strongback.mock.MockClock;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockJevois;
 import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLog;
+import frc.robot.mock.MockNetworkTableHelper;
 
 public class TestVision {
 
@@ -38,7 +40,7 @@ public class TestVision {
 
     DashboardInterface dashboard = new MockDashboard();
     // Listen on a port assigned by the operating system.
-    Vision vision = new Vision(jevois, location, dashboard, clock, 0, 0, 0, 255, 255, 255, log);
+    Vision vision = new Vision(jevois, location, new MockNetworkTableHelper("Vision"),dashboard, clock, 0, 0, 0, 255, 255, 255, log);
     // Shouldn't have a target lock.
     assertThat(vision.getTargetDetails().targetFound, is(equalTo(false)));
 

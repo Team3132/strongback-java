@@ -77,7 +77,7 @@ public class Subsystems implements DashboardUpdater {
 	 */
 	private final ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 
-	public Subsystems(final DashboardInterface dashboard, final RobotConfiguration config, final Clock clock, final Log log, final NetworkTableHelperInterface networkTable) {
+	public Subsystems(final DashboardInterface dashboard, final RobotConfiguration config, final Clock clock, final Log log, final NetworkTablesHelper networkTable) {
 		this.dashboard = dashboard;
 		this.config = config;
 		this.clock = clock;

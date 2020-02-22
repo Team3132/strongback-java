@@ -14,6 +14,7 @@ import frc.robot.interfaces.ClimberInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LiftInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.mock.MockClimber;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
@@ -55,7 +56,7 @@ public class TestController {
 	public void setUp() {
 		System.out.println("\n******************************");
 		clock = new MockClock();
-		subsystems = new Subsystems(new MockDashboard(), null, clock, log);
+		subsystems = new Subsystems(new MockDashboard(), null, clock, log, new NetworkTablesHelper(""));
 
 		subsystems.intake = intake = new IntakeSimulator();
 		subsystems.lift = lift = new LiftSimulator();

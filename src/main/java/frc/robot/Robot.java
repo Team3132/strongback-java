@@ -19,6 +19,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.OIInterface;
 import frc.robot.lib.LogDygraph;
+import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
@@ -78,7 +79,7 @@ public class Robot extends IterativeRobot implements Executable {
 		try {
 			init();
 			setupCompleted = true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// Write the exception to the log file.
 			log.exception("Exception caught while initializing robot", e);
 			throw e; // Cause it to abort the robot startup.
@@ -97,7 +98,7 @@ public class Robot extends IterativeRobot implements Executable {
 		createInputDevices();
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
-		subsystems = new Subsystems(createDashboard(), config, clock, log);
+		subsystems = new Subsystems(createDashboard(), config, clock, log, new NetworkTablesHelper("drive"));
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(createTrajectoryGenerator(), driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
@@ -117,10 +118,11 @@ public class Robot extends IterativeRobot implements Executable {
 		// Create the brains of the robot. This runs the sequences.
 		controller = new Controller(subsystems);
 
-		// Setup the interface to the user, mapping buttons to sequences for the controller.
+		// Setup the interface to the user, mapping buttons to sequences for the
+		// controller.
 		setupUserInterface();
 
-		startLogging();  // All subsystems have registered by now, enable logging.
+		startLogging(); // All subsystems have registered by now, enable logging.
 		Strongback.executor().register(this, Priority.LOW);
 
 		// Start the scheduler to keep all the subsystems working in the background.
@@ -141,12 +143,12 @@ public class Robot extends IterativeRobot implements Executable {
 	}
 
 	/**
-	 * Called when the robot starts the disabled mode. Normally on first start
-	 * and after teleop and autonomous finish.
+	 * Called when the robot starts the disabled mode. Normally on first start and
+	 * after teleop and autonomous finish.
 	 */
 	@Override
 	public void disabledInit() {
-		maybeInit();  // Called before robotPeriodic().
+		maybeInit(); // Called before robotPeriodic().
 		log.info("disabledInit");
 		// Log any failures again on disable.
 		RedundantTalonSRX.printStatus();
@@ -173,7 +175,7 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
-		Position resetPose = new Position(0.0, 0.0, 0.0);
+		final Position resetPose = new Position(0.0, 0.0, 0.0);
 		subsystems.location.setCurrentLocation(resetPose);
 
 		// Kick off the selected auto program.
@@ -198,10 +200,9 @@ public class Robot extends IterativeRobot implements Executable {
 	}
 
 	/**
-	 * Called every 20ms while in the teleop period.
-	 * All the logic is kicked off either in response to button presses
-	 * or by the strongback scheduler.
-	 * No spaghetti code here!
+	 * Called every 20ms while in the teleop period. All the logic is kicked off
+	 * either in response to button presses or by the strongback scheduler. No
+	 * spaghetti code here!
 	 */
 	@Override
 	public void teleopPeriodic() {
@@ -226,35 +227,38 @@ public class Robot extends IterativeRobot implements Executable {
 	}
 
 	/**
-	 * Plumb the dashboard requests through to a real dashboard.
-	 * Allows us to mock out the dashboard in unit tests.
+	 * Plumb the dashboard requests through to a real dashboard. Allows us to mock
+	 * out the dashboard in unit tests.
 	 */
 	private DashboardInterface createDashboard() {
 		return new DashboardInterface() {
 			@Override
-			public void putString(String key, String value) {
+			public void putString(final String key, final String value) {
 				SmartDashboard.putString(key, value);
 			}
+
 			@Override
-			public void putNumber(String key, double value) {
+			public void putNumber(final String key, final double value) {
 				SmartDashboard.putNumber(key, value);
 			}
+
 			@Override
-			public void putBoolean(String key, Boolean value) {
+			public void putBoolean(final String key, final Boolean value) {
 				SmartDashboard.putBoolean(key, value);
 			}
 		};
 	}
 
 	/**
-	 * Create the camera servers so the driver & operator can see what the robot can see.
+	 * Create the camera servers so the driver & operator can see what the robot can
+	 * see.
 	 */
 	public void createCameraServers() {
 		if (!config.visionIsPresent) {
 			log.sub("Vision not enabled, not creating a camera server");
 			return;
 		}
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
+		final UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
 		// Select FIRST Python processor on the Jevois camera by setting a particular
 		// resolution, frame rate and format.
 		camera.setVideoMode(VideoMode.PixelFormat.kYUYV, Constants.CAMERA_RESOLUTION_WIDTH,
@@ -267,22 +271,23 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void createPowerMonitor() {
 		// Do not monitor if not present, or we have been asked not to monitor
-		boolean enabled = config.pdpIsPresent || config.pdpMonitor;
-		//pdp = new PowerMonitor(new PowerDistributionPanel(config.pdpCanId), config.pdpChannelsToMonitor, enabled, log);
+		final boolean enabled = config.pdpIsPresent || config.pdpMonitor;
+		// pdp = new PowerMonitor(new PowerDistributionPanel(config.pdpCanId),
+		// config.pdpChannelsToMonitor, enabled, log);
 	}
 
 	/**
-	 * Create the simple web server so we can interrogate the robot during operation.
-	 * The web server lives on a port that is available over the firewalled link.
-	 * We use port 5800, the first of the opened ports.
+	 * Create the simple web server so we can interrogate the robot during
+	 * operation. The web server lives on a port that is available over the
+	 * firewalled link. We use port 5800, the first of the opened ports.
 	 * 
 	 */
 	private void startWebServer() {
-		File fileDir = new File(Constants.WEB_BASE_PATH);
+		final File fileDir = new File(Constants.WEB_BASE_PATH);
 		try {
 			new SimpleWebServer(fileDir, Constants.WEB_PORT);
 			log.sub("WebServer started at port: " + Constants.WEB_PORT);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.sub("Failed to start webserver on directory " + fileDir.getAbsolutePath());
 
 			e.printStackTrace();
@@ -301,8 +306,8 @@ public class Robot extends IterativeRobot implements Executable {
 	}
 
 	/**
-	 * Setup the button mappings on the joysticks and the operators button
-	 * box if it's attached.
+	 * Setup the button mappings on the joysticks and the operators button box if
+	 * it's attached.
 	 */
 	private void setupUserInterface() {
 		oi = new OI(controller, subsystems, log);
@@ -318,8 +323,9 @@ public class Robot extends IterativeRobot implements Executable {
 	 * Start the logging.
 	 */
 	private void startLogging() {
-		// Tell the logger what symbolic link to the log file based on the match name to use.
-		String matchDescription = String.format("%s_%s_M%d_R%d_%s_P%d", driverStation.getEventName(),
+		// Tell the logger what symbolic link to the log file based on the match name to
+		// use.
+		final String matchDescription = String.format("%s_%s_M%d_R%d_%s_P%d", driverStation.getEventName(),
 				driverStation.getMatchType().toString(), driverStation.getMatchNumber(),
 				driverStation.getReplayNumber(), driverStation.getAlliance().toString(), driverStation.getLocation());
 		log.logCompletedElements(matchDescription);
@@ -334,48 +340,54 @@ public class Robot extends IterativeRobot implements Executable {
 
 	/**
 	 * Creates the generator that converts from a list of Waypoints to two
-	 * Trajectory's (one for each side of the robot). Thanks to Jaci for the library.
+	 * Trajectory's (one for each side of the robot). Thanks to Jaci for the
+	 * library.
 	 * 
-	 * Because it's written in C and compiled for ARM it can't be easily unit tested,
-	 * hence it's in Robot.java instead of it's own file.
+	 * Because it's written in C and compiled for ARM it can't be easily unit
+	 * tested, hence it's in Robot.java instead of it's own file.
 	 * 
-	 * @return a generator function that converts from Waypoints to two Trajectory's.
+	 * @return a generator function that converts from Waypoints to two
+	 *         Trajectory's.
 	 */
 	private TrajectoryGenerator createTrajectoryGenerator() {
 		// dt is based on how often the drive routine is updated, which is under
 		// strongback's control. Currently set to 20ms in Strongback.java
 		// ...this is probably 4x too long.
 		final double dt_secs = Constants.EXECUTOR_CYCLE_INTERVAL_MSEC / 1000.0;
-		Trajectory.Config trajConfig = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
+		final Trajectory.Config trajConfig = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
 				Trajectory.Config.SAMPLES_HIGH, dt_secs, 40.0, 10.0, 10.0);
-		/*Trajectory.Config trajConfig = new Trajectory.Config(Trajectory.FitMethod.HERMITE_QUINTIC,
-		        Trajectory.Config.SAMPLES_HIGH, dt_secs, Constants.DRIVE_MAX_SPEED,
-		        Constants.DRIVE_MAX_ACCELERATION, Constants.DRIVE_MAX_JERK);*/
-		return (Waypoint[] points) -> {
+		/*
+		 * Trajectory.Config trajConfig = new
+		 * Trajectory.Config(Trajectory.FitMethod.HERMITE_QUINTIC,
+		 * Trajectory.Config.SAMPLES_HIGH, dt_secs, Constants.DRIVE_MAX_SPEED,
+		 * Constants.DRIVE_MAX_ACCELERATION, Constants.DRIVE_MAX_JERK);
+		 */
+		return (final Waypoint[] points) -> {
 			for (int i = 0; i < points.length; i++) {
 				log.error("  %f, %f, %f", points[i].x, points[i].y, points[i].angle);
 			}
 			log.error("Started generating path");
-			Trajectory trajectory = Pathfinder.generate(points, trajConfig);
+			final Trajectory trajectory = Pathfinder.generate(points, trajConfig);
 			log.error("Finished generating path");
-			TankModifier modifier = new TankModifier(trajectory).modify(Constants.ROBOT_WIDTH_INCHES);
+			final TankModifier modifier = new TankModifier(trajectory).modify(Constants.ROBOT_WIDTH_INCHES);
 			return new Trajectory[] { modifier.getLeftTrajectory(), modifier.getRightTrajectory() };
 		};
 	}
 
 	@Override
-	public void execute(long timeInMillis) {
-		//log.sub("Updating smartDashboard");
+	public void execute(final long timeInMillis) {
+		// log.sub("Updating smartDashboard");
 		maybeUpdateSmartDashboard();
 	}
 
 	private double lastDashboardUpdateSec = 0;
+
 	/**
-	 * Possibly update the smartdashboard.
-	 * Don't do this too often due to the amount that is sent to the dashboard.
+	 * Possibly update the smartdashboard. Don't do this too often due to the amount
+	 * that is sent to the dashboard.
 	 */
 	private void maybeUpdateSmartDashboard() {
-		double now = Strongback.timeSystem().currentTime();
+		final double now = Strongback.timeSystem().currentTime();
 		if (now < lastDashboardUpdateSec + Constants.DASHBOARD_UPDATE_INTERVAL_SEC)
 			return;
 		lastDashboardUpdateSec = now;
