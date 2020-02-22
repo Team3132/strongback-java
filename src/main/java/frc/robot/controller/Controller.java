@@ -206,6 +206,18 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
 	}
 
+	private void waitForCargo(int expectNumBalls) {
+		if (subsystems.spitter.hasCargo() == expectNumBalls) return;
+		logSub("Waiting for Cargo");
+		try {
+			waitUntilOrAbort(() -> subsystems.spitter.hasCargo() == expectNumBalls, "numBalls");
+		} catch (SequenceChangedException e) {
+			// Desired state has changed underneath us, give up waiting
+			//and return.
+			return;
+		}
+	}
+
 	private void maybeWaitForColourWheel() {
 		try {
 			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");

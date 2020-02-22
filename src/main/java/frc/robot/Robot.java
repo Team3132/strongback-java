@@ -169,6 +169,7 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
+		subsystems.loader.setInitBallCount(3);
 	}
 
 	/**
