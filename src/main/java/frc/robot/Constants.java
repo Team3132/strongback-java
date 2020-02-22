@@ -275,4 +275,11 @@ public class Constants {
 	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
 	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
 	public static final int COLOUR_WHEEL_ROTATION_TARGET = 3*8 + 2; //Counting in eights aiming for 3.25 full rotations.
+	public static final int COLOUR_WHEEL_DELAY = 15; //Time in miliseconds to wait before disabling motor when correct colour found.
+
+	/*
+	 * LED Strip
+	 */
+	public static final int LED_STRIP_PWM_PORT = 9;
+	public static final int LED_STRIP_NUMBER_OF_LEDS = 30;
 }
