@@ -117,8 +117,8 @@ public class RobotConfiguration {
 	public double visionVMax = Constants.VISION_V_MAX;
 	
 	public boolean climberIsPresent = true;
-	public int climberLeftCanID = Constants.CLIMBER_LEFT_CAN_ID;
-	public int climberRightCanID = Constants.CLIMBER_RIGHT_CAN_ID;
+	public int climberPtoCanID = Constants.CLIMBER_PTOSOLENOID_CAN_ID;
+	public int climberBrakeCanID = Constants.CLIMBER_BRAKESOLENOID_CAN_ID;
 
 	//climber PID
 	public double climberP = Constants.CLIMBER_P;
@@ -249,8 +249,8 @@ public class RobotConfiguration {
 		visionVMax = getAsDouble("vision/hsvFilter/v/max", Constants.VISION_V_MAX);
 
 		climberIsPresent = getAsBoolean("climber/present", false);
-		climberLeftCanID = getAsInt("climber/leftCanID", Constants.CLIMBER_LEFT_CAN_ID);
-		climberRightCanID = getAsInt("climber/rightCanID", Constants.CLIMBER_RIGHT_CAN_ID);
+		climberPtoCanID = getAsInt("climber/leftCanID", Constants.CLIMBER_PTOSOLENOID_CAN_ID);
+		climberBrakeCanID = getAsInt("climber/rightCanID", Constants.CLIMBER_BRAKESOLENOID_CAN_ID);
 
 		climberP = getAsDouble("climber/P", climberP);
 		climberI = getAsDouble("climber/I", climberI);
