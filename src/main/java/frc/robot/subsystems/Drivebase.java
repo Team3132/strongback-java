@@ -62,6 +62,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	@Override
 	public void setDriveRoutine(DriveRoutineParameters parameters) {
 		if (this.parameters != null && parameters.equals(this.parameters)) {
+			log.sub("%s: Parameters are identical not setting these", name);
 			return;
 		}
 		// Drive routine has changed.
@@ -74,15 +75,10 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		}
 		// Tell the drive routine to change what it is doing.
 		mode.routine.reset(parameters);
-		log.sub("%s: Switching to %s drive routine", name, mode.routine.getName());
+		log.sub("%s: Switching to %s drive routine using ControlMode %s", name, mode.routine.getName(), mode.controlMode);
 		if (routine != null) routine.disable();
 		mode.routine.enable();
 		routine = mode.routine;
-		if (mode.controlMode == ControlMode.PercentOutput) {
-			log.sub("%s: PercentOutput Control Mode", name);
-		} else {
-			log.sub("%s: Other Control Mode", name);
-		}
 		this.controlMode = mode.controlMode;
 	}
 
@@ -95,7 +91,9 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	synchronized public void update() {
 		// Query the drive routine for the desired wheel speed/power.
 		if (routine == null) return;  // No drive routine set yet.
-		DriveMotion motion = routine.getMotion();
+		// Ask for the power to supply to each side. Pass in the current wheel speeds.
+		// TODO: Ensure that this is in meters/sec (not inches/100ms). See comment above.
+		DriveMotion motion = routine.getMotion(left.getVelocity(), right.getVelocity());
 		//log.debug("drive subsystem motion = %.1f, %.1f", motion.left, motion.right);
 		if (motion.equals(currentMotion)) {
 			return; // No change.

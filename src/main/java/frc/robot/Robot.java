@@ -13,7 +13,6 @@ import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareDriverStation;
 import frc.robot.controller.Controller;
-import frc.robot.controller.Controller.TrajectoryGenerator;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
@@ -30,10 +29,6 @@ import edu.wpi.cscore.VideoMode;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import jaci.pathfinder.Pathfinder;
-import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Waypoint;
-import jaci.pathfinder.modifiers.TankModifier;
 
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
@@ -99,16 +94,13 @@ public class Robot extends IterativeRobot implements Executable {
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
 		subsystems = new Subsystems(createDashboard(), config, clock, log);
 		subsystems.createPneumatics();
-		subsystems.createDrivebaseLocation(createTrajectoryGenerator(), driverLeftJoystick, driverRightJoystick);
+		subsystems.createDrivebaseLocation(driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
 		subsystems.createClimber();
 		subsystems.createLoader();
-		subsystems.createSpitter();
-		subsystems.createHatch();
-		subsystems.createLift();
-		subsystems.createSparkTest();
 		subsystems.createOverrides();
 		subsystems.createVision();
+		subsystems.createLEDStrip();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();
@@ -194,7 +186,7 @@ public class Robot extends IterativeRobot implements Executable {
 	public void teleopInit() {
 		log.info("teleop has started");
 		subsystems.enable();
-		controller.doSequence(Sequences.getStartSequence());
+		controller.doSequence(Sequences.setDrivebaseToArcade());
 	}
 
 	/**
@@ -203,11 +195,10 @@ public class Robot extends IterativeRobot implements Executable {
 	 * or by the strongback scheduler.
 	 * No spaghetti code here!
 	 */
+
 	@Override
 	public void teleopPeriodic() {
-		// Set the speed of the spark to the left joystick for testing.
-		subsystems.spark.setMotorOutput(1.0 * driverLeftJoystick.getAxis(0).read());
-
+	
 	}
 
 	/**
@@ -330,37 +321,6 @@ public class Robot extends IterativeRobot implements Executable {
 		} else {
 			log.error("Logging: Dygraph logging disabled");
 		}
-	}
-
-	/**
-	 * Creates the generator that converts from a list of Waypoints to two
-	 * Trajectory's (one for each side of the robot). Thanks to Jaci for the library.
-	 * 
-	 * Because it's written in C and compiled for ARM it can't be easily unit tested,
-	 * hence it's in Robot.java instead of it's own file.
-	 * 
-	 * @return a generator function that converts from Waypoints to two Trajectory's.
-	 */
-	private TrajectoryGenerator createTrajectoryGenerator() {
-		// dt is based on how often the drive routine is updated, which is under
-		// strongback's control. Currently set to 20ms in Strongback.java
-		// ...this is probably 4x too long.
-		final double dt_secs = Constants.EXECUTOR_CYCLE_INTERVAL_MSEC / 1000.0;
-		Trajectory.Config trajConfig = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
-				Trajectory.Config.SAMPLES_HIGH, dt_secs, 40.0, 10.0, 10.0);
-		/*Trajectory.Config trajConfig = new Trajectory.Config(Trajectory.FitMethod.HERMITE_QUINTIC,
-		        Trajectory.Config.SAMPLES_HIGH, dt_secs, Constants.DRIVE_MAX_SPEED,
-		        Constants.DRIVE_MAX_ACCELERATION, Constants.DRIVE_MAX_JERK);*/
-		return (Waypoint[] points) -> {
-			for (int i = 0; i < points.length; i++) {
-				log.error("  %f, %f, %f", points[i].x, points[i].y, points[i].angle);
-			}
-			log.error("Started generating path");
-			Trajectory trajectory = Pathfinder.generate(points, trajConfig);
-			log.error("Finished generating path");
-			TankModifier modifier = new TankModifier(trajectory).modify(Constants.ROBOT_WIDTH_INCHES);
-			return new Trajectory[] { modifier.getLeftTrajectory(), modifier.getRightTrajectory() };
-		};
 	}
 
 	@Override
