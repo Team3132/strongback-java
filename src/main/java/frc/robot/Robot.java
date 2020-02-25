@@ -18,6 +18,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.OIInterface;
 import frc.robot.lib.LogDygraph;
+import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
@@ -34,6 +35,7 @@ public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
 	private Log log;
+	private NetworkTablesHelper networkTable;
 
 	// User interface.
 	private DriverStation driverStation;
@@ -48,6 +50,8 @@ public class Robot extends IterativeRobot implements Executable {
 	private Subsystems subsystems;
 	private PowerMonitor pdp;
 	private Auto auto;
+	
+	
 
 	/*
 	 * We wish to delay our full setup until; the driver's station has connected. At
@@ -62,6 +66,7 @@ public class Robot extends IterativeRobot implements Executable {
 		clock = Strongback.timeSystem();
 		log = new LogDygraph(Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION, Constants.LOG_DATE_EXTENSION, Constants.LOG_NUMBER_FILE, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
+		networkTable = new NetworkTablesHelper("");
 		startWebServer();
 		log.info("Waiting for driver's station to connect before setting up UI");
 		// Do the reset of the initialization in init().
@@ -100,6 +105,7 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.createLoader();
 		subsystems.createOverrides();
 		subsystems.createVision();
+		subsystems.createLEDStrip();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();

@@ -9,7 +9,10 @@ import org.strongback.components.Motor.ControlMode;
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.lib.WheelColour;
+import frc.robot.lib.LEDColour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.Subsystem;
 
@@ -29,25 +32,27 @@ import frc.robot.lib.Subsystem;
 
 public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
-  private Colour colourPrev = Colour.UNKNOWN; //Used in doubleCheck to check for mistakes with colour detection.
-  private Colour colour = Colour.UNKNOWN; //Variable for what the colour sensor currently sees.
-  private Colour nextColour = Colour.UNKNOWN;
+  private WheelColour colourPrev = WheelColour.UNKNOWN; //Used in doubleCheck to check for mistakes with colour detection.
+  private WheelColour colour = WheelColour.UNKNOWN; //Variable for what the colour sensor currently sees.
+  private WheelColour nextColour = WheelColour.UNKNOWN;
   private int rotCount = 0; //Roation counter for rotation controls.
   private boolean firstLoop = true; //Variable to check if this is the first time the colour sensor saw the desired colour.
   private long spinTime; //Variable to store the time when the colour sensor sees the desired colour.
   private double speed = 0;
-  private ColourAction action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN); //Default action for colour wheel subsystem.
+  private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN); //Default action for colour wheel subsystem.
 
   private Clock clock;
   private final Motor motor;
-  private final Supplier<Colour> colourSensor;
+  private final LEDStripInterface ledStrip;
+  private final Supplier<WheelColour> colourSensor;
 
-  public ColourWheel(Motor motor, Supplier<Colour> colourSensor, Clock clock, DashboardInterface dash, Log log) {
+  public ColourWheel(Motor motor, Supplier<WheelColour> colourSensor, LEDStripInterface ledStrip, Clock clock, DashboardInterface dash, Log log) {
     super("ColourWheel", dash, log);
     log.info("Creating Colour Wheel Subsystem");
     this.motor = motor;
     this.clock = clock;
     this.colourSensor = colourSensor;
+    this.ledStrip = ledStrip;
     log.register(false, () -> (double) colour.id, "%s/colour", name)
        .register(false, () -> (double) rotCount, "%s/rotCount", name)
        .register(false, () -> (double) motor.getOutputPercent(), "%s/motorspeed", name)
@@ -61,18 +66,23 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     switch (action.type) {
     case ROTATION:
       newSpeed = rotationalControl();
+      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.GOLD, ((double) rotCount)/Constants.COLOUR_WHEEL_ROTATION_TARGET);
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
+      ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_ANTICLOCKWISE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_CLOCKWISE:
       newSpeed = -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      ledStrip.setColour(colour.convert());
       break;
     case NONE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
+      ledStrip.setIdle();
       break;
     default:
       log.error("%s: Unknown Type %s", name, action.type);
@@ -123,7 +133,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     if (rotCount < Constants.COLOUR_WHEEL_ROTATION_TARGET) {
       return Constants.COLOUR_WHEEL_MOTOR_FULL;
     } else {
-      action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN);
+      action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
       return Constants.COLOUR_WHEEL_MOTOR_OFF;
     }
   }
@@ -153,12 +163,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   * If unknown, turn at current speed and direction until correct colour is found.
   * 
   */
-  public double positionalControl(Colour desired) {
+  public double positionalControl(WheelColour desired) {
     double newSpeed = (colour.id - desired.id) % 4; //Calculate new speed.
     if (newSpeed == 3) newSpeed -= 4; //If above calculation is 3, set speed to -1.
     if (newSpeed == -3) newSpeed += 4; //If above calculation is -3, set speed to 1.
     newSpeed = Constants.COLOUR_WHEEL_MOTOR_FULL * Math.signum(newSpeed);
-    if (colour.equals(Colour.UNKNOWN)) { //Colour is unknown, move in current direcion until colour identified.
+    if (colour.equals(WheelColour.UNKNOWN)) { //Colour is unknown, move in current direcion until colour identified.
       if(speed != 0) {
         return speed;
       } else {
@@ -170,10 +180,10 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         spinTime = clock.currentTimeInMillis(); //Check time when correct colour found.
         firstLoop = false;
       } 
-      if (clock.currentTimeInMillis() - spinTime < 50) { //Check if 50 milliseconds has passed.
+      if (clock.currentTimeInMillis() - spinTime < Constants.COLOUR_WHEEL_DELAY) {
         return motor.get();
       } else {
-        action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN);
+        action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
         log.info("ColourWheel: Desired colour found.");
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
@@ -194,8 +204,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    *          again after the wheel has moved.
    * 
   */
-  private Colour doubleCheck(Colour sensedColour) {
-    if (speed == 0 || colourPrev.equals(Colour.UNKNOWN)) {
+  private WheelColour doubleCheck(WheelColour sensedColour) {
+    if (speed == 0 || colourPrev.equals(WheelColour.UNKNOWN)) {
       colourPrev = sensedColour;
       return sensedColour;
     }
@@ -210,7 +220,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     this.action = action;
     firstLoop = true;
     rotCount = 0;
-    nextColour = Colour.UNKNOWN;
+    nextColour = WheelColour.UNKNOWN;
     return this;
   }
 
@@ -228,7 +238,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   @Override
   public void disable() {
     motor.set(ControlMode.PercentOutput, 0);
-    action = new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN);
+    action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
   }
 
   @Override
