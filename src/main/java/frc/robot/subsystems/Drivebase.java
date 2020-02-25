@@ -13,8 +13,9 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.lib.NetworkTablesHelper;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
+
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,7 +40,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private final Log log;
 	private DriveMotion currentMotion;
 
-	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, DashboardInterface dashboard, Log log) {
+	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, NetworkTableHelperInterface networkTable, Solenoid brakeSolenoid, DashboardInterface dashboard, Log log) {
 		super("Drive", dashboard, log);
 		this.left = left;
 		this.right = right;
@@ -114,24 +115,20 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 
 	@Override
 	public void enable() {
-		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
-		double leftP = helper.get("p", Constants.DRIVE_P);
-		double leftI = helper.get("i", Constants.DRIVE_I);
-		double leftD = helper.get("d", Constants.DRIVE_D);
-		double leftF = helper.get("f", Constants.DRIVE_F);
-		double rightP = helper.get("p", Constants.DRIVE_P);
-		double rightI = helper.get("i", Constants.DRIVE_I);
-		double rightD = helper.get("d", Constants.DRIVE_F);
-		double rightF = helper.get("f", Constants.DRIVE_P);
-		left.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
-				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
-		right.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
-				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
-		super.enable();
-		log.info("Drivebase LEFT PID values: %f %f %f %f", leftP, leftI, leftD, leftF);
-		log.info("Drivebase RIGHT PID values: %f %f %f %f", rightP, rightI, rightD, rightF);
+			double p = networkTable.get("p", Constants.DRIVE_P);
+			double i = networkTable.get("i", Constants.DRIVE_I);
+			double d = networkTable.get("d", Constants.DRIVE_D);
+			double f = networkTable.get("f", Constants.DRIVE_F);
+			left.setPIDF(0, p, i, d, f);
+					
+			super.enable();
+	
+			log.info("Drivebase  PID values: %f %f %f %f", p, i, d, f);
+	
 		if (routine != null) routine.enable();
 	}
+
+
 
 	public void disable() {
 		super.disable();

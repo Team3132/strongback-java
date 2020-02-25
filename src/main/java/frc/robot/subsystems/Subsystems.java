@@ -19,13 +19,13 @@ import org.strongback.components.Solenoid;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
+import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
 
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
 import frc.robot.drive.routines.*;
 import frc.robot.interfaces.*;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.*;
@@ -43,7 +43,7 @@ public class Subsystems implements DashboardUpdater {
 	public RobotConfiguration config;
 	public Clock clock;
 	public Log log;
-
+	public LEDStripInterface ledStrip;
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
@@ -137,12 +137,20 @@ public class Subsystems implements DashboardUpdater {
 		leftMotor.setPosition(0);
 		rightMotor.setPosition(0);
 
+		// Save PID values into Network Tables
+		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
+		driveHelper.set("p", config.drivebaseP);
+		driveHelper.set("i", config.drivebaseI);
+		driveHelper.set("d", config.drivebaseD);
+		driveHelper.set("f", config.drivebaseF);
+
+
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
 		location = new Location(() -> {	leftMotor.setPosition(0);
-									rightMotor.setPosition(0); },
-									leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
-		drivebase = new Drivebase(leftMotor, rightMotor, dashboard, log);
+			rightMotor.setPosition(0); },
+			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
+		drivebase = new Drivebase(leftMotor, rightMotor, driveHelper ,dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -343,6 +351,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
+	
 
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 		ColorMatch colourMatcher = new ColorMatch();
@@ -352,27 +361,35 @@ public class Subsystems implements DashboardUpdater {
     	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
 		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
 
-		colourWheel = new ColourWheel(motor, new Supplier<Colour>() {
+		colourWheel = new ColourWheel(motor, new Supplier<WheelColour>() {
 			@Override
-			public Colour get() {
+			public WheelColour get() {
 				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
-				Colour sensedColour = Colour.UNKNOWN;
+				WheelColour sensedColour = WheelColour.UNKNOWN;
 				if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
-					sensedColour = Colour.BLUE;
+					sensedColour = WheelColour.BLUE;
 				} else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
-					sensedColour = Colour.RED;
+					sensedColour = WheelColour.RED;
 				} else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
-					sensedColour = Colour.GREEN;
+					sensedColour = WheelColour.GREEN;
 				} else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
-					sensedColour = Colour.YELLOW;
+					sensedColour = WheelColour.YELLOW;
 				}
 				return sensedColour;
 			}
 			
-		}, clock, dashboard, log);
+		}, ledStrip, clock, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 
+	public void createLEDStrip() {
+		if (!config.ledStripIsPresent) {
+			ledStrip = new MockLEDStrip();
+			log.sub("LED Strip not present, using a mock LED Strip instead.");
+			return;
+		}
+		ledStrip = new LEDStrip(Constants.LED_STRIP_PWM_PORT, Constants.LED_STRIP_NUMBER_OF_LEDS, log);
+	}
 
 	public void createLoader() {
 		if (!config.loaderIsPresent) {

@@ -12,6 +12,7 @@ import frc.robot.interfaces.DrivebaseInterface.ClimberAction.ClimberType;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -222,7 +223,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while moving colour wheel");
 			// The sequence has changed, setting action to null.
-			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, Colour.UNKNOWN));
+			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
 			logSub("Resetting colour wheel to no action.");
 		}
 	}

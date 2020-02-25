@@ -16,6 +16,7 @@ import frc.robot.interfaces.DrivebaseInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
+import frc.robot.lib.WheelColour;
 import frc.robot.lib.TimeAction;
 import frc.robot.subsystems.Subsystems;
 
@@ -227,27 +228,27 @@ public class State {
 
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelPositional(Colour colour) {
+	public State colourWheelPositional(WheelColour colour) {
 		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelLeft() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelRight() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
+		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
