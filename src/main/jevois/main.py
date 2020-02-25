@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import math # for cos, sin, etc
 import time
-from angle_util import *
 
 GOAL_HEIGHT = 98.25 #inches to the center of goal
 GOAL_WIDTH = 39.25 #inches
@@ -16,6 +15,37 @@ CAMERA_HORI_FOV = 65 #horizontal
 CAMERA_VERT_FOV = CAMERA_HORI_FOV * (3/4)
 
 CAMERA_ANGLE = 25 # degrees from horizontal
+
+def deg_to_rad(degrees):
+    return degrees * (math.pi / 180)
+
+# converts radians to degrees
+def rad_to_deg(radians):
+    return radians * (180 / math.pi)
+
+# sine function which uses degrees
+def sin(degrees):
+    return math.sin(deg_to_rad(degrees))
+
+# cosine function which uses degrees
+def cos(degrees):
+    return math.cos(deg_to_rad(degrees))
+
+# tan function which uses degrees
+def tan(degrees):
+    return math.tan(deg_to_rad(degrees))
+
+# inverse sine function which returns degrees
+def asin(ratio):
+    return rad_to_deg(math.asin(ratio))
+
+# inverse cosine function which returns degrees
+def acos(ratio):
+    return rad_to_deg(math.acos(ratio))
+
+# inverse tan function which returns degrees
+def atan(degrees):
+    return rad_to_deg(math.atan(degrees))
 
 def cal_point_distance(p, q):
     x = math.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)

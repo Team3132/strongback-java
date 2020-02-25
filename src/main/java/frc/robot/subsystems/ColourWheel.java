@@ -6,8 +6,6 @@ import org.strongback.components.Clock;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
-import edu.wpi.first.wpilibj.util.Color;
-
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.DashboardInterface;

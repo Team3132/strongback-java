@@ -315,13 +315,6 @@ public class Subsystems implements DashboardUpdater {
 		return Math.min(distance, maxSpeed);
 	}
 
-
-
-	public double getTapeTurnAdjustment() {
-		// TODO: Implement
-		return 0;
-	}
-
 	public double getTurnToAngleTurnAdjustment() {
 		double target = drivebase.getDriveRoutine().value;
 		double actual = location.getBearing();
