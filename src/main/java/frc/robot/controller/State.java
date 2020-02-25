@@ -30,7 +30,6 @@ public class State {
 	// Double and Boolean are used instead of double and boolean
 	// so that null can be used to indicate that the state shouldn't
 	// be changed and the current state be preserved.
-
 	// Time
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
 
@@ -157,7 +156,6 @@ public class State {
 	// Climber
 	public State deployPtoGearbox() {
 		ptoGearboxExtended = Boolean.valueOf(true);
-		
 		return this;
 	}
 
@@ -321,17 +319,6 @@ public class State {
 		return this;
 	}
 
-	public State extendClimberGearbox(){
-		climberAction = new ClimberAction(ClimberType.GEARBOX_OUT, 0);
-		return this;
-	}
-
-	public State retractClimberGearbox(){
-		climberAction = new ClimberAction(ClimberType.GEARBOX_IN, 0)
-	}
-
-
-
 	/**
 	 * Add waypoints for the drive base to drive through.
 	 * Note: The robot will come to a complete halt after each list
@@ -400,7 +387,6 @@ public class State {
 		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
 		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
 		maybeAdd("drive", drive, result);
-		maybeAdd("climber", climberAction, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourwheelMode", colourWheel, result);

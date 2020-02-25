@@ -40,7 +40,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private final Log log;
 	private DriveMotion currentMotion;
 
-	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, NetworkTableHelperInterface networkTable, Solenoid brakeSolenoid, DashboardInterface dashboard, Log log) {
+	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, DashboardInterface dashboard, Log log) {
 		super("Drive", dashboard, log);
 		this.left = left;
 		this.right = right;
@@ -63,8 +63,6 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
 				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name);
-		log.info("pto solenoid extended: " + ptoSolenoid.isExtended());
-		log.info("brake solenoid extended: " + brakeSolenoid.isExtended());
 	}
 
 	@Override
@@ -186,5 +184,17 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
     public boolean isBrakeExtended() {
         //log.sub("Is intake extended: " +  solenoid.isExtended());
         return brakeSolenoid.isExtended();
-    }
+	}
+	
+	@Override
+	public boolean isBrakeRetracted() {
+        //log.sub("Is intake extended: " +  solenoid.isExtended());
+        return brakeSolenoid.isRetracted();
+	}
+
+	@Override
+	public boolean isPtoRetracted() {
+        //log.sub("Is intake extended: " +  solenoid.isExtended());
+        return ptoSolenoid.isRetracted();
+	}
 }
