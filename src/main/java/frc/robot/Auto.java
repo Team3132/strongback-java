@@ -36,9 +36,7 @@ public class Auto {
 		initBallSelector.addOption("0", Integer.valueOf(0));
 		initBallSelector.addOption("1", Integer.valueOf(1));
 		initBallSelector.addOption("2", Integer.valueOf(2));
-		initBallSelector.addOption("3", Integer.valueOf(3));
-		initBallSelector.addOption("4", Integer.valueOf(4));
-		initBallSelector.addOption("5", Integer.valueOf(5));
+		initBallSelector.setDefaultOption("3", Integer.valueOf(3));
 	}
 
 	public void executedSelectedSequence(Controller controller) {
