@@ -402,8 +402,8 @@ public class Subsystems implements DashboardUpdater {
 		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderInCanID, false, log);
 		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
 		BooleanSupplier loaderInSensor = () -> spinnerMotor.isAtForwardLimit();
-		BooleanSupplier loaderOutSensor = () -> spinnerMotor.isAtReverseLimit();
-		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, dashboard, log);
+		BooleanSupplier loaderOutSensor = () -> spinnerMotor.isAtReverseLimit(); 
+		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
 		Strongback.executor().register(loader, Priority.LOW);
 
 	}

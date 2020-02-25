@@ -98,6 +98,7 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
 		subsystems = new Subsystems(createDashboard(), config, clock, log);
+		subsystems.createLEDStrip();
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
@@ -105,7 +106,6 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.createLoader();
 		subsystems.createOverrides();
 		subsystems.createVision();
-		subsystems.createLEDStrip();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();

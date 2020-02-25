@@ -10,7 +10,9 @@ import org.strongback.components.Motor.ControlMode;
 import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
+import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Subsystem;
 
@@ -21,12 +23,13 @@ public class Loader extends Subsystem implements LoaderInterface {
     final Counter inSensorCount;
     final Counter outSensorCount;
     private int initBallCount = 0;
+    final private LEDStripInterface led;
 
     public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
-            final BooleanSupplier inSensor, final BooleanSupplier outSensor, final DashboardInterface dashboard,
+            final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard,
             final Log log) {
         super("Loader", dashboard, log);
-
+        this.led = led;
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
         this.paddleSolenoid = paddleSolenoid;
@@ -101,6 +104,11 @@ public class Loader extends Subsystem implements LoaderInterface {
         spinnerHelper.set("actualRPM", spinner.getVelocity());
         inSensorCount.execute(0);
         outSensorCount.execute(0);
+        
+        // Don't update all the time because the colour wheel may want to use the LEDs
+        if (spinner.getSpeed() > 1) { 
+            led.setProgressColour(LEDColour.PURPLE, LEDColour.WHITE, getCurrentCount() / 5 * 100);
+        }
     }
 
     /**
