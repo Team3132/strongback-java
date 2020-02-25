@@ -46,7 +46,7 @@ def acos(ratio):
 # inverse tan function which returns degrees
 def atan(degrees):
     return rad_to_deg(math.atan(degrees))
-    
+
 def cal_point_distance(p, q):
     x = math.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)
     return x
