@@ -40,6 +40,7 @@ public class State {
 	public Double loaderPassthroughMotorOutput = null;
 	public Double loaderSpinnerMotorVelocity = null;
 	public Boolean loaderPaddleExtended = null;
+	public Integer expectBalls = null;
 
 	// Vision
 	public CameraMode cameraMode = null;
@@ -72,6 +73,7 @@ public class State {
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
+		expectBalls = subsystems.loader.getCurrentCount();
 	}
 
 	// Time
@@ -128,6 +130,10 @@ public class State {
 	}
 	public State setPaddleExtended(boolean extended) {
 		loaderPaddleExtended = Boolean.valueOf(extended);
+		return this;
+	}
+	public State waitForBalls(int numBalls) {
+		expectBalls = Integer.valueOf(numBalls);
 		return this;
 	}
 

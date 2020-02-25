@@ -108,6 +108,7 @@ public class Sequences {
 		seq.add().deployIntake();
 		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT)
 			.setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT);
+		seq.add().waitForBalls(5);
 		return seq;
 	}
 

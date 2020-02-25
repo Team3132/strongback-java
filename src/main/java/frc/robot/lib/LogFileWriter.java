@@ -38,6 +38,8 @@ public class LogFileWriter {
 	 * @param basePath  Where on the file system to put these files.
 	 * @throws IOException 
 	 */
+
+	
 	public LogFileWriter(String name, long filenum, String extn, String basePath, String dataDir) throws IOException {
 		this.name = name;
 		this.extn = extn;
@@ -48,7 +50,10 @@ public class LogFileWriter {
 		Files.createDirectories(filePath.getParent());
 		// Create the file writer.
 		writer = Files.newBufferedWriter(filePath);
-
+		if (System.getProperty("os.name") == "Windows 10") {
+			System.out.println("WINDOWS IS HERE DON'T MISS ME!");
+		}
+		System.out.println();
 		createSymbolicLink("Latest");
 	}
 	

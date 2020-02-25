@@ -78,4 +78,15 @@ public class MockLoader implements LoaderInterface {
         return 0;
     }
 // 
+
+    @Override
+    public int getCurrentCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void setInitBallCount(int initBallCount) {
+        // TODO Auto-generated method stub
+    }
 }

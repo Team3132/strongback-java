@@ -174,6 +174,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitForClimber();
 		maybeWaitForColourWheel();
 		//waitForLiftDeployer();
+		waitForBalls(desiredState.expectBalls);
 
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
@@ -206,18 +207,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
 	}
 
-	private void waitForCargo(int expectNumBalls) {
-		if (subsystems.spitter.hasCargo() == expectNumBalls) return;
-		logSub("Waiting for Cargo");
-		try {
-			waitUntilOrAbort(() -> subsystems.spitter.hasCargo() == expectNumBalls, "numBalls");
-		} catch (SequenceChangedException e) {
-			// Desired state has changed underneath us, give up waiting
-			//and return.
-			return;
-		}
-	}
-
 	private void maybeWaitForColourWheel() {
 		try {
 			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");
@@ -229,6 +218,21 @@ public class Controller implements Runnable, DashboardUpdater {
 		}
 	}
 
+	/**
+	 * Blocks waiting till balls found, shot, or sequence is aborted.
+	 */
+	private void waitForBalls(int expectBalls) {
+		if (subsystems.loader.getCurrentCount() == expectBalls) return;
+		logSub("Waiting for Balls");
+		try {
+			waitUntilOrAbort(() -> subsystems.loader.getCurrentCount() == expectBalls, "balls");
+		} catch (SequenceChangedException e) {
+			// Desired state has changed underneath us, give up waiting
+			//and return.
+			return;
+		}
+	}
+	
 	/**
 	 * Blocks waiting until endtime has passed.
 	 */

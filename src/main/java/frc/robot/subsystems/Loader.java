@@ -20,7 +20,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     private double spinnerVelocity = 0;
     final Counter inSensorCount;
     final Counter outSensorCount;
-    private double initBallCount = 0;
+    private int initBallCount = 0;
 
     public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
             final BooleanSupplier inSensor, final BooleanSupplier outSensor, final DashboardInterface dashboard,
@@ -66,7 +66,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
     
     @Override
-    public void setInitBallCount(double initBallCount) {
+    public void setInitBallCount(int initBallCount) {
         this.initBallCount = initBallCount;
     }
 
@@ -123,7 +123,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public double getCurrentCount() {
+    public int getCurrentCount() {
         return inSensorCount.getCount() - outSensorCount.getCount() + initBallCount;
     }
 

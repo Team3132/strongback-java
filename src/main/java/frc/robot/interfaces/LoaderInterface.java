@@ -10,8 +10,8 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
     public double getTargetSpinnerMotorVelocity();
 	public double getTargetPassthroughMotorOutput();
 	
-	public double getCurrentCount();
-	public void setInitBallCount(double initBallCount); 
+	public int getCurrentCount();
+	public void setInitBallCount(int initBallCount); 
 
     public void setTargetSpinnerMotorVelocity(double current);
 	public void setTargetPassthroughMotorOutput(double percentoutput);

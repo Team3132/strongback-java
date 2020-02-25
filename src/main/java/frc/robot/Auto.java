@@ -21,17 +21,35 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Auto {
 	private final Log log;
 	private SendableChooser<Sequence> autoProgram = new SendableChooser<Sequence>();
+	private SendableChooser<Integer> initBallSelector = new SendableChooser<Integer>();
+	
 	
 	public Auto(Log log) {
 		this.log = log;
 		addAutoSequences();
 		addChooser();
+		addBallInts();
+		addInitBallChooser();
+	}
+
+	private void addBallInts() {
+		initBallSelector.addOption("0", Integer.valueOf(0));
+		initBallSelector.addOption("1", Integer.valueOf(1));
+		initBallSelector.addOption("2", Integer.valueOf(2));
+		initBallSelector.addOption("3", Integer.valueOf(3));
+		initBallSelector.addOption("4", Integer.valueOf(4));
+		initBallSelector.addOption("5", Integer.valueOf(5));
 	}
 
 	public void executedSelectedSequence(Controller controller) {
 		Sequence seq = autoProgram.getSelected();
 		log.info("Starting selected auto program %s", seq.getName());
 		controller.doSequence(seq);
+	}
+	public int executedSelectedBallSelector() {
+		Integer numBalls = initBallSelector.getSelected();
+		log.info("Starting with %s balls", numBalls);
+		return numBalls;
 	}
 
 	private void addAutoSequences() {
@@ -120,4 +138,7 @@ public class Auto {
 	private void addChooser() {
 		SmartDashboard.putData("Auto program", autoProgram);
 	}	
+	private void addInitBallChooser() {
+		SmartDashboard.putData("Initial Number of Balls the Robot Starts With", initBallSelector);
+	}
 }

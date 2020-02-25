@@ -160,7 +160,7 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void autonomousInit() {
 		log.info("auto has started");
-
+		auto.executedSelectedBallSelector();
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
@@ -169,7 +169,8 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
-		subsystems.loader.setInitBallCount(3);
+		int initialNumBalls = auto.executedSelectedBallSelector();
+		subsystems.loader.setInitBallCount(initialNumBalls);
 	}
 
 	/**
