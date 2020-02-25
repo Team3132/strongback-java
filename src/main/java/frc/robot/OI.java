@@ -47,27 +47,36 @@ public class OI implements OIInterface {
 	 *      (left thumbstick)   (right thumbstick)
 	 * 
 	 * Driver Controls:
-	 * Left Flight Joystick: Back/Forward
-	 * Right Flight Joystick: Left/Right
-	 * Left Joystick Trigger (Button 1): Half speed mode.
+	 * Left flight joystick: move back/forward, climb up/down
+	 * Right flight joystick: left/right
+	 * Right joystick bottom close left button (Button 12): deploy PTO
+	 * Right joystick bottom close right button (Button 11): stow PTO
+	 * Right joysick bottom middle right button (Button 10): brake
+	 * Right joystick bottom middle left button (Button 9): stop braking
+	 * Right joystick top close left button (Button 3): shoot
+	 * Right joystick thumb button (Button 2): intake
+	 * Right joystick trigger (Button 1): vision lineup
+	 * Left joystick trigger (Button 1): slow/half speed
+	 * 
 	 * 
 	 * Operator Controls:
+	 * Pushing (A) begins positional control. 
+	 * Pushing (B) stops the colourwheel from turning.	 
+	 * Pushing (X) begins rotational control. 
+	 * Pushing left stick to the left rotates colourwheel anticlockwise
+	 * Pushing left stick to the right rotates colourwheel clockwise
+	 * Pushing (left bumper) sets the hood and shooter to preset shot 1.
+	 * Pushing (right bumper) sets the hood and shooter to preset shot 2.
 	 * 
-	 * The hat vertical controls the lift height. Repeatedly pushing makes it go to the next height.
-	 * The hat horizontal controls the sideways scoring.
-	 * Pushing (A) starts intaking. Releasing it, stops intaking.
-	 * Pushing (B) does an intake eject. Releasing it, stops ejecting.
-	 * Pushing (left bumper) does a front eject (ie the outtake opens for the cube to fall out).
-	 * Pushing both triggers deploys the ramp (safety)
-	 * Pushing (Y) gets the robot ready for climbing.
-	 * While (X) is held, the robot will climb. 
-	 * (start) resets the robot lift at the bottom and intake stowed.
 	 * 
 	 * The following buttons are unused:
-	 *  (back)(mode)(left bumper).
+	 * (back)(mode)(left bumper)(right stick up/down/left/right)(left stick up/down)
+	 * (left trigger)(right trigger)(back)(start)(left joystick click)(right joystick click)
+	 * (D-pad up/down/left/right)(Y)
+	 * 
 	 */
 	public void configureJoysticks(FlightStick driverLeft, FlightStick driverRight, InputDevice operator) {
-		// Left and RIght driver joysticks have separate mappings, as well as Operator controller.
+		// Left and Right driver joysticks have separate mappings, as well as Operator controller.
 		configureDriverJoystick(driverLeft, driverRight, "driverSticks");
     	configureOperatorJoystick(operator, "operator");
 	}
@@ -77,14 +86,35 @@ public class OI implements OIInterface {
 
 		// Intake - Right Stick Button 2 (on/off)
 		onTriggered(rightStick.getButton(2), Sequences.startIntaking());
-		
 		onUntriggered(rightStick.getButton(2), Sequences.stopIntaking());
-
+		
+		//slowdrive
 		onTriggered(leftStick.getButton(1), Sequences.startSlowDriveForward());
 		onUntriggered(leftStick.getButton(1), Sequences.setDrivebaseToArcade());
 
-		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
-		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
+		//deploy pto (empty sequence)
+		onTriggered(rightStick.getButton(12), Sequences.getEmptySequence());
+		onUntriggered(rightStick.getButton(12), Sequences.getEmptySequence());
+
+		//stow pto (empty sequence)
+		onTriggered(rightStick.getButton(11), Sequences.getEmptySequence());
+		onUntriggered(rightStick.getButton(11), Sequences.getEmptySequence());		
+
+		//brake (empty sequence)
+		onTriggered(rightStick.getButton(10), Sequences.getEmptySequence());
+		onUntriggered(rightStick.getButton(10), Sequences.getEmptySequence());		
+
+		//stop braking (empty sequence)
+		onTriggered(rightStick.getButton(9), Sequences.getEmptySequence());
+		onUntriggered(rightStick.getButton(9), Sequences.getEmptySequence());	
+
+		//shoot (empty sequence)
+		onTriggered(rightStick.getButton(3), Sequences.getEmptySequence());
+		onUntriggered(rightStick.getButton(3), Sequences.getEmptySequence());	
+
+		//vision lineup
+		onTriggered(rightStick.getButton(2), Sequences.visionAim());
+		onUntriggered(rightStick.getButton(2), Sequences.getEmptySequence());	
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
@@ -98,6 +128,25 @@ public class OI implements OIInterface {
 			return Sequences.startIntaking();
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
+
+		//colourwheel positional
+		//lucas pls do the colourwheel stuff amogh is confused
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(WheelColour.UNKNOWN));
+		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.getEmptySequence());
+
+		//colourwheel rotational
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelRotational());
+		onUntriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.getEmptySequence());
+	
+		//shot 1
+		//currently no sequence 
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.getEmptySequence());
+		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.getEmptySequence());
+
+		//shot 2
+		//currently no sequence 
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.getEmptySequence());
+		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.getEmptySequence());
 
 		// Colour Wheel testing.
 		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(WheelColour.YELLOW));
