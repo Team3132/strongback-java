@@ -110,10 +110,10 @@ public class RobotConfiguration {
 
 	public boolean visionIsPresent = true;
 	public double visionHMin = Constants.VISION_H_MIN;
-	public double visionHMax = Constants.VISION_S_MAX;
-	public double visionSMin = Constants.VISION_H_MAX;
-	public double visionSMax = Constants.VISION_V_MIN;
-	public double visionVMin = Constants.VISION_S_MIN;
+	public double visionHMax = Constants.VISION_H_MAX;
+	public double visionSMin = Constants.VISION_S_MIN;
+	public double visionSMax = Constants.VISION_S_MAX;
+	public double visionVMin = Constants.VISION_V_MIN;
 	public double visionVMax = Constants.VISION_V_MAX;
 	
 	public boolean climberIsPresent = true;

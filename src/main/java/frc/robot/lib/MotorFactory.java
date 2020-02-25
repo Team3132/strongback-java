@@ -18,6 +18,7 @@ import org.strongback.hardware.HardwareTalonSRX;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 
 public class MotorFactory {
 
@@ -179,12 +180,35 @@ public class MotorFactory {
      * @param log for registration of the current reporting.
      * @return the leader HardwareTalonSRX
      */
-    private static HardwareTalonSRX getTalon(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
+
+	 private class TunableMotor {
+		 Motor motor;
+		 int id;
+		 Motor left;
+		NetworkTableHelperInterface networkTable;
+		public TunableMotor(Motor motor, int id, double p, double i , double d , double f) {
+			this.motor = motor;
+			this.id = id;
+			networkTable.get("p",  p);
+			networkTable.get("i", i);
+			networkTable.get("d", d);
+			networkTable.get("f", f);
+			left.setPIDF(0, p, i, d, f);
+	
+		}
+
+	 }
+
+    private static HardwareTalonSRX getTalon(int[] canIDs, boolean invert, NeutralMode mode, Log log, TunableMotor tunableMotor) {
 
     	HardwareTalonSRX leader = Hardware.Motors.talonSRX(abs(canIDs[0]), invert, mode);
 		log.register(false, () -> leader.getOutputCurrent(), "Talons/%d/Current", canIDs[0]);
 		leader.configContinuousCurrentLimit(Constants.DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT, 10);
 		leader.configPeakCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
+
+		TunableMotor networkTablePID = new TunableMotor(leader, canIDs[0], Constants.DRIVE_P, Constants.DRIVE_I, Constants.DRIVE_D, Constants.DRIVE_F);
+
+		NetworkTablesHelper networkTable = new NetworkTablesHelper("Talon " + canIDs[0]);
 
     	for (int i = 1; i < canIDs.length; i++) {
 			boolean shouldInvert = invert;
@@ -204,12 +228,13 @@ public class MotorFactory {
 	  * @param log for registration of the current values.
 	  * @return the HardwareTalonSRX motor controller.
 	  */
-    private static HardwareTalonSRX getTalon(int canID, boolean invert, NeutralMode mode, Log log) {
+	  private static HardwareTalonSRX getTalon(int canID, boolean invert, NeutralMode mode, Log log) {
 		log.sub("%s: " + canID, "talon");
 		int[] canIDs = new int[1];
 		canIDs[0] = canID;
     	return getTalon(canIDs, invert, mode, log);
 	}
+
 
 	/**
      * Code to allow us to log output current per Spark MAX and set up followers so that
