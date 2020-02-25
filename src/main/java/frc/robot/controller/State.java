@@ -13,7 +13,6 @@ import org.strongback.components.Clock;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.DrivebaseInterface.ClimberAction;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.WheelColour;
@@ -158,6 +157,7 @@ public class State {
 	// Climber
 	public State deployPtoGearbox() {
 		ptoGearboxExtended = Boolean.valueOf(true);
+		
 		return this;
 	}
 

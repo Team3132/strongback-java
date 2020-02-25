@@ -63,6 +63,8 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
 				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name);
+		log.info("pto solenoid extended: " + ptoSolenoid.isExtended());
+		log.info("brake solenoid extended: " + brakeSolenoid.isExtended());
 	}
 
 	@Override
