@@ -50,10 +50,6 @@ public class LogFileWriter {
 		Files.createDirectories(filePath.getParent());
 		// Create the file writer.
 		writer = Files.newBufferedWriter(filePath);
-		if (System.getProperty("os.name") == "Windows 10") {
-			System.out.println("WINDOWS IS HERE DON'T MISS ME!");
-		}
-		System.out.println();
 		createSymbolicLink("Latest");
 	}
 	

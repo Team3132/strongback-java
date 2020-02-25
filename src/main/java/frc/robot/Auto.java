@@ -46,7 +46,7 @@ public class Auto {
 		log.info("Starting selected auto program %s", seq.getName());
 		controller.doSequence(seq);
 	}
-	public int executedSelectedBallSelector() {
+	public int getSelectedBallAmount() {
 		Integer numBalls = initBallSelector.getSelected();
 		log.info("Starting with %s balls", numBalls);
 		return numBalls;

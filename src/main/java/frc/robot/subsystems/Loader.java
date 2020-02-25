@@ -41,6 +41,10 @@ public class Loader extends Subsystem implements LoaderInterface {
                 .register(true, () -> spinner.getVelocity(), "%s/spinner/Velocity", name)
                 .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                 .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
+                .register(true, () -> (double) getCurrentCount(), "%s/spinner/CurrentBallCount", name)
+                .register(true, () -> (double) inSensorCount.count, "%s/spinner/totalBallsIn", name)
+                .register(true, () -> (double) outSensorCount.count, "%s/spinner/totalBallsOut", name)
+                .register(true, () -> (double) initBallCount, "%s/spinner/initialBallCount", name)
                 .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name);
     }
 
