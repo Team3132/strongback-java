@@ -73,11 +73,11 @@ public class OperatorBoxButtons {
 	public static final int BLUE_DISABLE = 32;
 
 	// This years game-specific mappings
-	// Spitter
-	public static final int SPITTER_DISABLE = WHITE_DISABLE;
-	public static final int SPITTER_MANUAL = WHITE_MANUAL;
-	public static final int SPITTER_POT = WHITE_POT;
-	public static final int SPITTER_SPEED = WHITE_BUTTON1;
+	// Shooter
+	public static final int SHOOTER_DISABLE = WHITE_DISABLE;
+	public static final int SHOOTER_MANUAL = WHITE_MANUAL;
+	public static final int SHOOTER_POT = WHITE_POT;
+	public static final int SHOOTER_SPEED = WHITE_BUTTON1;
 
 	// Climber
 	public static final int CLIMBER_DISABLE = RED_DISABLE;
