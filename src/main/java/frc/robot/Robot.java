@@ -38,8 +38,7 @@ import jaci.pathfinder.modifiers.TankModifier;
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
-	private Log log;
-	private LogDygraph logDygraph;
+	private LogDygraph log;
 
 	// User interface.
 	private DriverStation driverStation;
@@ -169,7 +168,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
-		logDygraph.restartLogs();
+		log.restartLogs();
 		log.info("auto has started");
 
 
@@ -195,7 +194,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
-		logDygraph.restartLogs();
+		log.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.getStartSequence());
@@ -219,7 +218,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void testInit() {
-		logDygraph.restartLogs();
+		log.restartLogs();
 		subsystems.enable();
 	}
 
