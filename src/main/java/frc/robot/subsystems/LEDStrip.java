@@ -53,10 +53,10 @@ public class LEDStrip implements LEDStripInterface {
     @Override
     public void setIdle() {
         for (int i = 0; i < numberOfLEDs; i++) {
-            setLEDColour(i, i % 2 == 0 ? LEDColour.GOLD : LEDColour.GREEN);
+            setLEDColour(i, i % 2 == 0 ? LEDColour.YELLOW : LEDColour.GREEN);
         }
         setData();
-    } 
+    }
 
     private void setData() {
         ledStrip.setData(ledStripBuffer);

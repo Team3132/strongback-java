@@ -91,7 +91,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       break;
     case NONE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
-      ledStrip.setIdle();
       break;
     default:
       log.error("%s: Unknown Type %s", name, action.type);

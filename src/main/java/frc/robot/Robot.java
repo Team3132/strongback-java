@@ -158,6 +158,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledPeriodic() {
+		subsystems.updateIdleLED();
 	}
 
 	/**
