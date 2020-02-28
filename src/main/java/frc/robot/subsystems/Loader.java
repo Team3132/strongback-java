@@ -19,7 +19,7 @@ import frc.robot.lib.Subsystem;
 public class Loader extends Subsystem implements LoaderInterface {
     final private Motor spinner, passthrough;
     final private Solenoid paddleSolenoid;
-    private double spinnerVelocity = 0;
+    private double spinnerRPM = 0;
     final Counter inSensorCount;
     final Counter outSensorCount;
     private int initBallCount = 0;
@@ -38,7 +38,7 @@ public class Loader extends Subsystem implements LoaderInterface {
 
         log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                 .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
-                .register(true, () -> spinner.getVelocity(), "%s/spinner/Velocity", name)
+                .register(true, () -> spinner.getVelocity(), "%s/spinner/RPM", name)
                 .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                 .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
                 .register(true, () -> (double) getCurrentBallCount(), "%s/spinner/CurrentBallCount", name)
@@ -49,17 +49,17 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public void setTargetSpinnerMotorVelocity(final double velocity) {
+    public void setTargetSpinnerMotorRPM(final double rpm) {
         final NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
-        spinnerHelper.set("targetRPM", velocity);
-        spinnerVelocity = velocity;
-        log.sub("%s: Setting loader motor velocity to: %f", name, velocity);
+        spinnerHelper.set("targetRPM", rpm);
+        spinnerRPM = rpm;
+        log.sub("%s: Setting loader motor rpm to: %f", name, rpm);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
-        if (velocity == 0) {
+        if (rpm == 0) {
             spinner.set(ControlMode.PercentOutput, 0);
         } else {
-            spinner.set(ControlMode.Velocity, velocity);
+            spinner.set(ControlMode.Velocity, rpm);
         }
     }
 
@@ -140,8 +140,8 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public double getTargetSpinnerMotorVelocity() {
-        return spinnerVelocity;
+    public double getTargetSpinnerMotorRPM() {
+        return spinnerRPM;
     }
 
     @Override

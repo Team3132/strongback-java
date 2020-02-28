@@ -7,13 +7,13 @@ import org.strongback.Executable;
  */
 public interface LoaderInterface extends SubsystemInterface, Executable, DashboardUpdater {
 
-    public double getTargetSpinnerMotorVelocity();
+    public double getTargetSpinnerMotorRPM();
 	public double getTargetPassthroughMotorOutput();
 	
 	public int getCurrentBallCount();
 	public void setInitBallCount(int initBallCount); 
 
-    public void setTargetSpinnerMotorVelocity(double current);
+    public void setTargetSpinnerMotorRPM(double current);
 	public void setTargetPassthroughMotorOutput(double percentoutput);
 
 	/**

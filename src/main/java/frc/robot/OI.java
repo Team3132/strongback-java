@@ -143,9 +143,9 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
 	  // While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
-			() -> loaderIF.setTargetSpinnerMotorVelocity(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+			() -> loaderIF.setTargetSpinnerMotorRPM(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
-			() -> loaderIF.setTargetSpinnerMotorVelocity(0));
+			() -> loaderIF.setTargetSpinnerMotorRPM(0));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
 			() -> loaderIF.setTargetPassthroughMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),

@@ -38,7 +38,7 @@ public class State {
 
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
-	public Double loaderSpinnerMotorVelocity = null;
+	public Double loaderSpinnerMotorRPM = null;
 	public Boolean loaderPaddleNotBlocking = null;
 	// If this field is not called expectedNumberOfBalls plz update applyState in Controller.java
 	public Integer expectedNumberOfBalls = null;
@@ -68,7 +68,7 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
+		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
 		climber = subsystems.climber.getDesiredAction();
@@ -121,8 +121,8 @@ public class State {
 
 
 	// Loader
-	public State setLoaderSpinnerMotorVelocity(double velocity) {
-		loaderSpinnerMotorVelocity = Double.valueOf(velocity);
+	public State setLoaderSpinnerMotorRPM(double rpm) {
+		loaderSpinnerMotorRPM = Double.valueOf(rpm);
 		return this;
 	}
 	public State setLoaderPassthroughMotorOutput(double output) {
@@ -340,7 +340,7 @@ public class State {
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
-		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
+		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
 		maybeAdd("loaderPaddleExtended", loaderPaddleNotBlocking, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
