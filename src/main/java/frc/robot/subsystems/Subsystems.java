@@ -391,6 +391,10 @@ public class Subsystems implements DashboardUpdater {
 		ledStrip = new LEDStrip(Constants.LED_STRIP_PWM_PORT, Constants.LED_STRIP_NUMBER_OF_LEDS, log);
 	}
 
+	public void updateIdleLED() {
+		ledStrip.setIdle();
+	}
+
 	public void createLoader() {
 		if (!config.loaderIsPresent) {
 			loader = new MockLoader(log);

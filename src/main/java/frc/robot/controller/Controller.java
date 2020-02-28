@@ -147,7 +147,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		// Fill in the blanks in the desired state.
 		desiredState = State.calculateUpdatedState(desiredState, currentState);
 		if (desiredState.colourWheel == new ColourAction(ColourWheelType.POSITION, WheelColour.UNKNOWN)) {
-			desiredState.colourWheel = new ColourAction(ColourWheelType.NONE, ColourWheel.getFMSColour());
+			desiredState.colourWheel = new ColourAction(ColourWheelType.POSITION, ColourWheel.getFMSColour());
 		}
 		logSub("Calculated new 'safe' state: %s", desiredState);
 

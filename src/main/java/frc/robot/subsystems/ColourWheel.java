@@ -20,13 +20,23 @@ import frc.robot.lib.Subsystem;
 
 /**
  * This subsystem is made to spin the Colour Wheel on the control panel in the
- * 2020 game. It 5 seperate actions: 1) Rotational control, spins the colour
+ * 2020 game. It 5 seperate actions:
+ * 
+ * 1) Rotational control, spins the colour
  * wheel 3.25 full rotations, or 26 eighth turns. It uses the colour wheel as an
- * encoder, checking for every colour. 2) Positional control, spins the colour
+ * encoder, checking for every colour.
+ * 
+ * 2) Positional control, spins the colour
  * wheel to the selected colour, choosing clockwise or anticlockwise depending
- * on what is faster. 3) Manual adjustment clockwise, moves the colour wheel
- * clockwise at a slow speed incase it is off by a bit. 4) Manual adjustment
- * anticlockwise, same as above, in the opposite direction. 5) None, stops the
+ * on what is faster.
+ * 
+ * 3) Manual adjustment clockwise, moves the colour wheel
+ * clockwise at a slow speed incase it is off by a bit.
+ * 
+ * 4) Manual adjustment
+ * anticlockwise, same as above, in the opposite direction.
+ * 
+ * 5) None, stops the
  * motor. This is the default action.
  * 
  * This class expects to be given one motor and a RevRobotics Colour Sensor V3.
@@ -74,8 +84,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     switch (action.type) {
     case ROTATION:
       newSpeed = rotationalControl();
-      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.GOLD,
-          ((double) rotCount) / Constants.COLOUR_WHEEL_ROTATION_TARGET);
+      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.YELLOW, ((double) rotCount) / Constants.COLOUR_WHEEL_ROTATION_TARGET);
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
@@ -91,7 +100,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       break;
     case NONE:
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
-      ledStrip.setIdle();
       break;
     default:
       log.error("%s: Unknown Type %s", name, action.type);
