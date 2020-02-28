@@ -124,6 +124,7 @@ public class Loader extends Subsystem implements LoaderInterface {
                 isPaddleNotBlocking() ? "not blocking" : isPaddleBlocking() ? "blocking" : "moving");
         dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
+        dashboard.putNumber("Current Number of Balls", getCurrentBallCount());
         inSensorCount.updateDashboard();
         outSensorCount.updateDashboard();
     }

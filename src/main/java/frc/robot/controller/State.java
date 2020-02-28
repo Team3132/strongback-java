@@ -341,7 +341,7 @@ public class State {
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
-		maybeAdd("loaderPaddleExtended", loaderPaddleNotBlocking, result);
+		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);

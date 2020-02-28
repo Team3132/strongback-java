@@ -129,6 +129,7 @@ public class Sequences {
 		seq.add().setIntakeMotorOutput(0);
 		seq.add().setDelayDelta(0.25);
 		seq.add().setLoaderPassthroughMotorOutput(0);
+		seq.add().setLoaderSpinnerMotorRPM(0);
 		return seq;
 	}
 
