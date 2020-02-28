@@ -9,9 +9,12 @@ import frc.robot.interfaces.Log;
 
 public class MockDrivebase implements DrivebaseInterface  {
 	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE);
+	private boolean isPtoExtended = false;
+	private boolean isBrakeExtended = true;
 	String name = "MockDrivebase";
 	Log log;
-	MockSolenoid solenoid;
+	MockSolenoid ptosolenoid;
+	MockSolenoid brakesolenoid;
 	public MockDrivebase(Log log) {
 		this.log = log;
 	}
@@ -81,5 +84,17 @@ public class MockDrivebase implements DrivebaseInterface  {
 	@Override
 	public boolean isPtoRetracted() {
 		return false;
+	}
+
+	@Override
+	public DrivebaseInterface setPtoExtended(boolean extended) {
+		isPtoExtended = extended;
+		return this;
+	}
+
+	@Override
+	public DrivebaseInterface setBrakeExtended(boolean extended) {
+		isBrakeExtended = extended;
+		return this;
 	}
 }
