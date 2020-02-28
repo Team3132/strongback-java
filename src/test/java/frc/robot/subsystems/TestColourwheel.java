@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.strongback.mock.Mock;
 import org.strongback.mock.MockClock;
 import org.strongback.mock.MockMotor;
+import org.strongback.mock.MockSolenoid;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
@@ -24,6 +25,7 @@ public class TestColourwheel {
     WheelColour colour;
     MockMotor motor;
     MockClock clock;
+    MockSolenoid solenoid;
     ColourWheelInterface colourWheel;
     LEDStripInterface ledStrip;
 
@@ -31,9 +33,10 @@ public class TestColourwheel {
     public void setup() {
         colour = WheelColour.UNKNOWN;
         motor = Mock.stoppedMotor();
+        solenoid = Mock.Solenoids.singleSolenoid(0);
         clock = Mock.clock();
         ledStrip = Mock.ledStrip();
-        colourWheel = new ColourWheel(motor, () -> colour, ledStrip, clock, new MockDashboard(), new MockLog());
+        colourWheel = new ColourWheel(motor, solenoid, () -> colour, ledStrip, clock, new MockDashboard(), new MockLog());
     }
 
 

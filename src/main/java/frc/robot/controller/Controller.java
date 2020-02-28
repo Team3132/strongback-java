@@ -10,6 +10,7 @@ import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.WheelColour;
+import frc.robot.subsystems.ColourWheel;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -145,6 +146,9 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Current state: %s", currentState);
 		// Fill in the blanks in the desired state.
 		desiredState = State.calculateUpdatedState(desiredState, currentState);
+		if (desiredState.colourWheel == new ColourAction(ColourWheelType.POSITION, WheelColour.UNKNOWN)) {
+			desiredState.colourWheel = new ColourAction(ColourWheelType.NONE, ColourWheel.getFMSColour());
+		}
 		logSub("Calculated new 'safe' state: %s", desiredState);
 
 		// The time beyond which we are allowed to move onto the next state

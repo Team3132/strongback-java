@@ -57,4 +57,16 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
     /** @return if colour wheel has finished spinning.
      */
     public boolean isFinished();
+
+    /**
+	 * @return the state of the colour wheel arm solenoid. 
+	 * */
+    public LoaderInterface setArmExtended(boolean extended);
+
+	/**
+	 * @return the state of the colour wheel arm solenoid. 
+	 * */
+	public boolean isArmExtended();
+	public boolean isArmRetracted();
+
 }

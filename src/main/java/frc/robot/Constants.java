@@ -263,6 +263,7 @@ public class Constants {
 	 * Colour Wheel
 	 */
 	public static final int COLOUR_WHEEL_CAN_ID = 7;
+	public static final int COLOUR_WHEEL_SOLENOID_PORT = 3;
 	// Values callibrated using vynl sticker for control panel.
 	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); //Values from the colour sensor used to match colours.
 	//public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); //This is the real green value.
