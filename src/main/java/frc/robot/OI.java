@@ -153,9 +153,9 @@ public class OI implements OIInterface {
 		
 		
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
-			() -> loaderIF.setPaddleExtended(false));
+			() -> loaderIF.setPaddleBlocking(false));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
-			() -> loaderIF.setPaddleExtended(true));
+			() -> loaderIF.setPaddleBlocking(true));
 }
 
 

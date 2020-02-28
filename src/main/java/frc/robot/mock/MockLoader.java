@@ -12,18 +12,18 @@ public class MockLoader implements LoaderInterface {
     private boolean isPaddleExtended = false;
 
     @Override
-	public LoaderInterface setPaddleExtended(boolean extended) {
+	public LoaderInterface setPaddleBlocking(boolean extended) {
 		isPaddleExtended = extended;
 		return this;
 	}
 
 	@Override
-	public boolean isPaddleExtended() {
+	public boolean isPaddleBlocking() {
 		return isPaddleExtended;
 	}
 
 	@Override
-	public boolean isPaddleRetracted() {
+	public boolean isPaddleNotBlocking() {
 		return !isPaddleExtended;
     }
 
@@ -80,7 +80,7 @@ public class MockLoader implements LoaderInterface {
 // 
 
     @Override
-    public int getCurrentCount() {
+    public int getCurrentBallCount() {
         // TODO Auto-generated method stub
         return 0;
     }

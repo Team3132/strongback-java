@@ -10,7 +10,7 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
     public double getTargetSpinnerMotorVelocity();
 	public double getTargetPassthroughMotorOutput();
 	
-	public int getCurrentCount();
+	public int getCurrentBallCount();
 	public void setInitBallCount(int initBallCount); 
 
     public void setTargetSpinnerMotorVelocity(double current);
@@ -20,12 +20,12 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
 	 * @return the state of the loader solenoid. 
 	 * */
 
-    public LoaderInterface setPaddleExtended(boolean extended);
+    public LoaderInterface setPaddleBlocking(boolean blocking);
 
 	/**
 	 * @return the state of the loader paddle solenoid. 
 	 * */
-	public boolean isPaddleExtended();
-	public boolean isPaddleRetracted();
+	public boolean isPaddleBlocking();
+	public boolean isPaddleNotBlocking();
 
 }

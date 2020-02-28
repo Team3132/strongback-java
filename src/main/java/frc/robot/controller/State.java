@@ -39,8 +39,9 @@ public class State {
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
 	public Double loaderSpinnerMotorVelocity = null;
-	public Boolean loaderPaddleExtended = null;
-	public Integer expectBalls = null;
+	public Boolean loaderPaddleBlocking = null;
+	// If this field is not called expectedNumberOfBalls plz update applyState in Controller.java
+	public Integer expectedNumberOfBalls = null;
 
 	// Vision
 	public CameraMode cameraMode = null;
@@ -69,11 +70,11 @@ public class State {
 		intakeExtended = subsystems.intake.isExtended();
 		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
-		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
+		loaderPaddleBlocking = subsystems.loader.isPaddleBlocking();
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
-		expectBalls = subsystems.loader.getCurrentCount();
+		expectedNumberOfBalls = subsystems.loader.getCurrentBallCount();
 	}
 
 	// Time
@@ -120,20 +121,20 @@ public class State {
 
 
 	// Loader
-	public State setLoaderSpinnerMotorVelocity(double Velocity) {
-		loaderSpinnerMotorVelocity = Double.valueOf(Velocity);
+	public State setLoaderSpinnerMotorVelocity(double velocity) {
+		loaderSpinnerMotorVelocity = Double.valueOf(velocity);
 		return this;
 	}
 	public State setLoaderPassthroughMotorOutput(double output) {
 		loaderPassthroughMotorOutput = Double.valueOf(output);
 		return this;
 	}
-	public State setPaddleExtended(boolean extended) {
-		loaderPaddleExtended = Boolean.valueOf(extended);
+	public State setPaddleBlocking(boolean blocking) {
+		loaderPaddleBlocking = Boolean.valueOf(blocking);
 		return this;
 	}
 	public State waitForBalls(int numBalls) {
-		expectBalls = Integer.valueOf(numBalls);
+		expectedNumberOfBalls = Integer.valueOf(numBalls);
 		return this;
 	}
 
@@ -305,7 +306,10 @@ public class State {
 			// if (!field.canAccess(current)) continue;
 			try {
 				if (field.get(desiredState) == null) {
-					field.set(updatedState, field.get(currentState));
+					// Don't save state for expected balls to avoid race condition
+					if(field.getName() != "expectedNumberOfBalls") {
+						field.set(updatedState, field.get(currentState));
+					}	
 				} else {
 					field.set(updatedState, field.get(desiredState));
 				}
@@ -337,7 +341,7 @@ public class State {
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
-		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
+		maybeAdd("loaderPaddleExtended", loaderPaddleBlocking, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);

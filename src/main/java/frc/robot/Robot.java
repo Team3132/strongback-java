@@ -174,7 +174,7 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
-		//Gets the amount set in SmartDashboard and sets the init ball count
+		// Gets the amount set in SmartDashboard and sets the init ball count
 		int initialNumBalls = auto.getSelectedBallAmount(); 
 		subsystems.loader.setInitBallCount(initialNumBalls);
 	}

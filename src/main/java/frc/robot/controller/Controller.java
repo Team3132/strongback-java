@@ -169,12 +169,11 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
-		
+		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
 		waitForClimber();
 		maybeWaitForColourWheel();
-		//waitForLiftDeployer();
-		waitForBalls(desiredState.expectBalls);
+		//waitForLiftDeployer();		
 
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
@@ -219,13 +218,18 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * Blocks waiting till balls found, shot, or sequence is aborted.
+	 * Waits until loader has specific number of balls, or sequence is aborted.
+	 * @param expectBalls the number of balls to wait for. If null, it won't wait.
 	 */
-	private void waitForBalls(int expectBalls) {
-		if (subsystems.loader.getCurrentCount() == expectBalls) return;
+	private void maybeWaitForBalls(Integer expectBalls) {
+		if (expectBalls == null) {
+			// This state doesn't specify the number of balls to wait for.
+			return;
+		}
+		if (subsystems.loader.getCurrentBallCount() == expectBalls) return;
 		logSub("Waiting for balls");
 		try {
-			waitUntilOrAbort(() -> subsystems.loader.getCurrentCount() == expectBalls, "balls");
+			waitUntilOrAbort(() -> subsystems.loader.getCurrentBallCount() == expectBalls, "balls");
 		} catch (SequenceChangedException e) {
 			// Desired state has changed underneath us, give up waiting
 			//and return.

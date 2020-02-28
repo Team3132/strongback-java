@@ -41,11 +41,11 @@ public class Loader extends Subsystem implements LoaderInterface {
                 .register(true, () -> spinner.getVelocity(), "%s/spinner/Velocity", name)
                 .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                 .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
-                .register(true, () -> (double) getCurrentCount(), "%s/spinner/CurrentBallCount", name)
+                .register(true, () -> (double) getCurrentBallCount(), "%s/spinner/CurrentBallCount", name)
                 .register(true, () -> (double) inSensorCount.count, "%s/spinner/totalBallsIn", name)
                 .register(true, () -> (double) outSensorCount.count, "%s/spinner/totalBallsOut", name)
                 .register(true, () -> (double) initBallCount, "%s/spinner/initialBallCount", name)
-                .register(true, () -> isPaddleRetracted(), "%s/paddleRetracted", name);
+                .register(true, () -> isPaddleNotBlocking(), "%s/paddleRetracted", name);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         this.initBallCount = initBallCount;
     }
 
-    public LoaderInterface setPaddleExtended(final boolean extend) {
+    public LoaderInterface setPaddleBlocking(final boolean extend) {
         if (extend) {
             paddleSolenoid.extend();
         } else {
@@ -87,13 +87,13 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public boolean isPaddleExtended() {
+    public boolean isPaddleBlocking() {
         // log.sub("Is intake extended: " + solenoid.isExtended());
         return paddleSolenoid.isExtended();
     }
 
     @Override
-    public boolean isPaddleRetracted() {
+    public boolean isPaddleNotBlocking() {
         return paddleSolenoid.isRetracted();
     }
 
@@ -111,7 +111,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         
         // Don't update all the time because the colour wheel may want to use the LEDs
         if (spinner.getSpeed() > 1) { 
-            led.setProgressColour(LEDColour.PURPLE, LEDColour.WHITE, getCurrentCount() / 5 * 100);
+            led.setProgressColour(LEDColour.PURPLE, LEDColour.WHITE, getCurrentBallCount() / 5 * 100);
         }
     }
 
@@ -121,7 +121,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public void updateDashboard() {
         dashboard.putString("Loader Paddle position",
-                isPaddleExtended() ? "extended" : isPaddleRetracted() ? "retracted" : "moving");
+                isPaddleBlocking() ? "not blocking" : isPaddleNotBlocking() ? "blocking" : "moving");
         dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
         inSensorCount.updateDashboard();
@@ -135,7 +135,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public int getCurrentCount() {
+    public int getCurrentBallCount() {
         return inSensorCount.getCount() - outSensorCount.getCount() + initBallCount;
     }
 

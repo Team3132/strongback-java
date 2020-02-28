@@ -90,7 +90,9 @@ public class MotorFactory {
 
 	public static HardwareTalonSRX getLoaderSpinnerMotor(int canID, boolean invert, double p, double i, double d, double f,Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		// In sensor (beambreak) for loader
 		motor.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
+		// Out sensor (beambreak) for loader
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
 		motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
