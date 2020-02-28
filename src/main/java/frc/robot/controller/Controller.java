@@ -169,7 +169,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.climber.setDesiredAction(desiredState.climber);
 		
-		
+		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
@@ -217,7 +217,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			logSub("Sequence changed while moving colour wheel");
 			// The sequence has changed, setting action to null.
 			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
-			logSub("Resetting colour wheel to no action.");
+			subsystems.colourWheel.setArmExtended(false);
 		}
 	}
 

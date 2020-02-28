@@ -53,6 +53,7 @@ public class State {
 
 	//Colour Wheel
 	public ColourAction colourWheel = null;
+	public Boolean extendColourWheel = null;
 
 	/**
 	 * Create a blank state
@@ -74,6 +75,7 @@ public class State {
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
+		extendColourWheel = subsystems.colourWheel.isArmExtended();
 	}
 
 	// Time
@@ -181,7 +183,7 @@ public class State {
 		return this;
 	}
 
-	public State colourWheelPositional(WheelColour colour) {
+	public State startColourWheelPositional(WheelColour colour) {
 		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
@@ -198,6 +200,16 @@ public class State {
 
 	public State colourWheelRight() {
 		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
+		return this;
+	}
+
+	public State extendedColourWheel() {
+		extendColourWheel = Boolean.valueOf(true);
+		return this;
+	}
+
+	public State retractColourWheel() {
+		extendColourWheel = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -344,7 +356,7 @@ public class State {
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourwheelMode", colourWheel, result);
-	
+		maybeAdd("colourWheelExtended", extendColourWheel, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }

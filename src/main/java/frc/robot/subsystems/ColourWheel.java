@@ -293,18 +293,20 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   @Override
   public void setArmExtended(boolean extended) {
-    // TODO Auto-generated method stub
+    if (extended) {
+      solenoid.extend();
+    } else {
+      solenoid.retract();
+    }
   }
 
   @Override
   public boolean isArmExtended() {
-    // TODO Auto-generated method stub
-    return false;
+    return solenoid.isExtended();
   }
 
   @Override
   public boolean isArmRetracted() {
-    // TODO Auto-generated method stub
-    return false;
+    return solenoid.isRetracted();
   }
 }
