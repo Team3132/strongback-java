@@ -220,17 +220,17 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence colourWheelLeft() {
+	public static Sequence colourWheelAnticlockwise() {
 		Sequence seq = new Sequence("moving colour wheel left");
 		seq.add().extendedColourWheel();
-		seq.add().colourWheelLeft();
+		seq.add().colourWheelAnticlockwise();
 		return seq;
 	}
 
-	public static Sequence colourWheelRight() {
+	public static Sequence colourWheelClockwise() {
 		Sequence seq = new Sequence("moving colour wheel right");
 		seq.add().extendedColourWheel();
-		seq.add().colourWheelRight();
+		seq.add().colourWheelClockwise();
 		return seq;
 	}
 

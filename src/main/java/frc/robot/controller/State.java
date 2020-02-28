@@ -193,12 +193,12 @@ public class State {
 		return this;
 	}
 
-	public State colourWheelLeft() {
+	public State colourWheelAnticlockwise() {
 		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelRight() {
+	public State colourWheelClockwise() {
 		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
