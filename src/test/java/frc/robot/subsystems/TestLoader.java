@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix.GadgeteerUartClient.GadgeteerConnection;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.components.Motor.ControlMode;
@@ -37,23 +39,21 @@ public class TestLoader {
         passthrough = Mock.stoppedMotor();
         led = Mock.ledStrip(); 
         clock = Mock.clock();
+        log = new MockLog();
         loader = new Loader(spinner, passthrough, paddle, inSensor, outSensor, led, dashboard, log);
     }
 
-    @Test 
-    public void spinnerVelocity() {
-        spinner.enable();
-        spinner.set(ControlMode.Velocity, 0);
-        assertEquals(0, spinner.getVelocity(), 0.01);
+    @Test
+    public void testSpinnerMotor() {
+        // spinner.set(ControlMode.Velocity, 0);
+        loader.setTargetSpinnerMotorRPM(600);
+        assertEquals(600, loader.getTargetSpinnerMotorRPM(), 0.01);
     }
-    
-    @Test 
-    public void passthroughVelocity() {
-        passthrough.enable();
-        passthrough.set(ControlMode.Velocity, 0);
-        
-        passthrough.set(ControlMode.Velocity, 600);
-        assertEquals(600, spinner.getVelocity(), 0.01);
+
+    @Test
+    public void testInitialBalls() {
+        loader.setInitBallCount(3);
+        assertEquals(3, loader.getCurrentBallCount());
     }
 }
 
