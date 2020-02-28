@@ -18,7 +18,7 @@ public class MockShooter implements ShooterInterface {
     }
 
     @Override
-    public boolean isTargetSpeed() {
+    public boolean isAtTargetSpeed() {
         return true;
     }
 

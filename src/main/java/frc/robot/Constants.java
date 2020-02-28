@@ -125,14 +125,14 @@ public class Constants {
 	* TODO: Tune the Shooter F, P, I, D values.
 	* TODO: Find the tolerance and Shooter_speed value.
 	*/
-	public static final int[] SHOOTER_TALON_WITH_ENCODERS_CAN_ID_LIST = {30};
+	public static final int[] SHOOTER_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {30};
 	public static final int[] SHOOTER_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {31,32};
-	public static final double SHOOTER_SPEED_TOLERANCE 	= 0;
+	public static final double SHOOTER_SPEED_TOLERANCE = 600; // RPM | TODO: Set correct speed tolerance
 	public static final double SHOOTER_F = 0.18;
 	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-	public static final int SHOOTER_TARGET_SPEED = 6500;
+	public static final int SHOOTER_TARGET_SPEED = 6500;  // RPM
 	/*
 	* Loader
 	*/

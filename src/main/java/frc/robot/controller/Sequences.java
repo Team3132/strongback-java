@@ -174,8 +174,8 @@ public class Sequences {
 		return seq;
 	}
 	
-	public static Sequence startShooting() {
-		Sequence seq = new Sequence("start shooting");
+	public static Sequence spinUpShooter() {
+		Sequence seq = new Sequence("spin up shooter");
 		seq.add().setShooterTargetSpeed(SHOOTER_TARGET_SPEED); //RPM
 		return seq;
 	}
@@ -245,7 +245,7 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		startShooting(),
+		spinUpShooter(),
 		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),

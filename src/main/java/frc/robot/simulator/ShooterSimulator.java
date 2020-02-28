@@ -64,7 +64,7 @@ public class ShooterSimulator implements ShooterInterface{
 
 
     @Override
-    public boolean isTargetSpeed() {
+    public boolean isAtTargetSpeed() {
         if ((System.currentTimeMillis() - this.shooterTime) < 1000) {
             return true;
         }

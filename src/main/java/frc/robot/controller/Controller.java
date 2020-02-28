@@ -209,7 +209,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 	private void maybeWaitForShooter() {
 		try {
-			waitUntilOrAbort(() -> subsystems.shooter.isTargetSpeed(), "shooter");
+			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while spinning up shooter, stopping shooter");
 			subsystems.shooter.setTargetSpeed(0);

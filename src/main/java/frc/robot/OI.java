@@ -131,7 +131,7 @@ public class OI implements OIInterface {
 			mapOverrideSwitch(box, OperatorBoxButtons.SHOOTER_DISABLE, OperatorBoxButtons.SHOOTER_MANUAL, shooterOverride);
 		// While the shooter speed button is pressed, set the target speed. Does not turn off.
 			whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), 
-				() -> {shooterIF.setTargetSpeed(box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());});
+				() -> {shooterIF.setTargetSpeed(1.5 * Constants.SHOOTER_TARGET_SPEED * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());});
 		// Intake overrides.
 		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
 		// Get the interface that the diag box uses.
