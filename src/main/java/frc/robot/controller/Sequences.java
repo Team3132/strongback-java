@@ -109,7 +109,7 @@ public class Sequences {
 		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT)
 			.setLoaderSpinnerMotorVelocity(LOADER_MOTOR_VELOCITY)
 			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
-			.setPaddleBlocking(true);
+			.setPaddleNotBlocking(false);
 		seq.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
 		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT) 

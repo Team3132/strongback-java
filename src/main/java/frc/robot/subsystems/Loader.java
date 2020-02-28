@@ -45,7 +45,7 @@ public class Loader extends Subsystem implements LoaderInterface {
                 .register(true, () -> (double) inSensorCount.count, "%s/spinner/totalBallsIn", name)
                 .register(true, () -> (double) outSensorCount.count, "%s/spinner/totalBallsOut", name)
                 .register(true, () -> (double) initBallCount, "%s/spinner/initialBallCount", name)
-                .register(true, () -> isPaddleNotBlocking(), "%s/paddleRetracted", name);
+                .register(true, () -> isPaddleBlocking(), "%s/paddleRetracted", name);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         this.initBallCount = initBallCount;
     }
 
-    public LoaderInterface setPaddleBlocking(final boolean extend) {
+    public LoaderInterface setPaddleNotBlocking(final boolean extend) {
         if (extend) {
             paddleSolenoid.extend();
         } else {
@@ -87,13 +87,13 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public boolean isPaddleBlocking() {
+    public boolean isPaddleNotBlocking() {
         // log.sub("Is intake extended: " + solenoid.isExtended());
         return paddleSolenoid.isExtended();
     }
 
     @Override
-    public boolean isPaddleNotBlocking() {
+    public boolean isPaddleBlocking() {
         return paddleSolenoid.isRetracted();
     }
 
@@ -121,7 +121,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public void updateDashboard() {
         dashboard.putString("Loader Paddle position",
-                isPaddleBlocking() ? "not blocking" : isPaddleNotBlocking() ? "blocking" : "moving");
+                isPaddleNotBlocking() ? "not blocking" : isPaddleBlocking() ? "blocking" : "moving");
         dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
         inSensorCount.updateDashboard();

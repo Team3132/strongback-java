@@ -100,8 +100,8 @@ public class OperatorBoxButtons {
 	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
 	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
 	// Loader
-	public static final int LOADER_PADDLE_RETRACT = YELLOW_BUTTON4; //Undecided/Unassigned Buttons
-	public static final int LOADER_PADDLE_EXTEND = YELLOW_BUTTON4;
+	public static final int LOADER_PADDLE_BLOCKING = YELLOW_BUTTON4; //Undecided/Unassigned Buttons
+	public static final int LOADER_PADDLE_NOTBLOCKING = YELLOW_BUTTON4;
 	public static final int LOADER_RETRACT = YELLOW_BUTTON4;
 	public static final int LOADER_EXTEND = YELLOW_BUTTON4;
 	public static final int LOADER_PASSTHROUGH_MOTOR = GREEN_BUTTON1;

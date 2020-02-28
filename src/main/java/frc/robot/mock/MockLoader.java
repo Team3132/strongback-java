@@ -12,18 +12,18 @@ public class MockLoader implements LoaderInterface {
     private boolean isPaddleExtended = false;
 
     @Override
-	public LoaderInterface setPaddleBlocking(boolean extended) {
+	public LoaderInterface setPaddleNotBlocking(boolean extended) {
 		isPaddleExtended = extended;
 		return this;
 	}
 
 	@Override
-	public boolean isPaddleBlocking() {
+	public boolean isPaddleNotBlocking() {
 		return isPaddleExtended;
 	}
 
 	@Override
-	public boolean isPaddleNotBlocking() {
+	public boolean isPaddleBlocking() {
 		return !isPaddleExtended;
     }
 

@@ -152,10 +152,10 @@ public class OI implements OIInterface {
 			() -> loaderIF.setTargetPassthroughMotorOutput(0));
 		
 		
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
-			() -> loaderIF.setPaddleBlocking(false));
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
-			() -> loaderIF.setPaddleBlocking(true));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING), 
+			() -> loaderIF.setPaddleNotBlocking(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING), 
+			() -> loaderIF.setPaddleNotBlocking(true));
 }
 
 

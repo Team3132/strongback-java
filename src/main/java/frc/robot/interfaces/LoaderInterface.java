@@ -20,12 +20,12 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
 	 * @return the state of the loader solenoid. 
 	 * */
 
-    public LoaderInterface setPaddleBlocking(boolean blocking);
+    public LoaderInterface setPaddleNotBlocking(boolean blocking);
 
 	/**
 	 * @return the state of the loader paddle solenoid. 
 	 * */
-	public boolean isPaddleBlocking();
 	public boolean isPaddleNotBlocking();
+	public boolean isPaddleBlocking();
 
 }

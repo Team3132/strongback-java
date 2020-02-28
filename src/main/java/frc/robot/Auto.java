@@ -137,6 +137,6 @@ public class Auto {
 		SmartDashboard.putData("Auto program", autoProgram);
 	}	
 	private void initBallChooser() {
-		SmartDashboard.putData("Initial Number of Balls the Robot Starts With", initBallSelector);
+		SmartDashboard.putData("Initial balls", initBallSelector);
 	}
 }
