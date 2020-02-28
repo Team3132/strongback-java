@@ -58,7 +58,8 @@ public class State {
 	public DriveRoutineParameters drive = null;
 
 	//Colour Wheel
-	public ColourAction colourWheel = null;
+	public ColourAction colourAction = null;
+	public Boolean extendColourWheel = null;
 
 	/**
 	 * Create a blank state
@@ -80,7 +81,8 @@ public class State {
 		shooterUpToSpeed = subsystems.shooter.isAtTargetSpeed();
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
-		colourWheel = subsystems.colourWheel.getDesiredAction();
+		colourAction = subsystems.colourWheel.getDesiredAction();
+		extendColourWheel = subsystems.colourWheel.isArmExtended();
 		expectedNumberOfBalls = subsystems.loader.getCurrentBallCount();
 	}
 
@@ -202,27 +204,37 @@ public class State {
 
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelPositional(WheelColour colour) {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
+	public State startColourWheelPositional(WheelColour colour) {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelLeft() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
+	public State colourWheelAnticlockwise() {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelRight() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
+	public State colourWheelClockwise() {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
+		return this;
+	}
+
+	public State extendedColourWheel() {
+		extendColourWheel = Boolean.valueOf(true);
+		return this;
+	}
+
+	public State retractColourWheel() {
+		extendColourWheel = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -372,8 +384,8 @@ public class State {
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
-		maybeAdd("colourwheelMode", colourWheel, result);
-	
+		maybeAdd("colourwheelMode", colourAction, result);
+		maybeAdd("colourWheelExtended", extendColourWheel, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }

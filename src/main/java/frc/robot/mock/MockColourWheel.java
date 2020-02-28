@@ -57,4 +57,21 @@ public class MockColourWheel implements ColourWheelInterface {
         return true;
     }
 
+    @Override
+    public boolean isArmExtended() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isArmRetracted() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void setArmExtended(boolean extended) {
+        // TODO Auto-generated method stub
+    }
+
 }

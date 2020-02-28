@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 import org.jibble.simplewebserver.SimpleWebServer;
 import org.strongback.Executable;
@@ -21,6 +22,7 @@ import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
 import frc.robot.lib.RobotConfiguration;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
 import edu.wpi.cscore.UsbCamera;
@@ -108,7 +110,7 @@ public class Robot extends IterativeRobot implements Executable {
 		createCameraServers();
 
 		// Create the brains of the robot. This runs the sequences.
-		controller = new Controller(subsystems);
+		controller = new Controller(subsystems, getFMSColour());
 
 		// Setup the interface to the user, mapping buttons to sequences for the controller.
 		setupUserInterface();
@@ -154,6 +156,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledPeriodic() {
+		subsystems.updateIdleLED();
 	}
 
 	/**
@@ -349,5 +352,35 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.updateDashboard();
 		//pdp.updateDashboard();
 		controller.updateDashboard();
+	}
+
+	/**
+	 * Determines the desired colour wheel colour from FMS. Single letter R, G, B, or Y indicates colour.
+	 * If there is no letter or a letter other than those, the colour defaults to unknown.
+	 * Colours are flipped around so that the sensor on the robot will look for the colour perpendicular to the field sensor.
+	 * @return The colour the robots sensor should look for.
+	 */
+	private Supplier<WheelColour> getFMSColour() {
+		return new Supplier<WheelColour>() {
+			@Override
+			public WheelColour get() {
+				String fmsColour = edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage();
+				if (fmsColour.length() == 0) {
+					return WheelColour.UNKNOWN;
+				}
+				switch (fmsColour.charAt(0)) {
+				case 'B':
+					return WheelColour.RED;
+				case 'G':
+					return WheelColour.YELLOW;
+				case 'R':
+					return WheelColour.BLUE;
+				case 'Y':
+					return WheelColour.GREEN;
+				default:
+					return WheelColour.UNKNOWN;
+				}
+			}
+		};
 	}
 }
