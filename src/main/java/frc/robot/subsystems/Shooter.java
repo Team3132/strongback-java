@@ -6,6 +6,7 @@ import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Solenoid;
 
 import frc.robot.Constants;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
@@ -22,8 +23,8 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     private ShooterWheel flyWheel;
     private Solenoid solenoid;
 
-    public Shooter(Motor shooterMotor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
-        super("Shooter", dashboard, log);
+    public Shooter(Motor shooterMotor, Solenoid solenoid, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+        super("Shooter", networkTable, dashboard, log);
         this.solenoid = solenoid;
         flyWheel = new ShooterWheel(shooterMotor);
 
@@ -34,15 +35,13 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     //TODO: Get the PID values from the network tables.
 	@Override
 	public void enable() {
-		/* NetworkTablesHelper helper = new NetworkTablesHelper("shooter");
-		double shooterP = helper.get("p", Constants.SHOOTER_P);
-		double shooterI = helper.get("i", Constants.SHOOTER_I);
-		double shooterD = helper.get("d", Constants.SHOOTER_D);
-		double shooterF = helper.get("f", Constants.SHOOTER_F); 
-		flyWheel.setPIDF(shooterP, shooterI, shooterD, shooterF); */
-        super.enable(); 
-        flyWheel.setPIDF(Constants.SHOOTER_P, Constants.SHOOTER_I, Constants.SHOOTER_D, Constants.SHOOTER_F);
-		//log.info("Shooter PID values: %f %f %f %f", shooterP, shooterI, shooterD, shooterF);
+        double p = networkTable.get("p", Constants.SHOOTER_P);
+        double i = networkTable.get("i", Constants.SHOOTER_I);
+        double d = networkTable.get("d", Constants.SHOOTER_D);
+        double f = networkTable.get("f", Constants.SHOOTER_F);
+        super.enable();
+        flyWheel.setPIDF(p, i, d, f); 
+		log.info("Drivebase  PID values: %f %f %f %f", p, i, d, f);
 	}
 
 	public void disable() {

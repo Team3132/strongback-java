@@ -14,6 +14,7 @@ import org.strongback.mock.MockSolenoid;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockLog;
 import frc.robot.mock.MockShooter;
+import frc.robot.mock.MockNetworkTableHelper;
 
 
 public class TestShooter {
@@ -27,7 +28,7 @@ public class TestShooter {
     public void setUp() {
         shooterMotor = Mock.stoppedMotor();
         shooterSolenoid = Mock.Solenoids.singleSolenoid(0);
-        shooter = new Shooter(shooterMotor, shooterSolenoid, new MockDashboard(), new MockLog());
+        shooter = new Shooter(shooterMotor, shooterSolenoid, new MockNetworkTableHelper("Shooter"), new MockDashboard(), new MockLog());
     }
 
     @Test

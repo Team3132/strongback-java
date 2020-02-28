@@ -429,11 +429,18 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
+		// Save PID values into Network Tables
+		NetworkTablesHelper shooterHelper = new NetworkTablesHelper("Shooter");
+		shooterHelper.set("p", config.shooterP);
+		shooterHelper.set("i", config.shooterI);
+		shooterHelper.set("d", config.shooterD);
+		shooterHelper.set("f", config.shooterF);
+
 		Solenoid shooterSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIdsWithEncoders, config.shooterCanIdsWithoutEncoders, 
 		false, config.shooterP, config.shooterI, config.shooterD, config.shooterF, clock, log);
 
-		shooter = new Shooter(shooterMotor, shooterSolenoid, dashboard, log);
+		shooter = new Shooter(shooterMotor, shooterSolenoid, shooterHelper, dashboard, log);
 	}
 
 	public void createShooterOverride() {
