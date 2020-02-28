@@ -12,7 +12,6 @@ import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LEDStripInterface;
-import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.WheelColour;
 import frc.robot.lib.LEDColour;
@@ -293,9 +292,8 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   }
 
   @Override
-  public LoaderInterface setArmExtended(boolean extended) {
+  public void setArmExtended(boolean extended) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

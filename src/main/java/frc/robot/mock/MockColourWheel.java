@@ -4,7 +4,6 @@ import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.WheelColour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
-import frc.robot.interfaces.LoaderInterface; // FIXME: Why do I need to import this?
 
 public class MockColourWheel implements ColourWheelInterface {
     private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
@@ -71,9 +70,8 @@ public class MockColourWheel implements ColourWheelInterface {
     }
 
     @Override
-    public LoaderInterface setArmExtended(boolean extended) {
+    public void setArmExtended(boolean extended) {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

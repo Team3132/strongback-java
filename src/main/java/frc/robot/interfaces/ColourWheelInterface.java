@@ -61,7 +61,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
     /**
 	 * @return the state of the colour wheel arm solenoid. 
 	 * */
-    public LoaderInterface setArmExtended(boolean extended);
+    public void setArmExtended(boolean extended);
 
 	/**
 	 * @return the state of the colour wheel arm solenoid. 
