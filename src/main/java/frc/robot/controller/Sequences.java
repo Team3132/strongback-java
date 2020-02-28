@@ -107,16 +107,27 @@ public class Sequences {
 		// Wait for the intake to extend before turning motor
 		seq.add().deployIntake();
 		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT)
-			.setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT);
+			.setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT)
+			.setLoaderPassthroughMotorOutput(0.5);
 		seq.add().waitForBalls(5);
+		// Reverse to eject excess > 5 balls to avoid penalty
+		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT) 
+				.setLoaderSpinnerMotorOutput(0);
+		seq.add().setDelayDelta(0.5);
+		seq.add().setIntakeMotorOutput(0)
+			.setLoaderPassthroughMotorOutput(0);
 		return seq;
 	}
 
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
-		seq.add().setIntakeMotorOutput(0)
-				 .setLoaderSpinnerMotorOutput(0);
-		seq.add().setDelayDelta(0.1);
+
+		// Set intake to reverse and stop
+		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
+		seq.add().setDelayDelta(0.25);
+		seq.add().setIntakeMotorOutput(0);
+		seq.add().setDelayDelta(0.25);
+		seq.add().setLoaderPassthroughMotorOutput(0);
 		return seq;
 	}
 

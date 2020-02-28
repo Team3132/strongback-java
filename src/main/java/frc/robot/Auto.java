@@ -26,13 +26,13 @@ public class Auto {
 	
 	public Auto(Log log) {
 		this.log = log;
-		addAutoSequences();
-		addChooser();
-		addBallInts();
-		addInitBallChooser();
+		addAutoOptions();
+		initAutoChooser();
+		addBallOptions();
+		initBallChooser();
 	}
 
-	private void addBallInts() {
+	private void addBallOptions() {
 		initBallSelector.addOption("0", Integer.valueOf(0));
 		initBallSelector.addOption("1", Integer.valueOf(1));
 		initBallSelector.addOption("2", Integer.valueOf(2));
@@ -50,7 +50,7 @@ public class Auto {
 		return numBalls;
 	}
 
-	private void addAutoSequences() {
+	private void addAutoOptions() {
 		autoProgram.setDefaultOption("Nothing", Sequences.getEmptySequence());
 		autoProgram.addOption("Drive forward 10in", Sequences.getDriveToWaypointSequence(10 * Constants.INCHES_TO_METRES, 0, 0));
 		addDriveTestSequence();
@@ -133,10 +133,10 @@ public class Auto {
 	}
 
 	
-	private void addChooser() {
+	private void initAutoChooser() {
 		SmartDashboard.putData("Auto program", autoProgram);
 	}	
-	private void addInitBallChooser() {
+	private void initBallChooser() {
 		SmartDashboard.putData("Initial Number of Balls the Robot Starts With", initBallSelector);
 	}
 }
