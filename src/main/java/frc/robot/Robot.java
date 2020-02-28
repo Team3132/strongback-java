@@ -166,7 +166,6 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void autonomousInit() {
 		log.info("auto has started");
-		auto.getSelectedBallAmount(); // Calls an auto function to set/get the initial number of balls preloaded
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
@@ -175,7 +174,8 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
-		int initialNumBalls = auto.getSelectedBallAmount();
+		//Gets the amount set in SmartDashboard and sets the init ball count
+		int initialNumBalls = auto.getSelectedBallAmount(); 
 		subsystems.loader.setInitBallCount(initialNumBalls);
 	}
 

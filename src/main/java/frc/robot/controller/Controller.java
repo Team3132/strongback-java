@@ -223,7 +223,7 @@ public class Controller implements Runnable, DashboardUpdater {
 	 */
 	private void waitForBalls(int expectBalls) {
 		if (subsystems.loader.getCurrentCount() == expectBalls) return;
-		logSub("Waiting for Balls");
+		logSub("Waiting for balls");
 		try {
 			waitUntilOrAbort(() -> subsystems.loader.getCurrentCount() == expectBalls, "balls");
 		} catch (SequenceChangedException e) {

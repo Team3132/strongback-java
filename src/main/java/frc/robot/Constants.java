@@ -124,12 +124,10 @@ public class Constants {
 	/*
 	* Loader
 	*/
-	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 30; //TODO: find canID for Loader motor
-	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 31; //TODO: find canID for Loader Input motor
+	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 12; //TODO: find canID for Loader motor
+	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 11; //TODO: find canID for Loader Input motor
 	public static final double LOADER_MOTOR_CURRENT = 1.0;
-	public static final int LOADER_SOLENOID_PORT = 2; 
-	public static final int PADDLE_SOLENOID_PORT = 1;
-	public static final double LOADER_IN_MOTOR_SCALE = 4096/10;//1024*10; //ticks per rotation
+	public static final int PADDLE_SOLENOID_PORT = 5;
 	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; //ticks per rotation
 	public static final double LOADER_SPINNER_P = 0.4; //TODO: assign values to PIDF
 	public static final double LOADER_SPINNER_I = 0;

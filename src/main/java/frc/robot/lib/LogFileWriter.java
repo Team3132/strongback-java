@@ -38,8 +38,6 @@ public class LogFileWriter {
 	 * @param basePath  Where on the file system to put these files.
 	 * @throws IOException 
 	 */
-
-	
 	public LogFileWriter(String name, long filenum, String extn, String basePath, String dataDir) throws IOException {
 		this.name = name;
 		this.extn = extn;
