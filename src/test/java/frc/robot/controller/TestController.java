@@ -10,6 +10,7 @@ import org.strongback.mock.MockClock;
 import org.strongback.mock.MockPneumaticsModule;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.mock.MockClimber;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
@@ -40,6 +41,7 @@ public class TestController {
 	private TestHelper test;
 	// The bit that is being tested under test.
 	private Controller exec;
+	private NetworkTableHelperInterface networkTable;
 		
 	/**
 	 * Setup fields used by this test.
