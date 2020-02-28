@@ -83,7 +83,7 @@ public class LogDygraph implements Log, Executable {
 	private GraphLogState graphLogState = GraphLogState.INVALID;
 	private ArrayList<LogGraphElement> logGraphElements;	// list of registered graph elements
 	private String matchDescription;
-	private boolean createdDateFiles;
+	private boolean createdDateFiles;	
 	private Clock clock;
 	private boolean onlyLocal = false;	// only log locally defined elements.
 
@@ -97,6 +97,23 @@ public class LogDygraph implements Log, Executable {
 		this.onlyLocal = onlyLocal;
 		createdDateFiles = false;
 		
+		initLogs();
+	}
+
+	/**
+	 * Restarts logging, called each time robot is enabled or initialised.
+	 */
+
+	public void restartLogs() {
+		initLogs();
+		graphLogState = GraphLogState.CONFIGURED;
+	}
+
+	/**
+	 * Creates new log files on request.
+	 */
+
+	public void initLogs() {
 		try {
 			// Ensure the directories exist.
 			Files.createDirectories(getDataPath());
@@ -119,6 +136,7 @@ public class LogDygraph implements Log, Executable {
 			graphLogState = GraphLogState.ERRORED;
 		}
 	}
+
 	
 	/**
 	 * Create the date based symbolic links. These create symbolic links from date stamped
@@ -596,6 +614,7 @@ public class LogDygraph implements Log, Executable {
 			}
 		}
 	}
+
 
 	@Override
 	public Log flush() {

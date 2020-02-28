@@ -39,6 +39,7 @@ public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
 	private Log log;
+	private LogDygraph logDygraph;
 
 	// User interface.
 	private DriverStation driverStation;
@@ -168,7 +169,9 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
+		logDygraph.restartLogs();
 		log.info("auto has started");
+
 
 		subsystems.enable();
 
@@ -192,6 +195,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
+		logDygraph.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.getStartSequence());
@@ -215,6 +219,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void testInit() {
+		logDygraph.restartLogs();
 		subsystems.enable();
 	}
 
