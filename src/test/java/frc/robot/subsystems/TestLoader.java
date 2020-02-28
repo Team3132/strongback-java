@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix.GadgeteerUartClient.GadgeteerConnection;
@@ -27,7 +29,9 @@ public class TestLoader {
     MockMotor spinner, passthrough;
     MockSolenoid paddle;
     LoaderInterface loader;
-    BooleanSupplier inSensor, outSensor;
+    BooleanSupplier inSensor, outSensor = () -> false;
+    ArrayList<Boolean> inSensorCounts = new ArrayList<Boolean>(10);
+    int outSensorCounts = 0;
     LEDStripInterface led;
     MockDashboard dashboard;
     MockLog log;
@@ -40,6 +44,10 @@ public class TestLoader {
         led = Mock.ledStrip(); 
         clock = Mock.clock();
         log = new MockLog();
+        inSensor = () -> {
+            if (inSensorCounts.size() == 0) return false;
+            return inSensorCounts.get(0);
+        };
         loader = new Loader(spinner, passthrough, paddle, inSensor, outSensor, led, dashboard, log);
     }
 
@@ -51,9 +59,22 @@ public class TestLoader {
     }
 
     @Test
+    public void testPassthroughMotor() {
+        // spinner.set(ControlMode.Velocity, 0);
+        loader.setTargetPassthroughMotorOutput(0.5);
+        assertEquals(0.5, loader.getTargetPassthroughMotorOutput(),0.01);
+    }
+
+
+    @Test
     public void testInitialBalls() {
         loader.setInitBallCount(3);
         assertEquals(3, loader.getCurrentBallCount());
+    }
+
+    @Test
+    public void testCounting() {
+        // inSensorCounts.addAll(Arrays.asList({true,false,true,false}));
     }
 }
 
