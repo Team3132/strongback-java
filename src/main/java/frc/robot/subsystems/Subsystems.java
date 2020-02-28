@@ -19,6 +19,7 @@ import org.strongback.components.Solenoid;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
+import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
 
 import edu.wpi.first.wpilibj.I2C;
@@ -136,12 +137,20 @@ public class Subsystems implements DashboardUpdater {
 		leftMotor.setPosition(0);
 		rightMotor.setPosition(0);
 
+		// Save PID values into Network Tables
+		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
+		driveHelper.set("p", config.drivebaseP);
+		driveHelper.set("i", config.drivebaseI);
+		driveHelper.set("d", config.drivebaseD);
+		driveHelper.set("f", config.drivebaseF);
+
+
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
 		location = new Location(() -> {	leftMotor.setPosition(0);
-									rightMotor.setPosition(0); },
-									leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
-		drivebase = new Drivebase(leftMotor, rightMotor, dashboard, log);
+			rightMotor.setPosition(0); },
+			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
+		drivebase = new Drivebase(leftMotor, rightMotor, driveHelper ,dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -343,6 +352,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
 		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: FIX THE TWO 0.1s
+		
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 		ColorMatch colourMatcher = new ColorMatch();
 		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher

@@ -10,6 +10,7 @@ import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
 
 /**
