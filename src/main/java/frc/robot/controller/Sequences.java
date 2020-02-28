@@ -107,12 +107,12 @@ public class Sequences {
 		// Wait for the intake to extend before turning motor
 		seq.add().deployIntake();
 		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT)
-			.setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT)
+			.setLoaderSpinnerMotorVelocity(LOADER_MOTOR_VELOCITY)
 			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
 		seq.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
 		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT) 
-				.setLoaderSpinnerMotorOutput(0);
+				.setLoaderSpinnerMotorVelocity(0);
 		seq.add().setDelayDelta(0.5);
 		seq.add().setIntakeMotorOutput(0)
 			.setLoaderPassthroughMotorOutput(0);
@@ -144,15 +144,15 @@ public class Sequences {
 	public static Sequence startLoaderTest() {
 		Sequence seq = new Sequence("Start Loader Test Sequence");
 		seq.add().setLoaderPassthroughMotorOutput(0.5);
-		seq.add().setLoaderSpinnerMotorOutput(0.3);
+		seq.add().setLoaderSpinnerMotorVelocity(0.3);
 		seq.add().setDelayDelta(10);
 		seq.add().setLoaderPassthroughMotorOutput(0);
-		seq.add().setLoaderSpinnerMotorOutput(0);
+		seq.add().setLoaderSpinnerMotorVelocity(0);
 		seq.add().setDelayDelta(5);
 		//Switch/Extend Occurs here
-		seq.add().setLoaderSpinnerMotorOutput(0.2);
+		seq.add().setLoaderSpinnerMotorVelocity(0.2);
 		seq.add().setDelayDelta(5);
-		seq.add().setLoaderSpinnerMotorOutput(0);
+		seq.add().setLoaderSpinnerMotorVelocity(0);
 
 		return seq;
 	}
@@ -174,13 +174,13 @@ public class Sequences {
 	// This is to test the Loader system
 	public static Sequence startLoader() {
 		Sequence seq = new Sequence("start Loader");
-		seq.add().setLoaderSpinnerMotorOutput(LOADER_MOTOR_CURRENT);
+		seq.add().setLoaderSpinnerMotorVelocity(LOADER_MOTOR_VELOCITY);
 		return seq;
 	}
 
 	public static Sequence stopLoader() {
 		Sequence seq = new Sequence("stop Loader");
-		seq.add().setLoaderSpinnerMotorOutput(0.0);
+		seq.add().setLoaderSpinnerMotorVelocity(0.0);
 		return seq;
 	}
 	

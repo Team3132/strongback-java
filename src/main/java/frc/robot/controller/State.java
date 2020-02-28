@@ -120,8 +120,8 @@ public class State {
 
 
 	// Loader
-	public State setLoaderSpinnerMotorOutput(double output) {
-		loaderSpinnerMotorVelocity = Double.valueOf(output);
+	public State setLoaderSpinnerMotorVelocity(double Velocity) {
+		loaderSpinnerMotorVelocity = Double.valueOf(Velocity);
 		return this;
 	}
 	public State setLoaderPassthroughMotorOutput(double output) {
