@@ -50,9 +50,7 @@ public class Subsystems implements DashboardUpdater {
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
 	public LoaderInterface loader;
 	public OverridableSubsystem<LoaderInterface> loaderOverride;
-	public ClimberInterface climber;
 	public ColourWheelInterface colourWheel;
-	public OverridableSubsystem<ClimberInterface> climberOverride;
 	public PneumaticsModule compressor;
 	public VisionInterface vision;
 	public JevoisInterface jevois;
@@ -74,7 +72,6 @@ public class Subsystems implements DashboardUpdater {
 	public void createOverrides() {
 		createIntakeOverride();
 		createLoaderOverride();
-		createClimberOverride();
 	}
 
 	public void enable() {
@@ -82,7 +79,6 @@ public class Subsystems implements DashboardUpdater {
 		// location is always enabled.
 		drivebase.enable();
 		intake.enable();
-		climber.enable();
 		loader.enable();
 		colourWheel.enable();
 	}
@@ -91,7 +87,6 @@ public class Subsystems implements DashboardUpdater {
 		log.info("Disabling Subsystems");
 		drivebase.disable();
 		intake.disable();
-		climber.disable();
 		loader.disable();
 		colourWheel.disable();
 	}
@@ -100,7 +95,6 @@ public class Subsystems implements DashboardUpdater {
 	public void updateDashboard() {
 		drivebase.updateDashboard();
 		intake.updateDashboard();
-		climber.updateDashboard();
 		location.updateDashboard();
 		loader.updateDashboard();
 		vision.updateDashboard();
@@ -129,6 +123,9 @@ public class Subsystems implements DashboardUpdater {
 		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
 				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
+				Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.climberPtoCanID, Constants.CLIMBER_PTOSOLENOID_PORT, 0.1, 0.1);
+				Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.climberBrakeCanID, Constants.CLIMBER_BRAKESOLENOID_PORT, 0.1, 0.1);
+
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
 		leftDriveSpeed = () -> leftMotor.getVelocity();
@@ -150,7 +147,7 @@ public class Subsystems implements DashboardUpdater {
 		location = new Location(() -> {	leftMotor.setPosition(0);
 			rightMotor.setPosition(0); },
 			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
-		drivebase = new Drivebase(leftMotor, rightMotor, driveHelper ,dashboard, log);
+		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, driveHelper ,dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -331,9 +328,8 @@ public class Subsystems implements DashboardUpdater {
 
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
-		BooleanSupplier intakeSensor = () -> intakeMotor.isAtReverseLimit();
-		intake = new Intake(intakeMotor, intakeSensor, intakeSolenoid, dashboard, log);
-	}
+		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log);
+		}
 
 	public void createIntakeOverride() {
 		// Setup the diagBox so that it can take control.
@@ -426,27 +422,6 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		compressor = Hardware.pneumaticsModule(config.pcmCanId);
-	}
-
-
-	public void createClimber() {
-		if (!config.climberIsPresent) {
-			climber = new MockClimber(log);
-			return;
-		}
-		Motor leftWinchMotor = MotorFactory.getClimberWinchMotor(config.climberLeftCanID, true, log);
-		Motor rightWinchMotor = MotorFactory.getClimberWinchMotor(config.climberRightCanID, false, log);
-		climber = new Climber(leftWinchMotor, rightWinchMotor, dashboard, clock, log);
-		Strongback.executor().register(climber, Priority.HIGH);
-	}
-
-	public void createClimberOverride() {
-		// Setup the diagBox so that it can take control.
-		MockClimber simulator = new MockClimber(log);
-		MockClimber mock = new MockClimber(log);
-		climberOverride = new OverridableSubsystem<ClimberInterface>("climber", ClimberInterface.class, climber, simulator, mock, log);
-		// Plumb accessing the climber through the override.
-		climber = climberOverride.getNormalInterface();
 	}
 
 	public void createVision() {

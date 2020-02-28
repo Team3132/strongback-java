@@ -5,6 +5,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.strongback.mock.Mock;
 import org.strongback.mock.MockMotor;
+import org.strongback.mock.MockSolenoid;
+
+
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
@@ -53,9 +56,11 @@ public class TestDrivebase {
     @Test
     public void testDriveRoutine() {
     	MockMotor leftMotor = Mock.stoppedMotor();
-    	MockMotor rightMotor = Mock.stoppedMotor();
+        MockMotor rightMotor = Mock.stoppedMotor();
+        MockSolenoid ptoSolenoid = Mock.Solenoids.singleSolenoid(1);
+        MockSolenoid brakeSolenoid = Mock.Solenoids.singleSolenoid(1);
     	MockDriveRoutine arcade = new MockDriveRoutine("MockArcade");
-        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor,  new MockNetworkTableHelper("drive") ,new MockDashboard(), new MockLog(true));
+        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid,  new MockNetworkTableHelper("drive") ,new MockDashboard(), new MockLog(true));
         // Register this drive routine so it can be used.
         drive.registerDriveRoutine(DriveRoutineType.ARCADE, arcade);
         // Tell the drive subsystem to use it.

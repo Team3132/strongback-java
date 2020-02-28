@@ -9,7 +9,6 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.DrivebaseInterface.ClimberAction;
 import frc.robot.interfaces.DrivebaseInterface.ClimberAction.ClimberType;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.WheelColour;

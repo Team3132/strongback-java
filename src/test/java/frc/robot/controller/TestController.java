@@ -11,7 +11,6 @@ import org.strongback.mock.MockPneumaticsModule;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
-import frc.robot.mock.MockClimber;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLocation;

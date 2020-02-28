@@ -67,8 +67,8 @@ public class LogFileWriter {
 			Files.deleteIfExists(symlinkPath);
 			Files.createSymbolicLink(symlinkPath, relPath);
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.printf("Failed to create symbolic link: Are we on windows?\n");
+			//e.printStackTrace();
+			System.err.printf("Failed to create symbolic link: Are we on windows? %s", e);
 		}
 	}
 

@@ -278,8 +278,4 @@ public class Climber extends Subsystem implements ClimberInterface, Executable, 
     public ClimberAction getDesiredAction() {
         return action;        
     }
-<<<<<<< HEAD
 }*/
-=======
-}
->>>>>>> 86b9de1ac680e854e2a620f55014f034d1610ece

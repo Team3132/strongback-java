@@ -1,6 +1,7 @@
 package frc.robot.mock;
 
 import org.strongback.components.Motor.ControlMode;
+import org.strongback.mock.MockSolenoid;
 
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.DrivebaseInterface;
@@ -8,10 +9,9 @@ import frc.robot.interfaces.Log;
 
 public class MockDrivebase implements DrivebaseInterface  {
 	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE);
-
 	String name = "MockDrivebase";
 	Log log;
-	
+	MockSolenoid solenoid;
 	public MockDrivebase(Log log) {
 		this.log = log;
 	}
@@ -28,6 +28,8 @@ public class MockDrivebase implements DrivebaseInterface  {
 	@Override
 	public void enable() {
 	}
+
+	
 
 	@Override
 	public void disable() {
@@ -59,5 +61,25 @@ public class MockDrivebase implements DrivebaseInterface  {
 
 	@Override
 	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine, ControlMode controlMode) {
+	}
+	
+	@Override
+	public boolean isPtoExtended() {
+		return false;
+	}
+
+	@Override
+	public boolean isBrakeExtended() {
+		return false;
+	}
+
+	@Override
+	public boolean isBrakeRetracted() {
+		return false;
+	}
+
+	@Override
+	public boolean isPtoRetracted() {
+		return false;
 	}
 }

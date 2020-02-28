@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
@@ -15,10 +18,6 @@ import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
-
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Subsystem responsible for the drivetrain
@@ -40,8 +39,9 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private final Log log;
 	private DriveMotion currentMotion;
 
-	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, DashboardInterface dashboard, Log log) {
-		super("Drive", dashboard, log);
+	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, 
+			NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+		super("Drive", networkTable, dashboard, log);
 		this.left = left;
 		this.right = right;
 		this.ptoSolenoid = ptoSolenoid;
