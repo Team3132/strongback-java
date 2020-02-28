@@ -62,7 +62,33 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(false, () -> left.getOutputPercent(), "%s/outputPercentage/Left", name)
 				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
-				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name);
+				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name)
+				.register(true, () -> isPtoExtended(), "%s/extended", name)
+				.register(true, () -> isPtoRetracted(), "%s/retracted", name)
+				.register(true, () -> isBrakeExtended(), "%s/extended", name)
+          		.register(true, () -> isBrakeRetracted(), "%s/retracted", name);
+	}
+
+	@Override
+	public DrivebaseInterface setPtoExtended(boolean extend) {
+		if (extend) {
+			ptoSolenoid.extend();
+		} else {
+			ptoSolenoid.retract();
+		}
+
+		return this;
+	}
+
+	@Override
+	public DrivebaseInterface setBrakeExtended(boolean extend) {
+		if (extend) {
+			brakeSolenoid.extend();
+		} else {
+			brakeSolenoid.retract();
+		}
+
+		return this;
 	}
 
 	@Override

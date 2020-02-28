@@ -7,27 +7,17 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.strongback.components.Clock;
 import org.strongback.components.Motor;
-import org.strongback.components.Motor.ControlMode;
 import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.hardware.HardwareTalonSRX;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.Log;
-
-import com.ctre.phoenix.ParamEnum;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class MotorFactory {
 
@@ -129,16 +119,7 @@ public class MotorFactory {
 		motor.configClosedloopRamp(0.5, 10);
 		return motor;
 	}
-//sort stuff out here for motor types
-	public static HardwareSparkMAX getClimberWinchMotor(int canID, boolean invert, Log log) {
-		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log);
-		motor.set(ControlMode.Position, 0);
-		motor.setSmartCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT, 100);
-		motor.setScale(1.0 / Constants.CLIMBER_GEAR_RATIO
-				* Constants.CLIMBER_DRUM_CIRCUMFRENCE_METRES);
-		motor.setPIDF(0, Constants.CLIMBER_P, Constants.CLIMBER_I, Constants.CLIMBER_D, Constants.CLIMBER_F);
-		return motor;
-	}
+
 
 	/**
      * Code to allow us to log output current per talon using redundant talons so if a talon or encoder

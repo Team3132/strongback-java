@@ -192,7 +192,6 @@ public class Constants {
 	public static final int CLIMBER_BRAKESOLENOID_CAN_ID = 10;
 	public static final int CLIMBER_PTOSOLENOID_PORT = 3;
 	public static final int CLIMBER_BRAKESOLENOID_PORT = 4; 
-	public static final double NEO_TICKS_PER_TURN = 42;
 	public static final double CLIMBER_GEAR_RATIO = 13.5;
 	public static final double CLIMBER_DRUM_CIRCUMFRENCE_METRES = 0.039 * Math.PI;
 

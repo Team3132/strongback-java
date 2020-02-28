@@ -230,25 +230,25 @@ public class Sequences {
 	//climber
 	public static Sequence deployPto() {
 		Sequence seq = new Sequence("Deploying Pto - climb mode");
-		seq.add().deployPtoGearbox();
+		seq.add().ptoGearboxInPosition();
 		return seq;
 	}
 
 	public static Sequence stowPto() {
 		Sequence seq = new Sequence("Stowing Pto - drive mode");
-		seq.add().stowPtoGearbox();
+		seq.add().ptoGearboxRetracted();
 		return seq;
 	}
 
 	public static Sequence climberBrake() {
 		Sequence seq = new Sequence("Climber braking");
-		seq.add().deployBrake();
+		seq.add().applyClimberBrake();
 		return seq;
 	}
 
 	public static Sequence climberStopBrake() {
 		Sequence seq = new Sequence("Climber no longer braking");
-		seq.add().deployBrake();
+		seq.add().retractClimberBrake();
 		return seq;	
 	}
 

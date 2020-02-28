@@ -174,9 +174,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		
 		waitForIntake();
-		//maybeWaitForClimber();
 		maybeWaitForColourWheel();
-		//waitForLiftDeployer();
 
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
@@ -201,20 +199,6 @@ public class Controller implements Runnable, DashboardUpdater {
 	private void waitForIntake() {
 		waitUntil(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
 	}
-
-	/**
-	 * Blocks waiting till the climber is in position.
-	 */
-	/*private void maybeWaitForClimber() {
-		try {
-			waitUntilOrAbort(() -> subsystems.climber.isInPosition(), "climber");
-		} catch (SequenceChangedException e) {
-			logSub("Climber sequence aborted");
-			subsystems.climber.setDesiredAction(new ClimberAction(ClimberType.HOLD_HEIGHT, 0));
-			
-		}
-			
-	}*/
 
 	private void maybeWaitForColourWheel() {
 		try {

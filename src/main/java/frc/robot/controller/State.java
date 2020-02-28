@@ -6,13 +6,11 @@ import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
-import frc.robot.interfaces.DrivebaseInterface.ClimberAction.ClimberType;
 
 import org.strongback.components.Clock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import frc.robot.interfaces.DrivebaseInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.WheelColour;
@@ -75,7 +73,6 @@ public class State {
 		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
 		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
 		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
-		//climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
 	}
@@ -154,76 +151,26 @@ public class State {
 
 	
 	// Climber
-	public State deployPtoGearbox() {
+	public State ptoGearboxInPosition() {
 		ptoGearboxExtended = Boolean.valueOf(true);
 		return this;
 	}
 
-	public State stowPtoGearbox() {
+	public State ptoGearboxRetracted() {
 		intakeExtended = Boolean.valueOf(false);
 		return this;
 	}
 
-	public State deployBrake() {
+	public State applyClimberBrake() {
 		brakeExtended = Boolean.valueOf(true);
 		return this;
 	}
 
-	public State stowBrake() {
+	public State retractClimberBrake() {
 		brakeExtended = Boolean.valueOf(false);
 		return this;
 	}
-	/*public State setClimberPowerLeft(double speed) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_LEFT, speed);
-		return this;
-	}
-
-	public State setClimberPowerRight(double speed) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER_RIGHT, speed);
-		return this;
-	}
-
-	public State setClimberPower(double speed) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_CLIMBER_POWER, speed);
-		return this;
-	}
-
-	public State holdClimber() {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.HOLD_HEIGHT, 0);
-		return this;
-	}
-
-	public State stopClimber() {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.STOP_CLIMBER, 0);
-		return this;
-	}
-
-	//Auto-climber
-	public State setClimberLeft(double height) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_LEFT_HEIGHT, height);
-		return this;
-	}
-
-	public State setClimberRight(double height) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_RIGHT_HEIGHT, height);
-		return this;
-	}
 	
-	public State setClimberBoth(double height) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.SET_BOTH_HEIGHT, height);
-		return this;
-	}
-
-	public State leftClimberOverride(double height) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.OVERRIDE_LEFT_PERCENT_OUTPUT, height);
-		return this;
-	}
-
-	public State rightClimberOverride(double height) {
-		climberAction = new ClimberAction(ClimberAction.ClimberType.OVERRIDE_RIGHT_PERCENT_OUTPUT, height);
-		return this;
-	}*/
-
 	// Color Wheel
 	public State colourWheelRotational() {
 		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);

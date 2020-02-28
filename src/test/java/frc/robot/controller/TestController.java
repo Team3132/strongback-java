@@ -51,7 +51,6 @@ public class TestController {
 		subsystems = new Subsystems(new MockDashboard(), null, clock, log);
 
 		subsystems.intake = intake = new IntakeSimulator();
-		//subsystems.climber = new MockClimber(log);
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase(log);
 		subsystems.loader = new MockLoader(log);

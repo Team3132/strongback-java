@@ -116,16 +116,9 @@ public class RobotConfiguration {
 	public double visionVMin = Constants.VISION_S_MIN;
 	public double visionVMax = Constants.VISION_V_MAX;
 	
-	public boolean climberIsPresent = true;
+	
 	public int climberPtoCanID = Constants.CLIMBER_PTOSOLENOID_CAN_ID;
 	public int climberBrakeCanID = Constants.CLIMBER_BRAKESOLENOID_CAN_ID;
-
-	//climber PID
-	public double climberP = Constants.CLIMBER_P;
-	public double climberI = Constants.CLIMBER_I;
-	public double climberD = Constants.CLIMBER_D;
-	public double climberF = Constants.CLIMBER_F;
-
 
 	// Logging default is to not log anything to the graph, and to only log local information when we turn it on.
 	// These are the safest defaults.
@@ -250,15 +243,6 @@ public class RobotConfiguration {
 		visionVMin = getAsDouble("vision/hsvFilter/v/min", Constants.VISION_V_MIN);
 		visionVMax = getAsDouble("vision/hsvFilter/v/max", Constants.VISION_V_MAX);
 
-		climberIsPresent = getAsBoolean("climber/present", false);
-		climberPtoCanID = getAsInt("climber/leftCanID", Constants.CLIMBER_PTOSOLENOID_CAN_ID);
-		climberBrakeCanID = getAsInt("climber/rightCanID", Constants.CLIMBER_BRAKESOLENOID_CAN_ID);
-
-		climberP = getAsDouble("climber/P", climberP);
-		climberI = getAsDouble("climber/I", climberI);
-		climberD = getAsDouble("climber/D", climberD);
-		climberF = getAsDouble("climber/F", climberF);
-			
 		// logging default is to not log anything to the graph, and to only log local information when we turn it on.
 		// These are the safest defaults.
 		doLogging = getAsBoolean("logging/enabled", true);

@@ -38,24 +38,11 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		VISION_AIM;  //Shooter things
 
 	}
-	public class ClimberAction{	
-		public final ClimberType type;
-		public final double value;
 
-		public ClimberAction(ClimberType type, double value) {
-            this.type = type;
-            this.value = value;
-        }
+	public DrivebaseInterface setPtoExtended(boolean extended);
+	public DrivebaseInterface setBrakeExtended(boolean extended);
 
-		public enum ClimberType {
-			GEARBOX_IN,
-			GEARBOX_OUT,
-			BRAKE,
-			RELEASE_BRAKE,
-			NONE
-		}
-	}
-
+	
 
 	public class DriveRoutineParameters {
 		public DriveRoutineParameters(DriveRoutineType type) {
