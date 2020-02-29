@@ -3,6 +3,7 @@ package frc.robot.controller;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +12,14 @@ import org.strongback.mock.MockPneumaticsModule;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
+import frc.robot.lib.WheelColour;
 import frc.robot.mock.MockClimber;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLog;
 import frc.robot.mock.MockLoader;
+import frc.robot.mock.MockShooter;
 import frc.robot.simulator.IntakeSimulator;
 import frc.robot.subsystems.Subsystems;
 
@@ -56,11 +59,12 @@ public class TestController {
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase(log);
 		subsystems.loader = new MockLoader(log);
+		subsystems.shooter = new MockShooter(log);
 		subsystems.location = new MockLocation();
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
 		
-		exec = new Controller(subsystems);
+		exec = new Controller(subsystems, getFMSColour());
 
 		test = new TestHelper(() -> {
 			clock.incrementByMilliseconds(ktestStepMs);
@@ -233,5 +237,14 @@ public class TestController {
 		// Intake isn't in stowed or wide, this is a problem.
 		throw new AssertionError("Lift (" + subsystems.lift.getHeight() + ") is below intake threshold (" + subsystems.lift.getHeight() + ") and intake is in configuration " + config);
 		*/
+	}
+
+	private Supplier<WheelColour> getFMSColour() {
+		return new Supplier<WheelColour>() {
+			@Override
+			public WheelColour get() {
+				return WheelColour.UNKNOWN;
+			}
+		};
 	}
 }

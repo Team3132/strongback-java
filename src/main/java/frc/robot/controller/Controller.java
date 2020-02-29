@@ -2,6 +2,7 @@ package frc.robot.controller;
 
 import java.util.Iterator;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
 import frc.robot.interfaces.DashboardInterface;
@@ -10,6 +11,7 @@ import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.WheelColour;
+import frc.robot.subsystems.ColourWheel;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -40,12 +42,14 @@ public class Controller implements Runnable, DashboardUpdater {
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
+	private Supplier<WheelColour> fmsColour;
 
-	public Controller(Subsystems subsystems) {
+	public Controller(Subsystems subsystems, Supplier<WheelColour> fmsColour) {
 		this.subsystems = subsystems;
 		this.clock = subsystems.clock;
 		this.dashboard = subsystems.dashboard;
 		this.log = subsystems.log;
+		this.fmsColour = fmsColour;
 		(new Thread(this)).start();
 	}
 	
@@ -145,6 +149,9 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Current state: %s", currentState);
 		// Fill in the blanks in the desired state.
 		desiredState = State.calculateUpdatedState(desiredState, currentState);
+		if (desiredState.colourAction.movingToUnknownColour()) { // If the colour wheel is set to positional but the colour is unknown, work out the desired colour using FMS.
+			desiredState.colourAction = new ColourAction(ColourWheelType.POSITION, fmsColour.get());
+		}
 		logSub("Calculated new 'safe' state: %s", desiredState);
 
 		// The time beyond which we are allowed to move onto the next state
@@ -154,27 +161,23 @@ public class Controller implements Runnable, DashboardUpdater {
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 	
-		
-		// Do the next steps in parallel as they don't mechanically conflict with each other.
-		
-
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
 
-		subsystems.loader.setTargetSpinnerMotorVelocity(desiredState.loaderSpinnerMotorVelocity);
+		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
 
 		subsystems.climber.setDesiredAction(desiredState.climber);
 		
-		
-		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
+		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
+		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
+		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
-		
+		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
 		waitForClimber();
+		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
-		//waitForLiftDeployer();
-
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
 		maybeWaitForAutoDriving();
@@ -206,6 +209,23 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
 	}
 
+	/**
+	 * Maybe wait for the shooter to get up to the target speed.
+	 * @param shooterUpToSpeed if not null, blocks waiting for shooter to achieve target speed.
+	 */
+	private void maybeWaitForShooter(Boolean shooterUpToSpeed) {
+		if (shooterUpToSpeed == null) {
+			// Don't wait.
+			return;
+		}
+		try {
+			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while spinning up shooter, stopping shooter");
+			subsystems.shooter.setTargetRPM(0);
+		}
+	}
+	
 	private void maybeWaitForColourWheel() {
 		try {
 			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");
@@ -213,10 +233,30 @@ public class Controller implements Runnable, DashboardUpdater {
 			logSub("Sequence changed while moving colour wheel");
 			// The sequence has changed, setting action to null.
 			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
-			logSub("Resetting colour wheel to no action.");
+			subsystems.colourWheel.setArmExtended(false);
 		}
 	}
 
+	/**
+	 * Waits until loader has specific number of balls, or sequence is aborted.
+	 * @param expectBalls the number of balls to wait for. If null, it won't wait.
+	 */
+	private void maybeWaitForBalls(Integer expectBalls) {
+		if (expectBalls == null) {
+			// This state doesn't specify the number of balls to wait for.
+			return;
+		}
+		if (subsystems.loader.getCurrentBallCount() == expectBalls) return;
+		logSub("Waiting for balls");
+		try {
+			waitUntilOrAbort(() -> subsystems.loader.getCurrentBallCount() == expectBalls, "numBalls");
+		} catch (SequenceChangedException e) {
+			// Desired state has changed underneath us, give up waiting
+			//and return.
+			return;
+		}
+	}
+	
 	/**
 	 * Blocks waiting until endtime has passed.
 	 */

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 import org.jibble.simplewebserver.SimpleWebServer;
 import org.strongback.Executable;
@@ -15,14 +16,13 @@ import org.strongback.hardware.HardwareDriverStation;
 import frc.robot.controller.Controller;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.OIInterface;
 import frc.robot.lib.LogDygraph;
-import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
 import frc.robot.lib.RobotConfiguration;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
 import edu.wpi.cscore.UsbCamera;
@@ -34,8 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
-	private Log log;
-	private NetworkTablesHelper networkTable;
+	private LogDygraph log;
 
 	// User interface.
 	private DriverStation driverStation;
@@ -66,7 +65,6 @@ public class Robot extends IterativeRobot implements Executable {
 		clock = Strongback.timeSystem();
 		log = new LogDygraph(Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION, Constants.LOG_DATE_EXTENSION, Constants.LOG_NUMBER_FILE, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
-		networkTable = new NetworkTablesHelper("");
 		startWebServer();
 		log.info("Waiting for driver's station to connect before setting up UI");
 		// Do the reset of the initialization in init().
@@ -98,21 +96,21 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
 		subsystems = new Subsystems(createDashboard(), config, clock, log);
+		subsystems.createLEDStrip();
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
-		subsystems.createClimber();
+		subsystems.createShooter();
 		subsystems.createLoader();
 		subsystems.createOverrides();
 		subsystems.createVision();
-		subsystems.createLEDStrip();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();
 		createCameraServers();
 
 		// Create the brains of the robot. This runs the sequences.
-		controller = new Controller(subsystems);
+		controller = new Controller(subsystems, getFMSColour());
 
 		// Setup the interface to the user, mapping buttons to sequences for the controller.
 		setupUserInterface();
@@ -158,6 +156,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledPeriodic() {
+		subsystems.updateIdleLED();
 	}
 
 	/**
@@ -165,8 +164,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
+		log.restartLogs();
 		log.info("auto has started");
-
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
@@ -175,6 +174,9 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
+		// Gets the amount set in SmartDashboard and sets the init ball count
+		int initialNumBalls = auto.getSelectedBallAmount(); 
+		subsystems.loader.setInitBallCount(initialNumBalls);
 	}
 
 	/**
@@ -189,6 +191,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
+		log.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
@@ -211,6 +214,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void testInit() {
+		log.restartLogs();
 		subsystems.enable();
 	}
 
@@ -348,5 +352,35 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.updateDashboard();
 		//pdp.updateDashboard();
 		controller.updateDashboard();
+	}
+
+	/**
+	 * Determines the desired colour wheel colour from FMS. Single letter R, G, B, or Y indicates colour.
+	 * If there is no letter or a letter other than those, the colour defaults to unknown.
+	 * Colours are flipped around so that the sensor on the robot will look for the colour perpendicular to the field sensor.
+	 * @return The colour the robots sensor should look for.
+	 */
+	private Supplier<WheelColour> getFMSColour() {
+		return new Supplier<WheelColour>() {
+			@Override
+			public WheelColour get() {
+				String fmsColour = edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage();
+				if (fmsColour.length() == 0) {
+					return WheelColour.UNKNOWN;
+				}
+				switch (fmsColour.charAt(0)) {
+				case 'B':
+					return WheelColour.RED;
+				case 'G':
+					return WheelColour.YELLOW;
+				case 'R':
+					return WheelColour.BLUE;
+				case 'Y':
+					return WheelColour.GREEN;
+				default:
+					return WheelColour.UNKNOWN;
+				}
+			}
+		};
 	}
 }

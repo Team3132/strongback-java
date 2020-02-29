@@ -118,24 +118,24 @@ public class OI implements OIInterface {
 
 
 		//colourwheel positional
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(WheelColour.UNKNOWN));
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startColourWheelPositional(WheelColour.UNKNOWN));
 		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopColourWheel());
 
 		//colourwheel rotational
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelRotational());
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.startColourWheelRotational());
 		onUntriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.stopColourWheel());
 
 		//manual adjust clockwise  
 		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD),
 		() -> {
-			return Sequences.colourWheelRight();
+			return Sequences.colourWheelClockwise();
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.getEmptySequence());
 
 		//manual adjust anticlockwise  
 		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, -GamepadButtonsX.AXIS_THRESHOLD),
 		() -> {
-			return Sequences.colourWheelLeft();
+			return Sequences.colourWheelAnticlockwise();
 		});
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.getEmptySequence());
 
@@ -162,15 +162,13 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.getEmptySequence());
 
 		// Colour Wheel testing.
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(WheelColour.YELLOW));
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(WheelColour.BLUE));
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(WheelColour.RED));
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(WheelColour.GREEN));
-		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.colourWheelRotational());
-		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startColourWheelPositional(WheelColour.UNKNOWN));
+		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.startColourWheelRotational());
+		onUntriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelAnticlockwise());
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelRight());
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelClockwise());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
 
 
@@ -179,6 +177,20 @@ public class OI implements OIInterface {
 
  	@Override
 	public void configureDiagBox(InputDevice box) {
+		// Shooter overrides.
+		OverridableSubsystem<ShooterInterface> shooterOverride = subsystems.shooterOverride;
+		// Get the interface that the diag box uses.
+		ShooterInterface shooterIF = shooterOverride.getOverrideInterface();
+		// Setup the switch for manual/auto/off modes.
+		mapOverrideSwitch(box, OperatorBoxButtons.SHOOTER_DISABLE, OperatorBoxButtons.SHOOTER_MANUAL, shooterOverride);
+		// While the shooter speed button is pressed, set the target speed. Does not
+		// turn off.
+		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), () -> {
+			shooterIF.setTargetRPM(
+					1.5 * Constants.SHOOTER_TARGET_SPEED_RPM * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
+			log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
+		});
+
 		// Intake overrides.
 		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
 		// Get the interface that the diag box uses.
@@ -193,28 +205,25 @@ public class OI implements OIInterface {
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_STOW), 
 			() -> intakeIF.setExtended(false));
 
+
 		// Get the interface that the diag box uses.
 		LoaderInterface loaderIF = subsystems.loaderOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
-	  // While the loader speed button is pressed, set the target speed. Does not turn off.
+		// While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
-			() -> loaderIF.setTargetSpinnerMotorVelocity(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+			() -> loaderIF.setTargetSpinnerMotorRPM(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
-			() -> loaderIF.setTargetSpinnerMotorVelocity(0));
+			() -> loaderIF.setTargetSpinnerMotorRPM(0));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
-			() -> loaderIF.setTargetPassthroughMotorVelocity(25*box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+			() -> loaderIF.setTargetPassthroughMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
-			() -> loaderIF.setTargetPassthroughMotorVelocity(0));
-		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR), 
-			() -> loaderIF.setTargetFeederMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_FEEDER_POT).read()));
-		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR),
-			() -> loaderIF.setTargetFeederMotorOutput(0));
+			() -> loaderIF.setTargetPassthroughMotorOutput(0));
 		
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
-			() -> loaderIF.setPaddleExtended(false));
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
-			() -> loaderIF.setPaddleExtended(true));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING), 
+			() -> loaderIF.setPaddleNotBlocking(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING), 
+			() -> loaderIF.setPaddleNotBlocking(true));
 
 		
 		ClimberInterface climberIF = subsystems.climberOverride.getOverrideInterface();
@@ -235,7 +244,6 @@ public class OI implements OIInterface {
 					Switch.or(box.getButton(disableButton),
 							  box.getButton(manualButton)),
 					() -> overrideableSubsystem.setAutomaticMode());
-
 	}
     
 	/**
