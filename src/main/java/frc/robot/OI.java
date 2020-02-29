@@ -48,7 +48,7 @@ public class OI implements OIInterface {
 	 * 
 	 * Driver Controls:
 	 * Left flight joystick: move back/forward, climb up
-	 * Right flight joystick: left/right
+	 * Right flight joystick: left/right, climb up
 	 * While held, right joystick top far left button (Button 5): release ratchets
 	 * While not held, right joystick top far left button (Button 5): enable ratchets
 	 * Right joystick top far right button (Button 6): shift PTO mode
@@ -82,97 +82,60 @@ public class OI implements OIInterface {
 	}
 		
 	
-	public void configureDriverJoystick(FlightStick leftStick, FlightStick rightStick, String name) {
+	private void configureDriverJoystick(FlightStick leftStick, FlightStick rightStick, String name) {
 
 		// Intake 
 		onTriggered(rightStick.getButton(1), Sequences.startIntaking());
 		onUntriggered(rightStick.getButton(1), Sequences.stopIntaking());
 		
-		// slowdrive
+		// Slow drive
 		onTriggered(leftStick.getButton(1), Sequences.startSlowDriveForward());
 		onUntriggered(leftStick.getButton(1), Sequences.setDrivebaseToArcade());
 
-		// release/enable ratchets (empty sequence)
-		onTriggered(rightStick.getButton(5), Sequences.getEmptySequence());
-		onUntriggered(rightStick.getButton(5), Sequences.getEmptySequence());		
+		// Release/enable ratchets (empty sequence)
+		onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake());
+		onUntriggered(rightStick.getButton(5), Sequences.applyClimberBrake());		
 
-		// shift PTO mode, toggle (empty sequence)
-		onTriggered(rightStick.getButton(6), Sequences.getEmptySequence());
-		onUntriggered(rightStick.getButton(6), Sequences.getEmptySequence());		
+		// Toggle drive / climb mode
+		onTriggered(rightStick.getButton(6), Sequences.toggleDriveClimbModes());
 
 		// Vision lineup
 		onTriggered(rightStick.getButton(2), Sequences.visionAim());
-		onUntriggered(rightStick.getButton(2), Sequences.getEmptySequence());	
+		onUntriggered(rightStick.getButton(2), Sequences.setDrivebaseToArcade());	
 
-		//onTriggered(rightStick.getButton(4), Sequences.deployBuddyClimber());
-		//onTriggered(rightStick.getButton(5), Sequences.retractBuddyClimber());
+		//onTriggered(rightStick.getButton(4), Sequences.toggleBuddyClimb());
 	}
 
-	public void configureOperatorJoystick(InputDevice stick, String name) {
-		// i dont know what the text below is for, its from 2019
-		//onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.getStartSequence());
-		
-		//lucas pls finish the colourwheel stuff amogh is confused
-
-		//note: manual adjust doesnt have an untriggered stop on it 
-		//note: drop colourwheel has a seperate button (Y)
-
-
-		//colourwheel positional
+	private void configureOperatorJoystick(InputDevice stick, String name) {
+		// Colourwheel positional
 		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startColourWheelPositional(WheelColour.UNKNOWN));
 		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopColourWheel());
 
-		//colourwheel rotational
+		// Colourwheel rotational
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.startColourWheelRotational());
 		onUntriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.stopColourWheel());
 
-		//manual adjust clockwise  
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD),
-		() -> {
-			return Sequences.colourWheelClockwise();
-		});
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.getEmptySequence());
+		// Colourwheel manual adjust clockwise  
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.colourWheelClockwise());
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
 
-		//manual adjust anticlockwise  
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, -GamepadButtonsX.AXIS_THRESHOLD),
-		() -> {
-			return Sequences.colourWheelAnticlockwise();
-		});
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.getEmptySequence());
+		// Colourwheel manual adjust anticlockwise  
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, -GamepadButtonsX.AXIS_THRESHOLD), Sequences.colourWheelAnticlockwise());
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
 
-		//deploy/stow colourwheel, toggle (empty sequence)
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.getEmptySequence());
+		// Close shot
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/true));
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
 
-		//shoot (empty sequence)
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD),
-		() -> {
-			return Sequences.getEmptySequence();
-		});
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.getEmptySequence());
+		// Far shot
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/false));
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
 
-		//shot 1 (empty sequence)
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.getEmptySequence());
-		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.getEmptySequence());
+		// Spin up shooter. Touch and release the close or far shot buttons to stop shooter wheel.
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpShooter());
 
-		//shot 2 (empty sequence) 
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.getEmptySequence());
-		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.getEmptySequence());
-
-		//buddy climb, toggle (empty sequence)
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.getEmptySequence());
-		onUntriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.getEmptySequence());
-
-		// Colour Wheel testing.
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startColourWheelPositional(WheelColour.UNKNOWN));
-		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.startColourWheelRotational());
-		onUntriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelAnticlockwise());
-		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelClockwise());
-		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
-
-
+		// Buddy climb toggle
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.toggleBuddyClimb());
 	}
 
 
@@ -225,18 +188,7 @@ public class OI implements OIInterface {
 			() -> loaderIF.setPaddleNotBlocking(false));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING), 
 			() -> loaderIF.setPaddleNotBlocking(true));
-
-		//might be outdated already
-		/*
-		ClimberInterface climberIF = subsystems.climberOverride.getOverrideInterface();
-		// Setup the switch for manual/auto/off modes.
-		mapOverrideSwitch(box, OperatorBoxButtons.CLIMBER_DISABLE, OperatorBoxButtons.CLIMBER_MANUAL, subsystems.climberOverride);
-		onTriggered(box.getButton(OperatorBoxButtons.CLIMBER_EXTEND), 
-			() -> climberIF.setDesiredAction(new ClimberAction(Type.SET_BOTH_HEIGHT, 
-			0.2*box.getAxis(OperatorBoxButtons.CLIMBER_POT).read())));
-		*/
-		
-}
+	}
 
 
 

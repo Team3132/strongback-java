@@ -39,6 +39,7 @@ public class State {
 	public Double shooterRPM = null;  // Set the shooter target speed.
 	// If this field is not called shooterUpToSpeed plz update applyState() in Controller.java
 	public Boolean shooterUpToSpeed = null;
+	public Boolean shooterHoodExtended = null;
 
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
@@ -50,15 +51,13 @@ public class State {
 	// Vision
 	public CameraMode cameraMode = null;
 
-	// Climber
-	public Boolean climbModeEnabled = null;  // What the climber should do.
+	// Driving / Climbing
+	public DriveRoutineParameters drive = null;
+	public Boolean driveClimbModeToggle = null;
 	public Boolean climberBrakeApplied = null;
 
 	// Buddy Climb
-	public Boolean buddyClimbExtended = null;
-
-	// Driving.
-	public DriveRoutineParameters drive = null;
+	public Boolean buddyClimbToggle = null;
 
 	//Colour Wheel
 	public ColourAction colourAction = null;
@@ -77,14 +76,15 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		buddyClimbExtended = subsystems.buddyClimb.isExtended();
-		climbModeEnabled = subsystems.drivebase.isClimbModeEnabled();
+		buddyClimbToggle = false;
+		driveClimbModeToggle = true;
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
 		shooterRPM = subsystems.shooter.getTargetRPM();
 		shooterUpToSpeed = subsystems.shooter.isAtTargetSpeed();
+		shooterHoodExtended = subsystems.shooter.isHoodExtended();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourAction = subsystems.colourWheel.getDesiredAction();
 		extendColourWheel = subsystems.colourWheel.isArmExtended();
@@ -143,6 +143,16 @@ public class State {
 		return this;
 	}
 
+	public State extendShooterHood() {
+		shooterHoodExtended = true;
+		return this;
+	}
+
+	public State retractShooterHood() {
+		shooterHoodExtended = false;
+		return this;
+	}
+
 	// Loader
 	public State setLoaderSpinnerMotorRPM(double rpm) {
 		loaderSpinnerMotorRPM = Double.valueOf(rpm);
@@ -181,14 +191,9 @@ public class State {
 	}
 
 	
-	// Climber
-	public State enableClimbMode() {
-		climbModeEnabled = true;
-		return this;
-	}
-
-	public State enableDriveMode() {
-		climbModeEnabled = false;
+	// Toggle between drive and climb modes
+	public State toggleDriveClimbMode() {
+		driveClimbModeToggle = true;
 		return this;
 	}
 
@@ -202,14 +207,12 @@ public class State {
 		return this;
 	}
 
-	// Buddy Climb
-	public State deployBuddyClimb() {
-		buddyClimbExtended = true;
-		return this;
-	}
-
-	public State retractBuddyClimb() {
-		buddyClimbExtended = true;
+	/**
+	 * Calling this will retract the buddy climb if it was deployed
+	 * and deploy it if it was retracted.
+	 */
+	public State toggleBuddyClimb() {
+		buddyClimbToggle = true;
 		return this;
 	}
 	
@@ -382,21 +385,22 @@ public class State {
 	@Override
 	public String toString() {
 		ArrayList<String> result = new ArrayList<String>();
+		maybeAdd("buddyClimbToggle", buddyClimbToggle, result);
+		maybeAdd("cameraMode", cameraMode, result);
+		maybeAdd("colourWheelExtended", extendColourWheel, result);
+		maybeAdd("colourwheelMode", colourAction, result);
+		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
+		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
+		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
+		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
-		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
-		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
+		maybeAdd("shooterHoodExtended", shooterHoodExtended, result);
 		maybeAdd("shooterRPM", shooterRPM, result);
-		maybeAdd("drive", drive, result);
+		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
 		maybeAdd("timeAction", timeAction, result);
-		maybeAdd("cameraMode", cameraMode, result);
-		maybeAdd("colourwheelMode", colourAction, result);
-		maybeAdd("colourWheelExtended", extendColourWheel, result);
-		maybeAdd("climbModeEnabled", climbModeEnabled, result);
-		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
-		maybeAdd("buddyClimbExtended", buddyClimbExtended, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }
