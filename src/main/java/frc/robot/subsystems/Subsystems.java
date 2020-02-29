@@ -156,12 +156,13 @@ public class Subsystems implements DashboardUpdater {
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
 		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsLeftWithEncoders,
-				config.drivebaseCanIdsLeftWithoutEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
-				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, 
-				config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
+				!config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,config.drivebaseRampRate, config.drivebaseCurrentLimiting,
+				config.drivebaseContCurrent, config.drivebasePeakCurrent,config.drivebaseP, config.drivebaseI, config.drivebaseD,
+				config.drivebaseF, clock, log);
 		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
-				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
-				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
+				config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate, config.drivebaseCurrentLimiting, 
+				config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI,
+				 config.drivebaseD, config.drivebaseF, clock, log);
 		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT, 0.1, 0.1);
 		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
 
@@ -365,9 +366,12 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
+		
+		
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
-		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
-		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log);
+		// TODO: replace 0 with appropriate subsystem PIDF values
+		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, 0, 0, 0, 0, log);
+		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
 
 	public void createIntakeOverride() {
@@ -396,7 +400,8 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Colour Sensor not present, using a mock colour sensor instead");
 			return;
 		}
-		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
+		 // TODO: replace 0 with appropriate subsystem PIDF values
+		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, 0, 0, 0, 0, log);
 		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
@@ -448,7 +453,8 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderSpinnerCanID, false, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log);
-		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, log);
+		//TODO: replace with appropriate subsystem PIDF values.
+		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, 0, 0, 0, 0, log); 
 		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
 		BooleanSupplier loaderInSensor = () -> spinnerMotor.isAtForwardLimit();
 		BooleanSupplier loaderOutSensor = () -> spinnerMotor.isAtReverseLimit(); 
