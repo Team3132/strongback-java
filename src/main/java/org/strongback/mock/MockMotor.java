@@ -57,11 +57,6 @@ public class MockMotor implements Motor {
     }
 
     @Override
-    public void set(ControlMode mode, double demand) {
-        speed = demand;
-    }
-
-    @Override
     public double getSpeed() {
         return speed;
     }
