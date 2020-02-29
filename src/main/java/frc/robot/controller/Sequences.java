@@ -190,7 +190,7 @@ public class Sequences {
 	/**
 	 * As the shooter takes time to spin up, enable spinning
 	 * it up in advance.
-	 * Touch the startShooting() sequences to halt.
+	 * Use the button mapped for near/far shooting to halt.
 	 */
 	public static Sequence spinUpShooter() {
 		Sequence seq = new Sequence("spin up shooter");
@@ -200,6 +200,7 @@ public class Sequences {
 
 	public static Sequence startShooting(boolean closeToGoal) {
 		Sequence seq = new Sequence("start shooting");
+		// Shooter wheel may already be up to speed.
 		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
 		if (closeToGoal) {
 			// Shooting from just below the goal straight up.
@@ -265,7 +266,10 @@ public class Sequences {
 		// Wait for all of the balls to leave.
 		seq.add().waitForBalls(0);
 		// Turn off everything.
-		seq.add().setShooterRPM(0).setLoaderPassthroughMotorOutput(0).setLoaderSpinnerMotorRPM(0).blockShooter();
+		seq.add().setShooterRPM(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPM(0)
+			.blockShooter();
 		return seq;
 	}
 
@@ -348,6 +352,7 @@ public class Sequences {
 		startLoader(),
 		stopLoader(),
 		toggleBuddyClimb(),
+		toggleDriveClimbModes(),
 		visionAim(),
 	};	
 }  
