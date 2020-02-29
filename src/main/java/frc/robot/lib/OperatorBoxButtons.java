@@ -100,16 +100,14 @@ public class OperatorBoxButtons {
 	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
 	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
 	// Loader
-	public static final int LOADER_PADDLE_RETRACT = YELLOW_BUTTON4; //Undecided/Unassigned Buttons
-	public static final int LOADER_PADDLE_EXTEND = YELLOW_BUTTON4;
+	public static final int LOADER_PADDLE_BLOCKING = YELLOW_BUTTON4; //Undecided/Unassigned Buttons
+	public static final int LOADER_PADDLE_NOTBLOCKING = YELLOW_BUTTON4;
 	public static final int LOADER_RETRACT = YELLOW_BUTTON4;
 	public static final int LOADER_EXTEND = YELLOW_BUTTON4;
 	public static final int LOADER_PASSTHROUGH_MOTOR = GREEN_BUTTON1;
 	public static final int LOADER_PASSTHROUGH_POT = GREEN_POT; // Potentiometer needs to be assigned
 	public static final int LOADER_SPINNER_MOTOR = YELLOW_BUTTON1;
 	public static final int LOADER_SPINNER_POT = YELLOW_POT;
-	public static final int LOADER_FEEDER_MOTOR = BLUE_BUTTON1;
-	public static final int LOADER_FEEDER_POT = BLUE_POT;
 
 	// Hatch
 	public static final int HATCH_DISABLE = GREEN_DISABLE; //There is no hatch

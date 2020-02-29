@@ -83,17 +83,8 @@ public class RobotConfiguration {
 	public int[] sparkTestCanIds = Constants.TEST_SPARK_MOTOR_CAN_ID_LIST;
 
 	public boolean loaderIsPresent = false;
-	public int loaderCanID = Constants.LOADER_SPINNER_CAN_ID;
-	public int loaderInCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
-	public int loaderOutCanID = Constants.LOADER_FEEDER_MOTOR_CAN_ID;
-	public double loaderSpinnerP = Constants.LOADER_SPINNER_P;
-	public double loaderSpinnerI = Constants.LOADER_SPINNER_I;
-	public double loaderSpinnerD = Constants.LOADER_SPINNER_D;
-	public double loaderSpinnerF = Constants.LOADER_SPINNER_F;
-	public double loaderPassthroughP = Constants.LOADER_PASSTHROUGH_P;
-	public double loaderPassthroughI = Constants.LOADER_PASSTHROUGH_I;
-	public double loaderPassthroughD = Constants.LOADER_PASSTHROUGH_D;
-	public double loaderPassthroughF = Constants.LOADER_PASSTHROUGH_F;
+	public int loaderSpinnerCanID = Constants.LOADER_SPINNER_MOTOR_CAN_ID;
+	public int loaderPassthroughCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
 
 	public boolean pdpIsPresent = false;
 	public int pdpCanId = Constants.PDP_CAN_ID;
@@ -218,9 +209,9 @@ public class RobotConfiguration {
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
-		loaderIsPresent = getAsBoolean("loader/present", false);
-		loaderCanID = getAsInt("loader/canID", Constants.LOADER_SPINNER_CAN_ID);
-
+		loaderIsPresent = getAsBoolean("loader/present", true);
+		loaderSpinnerCanID = getAsInt("loader/spinner/canID", Constants.LOADER_SPINNER_MOTOR_CAN_ID);
+		loaderPassthroughCanID = getAsInt("loader/passthrough/canID", Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID);
 		
 		pdpIsPresent = getAsBoolean("pdp/present", false);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);

@@ -99,6 +99,7 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
 		subsystems = new Subsystems(createDashboard(), config, clock, log);
+		subsystems.createLEDStrip();
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
@@ -106,7 +107,6 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.createLoader();
 		subsystems.createOverrides();
 		subsystems.createVision();
-		subsystems.createLEDStrip();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();
@@ -168,8 +168,6 @@ public class Robot extends IterativeRobot implements Executable {
 	public void autonomousInit() {
 		log.restartLogs();
 		log.info("auto has started");
-
-
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
@@ -178,6 +176,9 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
+		// Gets the amount set in SmartDashboard and sets the init ball count
+		int initialNumBalls = auto.getSelectedBallAmount(); 
+		subsystems.loader.setInitBallCount(initialNumBalls);
 	}
 
 	/**
