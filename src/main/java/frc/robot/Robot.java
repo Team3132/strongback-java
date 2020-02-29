@@ -364,28 +364,22 @@ public class Robot extends IterativeRobot implements Executable {
 		return new Supplier<WheelColour>() {
 			@Override
 			public WheelColour get() {
-				String fmsColour;
-				WheelColour newColour = WheelColour.UNKNOWN;
-				fmsColour = edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage();
-				if (fmsColour.length() > 0) {
-					switch (fmsColour.charAt(0)) {
-					case 'B':
-						newColour = WheelColour.RED;
-						break;
-					case 'G':
-						newColour = WheelColour.YELLOW;
-						break;
-					case 'R':
-						newColour = WheelColour.BLUE;
-						break;
-					case 'Y':
-						newColour = WheelColour.GREEN;
-						break;
-					default:
-						break;
-					}
+				String fmsColour = edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage();
+				if (fmsColour.length() == 0) {
+					return WheelColour.UNKNOWN;
 				}
-				return newColour;
+				switch (fmsColour.charAt(0)) {
+				case 'B':
+					return WheelColour.RED;
+				case 'G':
+					return WheelColour.YELLOW;
+				case 'R':
+					return WheelColour.BLUE;
+				case 'Y':
+					return WheelColour.GREEN;
+				default:
+					return WheelColour.UNKNOWN;
+				}
 			}
 		};
 	}
