@@ -83,10 +83,9 @@ public class OperatorBoxButtons {
 	public static final int CLIMBER_DISABLE = RED_DISABLE;
 	public static final int CLIMBER_MANUAL = RED_MANUAL;
 	public static final int CLIMBER_POT = RED_POT;
-	public static final int CLIMBER_FRONT_HEIGHT = RED_BUTTON1;
-	public static final int CLIMBER_REAR_HEIGHT = RED_BUTTON2;
-	public static final int CLIMBER_BOTH_HEIGHT = RED_BUTTON3;
-	public static final int CLIMBER_DRIVE_SPEED = RED_BUTTON4;
+	public static final int CLIMBER_EXTEND = RED_BUTTON1;
+	public static final int CLIMBER_RETRACT = RED_BUTTON2;
+
 
 	// Intake (shares with passthru)
 	public static final int INTAKE_DISABLE = YELLOW_DISABLE;
@@ -97,8 +96,9 @@ public class OperatorBoxButtons {
 	public static final int LOADER_DISABLE = YELLOW_DISABLE;
 	public static final int LOADER_MANUAL = YELLOW_MANUAL;
 	public static final int INTAKE_MOTOR = YELLOW_BUTTON1;
-	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
-	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
+	public static final int INTAKE_DEPLOY = YELLOW_BUTTON3;
+	public static final int INTAKE_STOW = YELLOW_BUTTON4;
+
 	// Loader
 	public static final int LOADER_PADDLE_RETRACT = YELLOW_BUTTON4; //Undecided/Unassigned Buttons
 	public static final int LOADER_PADDLE_EXTEND = YELLOW_BUTTON4;

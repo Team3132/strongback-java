@@ -14,7 +14,7 @@ public interface ClimberInterface extends DashboardUpdater, SubsystemInterface, 
             this.value = value;
         }
 
-        public enum Type{
+        public enum Type {
             SET_FRONT_HEIGHT, 
             SET_REAR_HEIGHT,
             SET_BOTH_HEIGHT,
