@@ -9,12 +9,10 @@ import frc.robot.interfaces.Log;
 
 public class MockDrivebase implements DrivebaseInterface  {
 	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE);
-	private boolean isPtoExtended = false;
-	private boolean isBrakeExtended = true;
+	private boolean ClimbModeEnabled = false;
+	private boolean BrakeApplied = false;
 	String name = "MockDrivebase";
 	Log log;
-	MockSolenoid ptosolenoid;
-	MockSolenoid brakesolenoid;
 	public MockDrivebase(Log log) {
 		this.log = log;
 	}
@@ -31,8 +29,6 @@ public class MockDrivebase implements DrivebaseInterface  {
 	@Override
 	public void enable() {
 	}
-
-	
 
 	@Override
 	public void disable() {
@@ -68,33 +64,33 @@ public class MockDrivebase implements DrivebaseInterface  {
 	
 	@Override
 	public boolean isClimbModeEnabled() {
-		return false;
+		return ClimbModeEnabled;
 	}
 
 	@Override
 	public boolean isBrakeApplied() {
-		return false;
+		return BrakeApplied;
 	}
 
 	@Override
-	public boolean isBrakeRetracted() {
-		return false;
+	public boolean isBrakeReleased() {
+		return !BrakeApplied;
 	}
 
 	@Override
 	public boolean isDriveModeEnabled() {
-		return false;
+		return !ClimbModeEnabled;
 	}
 
 	@Override
-	public DrivebaseInterface activateClimbMode(boolean extended) {
-		isPtoExtended = extended;
+	public DrivebaseInterface activateClimbMode(boolean enabled) {
+		ClimbModeEnabled = enabled;
 		return this;
 	}
 
 	@Override
-	public DrivebaseInterface setBrakeExtended(boolean extended) {
-		isBrakeExtended = extended;
+	public DrivebaseInterface applyBrake(boolean enabled) {
+		BrakeApplied = enabled;
 		return this;
 	}
 }

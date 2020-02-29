@@ -181,33 +181,33 @@ public class State {
 	
 	// Climber
 	public State enableClimbMode() {
-		climbModeEnabled = Boolean.valueOf(true);
+		climbModeEnabled = true;
 		return this;
 	}
 
 	public State enableDriveMode() {
-		climbModeEnabled = Boolean.valueOf(false);
+		climbModeEnabled = false;
 		return this;
 	}
 
 	public State applyClimberBrake() {
-		climberBrakeApplied = Boolean.valueOf(true);
+		climberBrakeApplied = true;
 		return this;
 	}
 
 	public State releaseClimberBrake() {
-		climberBrakeApplied = Boolean.valueOf(false);
+		climberBrakeApplied = false;
 		return this;
 	}
 
 	// Buddy Climb
 	public State deployBuddyClimb() {
-		buddyClimbExtended = Boolean.valueOf(true);
+		buddyClimbExtended = true;
 		return this;
 	}
 
 	public State retractBuddyClimb() {
-		buddyClimbExtended = Boolean.valueOf(false);
+		buddyClimbExtended = true;
 		return this;
 	}
 	
@@ -381,6 +381,8 @@ public class State {
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourwheelMode", colourWheel, result);
+		maybeAdd("climbModeEnabled", climbModeEnabled, result);
+		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
 		maybeAdd("buddyClimbExtended", buddyClimbExtended, result);
 	
 		return "[" + String.join(",", result) + "]";

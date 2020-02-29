@@ -39,8 +39,8 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 	}
 
-	public DrivebaseInterface activateClimbMode(boolean extended);
-	public DrivebaseInterface setBrakeExtended(boolean extended);
+	public DrivebaseInterface activateClimbMode(boolean enabled);
+	public DrivebaseInterface applyBrake(boolean enabled);
 
 	
 
@@ -169,7 +169,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	public boolean isDriveModeEnabled();
 
 	public boolean isBrakeApplied();
-	public boolean isBrakeRetracted();
+	public boolean isBrakeReleased();
 
 	/**
 	 * Register with the drivebase a way to drive the requested mode by using the supplied routine.

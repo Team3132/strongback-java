@@ -45,11 +45,11 @@ public class BuddyClimb extends Subsystem implements BuddyClimbInterface, Execut
    // Other methods go here.
   
    /**
-    * Update the operator console with the status of the intake subsystem.
+    * Update the operator console with the status of the buddy climb subsystem.
     */
    @Override
    public void updateDashboard() {
-       dashboard.putString("Intake position",
+       dashboard.putString("Buddy climb position",
            isExtended() ? "extended" : isRetracted() ? "retracted" : "moving");
        // Motors, sensors here etc….
    }

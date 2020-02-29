@@ -66,7 +66,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(true, () -> isClimbModeEnabled(), "%s/extended", name)
 				.register(true, () -> isDriveModeEnabled(), "%s/retracted", name)
 				.register(true, () -> isBrakeApplied(), "%s/extended", name)
-          		.register(true, () -> isBrakeRetracted(), "%s/retracted", name);
+          		.register(true, () -> isBrakeReleased(), "%s/retracted", name);
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	}
 
 	@Override
-	public DrivebaseInterface setBrakeExtended(boolean extend) {
+	public DrivebaseInterface applyBrake(boolean extend) {
 		if (extend) {
 			brakeSolenoid.extend();
 		} else {
@@ -114,8 +114,6 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		this.controlMode = mode.controlMode;
 	}
 
-
-	
 	@Override
 	public DriveRoutineParameters getDriveRoutine() {
 		return parameters;
@@ -201,26 +199,28 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	}
 
 	@Override
-    public boolean isClimbModeEnabled() {
-        //log.sub("Is intake extended: " +  solenoid.isExtended());
-        return ptoSolenoid.isExtended();
-	}
-	
-	@Override
-    public boolean isBrakeApplied() {
-        //log.sub("Is intake extended: " +  solenoid.isExtended());
-        return brakeSolenoid.isExtended();
-	}
-	
-	@Override
-	public boolean isBrakeRetracted() {
-        //log.sub("Is intake extended: " +  solenoid.isExtended());
-        return brakeSolenoid.isRetracted();
+	public boolean isClimbModeEnabled() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return ptoSolenoid.isExtended();
 	}
 
 	@Override
 	public boolean isDriveModeEnabled() {
-        //log.sub("Is intake extended: " +  solenoid.isExtended());
-        return ptoSolenoid.isRetracted();
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return ptoSolenoid.isRetracted();
 	}
+
+	@Override
+	public boolean isBrakeApplied() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return brakeSolenoid.isExtended();
+	}
+
+	@Override
+	public boolean isBrakeReleased() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return brakeSolenoid.isRetracted();
+	}
+
+	
 }

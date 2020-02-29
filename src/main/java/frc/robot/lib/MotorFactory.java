@@ -221,11 +221,11 @@ public class MotorFactory {
 		return leader;
 	}
 
-    private static HardwareSparkMAX getSparkMAX(int canID, boolean invert, NeutralMode mode, Log log) {
+   	private static HardwareSparkMAX getSparkMAX(int canID, boolean invert, NeutralMode mode, Log log) {
 		log.sub("%s: " + canID, " spark max");
 		int[] canIDs = new int[1];
 		canIDs[0] = canID;
-    	return getSparkMAX(canIDs, invert, mode, log);
+		return getSparkMAX(canIDs, invert, mode, log);
 	}
 	
 	private static int abs(int value) {

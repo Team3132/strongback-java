@@ -195,7 +195,7 @@ public class Constants {
 	public static final int CLIMBER_PTO_SOLENOID_PORT = 3;
 	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
 	
-	//Buddy climb
+	// Buddy climb
 	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
 
 	// logging information constants

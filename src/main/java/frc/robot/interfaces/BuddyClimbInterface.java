@@ -1,6 +1,9 @@
 package frc.robot.interfaces;
 import org.strongback.Executable;
 
+/* The buddy climb is a bar that another robot can latch onto in an effort to bring them up
+    with us when we climb. It has a single solenoid that is extended when the subsystem is
+    deployed.*/
 public interface BuddyClimbInterface extends SubsystemInterface, Executable, DashboardUpdater {
     /**
      * @extended extend or retract the intake solenoid.
@@ -16,20 +19,3 @@ public interface BuddyClimbInterface extends SubsystemInterface, Executable, Das
 
        // Other intake methods here….
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
