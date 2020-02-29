@@ -24,7 +24,6 @@ import frc.robot.drive.routines.DriveRoutine;
  * control algorithms needed to co-ordinate actions on these devices.
  */
 public abstract interface DrivebaseInterface extends Executable, SubsystemInterface, DashboardUpdater {
-	
 	public enum DriveRoutineType {
 		CONSTANT_POWER,  // Set a constant power to drive wheels.
 		CONSTANT_SPEED,  // Set a constant speed to drive wheels.
@@ -39,6 +38,11 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		VISION_AIM;  //Shooter things
 
 	}
+
+	public DrivebaseInterface activateClimbMode(boolean enabled);
+	public DrivebaseInterface applyBrake(boolean enabled);
+
+	
 
 	public class DriveRoutineParameters {
 		public DriveRoutineParameters(DriveRoutineType type) {
@@ -160,6 +164,12 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	 * more driving to do. 
 	 */
 	public boolean hasFinished();
+
+	public boolean isClimbModeEnabled();
+	public boolean isDriveModeEnabled();
+
+	public boolean isBrakeApplied();
+	public boolean isBrakeReleased();
 
 	/**
 	 * Register with the drivebase a way to drive the requested mode by using the supplied routine.

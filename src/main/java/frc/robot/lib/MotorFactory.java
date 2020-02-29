@@ -7,11 +7,11 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.strongback.components.Clock;
 import org.strongback.components.Motor;
-import org.strongback.components.Motor.ControlMode;
 import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.hardware.HardwareTalonSRX;
@@ -125,7 +125,7 @@ public class MotorFactory {
 		return motor;
 	}
 
-    /**
+	/**
      * Code to allow us to log output current per talon using redundant talons so if a talon or encoder
      * fails, it will automatically log and switch to the next one.
      * @param canIDsWithEncoders list of talons that can be the leader due to having an encoder.
@@ -202,8 +202,8 @@ public class MotorFactory {
      * @return the leader SparkMAX
      */
     private static HardwareSparkMAX getSparkMAX(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
-
-    	HardwareSparkMAX leader = Hardware.Motors.sparkMAX(abs(canIDs[0]), MotorType.kBrushless, invert);
+		HardwareSparkMAX leader = Hardware.Motors.sparkMAX(abs(canIDs[0]), MotorType.kBrushless, invert);
+		leader.setIdleMode(mode == NeutralMode.Brake ? IdleMode.kBrake : IdleMode.kCoast);
 		log.register(false, () -> leader.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[0]);
 		leader.setSmartCurrentLimit(Constants.DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT, 10);
 		leader.setSecondaryCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
@@ -221,6 +221,12 @@ public class MotorFactory {
 		return leader;
 	}
 
+   	private static HardwareSparkMAX getSparkMAX(int canID, boolean invert, NeutralMode mode, Log log) {
+		log.sub("%s: " + canID, " spark max");
+		int[] canIDs = new int[1];
+		canIDs[0] = canID;
+		return getSparkMAX(canIDs, invert, mode, log);
+	}
 	
 	private static int abs(int value) {
 		return value >= 0 ? value : -value;

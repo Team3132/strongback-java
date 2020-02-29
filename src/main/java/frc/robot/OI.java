@@ -11,8 +11,6 @@ import frc.robot.controller.Controller;
 import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
-import frc.robot.interfaces.ClimberInterface.ClimberAction;
-import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
 import frc.robot.lib.WheelColour;
@@ -86,25 +84,28 @@ public class OI implements OIInterface {
 	
 	public void configureDriverJoystick(FlightStick leftStick, FlightStick rightStick, String name) {
 
-		//intake 
+		// Intake 
 		onTriggered(rightStick.getButton(1), Sequences.startIntaking());
 		onUntriggered(rightStick.getButton(1), Sequences.stopIntaking());
 		
-		//slowdrive
+		// slowdrive
 		onTriggered(leftStick.getButton(1), Sequences.startSlowDriveForward());
 		onUntriggered(leftStick.getButton(1), Sequences.setDrivebaseToArcade());
 
-		//release/enable ratchets (empty sequence)
+		// release/enable ratchets (empty sequence)
 		onTriggered(rightStick.getButton(5), Sequences.getEmptySequence());
 		onUntriggered(rightStick.getButton(5), Sequences.getEmptySequence());		
 
-		//shift PTO mode, toggle (empty sequence)
+		// shift PTO mode, toggle (empty sequence)
 		onTriggered(rightStick.getButton(6), Sequences.getEmptySequence());
 		onUntriggered(rightStick.getButton(6), Sequences.getEmptySequence());		
 
-		//vision lineup
+		// Vision lineup
 		onTriggered(rightStick.getButton(2), Sequences.visionAim());
 		onUntriggered(rightStick.getButton(2), Sequences.getEmptySequence());	
+
+		//onTriggered(rightStick.getButton(4), Sequences.deployBuddyClimber());
+		//onTriggered(rightStick.getButton(5), Sequences.retractBuddyClimber());
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
@@ -247,7 +248,8 @@ public class OI implements OIInterface {
 							  box.getButton(manualButton)),
 					() -> overrideableSubsystem.setAutomaticMode());
 	}
-    
+
+	
 	/**
 	 * Configure the rules for the user interfaces
 	 */

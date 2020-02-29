@@ -27,14 +27,33 @@ import org.strongback.components.Motor;
 public class MockMotor implements Motor {
 
     private volatile double speed = 0;
+    private volatile double position = 0;
+    private volatile double output = 0;
+    private volatile ControlMode mode = ControlMode.PercentOutput;
 
     MockMotor(double speed) {
         this.speed = speed;
     }
 
+
     @Override
     public void set(ControlMode mode, double demand) {
-        speed = demand;
+        // Default implementation. Either set() or setSpeed() needs to be implemented.
+        switch (mode) {
+            case Velocity:
+                setSpeed(demand);
+                break;
+            case PercentOutput:
+                this.mode = mode;
+                output = demand;
+                break;
+            case Position:
+                this.mode = mode;
+                position = demand;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -44,6 +63,7 @@ public class MockMotor implements Motor {
 
     @Override
     public MockMotor setSpeed(double speed) {
+        mode = ControlMode.Velocity;
         this.speed = speed;
         return this;
     }
@@ -51,5 +71,16 @@ public class MockMotor implements Motor {
     @Override
     public String toString() {
         return Double.toString(getSpeed());
+    }
+
+    @Override
+    public double getPosition() {
+        return position;
+    }
+
+    @Override
+    public double getOutputPercent() {
+        // Not implmented by default.
+        return output;
     }
 }

@@ -20,14 +20,12 @@ import frc.robot.lib.Subsystem;
 public class Intake extends Subsystem implements IntakeInterface, Executable, DashboardUpdater {
     private Motor motor;
     private Solenoid solenoid;
-    private BooleanSupplier sensor;
     private double targetCurrent;
 
-    public Intake(Motor motor, BooleanSupplier sensor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
+    public Intake(Motor motor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
         super("Intake", dashboard, log);   
         this.motor = motor;
         this.solenoid = solenoid;
-        this.sensor = sensor;
 
         log.register(true, () -> isExtended(), "%s/extended", name)
                .register(true, () -> isRetracted(), "%s/retracted", name)

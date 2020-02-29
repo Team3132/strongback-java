@@ -132,3 +132,4 @@ public class OperatorBoxButtons {
 	public static final int SPARK_POT = BLUE_POT;
 	public static final int SPARK_SET_SPEED = BLUE_BUTTON1;
 }
+	

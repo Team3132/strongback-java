@@ -276,8 +276,47 @@ public class Sequences {
 		return seq;
 	}
 
+	// Climber
+	public static Sequence enableClimbMode() {
+		Sequence seq = new Sequence("Enable climb mode");
+		seq.add().enableClimbMode();
+		return seq;
+	}
+
+	public static Sequence enableDriveMode() {
+		Sequence seq = new Sequence("Enable drive mode");
+		seq.add().enableDriveMode();
+		return seq;
+	}
+
+	public static Sequence climberBrake() {
+		Sequence seq = new Sequence("Climber brake apply");
+		seq.add().applyClimberBrake();
+		return seq;
+	}
+
+	public static Sequence climberStopBrake() {
+		Sequence seq = new Sequence("Climber brake release");
+		seq.add().releaseClimberBrake();
+		return seq;	
+	}
+
+	// Buddy Climb
+	public static Sequence deployBuddyClimber() {
+		Sequence seq = new Sequence("Deploying buddy climb attatchment");
+		seq.add().deployBuddyClimb();
+		return seq;
+	}
+
+	public static Sequence retractBuddyClimber() {
+		Sequence seq = new Sequence("Retracting buddy climb attatchment");
+		seq.add().retractBuddyClimb();
+		return seq;
+	}
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
+		
 		getEmptySequence(), 
 		getStartSequence(), 
 		getResetSequence(),

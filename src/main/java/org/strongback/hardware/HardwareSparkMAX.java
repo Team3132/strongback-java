@@ -240,8 +240,8 @@ public class HardwareSparkMAX implements Motor {
 
 	@Override
     public Motor setSensorPhase(boolean phase) {
-		// Not available in brushless mode.
-        //encoder.setInverted(phase);
+		// In brushless mode, this doesn't make sense.
+		// Invert the motor instead.
         return this;
     }
 
