@@ -2,6 +2,7 @@ package frc.robot.controller;
   
 import java.util.Iterator;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
 import frc.robot.interfaces.DashboardInterface;
@@ -10,6 +11,7 @@ import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.WheelColour;
+import frc.robot.subsystems.ColourWheel;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -41,12 +43,14 @@ public class Controller implements Runnable, DashboardUpdater {
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
+	private Supplier<WheelColour> fmsColour;
 
-	public Controller(Subsystems subsystems) {
+	public Controller(Subsystems subsystems, Supplier<WheelColour> fmsColour) {
 		this.subsystems = subsystems;
 		this.clock = subsystems.clock;
 		this.dashboard = subsystems.dashboard;
 		this.log = subsystems.log;
+		this.fmsColour = fmsColour;
 		(new Thread(this)).start();
 	}
 
@@ -146,6 +150,9 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Current state: %s", currentState);
 		// Fill in the blanks in the desired state.
 		desiredState = State.calculateUpdatedState(desiredState, currentState);
+		if (desiredState.colourAction.movingToUnknownColour()) { // If the colour wheel is set to positional but the colour is unknown, work out the desired colour using FMS.
+			desiredState.colourAction = new ColourAction(ColourWheelType.POSITION, fmsColour.get());
+		}
 		logSub("Calculated new 'safe' state: %s", desiredState);
 
 		// The time beyond which we are allowed to move onto the next state
@@ -160,9 +167,9 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
 		
+		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
+		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
 		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
-
-		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
@@ -219,7 +226,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			logSub("Sequence changed while moving colour wheel");
 			// The sequence has changed, setting action to null.
 			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
-			logSub("Resetting colour wheel to no action.");
+			subsystems.colourWheel.setArmExtended(false);
 		}
 	}
 

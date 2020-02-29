@@ -22,6 +22,7 @@ import org.strongback.hardware.Hardware;
 import org.strongback.mock.Mock;
 
 import edu.wpi.first.wpilibj.I2C;
+
 import frc.robot.Constants;
 import frc.robot.drive.routines.ArcadeDrive;
 import frc.robot.drive.routines.CheesyDpadDrive;
@@ -396,7 +397,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
-	
+		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 		ColorMatch colourMatcher = new ColorMatch();
@@ -406,7 +407,7 @@ public class Subsystems implements DashboardUpdater {
     	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
 		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
 
-		colourWheel = new ColourWheel(motor, new Supplier<WheelColour>() {
+		colourWheel = new ColourWheel(motor, colourWheelSolenoid, new Supplier<WheelColour>() {
 			@Override
 			public WheelColour get() {
 				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
@@ -422,7 +423,6 @@ public class Subsystems implements DashboardUpdater {
 				}
 				return sensedColour;
 			}
-			
 		}, ledStrip, clock, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
@@ -434,6 +434,10 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		ledStrip = new LEDStrip(Constants.LED_STRIP_PWM_PORT, Constants.LED_STRIP_NUMBER_OF_LEDS, log);
+	}
+
+	public void updateIdleLED() {
+		ledStrip.setIdle();
 	}
 
 	public void createLoader() {
