@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 import org.jibble.simplewebserver.SimpleWebServer;
 import org.strongback.Executable;
@@ -23,6 +24,7 @@ import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
 import frc.robot.lib.RobotConfiguration;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
 import edu.wpi.cscore.UsbCamera;
@@ -112,7 +114,7 @@ public class Robot extends IterativeRobot implements Executable {
 		createCameraServers();
 
 		// Create the brains of the robot. This runs the sequences.
-		controller = new Controller(subsystems);
+		controller = new Controller(subsystems, getFMSColour());
 
 		// Setup the interface to the user, mapping buttons to sequences for the controller.
 		setupUserInterface();
@@ -349,5 +351,41 @@ public class Robot extends IterativeRobot implements Executable {
 		subsystems.updateDashboard();
 		//pdp.updateDashboard();
 		controller.updateDashboard();
+	}
+
+	/**
+	 * Determines the desired colour wheel colour from FMS. Single letter R, G, B, or Y indicates colour.
+	 * If there is no letter or a letter other than those, the colour defaults to unknown.
+	 * Colours are flipped around so that the sensor on the robot will look for the colour perpendicular to the field sensor.
+	 * @return The colour the robots sensor should look for.
+	 */
+	private Supplier<WheelColour> getFMSColour() {
+		return new Supplier<WheelColour>() {
+			@Override
+			public WheelColour get() {
+				String fmsColour;
+				WheelColour newColour = WheelColour.UNKNOWN;
+				fmsColour = edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage();
+				if (fmsColour.length() > 0) {
+					switch (fmsColour.charAt(0)) {
+					case 'B':
+						newColour = WheelColour.RED;
+						break;
+					case 'G':
+						newColour = WheelColour.YELLOW;
+						break;
+					case 'R':
+						newColour = WheelColour.BLUE;
+						break;
+					case 'Y':
+						newColour = WheelColour.GREEN;
+						break;
+					default:
+						break;
+					}
+				}
+				return newColour;
+			}
+		};
 	}
 }

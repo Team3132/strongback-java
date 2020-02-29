@@ -22,6 +22,13 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
             NONE
         }
 
+        public boolean movingToUnknownColour() {
+            if (type.equals(ColourWheelType.POSITION) && colour.equals(WheelColour.UNKNOWN)) {
+                return true;
+            }
+            return false;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if(this == obj)

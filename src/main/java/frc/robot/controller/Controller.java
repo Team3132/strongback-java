@@ -2,6 +2,7 @@ package frc.robot.controller;
 
 import java.util.Iterator;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
 import frc.robot.interfaces.DashboardInterface;
@@ -41,12 +42,14 @@ public class Controller implements Runnable, DashboardUpdater {
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
+	private Supplier<WheelColour> fmsColour;
 
-	public Controller(Subsystems subsystems) {
+	public Controller(Subsystems subsystems, Supplier<WheelColour> fmsColour) {
 		this.subsystems = subsystems;
 		this.clock = subsystems.clock;
 		this.dashboard = subsystems.dashboard;
 		this.log = subsystems.log;
+		this.fmsColour = fmsColour;
 		(new Thread(this)).start();
 	}
 	
@@ -146,8 +149,8 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Current state: %s", currentState);
 		// Fill in the blanks in the desired state.
 		desiredState = State.calculateUpdatedState(desiredState, currentState);
-		if (desiredState.colourWheel == new ColourAction(ColourWheelType.POSITION, WheelColour.UNKNOWN)) {
-			desiredState.colourWheel = new ColourAction(ColourWheelType.POSITION, ColourWheel.getFMSColour());
+		if (desiredState.colourAction.movingToUnknownColour()) {
+			desiredState.colourAction = new ColourAction(ColourWheelType.POSITION, fmsColour.get());
 		}
 		logSub("Calculated new 'safe' state: %s", desiredState);
 
@@ -170,7 +173,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.climber.setDesiredAction(desiredState.climber);
 		
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
-		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
+		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		

@@ -52,7 +52,7 @@ public class State {
 	public DriveRoutineParameters drive = null;
 
 	//Colour Wheel
-	public ColourAction colourWheel = null;
+	public ColourAction colourAction = null;
 	public Boolean extendColourWheel = null;
 
 	/**
@@ -74,7 +74,7 @@ public class State {
 		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
-		colourWheel = subsystems.colourWheel.getDesiredAction();
+		colourAction = subsystems.colourWheel.getDesiredAction();
 		extendColourWheel = subsystems.colourWheel.isArmExtended();
 	}
 
@@ -179,27 +179,27 @@ public class State {
 
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
 		return this;
 	}
 
 	public State startColourWheelPositional(WheelColour colour) {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelAnticlockwise() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
 	public State colourWheelClockwise() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
@@ -355,7 +355,7 @@ public class State {
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
-		maybeAdd("colourwheelMode", colourWheel, result);
+		maybeAdd("colourwheelMode", colourAction, result);
 		maybeAdd("colourWheelExtended", extendColourWheel, result);
 		return "[" + String.join(",", result) + "]";
 	}

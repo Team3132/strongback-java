@@ -22,6 +22,7 @@ import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
 import frc.robot.drive.routines.*;
@@ -352,7 +353,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
 		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: FIX THE TWO 0.1s
-		
+
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 		ColorMatch colourMatcher = new ColorMatch();
 		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
@@ -377,7 +378,6 @@ public class Subsystems implements DashboardUpdater {
 				}
 				return sensedColour;
 			}
-			
 		}, ledStrip, clock, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}

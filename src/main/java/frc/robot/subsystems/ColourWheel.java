@@ -234,31 +234,6 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     return colourPrev;
   }
 
-  public static WheelColour getFMSColour() {
-    String fmsColour;
-    WheelColour newColour = WheelColour.UNKNOWN;
-    fmsColour = DriverStation.getInstance().getGameSpecificMessage();
-    if (fmsColour.length() > 0) {
-      switch (fmsColour.charAt(0)) {
-      case 'B':
-        newColour = WheelColour.RED;
-        break;
-      case 'G':
-        newColour = WheelColour.YELLOW;
-        break;
-      case 'R':
-        newColour = WheelColour.BLUE;
-        break;
-      case 'Y':
-        newColour = WheelColour.GREEN;
-        break;
-      default:
-        break;
-      }
-    }
-    return newColour;
-  }
-
   @Override
   public ColourWheelInterface setDesiredAction(ColourAction action) {
     this.action = action;
