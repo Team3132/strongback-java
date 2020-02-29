@@ -1,3 +1,5 @@
+package frc.robot.mock;
+
 import frc.robot.interfaces.BuddyClimbInterface;
 import frc.robot.interfaces.Log;
 

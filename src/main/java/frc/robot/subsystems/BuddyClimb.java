@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-
 import org.strongback.Executable;
 import org.strongback.components.Solenoid;
 

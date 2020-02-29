@@ -74,7 +74,7 @@ public class RobotConfiguration {
 	public double drivebaseCount =  Constants.DRIVE_COUNT_100ms;
 	
 	public boolean intakeIsPresent = false;
-	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;w
+	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
 
 	public boolean colourWheelIsPresent = false;
 	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;

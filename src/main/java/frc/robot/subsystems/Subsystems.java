@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import java.io.IOException;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -14,23 +13,52 @@ import org.strongback.Strongback;
 import org.strongback.components.Clock;
 import org.strongback.components.Gyroscope;
 import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.PneumaticsModule;
 import org.strongback.components.Solenoid;
-import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
-import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
 
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
-import frc.robot.drive.routines.*;
-import frc.robot.interfaces.*;
+import frc.robot.drive.routines.ArcadeDrive;
+import frc.robot.drive.routines.CheesyDpadDrive;
+import frc.robot.drive.routines.ConstantDrive;
+import frc.robot.drive.routines.PositionalPIDDrive;
+import frc.robot.drive.routines.TrajectoryDrive;
+import frc.robot.interfaces.BuddyClimbInterface;
+import frc.robot.interfaces.ColourWheelInterface;
+import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.DashboardUpdater;
+import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+import frc.robot.interfaces.IntakeInterface;
+import frc.robot.interfaces.JevoisInterface;
+import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.LoaderInterface;
+import frc.robot.interfaces.LocationInterface;
+import frc.robot.interfaces.Log;
+import frc.robot.interfaces.VisionInterface;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
-import frc.robot.lib.*;
-import frc.robot.mock.*;
-import frc.robot.simulator.*;
+import frc.robot.lib.GamepadButtonsX;
+import frc.robot.lib.Jevois;
+import frc.robot.lib.MathUtil;
+import frc.robot.lib.MotorFactory;
+import frc.robot.lib.NavXGyroscope;
+import frc.robot.lib.NetworkTablesHelper;
+import frc.robot.lib.Position;
+import frc.robot.lib.RobotConfiguration;
+import frc.robot.lib.WheelColour;
+import frc.robot.mock.MockBuddyClimb;
+import frc.robot.mock.MockColourWheel;
+import frc.robot.mock.MockDrivebase;
+import frc.robot.mock.MockIntake;
+import frc.robot.mock.MockLEDStrip;
+import frc.robot.mock.MockLoader;
+import frc.robot.mock.MockLocation;
+import frc.robot.mock.MockVision;
+import frc.robot.simulator.IntakeSimulator;
 
 /**
  * Contains the subsystems for the robot.

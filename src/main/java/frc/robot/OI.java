@@ -94,6 +94,8 @@ public class OI implements OIInterface {
 		onTriggered(rightStick.getButton(11), Sequences.stowPto());
 		onTriggered(rightStick.getButton(10), Sequences.climberBrake());
 		onTriggered(rightStick.getButton(9), Sequences.climberStopBrake());
+		onTriggered(rightStick.getButton(4), Sequences.deployBuddyClimber());
+		onTriggered(rightStick.getButton(5), Sequences.retractBuddyClimber());
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {

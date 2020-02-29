@@ -70,9 +70,10 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
+		buddyClimbExtended = subsystems.buddyClimb.isExtended();
 		ptoGearboxExtended = subsystems.drivebase.isPtoExtended();
 		climberBrakeExtended = subsystems.drivebase.isBrakeExtended();
-		buddyClimbExtended = subsystems.buddyClimb.isExtended()
+		buddyClimbExtended = subsystems.buddyClimb.isExtended();
 		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
 		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
 		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
@@ -352,6 +353,7 @@ public class State {
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourwheelMode", colourWheel, result);
+		maybeAdd("buddyClimbExtended", buddyClimbExtended, result);
 	
 		return "[" + String.join(",", result) + "]";
 	}
