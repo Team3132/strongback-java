@@ -78,8 +78,6 @@ public class OI implements OIInterface {
 		// Left Stick's onTrigger drive slowly mode is handled in Robot.java, not here
 		// Hatch Vision
 		// Intaking is on this button.
-		onTriggered(leftStick.getButton(1), Sequences.startDriveByVision());
-		onUntriggered(leftStick.getButton(1), Sequences.stopDriveByVision());
 
 		// Intake - Right Stick Button 2 (on/off)
 		onTriggered(rightStick.getButton(2), Sequences.startIntaking());
@@ -91,11 +89,18 @@ public class OI implements OIInterface {
 
 		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
 		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
+
+		onTriggered(rightStick.getButton(12), Sequences.enableClimbMode());
+		onTriggered(rightStick.getButton(11), Sequences.enableDriveMode());
+		onTriggered(rightStick.getButton(10), Sequences.climberBrake());
+		onTriggered(rightStick.getButton(9), Sequences.climberStopBrake());
+		onTriggered(rightStick.getButton(4), Sequences.deployBuddyClimber());
+		onTriggered(rightStick.getButton(5), Sequences.retractBuddyClimber());
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
 		// Reset robot: intake stowed and lift at bottom.
-		//TODO: update
+		// TODO: update
 		// onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.getStartSequence());
 		
 		// Intake
@@ -106,15 +111,13 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
 
 		// Colour Wheel testing.
-		onTriggered(stick.getButton(GamepadButtonsX.Y_BUTTON), Sequences.colourWheelPositional(WheelColour.YELLOW));
-		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.colourWheelPositional(WheelColour.BLUE));
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.colourWheelPositional(WheelColour.RED));
-		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.colourWheelPositional(WheelColour.GREEN));
-		onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.colourWheelRotational());
-		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelLeft());
+		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startColourWheelPositional(WheelColour.UNKNOWN));
+		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.startColourWheelRotational());
+		onUntriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.stopColourWheel());
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelAnticlockwise());
 		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelRight());
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelClockwise());
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
 
 
@@ -180,7 +183,8 @@ public class OI implements OIInterface {
 							  box.getButton(manualButton)),
 					() -> overrideableSubsystem.setAutomaticMode());
 	}
-    
+
+	
 	/**
 	 * Configure the rules for the user interfaces
 	 */

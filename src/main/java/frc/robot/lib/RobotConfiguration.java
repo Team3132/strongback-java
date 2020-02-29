@@ -68,6 +68,9 @@ public class RobotConfiguration {
 	public String drivebaseMode = Constants.DRIVE_DEFAULT_MODE;
 	public double drivebaseMaxSpeed = Constants.DRIVE_MAX_SPEED;
 
+	public int climberPtoPort = Constants.CLIMBER_PTO_SOLENOID_PORT;
+	public int climberBrakePort = Constants.CLIMBER_BRAKE_SOLENOID_PORT;
+
 
 	public boolean drivebaseSwapLeftRight = false;
 	public boolean drivebaseSensorPhase = false;
@@ -114,7 +117,9 @@ public class RobotConfiguration {
 	public double visionSMax = Constants.VISION_S_MAX;
 	public double visionVMin = Constants.VISION_V_MIN;
 	public double visionVMax = Constants.VISION_V_MAX;
-
+	
+	public boolean buddyClimbIsPresent = false;
+	public int buddyClimbSolenoidPort = Constants.BUDDYCLIMB_SOLENOID_PORT;
 
 	// Logging default is to not log anything to the graph, and to only log local information when we turn it on.
 	// These are the safest defaults.
@@ -202,6 +207,8 @@ public class RobotConfiguration {
 		drivebaseSwapLeftRight = getAsBoolean("drivebase/swapLeftRight", drivebaseSwapLeftRight);
 		drivebaseSensorPhase = getAsBoolean("drivebase/sensor/phase", drivebaseSensorPhase);
 		drivebaseCount = getAsDouble("drivebase/count100ms", drivebaseCount);
+
+		
 	
 		intakeIsPresent = getAsBoolean("intake/present", false);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);

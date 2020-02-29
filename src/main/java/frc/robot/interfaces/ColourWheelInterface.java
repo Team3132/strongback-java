@@ -22,6 +22,10 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
             NONE
         }
 
+        public boolean movingToUnknownColour() {
+            return type.equals(ColourWheelType.POSITION) && colour.equals(WheelColour.UNKNOWN);
+        }
+
         @Override
         public boolean equals(Object obj) {
             if(this == obj)
@@ -38,6 +42,9 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
 
         @Override
         public String toString() {
+            if (type.equals(type.NONE)) {
+                return String.format("%s", type.toString().toLowerCase());
+            }
             return String.format("%s: %s", type.toString().toLowerCase(), colour);
         }
     }
@@ -57,4 +64,16 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
     /** @return if colour wheel has finished spinning.
      */
     public boolean isFinished();
+
+    /**
+	 * Sets the state of the colour wheel arm solenoid.
+	 * */
+    public void setArmExtended(boolean extended);
+
+	/**
+	 * @return the state of the colour wheel arm solenoid. 
+	 * */
+	public boolean isArmExtended();
+	public boolean isArmRetracted();
+
 }

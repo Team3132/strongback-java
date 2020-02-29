@@ -114,7 +114,7 @@ public class Constants {
 	public static final double INTAKE_POSITION_I = 0;
 	public static final double INTAKE_POSITION_D = 0;
 
-	public static final int INTAKE_SOLENOID_PORT = 0;
+	public static final int INTAKE_SOLENOID_PORT = 1;
 
 	public static final int[] TEST_SPARK_MOTOR_CAN_ID_LIST = {50, 51};
 
@@ -191,6 +191,13 @@ public class Constants {
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
 
+	// Climber
+	public static final int CLIMBER_PTO_SOLENOID_PORT = 3;
+	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
+	
+	// Buddy climb
+	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
+
 	// logging information constants
 	public static final String WEB_BASE_PATH = "/media/sda1";		// where web server's data lives
 	public static final String LOG_BASE_PATH = WEB_BASE_PATH;		// log files (has to be inside web server)
@@ -246,6 +253,7 @@ public class Constants {
 	 * Colour Wheel
 	 */
 	public static final int COLOUR_WHEEL_CAN_ID = 7;
+	public static final int COLOUR_WHEEL_SOLENOID_PORT = 5;
 	// Values callibrated using vynl sticker for control panel.
 	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); //Values from the colour sensor used to match colours.
 	//public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); //This is the real green value.
