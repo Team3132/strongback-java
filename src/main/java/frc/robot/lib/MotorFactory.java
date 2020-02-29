@@ -68,15 +68,11 @@ public class MotorFactory {
 		}
 	}
 	
-	public static HardwareTalonSRX getIntakeMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, p , i, d, f, new NetworkTablesHelper("intake"));
-		motor.configClosedloopRamp(.25, 10);
-		motor.configReverseSoftLimitEnable(false, 10);
-		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyClosed, 10);
-		motor.configVoltageCompSaturation(8, 10);
-		motor.enableVoltageCompensation(true);
+	public static HardwareSparkMAX getIntakeMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {
+		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p , i, d, f, new NetworkTablesHelper("intake"));
 		return motor;
 	}
+
 	public static HardwareTalonSRX getColourWheelMotor(int canID, boolean invert, double p, double i, double d, double f,Log log) {
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("colour"));
 		motor.configClosedloopRamp(.25, 10);
@@ -94,9 +90,8 @@ public class MotorFactory {
 		motor.configClosedloopRamp(0, 10);
 		return motor;
 	}
-	public static HardwareTalonSRX getLoaderPassthroughMotor(int canID, boolean invert,double p, double i, double d, double f, Log log) {	
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("loader passthrough"));
-		motor.configClosedloopRamp(0.5, 10);
+	public static HardwareSparkMAX getLoaderPassthroughMotor(int canID, boolean invert,double p, double i, double d, double f, Log log) {
+		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("loader passthrough"));
 		return motor;
 	}
 	

@@ -366,8 +366,6 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Intake not present, using a mock intake instead");
 			return;
 		}
-
-		
 		
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		// TODO: replace 0 with appropriate subsystem PIDF values
