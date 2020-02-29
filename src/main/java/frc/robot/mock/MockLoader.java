@@ -4,34 +4,32 @@ import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.Log;
 
 public class MockLoader implements LoaderInterface {
-    private double spinnerVelocity = 0;
-    private double passthroughVelocity = 0;
-    private double feederVelocity = 0;
+    private double spinnerRPM = 0;
 
     public MockLoader(Log log) {
     }
     // Paddle
-    private boolean isPaddleExtended = false;
+    private boolean isPaddleNotBlocking = false;
 
     @Override
-	public LoaderInterface setPaddleExtended(boolean extended) {
-		isPaddleExtended = extended;
+	public LoaderInterface setPaddleNotBlocking(boolean notBlocking) {
+		isPaddleNotBlocking = notBlocking;
 		return this;
 	}
 
 	@Override
-	public boolean isPaddleExtended() {
-		return isPaddleExtended;
+	public boolean isPaddleNotBlocking() {
+		return isPaddleNotBlocking;
 	}
 
 	@Override
-	public boolean isPaddleRetracted() {
-		return !isPaddleExtended;
+	public boolean isPaddleBlocking() {
+		return !isPaddleNotBlocking;
     }
 
     @Override
-    public void setTargetSpinnerMotorVelocity(double velocity) {
-        spinnerVelocity = velocity;
+    public void setTargetSpinnerMotorRPM(double rpm) {
+        spinnerRPM = rpm;
     }
 
     @Override
@@ -66,31 +64,29 @@ public class MockLoader implements LoaderInterface {
 
 
     @Override
-    public void setTargetPassthroughMotorVelocity(double velocity) {
-        passthroughVelocity = velocity;
+    public void setTargetPassthroughMotorOutput(double percent) {
     }
 
 
     @Override
-    public double getTargetSpinnerMotorVelocity() {
-        return spinnerVelocity;
+    public double getTargetSpinnerMotorRPM() {
+        return spinnerRPM;
        
     }
-
     @Override
-    public void setTargetFeederMotorOutput(double FeederMotorCurrent) {
-        // TODO Auto-generated method stub
-        feederVelocity = FeederMotorCurrent;
-
-    }
-    @Override
-    public double getTargetFeederMotorOutput() {
-        return feederVelocity;
-
-    }
-    @Override
-    public double getTargetPassthroughMotorVelocity() {
-        return passthroughVelocity;
+    public double getTargetPassthroughMotorOutput() {
+        return 0;
     }
 // 
+
+    @Override
+    public int getCurrentBallCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void setInitBallCount(int initBallCount) {
+        // TODO Auto-generated method stub
+    }
 }

@@ -48,7 +48,6 @@ public class LogFileWriter {
 		Files.createDirectories(filePath.getParent());
 		// Create the file writer.
 		writer = Files.newBufferedWriter(filePath);
-
 		createSymbolicLink("Latest");
 	}
 	
