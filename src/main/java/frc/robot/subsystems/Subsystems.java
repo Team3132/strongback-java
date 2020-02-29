@@ -145,10 +145,10 @@ public class Subsystems implements DashboardUpdater {
 
 		// Save PID values into Network Tables
 		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
-		driveHelper.set("p", config.drivebaseP);
-		driveHelper.set("i", config.drivebaseI);
-		driveHelper.set("d", config.drivebaseD);
-		driveHelper.set("f", config.drivebaseF);
+		driveHelper.get("p", config.drivebaseP);
+		driveHelper.get("i", config.drivebaseI);
+		driveHelper.get("d", config.drivebaseD);
+		driveHelper.get("f", config.drivebaseF);
 
 
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);

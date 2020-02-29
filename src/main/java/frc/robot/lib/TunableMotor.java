@@ -31,10 +31,10 @@ import org.strongback.mock.MockUpdateTimer;
 	
 	public static void tuneMotor(Motor  motor, int id, double p, double i , double d , double f, NetworkTablesHelper networkTable) {
 		var tunable = new TunableMotor(motor, id, p, i, d, f);
-		networkTable.set("p", p);
-		networkTable.set("i", i);
-		networkTable.set("d", d);
-		networkTable.set("f", f);
+		networkTable.get("p", p);
+		networkTable.get("i", i);
+		networkTable.get("d", d);
+		networkTable.get("f", f);
 		motor.setPIDF(0, p, i, d, f);
 		Strongback.executor().register(tunable, Priority.LOW);
 	}
@@ -43,10 +43,10 @@ import org.strongback.mock.MockUpdateTimer;
 	@Override
 	public void execute(long timeInMillis) {
 		if(startTime.diff() >= Constants.TIME_TUNABLEMOTOR_PERIOD) {
-			double p = networkTable.set("p", Constants.DRIVE_P);
-			double i = networkTable.set("i", Constants.DRIVE_I);
-			double d = networkTable.set("d", Constants.DRIVE_D);
-			double f = networkTable.set("f", Constants.DRIVE_F);
+			double p = networkTable.get("p", Constants.DRIVE_P);
+			double i = networkTable.get("i", Constants.DRIVE_I);
+			double d = networkTable.get("d", Constants.DRIVE_D);
+			double f = networkTable.get("f", Constants.DRIVE_F);
 			motor.setPIDF(0, p, i, d, f);
 			startTime.init();
 		}

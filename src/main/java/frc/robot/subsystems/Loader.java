@@ -51,7 +51,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public void setTargetSpinnerMotorRPM(final double rpm) {
         final NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
-        spinnerHelper.set("targetRPM", rpm);
+        spinnerHelper.get("targetRPM", rpm);
         spinnerRPM = rpm;
         log.sub("%s: Setting loader motor rpm to: %f", name, rpm);
         // If motor is zero in velocity the PID will try and reverse the motor in order
@@ -100,12 +100,12 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public void execute(final long timeInMillis) {
         final NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
-        final double p = spinnerHelper.set("p", 0);
-        final double i = spinnerHelper.set("i", 0);
-        final double d = spinnerHelper.set("d", 0);
-        final double f = spinnerHelper.set("f", 0);
+        final double p = spinnerHelper.get("p", 0);
+        final double i = spinnerHelper.get("i", 0);
+        final double d = spinnerHelper.get("d", 0);
+        final double f = spinnerHelper.get("f", 0);
         spinner.setPIDF(0, p, i, d, f);
-        spinnerHelper.set("actualRPM", spinner.getVelocity());
+        spinnerHelper.get("actualRPM", spinner.getVelocity());
         inSensorCount.execute(0);
         outSensorCount.execute(0);
         
