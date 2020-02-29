@@ -12,7 +12,7 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
  *  Whenever a motor is created, networkTable for the motor PIDF values are implemented from here.
  *  The PIDF values are initiliased on the network table and and the motors are updated from the PIDF 
  *  values in the network tables once per second. This allows the values to be updated on the fly by changing 
- * the values in the network tables.
+ *  the values in the network tables.
  */
 
  class TunableMotor implements Executable {
