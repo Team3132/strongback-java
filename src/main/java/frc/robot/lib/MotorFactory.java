@@ -92,28 +92,16 @@ public class MotorFactory {
 
 	public static HardwareTalonSRX getLoaderSpinnerMotor(int canID, boolean invert, double p, double i, double d, double f,Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, new NetworkTablesHelper("loader spinner"));
-		// motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_MAIN_MOTOR_SCALE); // number of ticks per rotation.
 		motor.configClosedloopRamp(0, 10);
-		// NetworkTablesHelper networkTables = new NetworkTablesHelper("loader/spinnermotor/");
-		// networkTables.set("p", p);
-		// networkTables.set("i", i);
-		// networkTables.set("d", d);
-		// networkTables.set("f", f);
 		return motor;
 	}
 	public static HardwareTalonSRX getLoaderPassthroughMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, null);
-		// motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_IN_MOTOR_SCALE); // number of ticks per rotation
 		motor.configClosedloopRamp(0.5, 10);
-		// NetworkTablesHelper networkTables = new NetworkTablesHelper("loader/passthroughmotor/");
-		// networkTables.set("p", p);
-		// networkTables.set("i", i);
-		// networkTables.set("d", d);
-		// networkTables.set("f", f);
 		return motor;
 	}
 	public static HardwareTalonSRX getLoaderFeederMotor(int canID, boolean invert, Log log) {	
@@ -123,7 +111,7 @@ public class MotorFactory {
 	}
 
 	public static HardwareTalonSRX getClimberWinchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, new NetworkTablesHelper("intake"));
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, new NetworkTablesHelper("climber winch"));
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.getSensorCollection().setQuadraturePosition(0, 10); // reset the encoders on code start. We assume we are on the floor and the lifts are retracted on code restart.
@@ -139,7 +127,7 @@ public class MotorFactory {
 	}
 	
 	public static HardwareTalonSRX getClimberDriveMotor(int canID, boolean invert, Log log) {	
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, new NetworkTablesHelper("intake"));
+		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log, new NetworkTablesHelper("climber drive"));
 		motor.configClosedloopRamp(.25, 10);
 		motor.configVoltageCompSaturation(8, 10);
 		motor.enableVoltageCompensation(true);
