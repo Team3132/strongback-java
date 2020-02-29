@@ -225,16 +225,18 @@ public class OI implements OIInterface {
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING), 
 			() -> loaderIF.setPaddleNotBlocking(true));
 
-		
+		//might be outdated already
+		/*
 		ClimberInterface climberIF = subsystems.climberOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.CLIMBER_DISABLE, OperatorBoxButtons.CLIMBER_MANUAL, subsystems.climberOverride);
 		onTriggered(box.getButton(OperatorBoxButtons.CLIMBER_EXTEND), 
 			() -> climberIF.setDesiredAction(new ClimberAction(Type.SET_BOTH_HEIGHT, 
 			0.2*box.getAxis(OperatorBoxButtons.CLIMBER_POT).read())));
-	
+		*/
 		
 }
+
 
 
 	private void mapOverrideSwitch(InputDevice box, int disableButton, int manualButton, OverridableSubsystem overrideableSubsystem) {
