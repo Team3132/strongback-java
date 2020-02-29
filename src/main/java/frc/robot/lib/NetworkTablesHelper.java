@@ -53,4 +53,18 @@ public class NetworkTablesHelper implements NetworkTableHelperInterface{
         }
         return entry.getString(defaultValue);
     }
+    /**
+     * Sets a named double value from the network tables.
+     * @param key the name to look up in the table.
+     * @param value the value set to the network table.
+     */
+    @Override
+    public void set(String key, double value) {
+        NetworkTableEntry entry = table.getEntry(key);
+        if (entry.getType() == NetworkTableType.kUnassigned) {
+            System.out.println("Unable to get the value for '" + key
+                    + "' in table '" + tableName + "'");
+        	entry.setDouble(value);
+        }
+    }
 }

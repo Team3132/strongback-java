@@ -1,16 +1,13 @@
 package frc.robot.lib;
 
-import java.util.ArrayList;
-
 import org.strongback.Executable;
-import org.strongback.Strongback;
 import org.strongback.Executor.Priority;
+import org.strongback.Strongback;
+import org.strongback.components.Clock;
 import org.strongback.components.Motor;
-import org.strongback.hardware.HardwareTalonSRX;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.NetworkTableHelperInterface;
-import org.strongback.mock.MockUpdateTimer;
 
 /**
  *  Whenever a motor is created, networkTable for the motor PIDF values are implemented from here.
@@ -19,38 +16,40 @@ import org.strongback.mock.MockUpdateTimer;
  */
 
  class TunableMotor implements Executable {
-	 Motor motor;
-	 ArrayList<HardwareTalonSRX> motorLists;
-	 int id;
-	NetworkTableHelperInterface networkTable;
-	MockUpdateTimer startTime = new MockUpdateTimer();
-	public TunableMotor(Motor motor, int id, double p, double i , double d , double f) {
+	private Motor motor;
+	private int id;
+	private NetworkTableHelperInterface networkTable;
+	private double lastUpdateSec = 0;
+
+	public TunableMotor(Motor motor, int id, double p, double i, double d, double f) {
 		this.id = id;
-		startTime.init();
-	}
-	
-	public static void tuneMotor(Motor  motor, int id, double p, double i , double d , double f, NetworkTablesHelper networkTable) {
-		var tunable = new TunableMotor(motor, id, p, i, d, f);
-		networkTable.get("p", p);
-		networkTable.get("i", i);
-		networkTable.get("d", d);
-		networkTable.get("f", f);
-		motor.setPIDF(0, p, i, d, f);
-		Strongback.executor().register(tunable, Priority.LOW);
 	}
 
+	public static void tuneMotor(Motor  motor, int id, double p, double i , double d , double f, NetworkTablesHelper networkTable) {
+		var tunable = new TunableMotor(motor, id, p, i, d, f);
+		networkTable.set("p", p);
+		networkTable.set("i", i);
+		networkTable.set("d", d);
+		networkTable.set("f", f);
+		Strongback.executor().register(tunable, Priority.LOW);
+	}
+	
+	
 	// Executes the command 1 time every 1 second.
 	@Override
 	public void execute(long timeInMillis) {
-		if(startTime.diff() >= Constants.TIME_TUNABLEMOTOR_PERIOD) {
-			double p = networkTable.get("p", Constants.DRIVE_P);
-			double i = networkTable.get("i", Constants.DRIVE_I);
-			double d = networkTable.get("d", Constants.DRIVE_D);
-			double f = networkTable.get("f", Constants.DRIVE_F);
-			motor.setPIDF(0, p, i, d, f);
-			startTime.init();
-		}
-
+		double now = Strongback.timeSystem().currentTime();
+		if (now < lastUpdateSec + Constants.DASHBOARD_UPDATE_INTERVAL_SEC)
+			return;
+		update();
+		lastUpdateSec = now;
 	}
 
- }
+	private void update() {
+		double p = networkTable.get("p", Constants.DRIVE_P);
+		double i = networkTable.get("i", Constants.DRIVE_I);
+		double d = networkTable.get("d", Constants.DRIVE_D);
+		double f = networkTable.get("f", Constants.DRIVE_F);
+		motor.setPIDF(0, p, i, d, f);
+	}
+}

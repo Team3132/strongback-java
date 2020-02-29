@@ -17,7 +17,6 @@ import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.PneumaticsModule;
 import org.strongback.components.Solenoid;
-
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
 import org.strongback.mock.Mock;
@@ -161,11 +160,12 @@ public class Subsystems implements DashboardUpdater {
 				config.drivebaseContCurrent, config.drivebasePeakCurrent,config.drivebaseP, config.drivebaseI, config.drivebaseD,
 				config.drivebaseF, clock, log);
 		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
-				config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate, config.drivebaseCurrentLimiting,
-				config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, 
-				config.drivebaseF, clock, log);
+				config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate, config.drivebaseCurrentLimiting, 
+				config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI,
+				 config.drivebaseD, config.drivebaseF, clock, log);
 		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT, 0.1, 0.1);
 		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
+
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
 		leftDriveSpeed = () -> leftMotor.getVelocity();
@@ -176,10 +176,10 @@ public class Subsystems implements DashboardUpdater {
 
 		// Save PID values into Network Tables
 		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
-		driveHelper.set("p", config.drivebaseP);
-		driveHelper.set("i", config.drivebaseI);
-		driveHelper.set("d", config.drivebaseD);
-		driveHelper.set("f", config.drivebaseF);
+		driveHelper.get("p", config.drivebaseP);
+		driveHelper.get("i", config.drivebaseI);
+		driveHelper.get("d", config.drivebaseD);
+		driveHelper.get("f", config.drivebaseF);
 
 
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
@@ -367,8 +367,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
-		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
-		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log);
+		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, 0, 0, 0, 0, log); // TODO: replace 0 with appropriate subsystem PIDF values
 	}
 
 	public void createIntakeOverride() {
@@ -397,7 +396,8 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Colour Sensor not present, using a mock colour sensor instead");
 			return;
 		}
-		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
+		
+		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, 0, 0, 0, 0, log); //TODO: replace 0 with appropriate subsystem PIDF values
 		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
@@ -424,7 +424,6 @@ public class Subsystems implements DashboardUpdater {
 				}
 				return sensedColour;
 			}
-			
 		}, ledStrip, clock, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
@@ -450,7 +449,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderSpinnerCanID, false, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log);
-		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, log);
+		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, 0, 0, 0, 0, log); //TODO: replace with appropriate subsystem PIDF values.
 		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
 		BooleanSupplier loaderInSensor = () -> spinnerMotor.isAtForwardLimit();
 		BooleanSupplier loaderOutSensor = () -> spinnerMotor.isAtReverseLimit(); 
