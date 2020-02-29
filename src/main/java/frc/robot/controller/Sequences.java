@@ -186,15 +186,34 @@ public class Sequences {
 		return seq;
 	}
 	
-	public static Sequence spinUpShooter() {
-		Sequence seq = new Sequence("spin up shooter");
-		seq.add().setShooterTargetSpeed(SHOOTER_TARGET_SPEED); //RPM
+	public static Sequence startShooting() {
+		Sequence seq = new Sequence("start shooting");
+		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
+		// Give the shooter wheel time to spin up.
+		seq.add().setDelayDelta(2); 
+		// Start the loader to push the balls.
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		// Wait for the shooter wheel to settle.
+		seq.add().waitForShooter();
+		// Let the balls out of the loader and into the shooter.
+		seq.add().unblockShooter();
+		// Wait for all of the balls to leave.
+		seq.add().waitForBalls(0);
+		// Turn off everything.
+		seq.add().setShooterRPM(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPM(0)
+			.blockShooter();
 		return seq;
 	}
 
 	public static Sequence stopShooting() {
 		Sequence seq = new Sequence("stop shooting");
-		seq.add().setShooterTargetSpeed(0); //RPM
+		// Turn off everything.
+		seq.add().setShooterRPM(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPM(0)
+			.blockShooter();
 		return seq;
 	}
 
@@ -213,10 +232,10 @@ public class Sequences {
 
 	public static Sequence visionAim(){
 		Sequence seq = new Sequence("vision aim");
+		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
 		seq.add().doVisionAim(); 
+		seq.add().waitForShooter();
 		seq.add().doArcadeDrive();
-		// seq.add().startShooter(); 
-		// seq.add().startHopper();
 		return seq;
 	}
 
@@ -257,7 +276,7 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		spinUpShooter(),
+		startShooting(),
 		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),

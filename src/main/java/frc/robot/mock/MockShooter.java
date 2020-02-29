@@ -23,7 +23,7 @@ public class MockShooter implements ShooterInterface {
     }
 
     @Override
-    public double getTargetSpeed() {
+    public double getTargetRPM() {
         return targetSpeed;
     }
 

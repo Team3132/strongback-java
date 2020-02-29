@@ -165,7 +165,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.climber.setDesiredAction(desiredState.climber);
 		
-		subsystems.shooter.setTargetSpeed(desiredState.shooterTargetSpeed);
+		subsystems.shooter.setTargetSpeed(desiredState.shooterRPM);
 
 		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 

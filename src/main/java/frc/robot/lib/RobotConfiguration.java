@@ -87,8 +87,7 @@ public class RobotConfiguration {
 	public int loaderPassthroughCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
 
 	public boolean shooterIsPresent = false;
-	public int[] shooterCanIdsWithEncoders = Constants.SHOOTER_TALON_WITH_ENCODERS_CAN_ID_LIST;
-	public int[] shooterCanIdsWithoutEncoders = Constants.SHOOTER_TALON_WITHOUT_ENCODERS_CAN_ID_LIST;
+	public int[] shooterCanIds = Constants.SHOOTER_TALON_CAN_ID_LIST;
 
 	public double shooterP = Constants.SHOOTER_P;
 	public double shooterI = Constants.SHOOTER_I;
@@ -115,11 +114,6 @@ public class RobotConfiguration {
 	public double visionSMax = Constants.VISION_V_MIN;
 	public double visionVMin = Constants.VISION_S_MIN;
 	public double visionVMax = Constants.VISION_V_MAX;
-	
-	public boolean climberIsPresent = false;
-	public int climberFrontCanID = Constants.CLIMBER_FRONT_CAN_ID;
-	public int climberRearCanID = Constants.CLIMBER_REAR_CAN_ID;
-	public int climberDriveMotorCanID = Constants.CLIMBER_DRIVE_MOTOR_CAN_ID;
 
 
 	// Logging default is to not log anything to the graph, and to only log local information when we turn it on.
@@ -223,8 +217,7 @@ public class RobotConfiguration {
 		loaderPassthroughCanID = getAsInt("loader/passthrough/canID", Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID);
 
 		shooterIsPresent = getAsBoolean("shooter/present", true);
-		shooterCanIdsWithEncoders = getAsIntArray("shooter/shooterCanIdsWithEncoders", Constants.SHOOTER_TALON_WITH_ENCODERS_CAN_ID_LIST);
-		shooterCanIdsWithoutEncoders = getAsIntArray("shooter/shooterCanIdsWithoutEncoders", Constants.SHOOTER_TALON_WITHOUT_ENCODERS_CAN_ID_LIST);
+		shooterCanIds = getAsIntArray("shooter/shooterCanIDs", Constants.SHOOTER_TALON_CAN_ID_LIST);
 		
 		shooterP = getAsDouble("shooter/p", shooterP);
 		shooterI = getAsDouble("drivebase/i", shooterI);
@@ -254,11 +247,6 @@ public class RobotConfiguration {
 		visionVMin = getAsDouble("vision/hsvFilter/v/min", Constants.VISION_V_MIN);
 		visionVMax = getAsDouble("vision/hsvFilter/v/max", Constants.VISION_V_MAX);
 
-		climberIsPresent = getAsBoolean("climber/present", false);
-		climberFrontCanID = getAsInt("climber/frontCanID", Constants.CLIMBER_FRONT_CAN_ID);
-		climberRearCanID = getAsInt("climber/rearCanID", Constants.CLIMBER_REAR_CAN_ID);
-		climberDriveMotorCanID = getAsInt("climber/driveMotorCanID", Constants.CLIMBER_DRIVE_MOTOR_CAN_ID);
-			
 		// logging default is to not log anything to the graph, and to only log local information when we turn it on.
 		// These are the safest defaults.
 		doLogging = getAsBoolean("logging/enabled", true);

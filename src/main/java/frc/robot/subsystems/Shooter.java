@@ -1,52 +1,34 @@
 package frc.robot.subsystems;
 
-import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Solenoid;
 
-import frc.robot.Constants;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ShooterInterface;
 import frc.robot.lib.Subsystem;
-import frc.robot.lib.NetworkTablesHelper;
 
 /**
  * On the 2020 robot, there are three shooter motors. 
  * One with an encoder and the rest without, that are under PID control for speed control.
  */
-public class Shooter extends Subsystem implements ShooterInterface, Executable, DashboardUpdater {
+public class Shooter extends Subsystem implements ShooterInterface {
 
-    private ShooterWheel flyWheel;
-    private Solenoid solenoid;
+    private final ShooterWheel flyWheel;
+    private final Solenoid solenoid;
 
-    public Shooter(Motor shooterMotor, Solenoid solenoid, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
-        super("Shooter", networkTable, dashboard, log);
+    public Shooter(Motor shooterMotor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
+        super("Shooter", dashboard, log);
         this.solenoid = solenoid;
         flyWheel = new ShooterWheel(shooterMotor);
-
         log.register(true, () -> isHoodExtended(), "%s/extended", name)
-               .register(true, () -> isHoodRetracted(), "%s/retracted", name);
+            .register(true, () -> isHoodRetracted(), "%s/retracted", name);
     }
-
-    //TODO: Get the PID values from the network tables.
-	@Override
-	public void enable() {
-        double p = networkTable.get("p", Constants.SHOOTER_P);
-        double i = networkTable.get("i", Constants.SHOOTER_I);
-        double d = networkTable.get("d", Constants.SHOOTER_D);
-        double f = networkTable.get("f", Constants.SHOOTER_F);
-        super.enable();
-        flyWheel.setPIDF(p, i, d, f); 
-		log.info("Drivebase  PID values: %f %f %f %f", p, i, d, f);
-	}
 
 	public void disable() {
 		super.disable();
-        flyWheel.setTargetSpeed(0);
+        flyWheel.setTargetRPM(0);
 	}
     
     /**
@@ -54,18 +36,18 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
      */
     @Override
     public ShooterInterface setTargetSpeed(double speed) { 
-        System.out.println("Setting target speed");
-        flyWheel.setTargetSpeed(speed);
+        log.sub("Setting target speed");
+        flyWheel.setTargetRPM(speed);
         return this;
     }
 
     @Override
-    public double getTargetSpeed() {
-        return flyWheel.getTargetSpeed(); 
+    public double getTargetRPM() {
+        return flyWheel.getTargetRPM(); 
     }
     
     public boolean isAtTargetSpeed() {
-        if (flyWheel.getSpeed() >= flyWheel.getTargetSpeed()) {
+        if (flyWheel.getRPM() >= flyWheel.getTargetRPM()) {
             return true;
         }
         return false;
@@ -83,7 +65,6 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
     @Override
     public boolean isHoodExtended() {
-        //log.sub("Is hood extended: " +  solenoid.isExtended());
         return solenoid.isExtended();
     }
 
@@ -95,40 +76,40 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
     protected class ShooterWheel {
 
         private final Motor motor;
-        private double targetSpeed;
+        private double targetRPM;
     
         public ShooterWheel(Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> flyWheel.getTargetSpeed(), "Shooter/flyWheel/targetSpeed", name)
-            .register(false, motor::getSpeed, "Shooter/flyWheel/speed", name)
-            .register(false, motor::getOutputVoltage, "Shooter/flyWheel/outputVoltage", name)
-            .register(false, motor::getOutputPercent, "Shooter/flyWheel/outputPercent", name)
-            .register(false, motor::getOutputCurrent, "Shooter/flyWheel/outputCurrent", name);
+            log.register(false, () -> flyWheel.getTargetRPM(), "shooter/flyWheel/targetSpeed", name)
+            .register(false, motor::getSpeed, "shooter/flyWheel/rpm", name)
+            .register(false, motor::getOutputVoltage, "shooter/flyWheel/outputVoltage", name)
+            .register(false, motor::getOutputPercent, "shooter/flyWheel/outputPercent", name)
+            .register(false, motor::getOutputCurrent, "shooter/flyWheel/outputCurrent", name);
         }
         
-        public void setTargetSpeed(double speed) {
-            if (speed == targetSpeed) {
+        public void setTargetRPM(double rpm) {
+            if (rpm == targetRPM) {
                  return;
             }
-            targetSpeed = speed;
+            targetRPM = rpm;
             // Note that if velocity mode is used and the speed is ever set to 0, 
             // change the control mode from percent output, to avoid putting
             // unnecessary load on the battery and motor.
-            if (speed == 0) { 
+            if (rpm == 0) { 
                 log.sub("Turning shooter wheel off.");
                 motor.set(ControlMode.PercentOutput, 0); 
             } else {
-                motor.set(ControlMode.Velocity, speed);
+                motor.set(ControlMode.Velocity, rpm);
             }
-            log.sub("Setting shooter target speed to %f", targetSpeed);
+            log.sub("Setting shooter target speed to %f", targetRPM);
         }
 
-        public double getTargetSpeed() {
-            return targetSpeed;
+        public double getTargetRPM() {
+            return targetRPM;
         }
 
-        public double getSpeed() {
+        public double getRPM() {
             return motor.getSpeed();
         }
 
@@ -139,6 +120,8 @@ public class Shooter extends Subsystem implements ShooterInterface, Executable, 
 
     @Override
     public void updateDashboard() {
-        dashboard.putNumber("Shooter target speed", flyWheel.getTargetSpeed());
+        dashboard.putNumber("Shooter target rpm", flyWheel.getTargetRPM());
+        dashboard.putNumber("Shooter actual rpm", flyWheel.getRPM());
+        dashboard.putString("Shooter hood", isHoodExtended() ? "extended" : (isHoodRetracted() ? "retracted" : "moving"));
     }
 }

@@ -77,7 +77,6 @@ public class Subsystems implements DashboardUpdater {
 		createIntakeOverride();
 		createLoaderOverride();
 		createShooterOverride();
-		createClimberOverride();
 	}
 
 	public void enable() {
@@ -406,8 +405,7 @@ public class Subsystems implements DashboardUpdater {
 
 		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderSpinnerCanID, false, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log);
 		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, log);
-		// Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
-		Solenoid paddleSolenoid = Mock.Solenoids.singleSolenoid(1);
+		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
 		BooleanSupplier loaderInSensor = () -> spinnerMotor.isAtForwardLimit();
 		BooleanSupplier loaderOutSensor = () -> spinnerMotor.isAtReverseLimit(); 
 		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
@@ -431,18 +429,11 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		// Save PID values into Network Tables
-		NetworkTablesHelper shooterHelper = new NetworkTablesHelper("Shooter");
-		shooterHelper.set("p", config.shooterP);
-		shooterHelper.set("i", config.shooterI);
-		shooterHelper.set("d", config.shooterD);
-		shooterHelper.set("f", config.shooterF);
-
 		Solenoid shooterSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
-		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIdsWithEncoders, config.shooterCanIdsWithoutEncoders, 
-		false, config.shooterP, config.shooterI, config.shooterD, config.shooterF, clock, log);
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, false, config.shooterP, config.shooterI,
+				config.shooterD, config.shooterF, clock, log);
 
-		shooter = new Shooter(shooterMotor, shooterSolenoid, shooterHelper, dashboard, log);
+		shooter = new Shooter(shooterMotor, shooterSolenoid, dashboard, log);
 	}
 
 	public void createShooterOverride() {
@@ -464,31 +455,6 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		compressor = Hardware.pneumaticsModule(config.pcmCanId);
-	}
-
-
-	public void createClimber() {
-		if (!config.climberIsPresent) {
-			climber = new MockClimber(log);
-			return;
-		}
-		Motor frontWinchMotor = MotorFactory.getClimberWinchMotor(config.climberFrontCanID, false, false, log);
-		frontWinchMotor.setInverted(true);
-		frontWinchMotor.setScale(Constants.CLIMBER_WINCH_FRONT_SCALE_FACTOR); // 18" ticks = 20208 ticks
-		Motor rearWinchMotor = MotorFactory.getClimberWinchMotor(config.climberRearCanID, false, false, log);
-		rearWinchMotor.setScale(Constants.CLIMBER_WINCH_REAR_SCALE_FACTOR); // 18" ticks = 20208 ticks
-		Motor driveMotor = MotorFactory.getClimberDriveMotor(config.climberDriveMotorCanID, true, log);
-		climber = new Climber(frontWinchMotor, rearWinchMotor, driveMotor, dashboard, log);
-		Strongback.executor().register(climber, Priority.HIGH);
-	}
-
-	public void createClimberOverride() {
-		// Setup the diagBox so that it can take control.
-		MockClimber simulator = new MockClimber(log);
-		MockClimber mock = new MockClimber(log);
-		climberOverride = new OverridableSubsystem<ClimberInterface>("climber", ClimberInterface.class, climber, simulator, mock, log);
-		// Plumb accessing the climber through the override.
-		climber = climberOverride.getNormalInterface();
 	}
 
 	public void createVision() {

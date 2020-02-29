@@ -37,7 +37,8 @@ public class State {
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
 	
 	// Shooter
-	public Double shooterTargetSpeed = null;  // Target speed in RPM to give to shooter.
+	public Double shooterRPM = null;  // Set the shooter target speed.
+	public Boolean shooterUpToSpeed = null;
 
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
@@ -74,7 +75,8 @@ public class State {
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
-		shooterTargetSpeed = subsystems.shooter.getTargetSpeed();
+		shooterRPM = subsystems.shooter.getTargetRPM();
+		shooterUpToSpeed = subsystems.shooter.isAtTargetSpeed();
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
@@ -123,8 +125,13 @@ public class State {
 		return this;
 	}
 
-	public State setShooterTargetSpeed(double targetSpeed) {
-		shooterTargetSpeed = Double.valueOf(targetSpeed);
+	public State setShooterRPM(double targetSpeed) {
+		shooterRPM = Double.valueOf(targetSpeed);
+		return this;
+	}
+
+	public State waitForShooter() {
+		shooterUpToSpeed = true;
 		return this;
 	}
 
@@ -139,6 +146,14 @@ public class State {
 	}
 	public State setPaddleNotBlocking(boolean blocking) {
 		loaderPaddleNotBlocking = Boolean.valueOf(blocking);
+		return this;
+	}
+	public State unblockShooter() {
+		loaderPaddleNotBlocking = true;
+		return this;
+	}
+	public State blockShooter() {
+		loaderPaddleNotBlocking = false;
 		return this;
 	}
 	public State waitForBalls(int numBalls) {
@@ -350,6 +365,8 @@ public class State {
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
 		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
+		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
+		maybeAdd("shooterRPM", shooterRPM, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
