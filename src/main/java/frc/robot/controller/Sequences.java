@@ -263,14 +263,14 @@ public class Sequences {
 	}
 
 	public static Sequence colourWheelAnticlockwise() {
-		Sequence seq = new Sequence("moving colour wheel left");
+		Sequence seq = new Sequence("moving colour wheel anticlockwise");
 		seq.add().extendedColourWheel();
 		seq.add().colourWheelAnticlockwise();
 		return seq;
 	}
 
 	public static Sequence colourWheelClockwise() {
-		Sequence seq = new Sequence("moving colour wheel right");
+		Sequence seq = new Sequence("moving colour wheel clockwise");
 		seq.add().extendedColourWheel();
 		seq.add().colourWheelClockwise();
 		return seq;

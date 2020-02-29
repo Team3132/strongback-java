@@ -149,7 +149,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Current state: %s", currentState);
 		// Fill in the blanks in the desired state.
 		desiredState = State.calculateUpdatedState(desiredState, currentState);
-		if (desiredState.colourAction.movingToUnknownColour()) {
+		if (desiredState.colourAction.movingToUnknownColour()) { // If the colour wheel is set to positional but the colour is unknown, work out the desired colour using FMS.
 			desiredState.colourAction = new ColourAction(ColourWheelType.POSITION, fmsColour.get());
 		}
 		logSub("Calculated new 'safe' state: %s", desiredState);

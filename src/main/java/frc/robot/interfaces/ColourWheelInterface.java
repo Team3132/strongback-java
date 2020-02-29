@@ -23,10 +23,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
         }
 
         public boolean movingToUnknownColour() {
-            if (type.equals(ColourWheelType.POSITION) && colour.equals(WheelColour.UNKNOWN)) {
-                return true;
-            }
-            return false;
+            return type.equals(ColourWheelType.POSITION) && colour.equals(WheelColour.UNKNOWN);
         }
 
         @Override
@@ -69,7 +66,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
     public boolean isFinished();
 
     /**
-	 * @return the state of the colour wheel arm solenoid. 
+	 * Sets the state of the colour wheel arm solenoid.
 	 * */
     public void setArmExtended(boolean extended);
 

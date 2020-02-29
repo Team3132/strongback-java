@@ -22,39 +22,35 @@ import frc.robot.lib.Subsystem;
  * This subsystem is made to spin the Colour Wheel on the control panel in the
  * 2020 game. It 5 seperate actions:
  * 
- * 1) Rotational control, spins the colour
- * wheel 3.25 full rotations, or 26 eighth turns. It uses the colour wheel as an
- * encoder, checking for every colour.
+ * 1) Rotational control, spins the colour wheel 3.25 full rotations, or 26
+ * eighth turns. It uses the colour wheel as an encoder, checking for every
+ * colour.
  * 
- * 2) Positional control, spins the colour
- * wheel to the selected colour, choosing clockwise or anticlockwise depending
- * on what is faster.
+ * 2) Positional control, spins the colour wheel to the selected colour,
+ * choosing clockwise or anticlockwise depending on what is faster.
  * 
- * 3) Manual adjustment clockwise, moves the colour wheel
- * clockwise at a slow speed incase it is off by a bit.
+ * 3) Manual adjustment clockwise, moves the colour wheel clockwise at a slow
+ * speed incase it is off by a bit.
  * 
- * 4) Manual adjustment
- * anticlockwise, same as above, in the opposite direction.
+ * 4) Manual adjustment anticlockwise, same as above, in the opposite direction.
  * 
- * 5) None, stops the
- * motor. This is the default action.
+ * 5) None, stops the motor. This is the default action.
  * 
  * This class expects to be given one motor and a RevRobotics Colour Sensor V3.
  */
 
 public class ColourWheel extends Subsystem implements ColourWheelInterface {
-
-  private WheelColour colourPrev = WheelColour.UNKNOWN; // Used in doubleCheck to check for mistakes with colour
-                                                        // detection.
+  // Used in doubleCheck to check for mistakes with colour detection.
+  private WheelColour colourPrev = WheelColour.UNKNOWN;
   private WheelColour colour = WheelColour.UNKNOWN; // Variable for what the colour sensor currently sees.
   private WheelColour nextColour = WheelColour.UNKNOWN;
   private int rotCount = 0; // Roation counter for rotation controls.
-  private boolean firstLoop = true; // Variable to check if this is the first time the colour sensor saw the desired
-                                    // colour.
+  // Variable to check if this is the first time the colour sensor saw the desired colour.
+  private boolean firstLoop = true;
   private long spinTime; // Variable to store the time when the colour sensor sees the desired colour.
   private double speed = 0;
-  private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN); // Default action for
-                                                                                             // colour wheel subsystem.
+  // Default action for colour wheel subsystem.
+  private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
 
   private Clock clock;
   private final Motor motor;
@@ -183,10 +179,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    */
   public double positionalControl(WheelColour desired) {
     double newSpeed = (colour.id - desired.id) % 4; // Calculate new speed.
-    if (newSpeed == 3)
+    if (newSpeed == 3) {
       newSpeed -= 4; // If above calculation is 3, set speed to -1.
-    if (newSpeed == -3)
+    }
+    if (newSpeed == -3) {
       newSpeed += 4; // If above calculation is -3, set speed to 1.
+    }
     newSpeed = Constants.COLOUR_WHEEL_MOTOR_FULL * Math.signum(newSpeed);
     if (colour.equals(WheelColour.UNKNOWN)) { // Colour is unknown, move in current direcion until colour identified.
       if (speed != 0) {
