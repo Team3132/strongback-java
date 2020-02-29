@@ -8,6 +8,7 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.JevoisInterface;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.VisionInterface;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;

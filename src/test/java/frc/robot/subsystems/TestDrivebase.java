@@ -11,23 +11,24 @@ import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockLog;
+import frc.robot.mock.MockNetworkTableHelper;
 
 public class TestDrivebase {
 
 	class MockDriveRoutine implements DriveRoutine {
         public String name;
 		public int callCount = 0;
-		public double leftSpeed = 0;
-		public double rightSpeed = 0;
+		public double leftPower = 0;
+		public double rightPower = 0;
         
         public MockDriveRoutine(String name) {
             this.name = name;
         }
         
 		@Override
-		public DriveMotion getMotion() {
+		public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
 			callCount++;
-			return new DriveMotion(leftSpeed, rightSpeed);
+			return new DriveMotion(leftPower, rightPower);
 		}
 
 		@Override
@@ -54,7 +55,7 @@ public class TestDrivebase {
     	MockMotor leftMotor = Mock.stoppedMotor();
     	MockMotor rightMotor = Mock.stoppedMotor();
     	MockDriveRoutine arcade = new MockDriveRoutine("MockArcade");
-        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor, new MockDashboard(), new MockLog(true));
+        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor,  new MockNetworkTableHelper("drive") ,new MockDashboard(), new MockLog(true));
         // Register this drive routine so it can be used.
         drive.registerDriveRoutine(DriveRoutineType.ARCADE, arcade);
         // Tell the drive subsystem to use it.
@@ -69,35 +70,35 @@ public class TestDrivebase {
         assertEquals(0, rightMotor.get(), 0.01); 
 
         // Enable the drivebase
-        arcade.leftSpeed = 0.5;
-        arcade.rightSpeed = 0.75;
+        arcade.leftPower = 0.5;
+        arcade.rightPower = 0.75;
         drive.enable();
         drive.execute(0); // Should call getMotion() on driveRoutine.
         assertEquals(++expectedCallCount, arcade.callCount);
         // Check that the motors now have power.
-        assertEquals(arcade.leftSpeed, leftMotor.get(), 0.01);
-        assertEquals(arcade.rightSpeed, rightMotor.get(), 0.01);
+        assertEquals(arcade.leftPower, leftMotor.get(), 0.01);
+        assertEquals(arcade.rightPower, rightMotor.get(), 0.01);
 
         // Update the speed and see if the motors change.
-        arcade.leftSpeed = -0.1;
-        arcade.rightSpeed = 1;
+        arcade.leftPower = -0.1;
+        arcade.rightPower = 1;
         drive.execute(0); // Should call getMotion() on driveRoutine.
         assertEquals(++expectedCallCount, arcade.callCount);
         // Check that the motors now have power.
-        assertEquals(arcade.leftSpeed, leftMotor.get(), 0.01);
-        assertEquals(arcade.rightSpeed, rightMotor.get(), 0.01);
+        assertEquals(arcade.leftPower, leftMotor.get(), 0.01);
+        assertEquals(arcade.rightPower, rightMotor.get(), 0.01);
         
         // Change driveRoutine and see if the outputs are different
     	MockDriveRoutine cheesy = new MockDriveRoutine("MockCheesy");
-    	cheesy.leftSpeed = 1;
-    	cheesy.rightSpeed = -1;
+    	cheesy.leftPower = 1;
+    	cheesy.rightPower = -1;
         drive.registerDriveRoutine(DriveRoutineType.CHEESY, cheesy);
         // Tell the drive subsystem to use it.
         drive.setDriveRoutine(new DriveRoutineParameters(DriveRoutineType.CHEESY));
     	drive.execute(0);
         assertEquals(1, cheesy.callCount); // first time running this driveRoutine
-        assertEquals(cheesy.leftSpeed, leftMotor.get(), 0.01);
-        assertEquals(cheesy.rightSpeed, rightMotor.get(), 0.01);
+        assertEquals(cheesy.leftPower, leftMotor.get(), 0.01);
+        assertEquals(cheesy.rightPower, rightMotor.get(), 0.01);
 
         // Disable and confirm that the driveRoutine isn't called and the motors are stopped
         drive.disable();

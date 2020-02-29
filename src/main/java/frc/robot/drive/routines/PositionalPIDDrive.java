@@ -100,7 +100,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 	
 
 	@Override
-	public DriveMotion getMotion() {
+	public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
 		// Calculate the new speeds for both left and right motors.
 		double leftPower = leftPID.getMotorPower();
 		double rightPower = rightPID.getMotorPower();
