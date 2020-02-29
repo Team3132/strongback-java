@@ -30,7 +30,7 @@ public class MotorFactory {
 
 		switch (motorControllerType) {
 		case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: {
-			HardwareSparkMAX spark = getSparkMAX(canIDsWithEncoders, leftMotor, NeutralMode.Brake, log);
+			HardwareSparkMAX spark = getSparkMAX(canIDsWithEncoders, leftMotor, NeutralMode.Brake, log, new NetworkTablesHelper(""));
 			spark.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE);
 			spark.setPIDF(0, p, i, d, f);
 			spark.setSensorPhase(sensorPhase);
@@ -215,12 +215,15 @@ public class MotorFactory {
      * @param log for registration of the current reporting.
      * @return the leader SparkMAX
      */
-    private static HardwareSparkMAX getSparkMAX(int[] canIDs, boolean invert, NeutralMode mode, Log log) {
+    private static HardwareSparkMAX getSparkMAX(int[] canIDs, boolean invert, NeutralMode mode, Log log, NetworkTableHelperInterface networkTable) {
 
     	HardwareSparkMAX leader = Hardware.Motors.sparkMAX(abs(canIDs[0]), MotorType.kBrushless, invert);
 		log.register(false, () -> leader.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[0]);
 		leader.setSmartCurrentLimit(Constants.DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT, 10);
 		leader.setSecondaryCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
+		TunableMotor.tuneMotor(leader, abs(canIDs[0]), Constants.DRIVE_P, Constants.DRIVE_I, Constants.DRIVE_D, Constants.DRIVE_F,
+		networkTable);
+
     	for (int i = 1; i < canIDs.length; i++) {
 			boolean shouldInvert = invert;
 			if (canIDs[i] < 0) shouldInvert = !shouldInvert;
