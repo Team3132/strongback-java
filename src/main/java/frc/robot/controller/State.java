@@ -35,12 +35,18 @@ public class State {
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
+	
+	// Shooter
+	public Double shooterRPM = null;  // Set the shooter target speed.
+	// If this field is not called shooterUpToSpeed plz update applyState() in Controller.java
+	public Boolean shooterUpToSpeed = null;
 
 	// Loader
-	public Double loaderFeederMotorOutput = null;
-	public Double loaderPassthroughMotorVelocity = null;
-	public Double loaderSpinnerMotorVelocity = null;
-	public Boolean loaderPaddleExtended = null;
+	public Double loaderPassthroughMotorOutput = null;
+	public Double loaderSpinnerMotorRPM = null;
+	public Boolean loaderPaddleNotBlocking = null;
+	// If this field is not called expectedNumberOfBalls plz update applyState() in Controller.java
+	public Integer expectedNumberOfBalls = null;
 
 	// Vision
 	public CameraMode cameraMode = null;
@@ -67,13 +73,15 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
-		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
-		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
-		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
+		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
+		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
+		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
+		shooterRPM = subsystems.shooter.getTargetRPM();
+		shooterUpToSpeed = subsystems.shooter.isAtTargetSpeed();
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourWheel = subsystems.colourWheel.getDesiredAction();
+		expectedNumberOfBalls = subsystems.loader.getCurrentBallCount();
 	}
 
 	// Time
@@ -118,22 +126,39 @@ public class State {
 		return this;
 	}
 
+	public State setShooterRPM(double targetSpeed) {
+		shooterRPM = Double.valueOf(targetSpeed);
+		return this;
+	}
+
+	public State waitForShooter() {
+		shooterUpToSpeed = true;
+		return this;
+	}
 
 	// Loader
-	public State setLoaderSpinnerMotorOutput(double output) {
-		loaderSpinnerMotorVelocity = Double.valueOf(output);
+	public State setLoaderSpinnerMotorRPM(double rpm) {
+		loaderSpinnerMotorRPM = Double.valueOf(rpm);
 		return this;
 	}
 	public State setLoaderPassthroughMotorOutput(double output) {
-		loaderPassthroughMotorVelocity = Double.valueOf(output);
+		loaderPassthroughMotorOutput = Double.valueOf(output);
 		return this;
 	}
-	public State setLoaderFeederMotorOutput(double output) {
-		loaderFeederMotorOutput = Double.valueOf(output);
+	public State setPaddleNotBlocking(boolean blocking) {
+		loaderPaddleNotBlocking = Boolean.valueOf(blocking);
 		return this;
 	}
-	public State setPaddleExtended(boolean extended) {
-		loaderPaddleExtended = Boolean.valueOf(extended);
+	public State unblockShooter() {
+		loaderPaddleNotBlocking = true;
+		return this;
+	}
+	public State blockShooter() {
+		loaderPaddleNotBlocking = false;
+		return this;
+	}
+	public State waitForBalls(int numBalls) {
+		expectedNumberOfBalls = Integer.valueOf(numBalls);
 		return this;
 	}
 
@@ -305,7 +330,10 @@ public class State {
 			// if (!field.canAccess(current)) continue;
 			try {
 				if (field.get(desiredState) == null) {
-					field.set(updatedState, field.get(currentState));
+					// Don't save state for expected balls to avoid race condition
+					if (field.getName() != "expectedNumberOfBalls" && field.getName() != "shooterUpToSpeed") {
+						field.set(updatedState, field.get(currentState));
+					}	
 				} else {
 					field.set(updatedState, field.get(desiredState));
 				}
@@ -335,10 +363,11 @@ public class State {
 		ArrayList<String> result = new ArrayList<String>();
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("loaderPassthroughMotorVelocity", loaderPassthroughMotorVelocity, result);
-		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
-		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
-		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
+		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
+		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
+		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
+		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
+		maybeAdd("shooterRPM", shooterRPM, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);

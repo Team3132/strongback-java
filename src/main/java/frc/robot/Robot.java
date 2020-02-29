@@ -15,10 +15,8 @@ import org.strongback.hardware.HardwareDriverStation;
 import frc.robot.controller.Controller;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.OIInterface;
 import frc.robot.lib.LogDygraph;
-import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
@@ -34,8 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
-	private Log log;
-	private NetworkTablesHelper networkTable;
+	private LogDygraph log;
 
 	// User interface.
 	private DriverStation driverStation;
@@ -66,7 +63,6 @@ public class Robot extends IterativeRobot implements Executable {
 		clock = Strongback.timeSystem();
 		log = new LogDygraph(Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION, Constants.LOG_DATE_EXTENSION, Constants.LOG_NUMBER_FILE, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
-		networkTable = new NetworkTablesHelper("");
 		startWebServer();
 		log.info("Waiting for driver's station to connect before setting up UI");
 		// Do the reset of the initialization in init().
@@ -98,14 +94,14 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
 		subsystems = new Subsystems(createDashboard(), config, clock, log);
+		subsystems.createLEDStrip();
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
-		subsystems.createClimber();
+		subsystems.createShooter();
 		subsystems.createLoader();
 		subsystems.createOverrides();
 		subsystems.createVision();
-		subsystems.createLEDStrip();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();
@@ -165,8 +161,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
+		log.restartLogs();
 		log.info("auto has started");
-
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
@@ -175,6 +171,9 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
+		// Gets the amount set in SmartDashboard and sets the init ball count
+		int initialNumBalls = auto.getSelectedBallAmount(); 
+		subsystems.loader.setInitBallCount(initialNumBalls);
 	}
 
 	/**
@@ -189,6 +188,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
+		log.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
@@ -211,6 +211,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void testInit() {
+		log.restartLogs();
 		subsystems.enable();
 	}
 

@@ -55,7 +55,7 @@ public class TestDrivebase {
     	MockMotor leftMotor = Mock.stoppedMotor();
     	MockMotor rightMotor = Mock.stoppedMotor();
     	MockDriveRoutine arcade = new MockDriveRoutine("MockArcade");
-        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor,  new MockNetworkTableHelper("drive") ,new MockDashboard(), new MockLog(true));
+        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor, new MockNetworkTableHelper("drive"), new MockDashboard(), new MockLog(true));
         // Register this drive routine so it can be used.
         drive.registerDriveRoutine(DriveRoutineType.ARCADE, arcade);
         // Tell the drive subsystem to use it.
