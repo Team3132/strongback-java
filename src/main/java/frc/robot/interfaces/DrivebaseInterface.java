@@ -39,7 +39,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 	}
 
-	public DrivebaseInterface setPtoExtended(boolean extended);
+	public DrivebaseInterface activateClimbMode(boolean extended);
 	public DrivebaseInterface setBrakeExtended(boolean extended);
 
 	
@@ -165,10 +165,10 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	 */
 	public boolean hasFinished();
 
-	public boolean isPtoExtended();
-	public boolean isPtoRetracted();
+	public boolean isClimbModeEnabled();
+	public boolean isDriveModeEnabled();
 
-	public boolean isBrakeExtended();
+	public boolean isBrakeApplied();
 	public boolean isBrakeRetracted();
 
 	/**

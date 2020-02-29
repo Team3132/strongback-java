@@ -269,28 +269,28 @@ public class Sequences {
 		return seq;
 	}
 
-	//climber
-	public static Sequence deployPto() {
-		Sequence seq = new Sequence("Deploying Pto - climb mode");
-		seq.add().ptoGearboxInPosition();
+	// Climber
+	public static Sequence enableClimbMode() {
+		Sequence seq = new Sequence("Enable climb mode");
+		seq.add().enableClimbMode();
 		return seq;
 	}
 
-	public static Sequence stowPto() {
-		Sequence seq = new Sequence("Stowing Pto - drive mode");
-		seq.add().ptoGearboxRetracted();
+	public static Sequence enableDriveMode() {
+		Sequence seq = new Sequence("Enable drive mode");
+		seq.add().enableDriveMode();
 		return seq;
 	}
 
 	public static Sequence climberBrake() {
-		Sequence seq = new Sequence("Climber braking");
+		Sequence seq = new Sequence("Climber brake apply");
 		seq.add().applyClimberBrake();
 		return seq;
 	}
 
 	public static Sequence climberStopBrake() {
-		Sequence seq = new Sequence("Climber no longer braking");
-		seq.add().retractClimberBrake();
+		Sequence seq = new Sequence("Climber brake release");
+		seq.add().releaseClimberBrake();
 		return seq;	
 	}
 

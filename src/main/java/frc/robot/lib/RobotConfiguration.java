@@ -68,8 +68,8 @@ public class RobotConfiguration {
 	public String drivebaseMode = Constants.DRIVE_DEFAULT_MODE;
 	public double drivebaseMaxSpeed = Constants.DRIVE_MAX_SPEED;
 
-	public int climberPtoPort = Constants.CLIMBER_PTOSOLENOID_PORT;
-	public int climberBrakePort = Constants.CLIMBER_BRAKESOLENOID_PORT;
+	public int climberPtoPort = Constants.CLIMBER_PTO_SOLENOID_PORT;
+	public int climberBrakePort = Constants.CLIMBER_BRAKE_SOLENOID_PORT;
 
 
 	public boolean drivebaseSwapLeftRight = false;

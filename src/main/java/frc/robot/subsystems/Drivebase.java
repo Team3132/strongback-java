@@ -63,14 +63,14 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
 				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name)
-				.register(true, () -> isPtoExtended(), "%s/extended", name)
-				.register(true, () -> isPtoRetracted(), "%s/retracted", name)
-				.register(true, () -> isBrakeExtended(), "%s/extended", name)
+				.register(true, () -> isClimbModeEnabled(), "%s/extended", name)
+				.register(true, () -> isDriveModeEnabled(), "%s/retracted", name)
+				.register(true, () -> isBrakeApplied(), "%s/extended", name)
           		.register(true, () -> isBrakeRetracted(), "%s/retracted", name);
 	}
 
 	@Override
-	public DrivebaseInterface setPtoExtended(boolean extend) {
+	public DrivebaseInterface activateClimbMode(boolean extend) {
 		if (extend) {
 			ptoSolenoid.extend();
 		} else {
@@ -201,13 +201,13 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	}
 
 	@Override
-    public boolean isPtoExtended() {
+    public boolean isClimbModeEnabled() {
         //log.sub("Is intake extended: " +  solenoid.isExtended());
         return ptoSolenoid.isExtended();
 	}
 	
 	@Override
-    public boolean isBrakeExtended() {
+    public boolean isBrakeApplied() {
         //log.sub("Is intake extended: " +  solenoid.isExtended());
         return brakeSolenoid.isExtended();
 	}
@@ -219,7 +219,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	}
 
 	@Override
-	public boolean isPtoRetracted() {
+	public boolean isDriveModeEnabled() {
         //log.sub("Is intake extended: " +  solenoid.isExtended());
         return ptoSolenoid.isRetracted();
 	}

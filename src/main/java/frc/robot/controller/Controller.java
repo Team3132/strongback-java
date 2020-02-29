@@ -159,8 +159,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
 
 		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
-
-		//subsystems.climber.setDesiredAction(desiredState.climber);
 		
 		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
 

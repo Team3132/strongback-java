@@ -51,8 +51,8 @@ public class State {
 	public CameraMode cameraMode = null;
 
 	// Climber
-	public Boolean ptoGearboxExtended = null;  // What the climber should do.
-	public Boolean climberBrakeExtended = null;
+	public Boolean climbModeEnabled = null;  // What the climber should do.
+	public Boolean climberBrakeApplied = null;
 
 	// Buddy Climb
 	public Boolean buddyClimbExtended = null;
@@ -77,9 +77,8 @@ public class State {
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
 		buddyClimbExtended = subsystems.buddyClimb.isExtended();
-		ptoGearboxExtended = subsystems.drivebase.isPtoExtended();
-		climberBrakeExtended = subsystems.drivebase.isBrakeExtended();
-		buddyClimbExtended = subsystems.buddyClimb.isExtended();
+		climbModeEnabled = subsystems.drivebase.isClimbModeEnabled();
+		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
@@ -181,23 +180,23 @@ public class State {
 
 	
 	// Climber
-	public State ptoGearboxInPosition() {
-		ptoGearboxExtended = Boolean.valueOf(true);
+	public State enableClimbMode() {
+		climbModeEnabled = Boolean.valueOf(true);
 		return this;
 	}
 
-	public State ptoGearboxRetracted() {
-		intakeExtended = Boolean.valueOf(false);
+	public State enableDriveMode() {
+		climbModeEnabled = Boolean.valueOf(false);
 		return this;
 	}
 
 	public State applyClimberBrake() {
-		climberBrakeExtended = Boolean.valueOf(true);
+		climberBrakeApplied = Boolean.valueOf(true);
 		return this;
 	}
 
-	public State retractClimberBrake() {
-		climberBrakeExtended = Boolean.valueOf(false);
+	public State releaseClimberBrake() {
+		climberBrakeApplied = Boolean.valueOf(false);
 		return this;
 	}
 

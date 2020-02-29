@@ -192,8 +192,8 @@ public class Constants {
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
 
 	// Climber
-	public static final int CLIMBER_PTOSOLENOID_PORT = 3;
-	public static final int CLIMBER_BRAKESOLENOID_PORT = 0; 
+	public static final int CLIMBER_PTO_SOLENOID_PORT = 3;
+	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
 	
 	//Buddy climb
 	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;

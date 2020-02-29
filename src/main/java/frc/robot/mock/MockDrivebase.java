@@ -67,12 +67,12 @@ public class MockDrivebase implements DrivebaseInterface  {
 	}
 	
 	@Override
-	public boolean isPtoExtended() {
+	public boolean isClimbModeEnabled() {
 		return false;
 	}
 
 	@Override
-	public boolean isBrakeExtended() {
+	public boolean isBrakeApplied() {
 		return false;
 	}
 
@@ -82,12 +82,12 @@ public class MockDrivebase implements DrivebaseInterface  {
 	}
 
 	@Override
-	public boolean isPtoRetracted() {
+	public boolean isDriveModeEnabled() {
 		return false;
 	}
 
 	@Override
-	public DrivebaseInterface setPtoExtended(boolean extended) {
+	public DrivebaseInterface activateClimbMode(boolean extended) {
 		isPtoExtended = extended;
 		return this;
 	}

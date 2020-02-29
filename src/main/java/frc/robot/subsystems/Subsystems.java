@@ -161,8 +161,8 @@ public class Subsystems implements DashboardUpdater {
 		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
 				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
-				Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTOSOLENOID_PORT, 0.1, 0.1);
-				Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_BRAKESOLENOID_PORT, 0.1, 0.1);
+				Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT, 0.1, 0.1);
+				Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
 
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();

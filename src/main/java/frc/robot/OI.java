@@ -90,8 +90,8 @@ public class OI implements OIInterface {
 		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
 		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
 
-		onTriggered(rightStick.getButton(12), Sequences.deployPto());
-		onTriggered(rightStick.getButton(11), Sequences.stowPto());
+		onTriggered(rightStick.getButton(12), Sequences.enableClimbMode());
+		onTriggered(rightStick.getButton(11), Sequences.enableDriveMode());
 		onTriggered(rightStick.getButton(10), Sequences.climberBrake());
 		onTriggered(rightStick.getButton(9), Sequences.climberStopBrake());
 		onTriggered(rightStick.getButton(4), Sequences.deployBuddyClimber());
