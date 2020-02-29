@@ -6,11 +6,11 @@ import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+
 import org.strongback.components.Clock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import frc.robot.interfaces.ClimberInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.WheelColour;
@@ -28,7 +28,6 @@ public class State {
 	// Double and Boolean are used instead of double and boolean
 	// so that null can be used to indicate that the state shouldn't
 	// be changed and the current state be preserved.
-
 	// Time
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
 
@@ -52,7 +51,11 @@ public class State {
 	public CameraMode cameraMode = null;
 
 	// Climber
-	public ClimberAction climber = null;  // What the climber should do.
+	public Boolean climbModeEnabled = null;  // What the climber should do.
+	public Boolean climberBrakeApplied = null;
+
+	// Buddy Climb
+	public Boolean buddyClimbExtended = null;
 
 	// Driving.
 	public DriveRoutineParameters drive = null;
@@ -74,12 +77,14 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
+		buddyClimbExtended = subsystems.buddyClimb.isExtended();
+		climbModeEnabled = subsystems.drivebase.isClimbModeEnabled();
+		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
 		shooterRPM = subsystems.shooter.getTargetRPM();
 		shooterUpToSpeed = subsystems.shooter.isAtTargetSpeed();
-		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourAction = subsystems.colourWheel.getDesiredAction();
 		extendColourWheel = subsystems.colourWheel.isArmExtended();
@@ -114,7 +119,7 @@ public class State {
 	}
 
 	public State stowIntake() {
-		intakeExtended = Boolean.valueOf(true);
+		intakeExtended = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -175,33 +180,39 @@ public class State {
 		return this;
 	}
 
-
+	
 	// Climber
-	public State setFrontHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_FRONT_HEIGHT, height);
+	public State enableClimbMode() {
+		climbModeEnabled = true;
 		return this;
 	}
 
-	public State stopBothHeight() {
-		climber = new ClimberAction(ClimberAction.Type.STOP_BOTH_HEIGHT, 0);
+	public State enableDriveMode() {
+		climbModeEnabled = false;
 		return this;
 	}
 
-	public State setRearHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_REAR_HEIGHT, height);
+	public State applyClimberBrake() {
+		climberBrakeApplied = true;
 		return this;
 	}
 
-	public State setBothHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
+	public State releaseClimberBrake() {
+		climberBrakeApplied = false;
 		return this;
 	}
 
-	public State setClimberDriveSpeed(double speed) {
-		climber = new ClimberAction(ClimberAction.Type.SET_DRIVE_SPEED, speed);
+	// Buddy Climb
+	public State deployBuddyClimb() {
+		buddyClimbExtended = true;
 		return this;
 	}
 
+	public State retractBuddyClimb() {
+		buddyClimbExtended = true;
+		return this;
+	}
+	
 	// Color Wheel
 	public State colourWheelRotational() {
 		colourAction = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
@@ -307,8 +318,6 @@ public class State {
 		return this;
 	}
 
-
-
 	/**
 	 * Add waypoints for the drive base to drive through.
 	 * Note: The robot will come to a complete halt after each list
@@ -381,11 +390,13 @@ public class State {
 		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
 		maybeAdd("shooterRPM", shooterRPM, result);
 		maybeAdd("drive", drive, result);
-		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourwheelMode", colourAction, result);
 		maybeAdd("colourWheelExtended", extendColourWheel, result);
+		maybeAdd("climbModeEnabled", climbModeEnabled, result);
+		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
+		maybeAdd("buddyClimbExtended", buddyClimbExtended, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }

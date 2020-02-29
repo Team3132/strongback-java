@@ -14,9 +14,9 @@ import org.strongback.Strongback;
 import org.strongback.components.Clock;
 import org.strongback.components.Gyroscope;
 import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.PneumaticsModule;
 import org.strongback.components.Solenoid;
-import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
 import org.strongback.mock.Mock;
@@ -24,13 +24,45 @@ import org.strongback.mock.Mock;
 import edu.wpi.first.wpilibj.I2C;
 
 import frc.robot.Constants;
-import frc.robot.drive.routines.*;
-import frc.robot.interfaces.*;
+import frc.robot.drive.routines.ArcadeDrive;
+import frc.robot.drive.routines.CheesyDpadDrive;
+import frc.robot.drive.routines.ConstantDrive;
+import frc.robot.drive.routines.PositionalPIDDrive;
+import frc.robot.drive.routines.TrajectoryDrive;
+import frc.robot.interfaces.BuddyClimbInterface;
+import frc.robot.interfaces.ColourWheelInterface;
+import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.DashboardUpdater;
+import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+import frc.robot.interfaces.IntakeInterface;
+import frc.robot.interfaces.JevoisInterface;
+import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.LoaderInterface;
+import frc.robot.interfaces.LocationInterface;
+import frc.robot.interfaces.Log;
+import frc.robot.interfaces.ShooterInterface;
+import frc.robot.interfaces.VisionInterface;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
-import frc.robot.lib.*;
-import frc.robot.mock.*;
-import frc.robot.simulator.*;
+import frc.robot.lib.GamepadButtonsX;
+import frc.robot.lib.Jevois;
+import frc.robot.lib.MathUtil;
+import frc.robot.lib.MotorFactory;
+import frc.robot.lib.NavXGyroscope;
+import frc.robot.lib.NetworkTablesHelper;
+import frc.robot.lib.Position;
+import frc.robot.lib.RobotConfiguration;
+import frc.robot.lib.WheelColour;
+import frc.robot.mock.MockBuddyClimb;
+import frc.robot.mock.MockColourWheel;
+import frc.robot.mock.MockDrivebase;
+import frc.robot.mock.MockIntake;
+import frc.robot.mock.MockLEDStrip;
+import frc.robot.mock.MockLoader;
+import frc.robot.mock.MockLocation;
+import frc.robot.mock.MockShooter;
+import frc.robot.mock.MockVision;
+import frc.robot.simulator.IntakeSimulator;
 
 /**
  * Contains the subsystems for the robot.
@@ -47,14 +79,13 @@ public class Subsystems implements DashboardUpdater {
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
+	public BuddyClimbInterface buddyClimb;
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
 	public LoaderInterface loader;
 	public OverridableSubsystem<LoaderInterface> loaderOverride;
 	public ShooterInterface shooter;
 	public OverridableSubsystem<ShooterInterface> shooterOverride;
-	public ClimberInterface climber;
 	public ColourWheelInterface colourWheel;
-	public OverridableSubsystem<ClimberInterface> climberOverride;
 	public PneumaticsModule compressor;
 	public VisionInterface vision;
 	public JevoisInterface jevois;
@@ -85,7 +116,6 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.enable();
 		intake.enable();
 		shooter.enable();
-		climber.enable();
 		loader.enable();
 		colourWheel.enable();
 	}
@@ -95,7 +125,6 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.disable();
 		intake.disable();
 		shooter.disable();
-		climber.disable();
 		loader.disable();
 		colourWheel.disable();
 	}
@@ -104,7 +133,6 @@ public class Subsystems implements DashboardUpdater {
 	public void updateDashboard() {
 		drivebase.updateDashboard();
 		intake.updateDashboard();
-		climber.updateDashboard();
 		location.updateDashboard();
 		loader.updateDashboard();
 		shooter.updateDashboard();
@@ -134,6 +162,9 @@ public class Subsystems implements DashboardUpdater {
 		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
 				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
 				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
+		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT, 0.1, 0.1);
+		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
+
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
 		leftDriveSpeed = () -> leftMotor.getVelocity();
@@ -155,7 +186,7 @@ public class Subsystems implements DashboardUpdater {
 		location = new Location(() -> {	leftMotor.setPosition(0);
 			rightMotor.setPosition(0); },
 			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
-		drivebase = new Drivebase(leftMotor, rightMotor, driveHelper ,dashboard, log);
+		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, driveHelper ,dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -336,8 +367,7 @@ public class Subsystems implements DashboardUpdater {
 
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
-		BooleanSupplier intakeSensor = () -> intakeMotor.isAtReverseLimit();
-		intake = new Intake(intakeMotor, intakeSensor, intakeSolenoid, dashboard, log);
+		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log);
 	}
 
 	public void createIntakeOverride() {
@@ -347,6 +377,17 @@ public class Subsystems implements DashboardUpdater {
 		intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, intake, simulator, mock, log);
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
+	}
+
+	public void createBuddyClimb() {
+		if (!config.buddyClimbIsPresent) {
+			buddyClimb = new MockBuddyClimb(log);
+			log.sub("Buddy climb not present, using a mock buddy climb instead");
+			return;
+		}
+
+		Solenoid buddyClimbSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.BUDDYCLIMB_SOLENOID_PORT, 0.1, 0.1);
+		buddyClimb = new BuddyClimb(buddyClimbSolenoid, dashboard, log);
 	}
 
 	public void createColourWheel() {

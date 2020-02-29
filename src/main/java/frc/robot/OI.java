@@ -78,8 +78,6 @@ public class OI implements OIInterface {
 		// Left Stick's onTrigger drive slowly mode is handled in Robot.java, not here
 		// Hatch Vision
 		// Intaking is on this button.
-		onTriggered(leftStick.getButton(1), Sequences.startDriveByVision());
-		onUntriggered(leftStick.getButton(1), Sequences.stopDriveByVision());
 
 		// Intake - Right Stick Button 2 (on/off)
 		onTriggered(rightStick.getButton(2), Sequences.startIntaking());
@@ -91,6 +89,13 @@ public class OI implements OIInterface {
 
 		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
 		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
+
+		onTriggered(rightStick.getButton(12), Sequences.enableClimbMode());
+		onTriggered(rightStick.getButton(11), Sequences.enableDriveMode());
+		onTriggered(rightStick.getButton(10), Sequences.climberBrake());
+		onTriggered(rightStick.getButton(9), Sequences.climberStopBrake());
+		onTriggered(rightStick.getButton(4), Sequences.deployBuddyClimber());
+		onTriggered(rightStick.getButton(5), Sequences.retractBuddyClimber());
 	}
 
 	public void configureOperatorJoystick(InputDevice stick, String name) {
@@ -178,7 +183,8 @@ public class OI implements OIInterface {
 							  box.getButton(manualButton)),
 					() -> overrideableSubsystem.setAutomaticMode());
 	}
-    
+
+	
 	/**
 	 * Configure the rules for the user interfaces
 	 */
