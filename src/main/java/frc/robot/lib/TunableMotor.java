@@ -13,7 +13,7 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
 import org.strongback.mock.MockUpdateTimer;
 
 /**
- *  Whenever a motor is created, networkTable for the motor PIDF values are implemented from here * 
+ *  Whenever a motor is created, networkTable for the motor PIDF values are implemented from here.
  *  The PIDF values are initiliased on the network table and the motors on the robot grabs the PIDF
  * 	values once a second.
  */
@@ -28,12 +28,8 @@ import org.strongback.mock.MockUpdateTimer;
 		this.id = id;
 		startTime.init();
 	}
-	public TunableMotor(ArrayList<HardwareTalonSRX> motor, int id, double p, double i , double d , double f, 
-			NetworkTableHelperInterface networkTable) {
-				
-	}
 	
-	public static void tuneMotor(Motor motor, int id, double p, double i , double d , double f, NetworkTableHelperInterface networkTable) {
+	public static void tuneMotor(Motor  motor, int id, double p, double i , double d , double f, NetworkTablesHelper networkTable) {
 		var tunable = new TunableMotor(motor, id, p, i, d, f);
 		networkTable.set("p", p);
 		networkTable.set("i", i);
@@ -43,19 +39,6 @@ import org.strongback.mock.MockUpdateTimer;
 		Strongback.executor().register(tunable, Priority.LOW);
 	}
 
-	public static void tuneMotorArray(ArrayList<HardwareTalonSRX> motorLists, int id, double p, double i , double d , double f, NetworkTableHelperInterface networkTable) {
-		var tunable = new TunableMotor(motorLists, id, p, i, d, f);
-		networkTable.set("p", p);
-		networkTable.set("i", i);
-		networkTable.set("d", d);
-		networkTable.set("f", f);
-		motorLists.setPIDF(0, p, i, d, f);
-		Strongback.executor().register(tunable, Priority.LOW);
-	}
-
-	
-
-	
 	// Executes the command 1 time every 1 second.
 	@Override
 	public void execute(long timeInMillis) {

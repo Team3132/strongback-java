@@ -100,10 +100,10 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public void execute(final long timeInMillis) {
         final NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
-        final double p = spinnerHelper.get("p", 0);
-        final double i = spinnerHelper.get("i", 0);
-        final double d = spinnerHelper.get("d", 0);
-        final double f = spinnerHelper.get("f", 0);
+        final double p = spinnerHelper.set("p", 0);
+        final double i = spinnerHelper.set("i", 0);
+        final double d = spinnerHelper.set("d", 0);
+        final double f = spinnerHelper.set("f", 0);
         spinner.setPIDF(0, p, i, d, f);
         spinnerHelper.set("actualRPM", spinner.getVelocity());
         inSensorCount.execute(0);
