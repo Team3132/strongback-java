@@ -91,18 +91,18 @@ public class Loader extends Subsystem implements LoaderInterface, Executable, Da
     @Override
     public void execute(long timeInMillis) {
         NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
-        double p = spinnerHelper.get("p", 0);
-        double i = spinnerHelper.get("i", 0);
-        double d = spinnerHelper.get("d", 0);
-        double f = spinnerHelper.get("f", 0);
+        double p = spinnerHelper.set("p", 0);
+        double i = spinnerHelper.set("i", 0);
+        double d = spinnerHelper.set("d", 0);
+        double f = spinnerHelper.set("f", 0);
         spinner.setPIDF(0, p, i, d, f);
         spinnerHelper.set("actualRPM", spinner.getVelocity());
 
         NetworkTablesHelper passthroughHelper = new NetworkTablesHelper("loader/loaderinmotor/");
-        p = passthroughHelper.get("p", 0);
-        i = passthroughHelper.get("i", 0);
-        d = passthroughHelper.get("d", 0);
-        f = passthroughHelper.get("f", 0);
+        p = passthroughHelper.set("p", 0);
+        i = passthroughHelper.set("i", 0);
+        d = passthroughHelper.set("d", 0);
+        f = passthroughHelper.set("f", 0);
         passthrough.setPIDF(0, p, i, d, f);
         passthroughHelper.set("actualRPM", passthrough.getVelocity());
     }

@@ -20,17 +20,17 @@ public class MockNetworkTableHelper implements NetworkTableHelperInterface {
     }
 
     @Override
-    public double get(String key, double defaultValue) {
+    public double set(String key, double defaultValue) {
         return defaultValue;
     }
 
     @Override
-    public boolean get(String key, boolean defaultValue) {
+    public boolean set(String key, boolean defaultValue) {
         return defaultValue;
     }
 
     @Override
-    public String get(String key, String defaultValue) {
+    public String set(String key, String defaultValue) {
         return defaultValue;
     }
 

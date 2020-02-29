@@ -22,7 +22,7 @@ public class NetworkTablesHelper implements NetworkTableHelperInterface{
 	}
 	
     // double
-    public double get(String key, double defaultValue) {
+    public double set(String key, double defaultValue) {
         NetworkTableEntry entry = table.getEntry(key);
         if (entry.getType() == NetworkTableType.kUnassigned) {
             System.out.println("Unable to get the value for '" + key
@@ -32,13 +32,8 @@ public class NetworkTablesHelper implements NetworkTableHelperInterface{
         return entry.getDouble(defaultValue);
     }
     
-    public void set(String key, double value) {
-        NetworkTableEntry entry = table.getEntry(key);
-        entry.setDouble(value);
-    }
-
     // boolean
-    public boolean get(String key, boolean defaultValue) {
+    public boolean set(String key, boolean defaultValue) {
         NetworkTableEntry entry = table.getEntry(key);
         if (entry.getType() == NetworkTableType.kUnassigned) {
             System.out.println("Unable to get the value for '" + key
@@ -49,7 +44,7 @@ public class NetworkTablesHelper implements NetworkTableHelperInterface{
     }
 
     // String
-    public String get(String key, String defaultValue) {
+    public String set(String key, String defaultValue) {
         NetworkTableEntry entry = table.getEntry(key);
         if (entry.getType() == NetworkTableType.kUnassigned) {
             System.out.println("Unable to get the value for '" + key

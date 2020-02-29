@@ -7,7 +7,6 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.fasterxml.jackson.core.sym.Name;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.strongback.components.Clock;
@@ -23,14 +22,13 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
 
 public class MotorFactory {
 
-	public static Motor getDriveMotor(String motorControllerType, int[] canIDsWithEncoders,
-			int[] canIDsWithoutEncoders,
+	public static Motor getDriveMotor(String motorControllerType, int[] canIDsWithEncoders, int[] canIDsWithoutEncoders,
 			boolean leftMotor, boolean sensorPhase, double rampRate, boolean doCurrentLimiting, int contCurrent,
 			int peakCurrent, double p, double i, double d, double f, Clock clock, Log log) {
 
 		switch (motorControllerType) {
 		case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: {
-			HardwareSparkMAX spark = getSparkMAX(canIDsWithEncoders, leftMotor, NeutralMode.Brake, log, new NetworkTablesHelper(""));
+			HardwareSparkMAX spark = getSparkMAX(canIDsWithEncoders, leftMotor, NeutralMode.Brake, log, new NetworkTablesHelper("sparkMAX motor"));
 			spark.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE);
 			spark.setPIDF(0, p, i, d, f);
 			spark.setSensorPhase(sensorPhase);
@@ -53,9 +51,8 @@ public class MotorFactory {
 
 		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
 			HardwareTalonSRX talon = getTalon(canIDsWithEncoders, canIDsWithoutEncoders, leftMotor, NeutralMode.Brake,
-					clock, log); // don't invert output
+				clock, log, new NetworkTablesHelper("Drive motor")); // don't invert output
 			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
-			talon.setPIDF(0, p, i, d, f);
 			talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 			talon.setSensorPhase(sensorPhase);
 			talon.configClosedloopRamp(rampRate, 10);
@@ -143,9 +140,16 @@ public class MotorFactory {
      * @param log logger.
      * @return
      */
-    private static HardwareTalonSRX getTalon(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean invert, NeutralMode mode, Clock clock, Log log) {
+    private static HardwareTalonSRX getTalon(int[] canIDsWithEncoders, int[] canIDsWithoutEncoders, boolean invert, NeutralMode mode, Clock clock, Log log, NetworkTablesHelper networkTable) {
     	ArrayList<HardwareTalonSRX> potentialLeaders = getTalonList(canIDsWithEncoders, invert, mode, log);
-    	ArrayList<HardwareTalonSRX> followers = getTalonList(canIDsWithoutEncoders, invert, mode, log);
+		ArrayList<HardwareTalonSRX> followers = getTalonList(canIDsWithoutEncoders, invert, mode, log);
+
+		for (int i = 1; i < canIDsWithEncoders.length; i++){
+			TunableMotor.tuneMotorArray(potentialLeaders, abs(canIDsWithEncoders[i]), Constants.DRIVE_P, Constants.DRIVE_I, Constants.DRIVE_D, Constants.DRIVE_F, networkTable);
+		}
+		for (int i = 1; i < canIDsWithoutEncoders.length; i++){
+			TunableMotor.tuneMotorArray(followers, abs(canIDsWithoutEncoders[i]), Constants.DRIVE_P, Constants.DRIVE_I, Constants.DRIVE_D, Constants.DRIVE_F, networkTable);
+			}
     	return new RedundantTalonSRX(potentialLeaders, followers, clock, log);
 	}
 	
@@ -159,17 +163,17 @@ public class MotorFactory {
 		}
 		return list;
 	}
-		/**
-		 * Code to allow us to log output current per Talon and set up followers so that
-		 * it appears as a single motor but can be an arbitary number of motors configured
-		 * in the per robot configuration.
-		 * PID values 
-		 * @param name the name of the motor.
-		 * @param canIDs list of canIDs. First entry is the leader and the rest follow it.
-		 * @param invert change the direction.
-		 * @param log for registration of the current reporting.
-		 * @return the leader HardwareTalonSRX
-		 */
+	/**
+	 * Code to allow us to log output current per Talon and set up followers so that
+	 * it appears as a single motor but can be an arbitary number of motors configured
+	 * in the per robot configuration.
+	 * PID values 
+	 * @param name the name of the motor.
+	 * @param canIDs list of canIDs. First entry is the leader and the rest follow it.
+	 * @param invert change the direction.
+	 * @param log for registration of the current reporting.
+	 * @return the leader HardwareTalonSRX
+	 */
 
     private static HardwareTalonSRX getTalon(int[] canIDs, boolean invert, NeutralMode mode, Log log, NetworkTableHelperInterface networkTable) {
 
@@ -198,7 +202,7 @@ public class MotorFactory {
 	  * @param log for registration of the current values.
 	  * @return the HardwareTalonSRX motor controller.
 	  */
-	  private static HardwareTalonSRX getTalon(int canID, boolean invert, NeutralMode mode, Log log, NetworkTableHelperInterface networkTable) {
+	private static HardwareTalonSRX getTalon(int canID, boolean invert, NeutralMode mode, Log log, NetworkTableHelperInterface networkTable) {
 		log.sub("%s: " + canID, "talon");
 		int[] canIDs = new int[1];
 		canIDs[0] = canID;

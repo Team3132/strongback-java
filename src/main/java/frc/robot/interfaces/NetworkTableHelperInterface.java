@@ -8,7 +8,7 @@
 package frc.robot.interfaces;
 
 public interface NetworkTableHelperInterface extends DashboardUpdater {
-    public double get(String key, double defaultValue);
-    public boolean get(String key, boolean defaultValue);
-    public String get(String key, String defaultValue);
+    public double set(String key, double defaultValue);
+    public boolean set(String key, boolean defaultValue);
+    public String set(String key, String defaultValue);
 }
