@@ -239,33 +239,40 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence colourWheelRotational() {
+	public static Sequence startColourWheelRotational() {
 		Sequence seq = new Sequence("start rotational control");
+		seq.add().extendedColourWheel();
 		seq.add().colourWheelRotational();
+		seq.add().retractColourWheel();
 		return seq;
 	}
 	
-	public static Sequence colourWheelPositional(WheelColour colour) {
+	public static Sequence startColourWheelPositional(WheelColour colour) {
 		Sequence seq = new Sequence("start positional control");
-		seq.add().colourWheelPositional(colour);
+		seq.add().extendedColourWheel();
+		seq.add().startColourWheelPositional(colour);
+		seq.add().retractColourWheel();
 		return seq;
 	}
 
 	public static Sequence stopColourWheel() {
 		Sequence seq = new Sequence("stop colour wheel spinner");
 		seq.add().stopColourWheel();
+		seq.add().retractColourWheel();
 		return seq;
 	}
 
-	public static Sequence colourWheelLeft() {
-		Sequence seq = new Sequence("moving colour wheel left");
-		seq.add().colourWheelLeft();
+	public static Sequence colourWheelAnticlockwise() {
+		Sequence seq = new Sequence("moving colour wheel anticlockwise");
+		seq.add().extendedColourWheel();
+		seq.add().colourWheelAnticlockwise();
 		return seq;
 	}
 
-	public static Sequence colourWheelRight() {
-		Sequence seq = new Sequence("moving colour wheel right");
-		seq.add().colourWheelRight();
+	public static Sequence colourWheelClockwise() {
+		Sequence seq = new Sequence("moving colour wheel clockwise");
+		seq.add().extendedColourWheel();
+		seq.add().colourWheelClockwise();
 		return seq;
 	}
 
