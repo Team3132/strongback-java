@@ -174,7 +174,7 @@ public class MotorFactory {
 		log.register(false, () -> leader.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[0]);
 		leader.setSmartCurrentLimit(Constants.DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT, 10);
 		leader.setSecondaryCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
-		TunableMotor.tuneMotor(leader, abs(canIDs[0]), Constants.DRIVE_P, Constants.DRIVE_I, Constants.DRIVE_D, Constants.DRIVE_F, networkTable);
+		TunableMotor.tuneMotor(leader, abs(canIDs[0]), p, i, d, f, networkTable);
 
 		for (int n = 1; n < canIDs.length; n++) {
 			boolean shouldInvert = invert;

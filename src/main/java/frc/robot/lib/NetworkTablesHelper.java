@@ -61,10 +61,6 @@ public class NetworkTablesHelper implements NetworkTableHelperInterface{
     @Override
     public void set(String key, double value) {
         NetworkTableEntry entry = table.getEntry(key);
-        if (entry.getType() == NetworkTableType.kUnassigned) {
-            System.out.println("Unable to get the value for '" + key
-                    + "' in table '" + tableName + "'");
-        	entry.setDouble(value);
-        }
+        entry.setDouble(value);
     }
 }
