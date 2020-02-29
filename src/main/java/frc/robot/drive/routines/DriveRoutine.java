@@ -61,9 +61,11 @@ public abstract interface DriveRoutine {
 	/**
 	 * DriveMotion determines the power that should be applied to the left and right
 	 * hand fieldConfig of the robot by the drivebase.
+	 * @param leftSpeed The current speed of the robot on the left side.
+	 * @param rightSpeed The current speed of the robot on the right side.
 	 * @return The power to apply to each side of the robot by the drivebase.
 	 */
-	public DriveMotion getMotion();
+	public DriveMotion getMotion(double leftSpeed, double rightSpeed);
 
 	/**
 	 * Returns true if there is nothing more to do.

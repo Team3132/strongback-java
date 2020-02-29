@@ -23,6 +23,9 @@ import org.strongback.control.PIDController;
 import org.strongback.hardware.Hardware.Switches.AnalogOption;
 import org.strongback.hardware.Hardware.Switches.TriggerMode;
 
+import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.mock.MockLEDStrip;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -442,4 +445,8 @@ public class Mock {
             return new MockRelay();
         }
     }
+
+	public static LEDStripInterface ledStrip() {
+		return new MockLEDStrip();
+	}
 }
