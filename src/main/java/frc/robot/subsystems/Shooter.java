@@ -4,6 +4,7 @@ import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Solenoid;
 
+import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ShooterInterface;
@@ -26,6 +27,7 @@ public class Shooter extends Subsystem implements ShooterInterface {
             .register(true, () -> isHoodRetracted(), "%s/retracted", name);
     }
 
+    @Override
 	public void disable() {
 		super.disable();
         flyWheel.setTargetRPM(0);
@@ -35,7 +37,7 @@ public class Shooter extends Subsystem implements ShooterInterface {
      * Set the speed on the shooter wheels.
      */
     @Override
-    public ShooterInterface setTargetSpeed(double speed) { 
+    public ShooterInterface setTargetRPM(double speed) { 
         log.sub("Setting target speed");
         flyWheel.setTargetRPM(speed);
         return this;
@@ -46,11 +48,9 @@ public class Shooter extends Subsystem implements ShooterInterface {
         return flyWheel.getTargetRPM(); 
     }
     
+    @Override
     public boolean isAtTargetSpeed() {
-        if (flyWheel.getRPM() >= flyWheel.getTargetRPM()) {
-            return true;
-        }
-        return false;
+        return Math.abs(flyWheel.getRPM() - flyWheel.getTargetRPM()) < Constants.SHOOTER_SPEED_TOLERANCE_RPM;
     }
 
     @Override
@@ -122,6 +122,7 @@ public class Shooter extends Subsystem implements ShooterInterface {
     public void updateDashboard() {
         dashboard.putNumber("Shooter target rpm", flyWheel.getTargetRPM());
         dashboard.putNumber("Shooter actual rpm", flyWheel.getRPM());
+        dashboard.putString("Shooter status", isAtTargetSpeed() ? "At target" : "Not at target");
         dashboard.putString("Shooter hood", isHoodExtended() ? "extended" : (isHoodRetracted() ? "retracted" : "moving"));
     }
 }

@@ -1,7 +1,6 @@
 
 package frc.robot.simulator;
 
-import java.lang.*;
 import frc.robot.interfaces.ShooterInterface;
 import frc.robot.lib.MovementSimulator;
 
@@ -16,7 +15,7 @@ public class ShooterSimulator implements ShooterInterface{
 	private final double kMinAngle = 0;
 	private final double kMaxAngle = 45;
 	private final double kMovementTolerance = 1;  // How close before it's classed as being in position.
-    private double targetSpeed = 0;
+    private double targetRPM = 0;
     private double shooterTime = 0;
 	private MovementSimulator arm = new MovementSimulator("hood", kMaxSpeed, kMaxAccel, kMinAngle, kMaxAngle, kMovementTolerance);
 
@@ -51,15 +50,15 @@ public class ShooterSimulator implements ShooterInterface{
     }
 
     @Override
-    public ShooterInterface setTargetSpeed(double speed) {
-        this.targetSpeed = speed;
+    public ShooterInterface setTargetRPM(double rpm) {
+        this.targetRPM = rpm;
         this.shooterTime = System.currentTimeMillis();
         return this;
     }
 
     @Override
     public double getTargetRPM() {
-        return targetSpeed;
+        return targetRPM;
     }
 
 

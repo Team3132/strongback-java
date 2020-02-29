@@ -5,15 +5,15 @@ import frc.robot.interfaces.Log;
 
 public class MockShooter implements ShooterInterface {
 
-    private double targetSpeed = 0;
+    private double targetRPM = 0;
 	private boolean isExtended = false;
 
     public MockShooter(Log log) {
     }
 
     @Override
-    public ShooterInterface setTargetSpeed(double speed) {
-        targetSpeed = speed;
+    public ShooterInterface setTargetRPM(double rpm) {
+        targetRPM = rpm;
         return this;
     }
 
@@ -24,7 +24,7 @@ public class MockShooter implements ShooterInterface {
 
     @Override
     public double getTargetRPM() {
-        return targetSpeed;
+        return targetRPM;
     }
 
 	@Override

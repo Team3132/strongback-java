@@ -161,7 +161,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.climber.setDesiredAction(desiredState.climber);
 		
-		subsystems.shooter.setTargetSpeed(desiredState.shooterRPM);
+		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
 
 		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
 
@@ -215,7 +215,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while spinning up shooter, stopping shooter");
-			subsystems.shooter.setTargetSpeed(0);
+			subsystems.shooter.setTargetRPM(0);
 		}
 	}
 	

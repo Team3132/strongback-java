@@ -132,7 +132,7 @@ public class OI implements OIInterface {
 		// While the shooter speed button is pressed, set the target speed. Does not
 		// turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), () -> {
-			shooterIF.setTargetSpeed(
+			shooterIF.setTargetRPM(
 					1.5 * Constants.SHOOTER_TARGET_SPEED_RPM * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
 			log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
 		});
