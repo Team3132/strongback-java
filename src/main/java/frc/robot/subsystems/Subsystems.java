@@ -21,6 +21,7 @@ import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
 import org.strongback.mock.Mock;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
 
 import frc.robot.Constants;
@@ -456,8 +457,10 @@ public class Subsystems implements DashboardUpdater {
 		//TODO: replace with appropriate subsystem PIDF values.
 		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, 0, 0, 0, 0, log); 
 		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
-		BooleanSupplier loaderInSensor = () -> spinnerMotor.isAtForwardLimit();
-		BooleanSupplier loaderOutSensor = () -> spinnerMotor.isAtReverseLimit(); 
+		DigitalInput inBallSensor = new DigitalInput(Constants.IN_BALL_DETECTOR_DIO_PORT);
+		DigitalInput outBallSensor = new DigitalInput(Constants.OUT_BALL_DETECTOR_DIO_PORT);
+		BooleanSupplier loaderInSensor = () -> inBallSensor.get();
+		BooleanSupplier loaderOutSensor = () -> outBallSensor.get(); 
 		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
 		Strongback.executor().register(loader, Priority.LOW);
 
