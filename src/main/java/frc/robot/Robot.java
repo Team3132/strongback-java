@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
+	private LogDygraph log;
 	private Log log;
 	private NetworkTablesHelper networkTable;
 
@@ -165,6 +166,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
+		log.restartLogs();
 		log.info("auto has started");
 		subsystems.enable();
 
@@ -191,6 +193,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
+		log.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
@@ -213,6 +216,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void testInit() {
+		log.restartLogs();
 		subsystems.enable();
 	}
 
