@@ -2,9 +2,6 @@
  * Sequences for doing most actions on the robot.
  * 
  * If you add a new sequence, add it to allSequences at the end of this file.
- * 
- * Design doc:
- *   https://docs.google.com/document/d/1IBAw5dKG8hiahRkd8FzU75j3yF6No33oQXtNEKi3LXc/edit#
  */
 package frc.robot.controller;
 
@@ -93,7 +90,10 @@ public class Sequences {
 
 	public static Sequence setDrivebaseToArcade() {
 		Sequence seq = new Sequence("Arcade");
-		seq.add().doArcadeDrive();
+		seq.add().doArcadeDrive()
+			.setShooterRPM(0) // Turn off everything that may be on.
+			.retractShooterHood()
+			.setLoaderSpinnerMotorRPM(0);
 		return seq;
 	}
 
@@ -161,36 +161,54 @@ public class Sequences {
 
 	// Testing methods
 	public static Sequence startIntakingOnly() {
-		Sequence seq = new Sequence("start Intaking");
+		Sequence seq = new Sequence("start intaking");
 		seq.add().deployIntake();
 		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT).deployIntake();
 		return seq;
 	}
 
 	public static Sequence stopIntakingOnly() {
-		Sequence seq = new Sequence("stop Intaking");
+		Sequence seq = new Sequence("stop intaking");
 		seq.add().setIntakeMotorOutput(0.0);
 		seq.add().stowIntake();
 		return seq;
 	}
+
 	// This is to test the Loader system
 	public static Sequence startLoader() {
-		Sequence seq = new Sequence("start Loader");
+		Sequence seq = new Sequence("start loader");
 		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
 		return seq;
 	}
 
 	public static Sequence stopLoader() {
-		Sequence seq = new Sequence("stop Loader");
+		Sequence seq = new Sequence("stop loader");
 		seq.add().setLoaderSpinnerMotorRPM(0.0);
 		return seq;
 	}
-	
-	public static Sequence startShooting() {
-		Sequence seq = new Sequence("start shooting");
+
+	/**
+	 * As the shooter takes time to spin up, enable spinning
+	 * it up in advance.
+	 * Use the button mapped for near/far shooting to halt.
+	 */
+	public static Sequence spinUpShooter() {
+		Sequence seq = new Sequence("spin up shooter");
 		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
-		// Give the shooter wheel time to spin up.
-		seq.add().setDelayDelta(2); 
+		return seq;
+	}
+
+	public static Sequence startShooting(boolean closeToGoal) {
+		Sequence seq = new Sequence("start shooting");
+		// Shooter wheel may already be up to speed.
+		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
+		if (closeToGoal) {
+			// Shooting from just below the goal straight up.
+			seq.add().retractShooterHood();
+		} else {
+			// Shooting from far from the goal at a flat angle.
+			seq.add().extendShooterHood();
+		}
 		// Start the loader to push the balls.
 		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
 		// Wait for the shooter wheel to settle.
@@ -233,9 +251,25 @@ public class Sequences {
 	public static Sequence visionAim(){
 		Sequence seq = new Sequence("vision aim");
 		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
+		// Start the loader to push the balls.
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		seq.add().extendShooterHood();
+		// Allow the robot to move to aim to the vision target while
+		// the shooter wheel spins up.
 		seq.add().doVisionAim(); 
+		// Wait for the shooter wheel to settle if it hasn't already.
 		seq.add().waitForShooter();
+		// Back to normal driving so it can be adjusted while shooting.
 		seq.add().doArcadeDrive();
+		// Let the balls out of the loader and into the shooter.
+		seq.add().unblockShooter();
+		// Wait for all of the balls to leave.
+		seq.add().waitForBalls(0);
+		// Turn off everything.
+		seq.add().setShooterRPM(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPM(0)
+			.blockShooter();
 		return seq;
 	}
 
@@ -276,41 +310,29 @@ public class Sequences {
 		return seq;
 	}
 
-	// Climber
-	public static Sequence enableClimbMode() {
-		Sequence seq = new Sequence("Enable climb mode");
-		seq.add().enableClimbMode();
+	// Drive / climb mode.
+	public static Sequence toggleDriveClimbModes() {
+		Sequence seq = new Sequence("toggle drive / climb modes");
+		seq.add().toggleDriveClimbMode();
 		return seq;
 	}
 
-	public static Sequence enableDriveMode() {
-		Sequence seq = new Sequence("Enable drive mode");
-		seq.add().enableDriveMode();
-		return seq;
-	}
-
-	public static Sequence climberBrake() {
-		Sequence seq = new Sequence("Climber brake apply");
+	public static Sequence applyClimberBrake() {
+		Sequence seq = new Sequence("apply climber brake");
 		seq.add().applyClimberBrake();
 		return seq;
 	}
 
-	public static Sequence climberStopBrake() {
-		Sequence seq = new Sequence("Climber brake release");
+	public static Sequence releaseClimberBrake() {
+		Sequence seq = new Sequence("release climber brake");
 		seq.add().releaseClimberBrake();
 		return seq;	
 	}
 
-	// Buddy Climb
-	public static Sequence deployBuddyClimber() {
-		Sequence seq = new Sequence("Deploying buddy climb attatchment");
-		seq.add().deployBuddyClimb();
-		return seq;
-	}
-
-	public static Sequence retractBuddyClimber() {
-		Sequence seq = new Sequence("Retracting buddy climb attatchment");
-		seq.add().retractBuddyClimb();
+	// Toggle buddy climb (deploy / retract)
+	public static Sequence toggleBuddyClimb() {
+		Sequence seq = new Sequence("toggle buddy climb attatchment");
+		seq.add().toggleBuddyClimb();
 		return seq;
 	}
 
@@ -322,13 +344,15 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		startShooting(),
+		startShooting(true),
 		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),
 		getDriveToWaypointSequence(0, 12, 0),
 		startLoader(),
 		stopLoader(),
+		toggleBuddyClimb(),
+		toggleDriveClimbModes(),
 		visionAim(),
 	};	
 }  

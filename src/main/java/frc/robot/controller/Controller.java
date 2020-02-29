@@ -11,7 +11,6 @@ import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.WheelColour;
-import frc.robot.subsystems.ColourWheel;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -124,11 +123,6 @@ public class Controller implements Runnable, DashboardUpdater {
 	/**
 	 * Does the simple, dumb and most importantly, safe thing.
 	 * 
-	 * See the design doc before changing this.
-	 * 
-	 * Steps through: - Wait for all subsystems to finish moving. - Deploy or
-	 * retract the intake if necessary. -
-	 * 
 	 * Note if the step asks for something which will cause harm to the robot, the
 	 * request will be ignored. For example if the lift was moved into a position
 	 * the intake could hit it and then the intake was moved into the lift, the
@@ -169,11 +163,24 @@ public class Controller implements Runnable, DashboardUpdater {
 		
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
+
 		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
+		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
+
+		// Toggle buddy climb if needed
+		if (desiredState.buddyClimbToggle) {
+			subsystems.buddyClimb.setExtended(!subsystems.buddyClimb.isExtended());
+		}
+
+		// Toggle between drive and climb modes if needed
+		if (desiredState.driveClimbModeToggle) {
+			subsystems.drivebase.activateClimbMode(!subsystems.drivebase.isClimbModeEnabled());
+		}
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
+		waitForShooterHood();
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
 		// Wait for driving to finish if needed.
@@ -200,7 +207,12 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitUntil(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
 	}
 
-
+	/**
+	 * Blocks waiting till the shooter hood is in position.
+	 */
+	private void waitForShooterHood() {
+		waitUntil(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
+	}
 
 	/**
 	 * Maybe wait for the shooter to get up to the target speed.

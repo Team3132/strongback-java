@@ -124,6 +124,7 @@ public class Constants {
 	* Shooter constants
 	*/
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
+	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
 	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
 	public static final double SHOOTER_F = 0.18;
 	public static final double SHOOTER_P = 0.7;

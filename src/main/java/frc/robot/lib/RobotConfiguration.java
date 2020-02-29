@@ -219,11 +219,11 @@ public class RobotConfiguration {
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
-		loaderIsPresent = getAsBoolean("loader/present", true);
+		loaderIsPresent = getAsBoolean("loader/present", false);
 		loaderSpinnerCanID = getAsInt("loader/spinner/canID", Constants.LOADER_SPINNER_MOTOR_CAN_ID);
 		loaderPassthroughCanID = getAsInt("loader/passthrough/canID", Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID);
 
-		shooterIsPresent = getAsBoolean("shooter/present", true);
+		shooterIsPresent = getAsBoolean("shooter/present", false);
 		shooterCanIds = getAsIntArray("shooter/shooterCanIDs", Constants.SHOOTER_TALON_CAN_ID_LIST);
 		
 		shooterP = getAsDouble("shooter/p", shooterP);
