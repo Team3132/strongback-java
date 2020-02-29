@@ -19,15 +19,14 @@ import frc.robot.interfaces.Log;
 
 public class MotorFactory {
 
-	public static Motor getDriveMotor(String motorControllerType, int[] canIDs, boolean leftMotor, 
+	public static Motor getDriveMotor(String motorControllerType, int[] drivebaseCanIdsLeftWithEncoders, boolean leftMotor, 
 			boolean sensorPhase, double rampRate, boolean doCurrentLimiting, int contCurrent,
 			int peakCurrent, double p, double i, double d, double f, Clock clock, Log log) {
 
 		switch (motorControllerType) {
 		case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: {
-			HardwareSparkMAX spark = getSparkMAX(canIDs, leftMotor, NeutralMode.Brake, log, new NetworkTablesHelper("drive"));
+			HardwareSparkMAX spark = getSparkMAX(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("drive"));
 			spark.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE);
-			spark.setPIDF(0, p, i, d, f);
 			spark.setSensorPhase(sensorPhase);
 
 			/*
@@ -47,7 +46,7 @@ public class MotorFactory {
 			// Falling through to TalonSRX.
 
 		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
-			HardwareTalonSRX talon = getTalon(canIDs, leftMotor, NeutralMode.Coast, log, p, i, d, f,
+			HardwareTalonSRX talon = getTalon(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Coast, log, p, i, d, f,
 					new NetworkTablesHelper("drive")); // don't invert output
 			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
 			talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
@@ -90,15 +89,9 @@ public class MotorFactory {
 		motor.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
 		// Out sensor (beambreak) for loader
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
-		motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_MAIN_MOTOR_SCALE); // number of ticks per rotation.
 		motor.configClosedloopRamp(0, 10);
-		NetworkTablesHelper helper = new NetworkTablesHelper("loader/spinnermotor/");
-		helper.get("p", p);
-		helper.get("i", i);
-		helper.get("d", d);
-		helper.get("f", f);
 		return motor;
 	}
 	public static HardwareTalonSRX getLoaderPassthroughMotor(int canID, boolean invert,double p, double i, double d, double f, Log log) {	
@@ -111,7 +104,6 @@ public class MotorFactory {
 			double p, double i, double d, double f,	Clock clock, Log log) {
 		HardwareTalonSRX motor = getTalon(canIDs, false, NeutralMode.Coast, log, p, i, d, f,
 				new NetworkTablesHelper("shooter")); // don't invert output
-		motor.setPIDF(0, p, i, d, f);
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(36);
@@ -176,7 +168,7 @@ public class MotorFactory {
      * @return the leader SparkMAX
      */
 
-    private static HardwareSparkMAX getSparkMAX(int[] canIDs, boolean invert, NeutralMode mode, Log log, NetworkTablesHelper networkTable) {
+    private static HardwareSparkMAX getSparkMAX(int[] canIDs, boolean invert, NeutralMode mode, Log log, double p, double i, double d, double f, NetworkTablesHelper networkTable) {
 		HardwareSparkMAX leader = Hardware.Motors.sparkMAX(abs(canIDs[0]), MotorType.kBrushless, invert);
 		leader.setIdleMode(mode == NeutralMode.Brake ? IdleMode.kBrake : IdleMode.kCoast);
 		log.register(false, () -> leader.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[0]);
@@ -184,13 +176,13 @@ public class MotorFactory {
 		leader.setSecondaryCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
 		TunableMotor.tuneMotor(leader, abs(canIDs[0]), Constants.DRIVE_P, Constants.DRIVE_I, Constants.DRIVE_D, Constants.DRIVE_F, networkTable);
 
-		for (int i = 1; i < canIDs.length; i++) {
+		for (int n = 1; n < canIDs.length; n++) {
 			boolean shouldInvert = invert;
-			if (canIDs[i] < 0)
+			if (canIDs[n] < 0)
 				shouldInvert = !shouldInvert;
-			HardwareSparkMAX follower = Hardware.Motors.sparkMAX(abs(canIDs[i]), MotorType.kBrushless, shouldInvert);
+			HardwareSparkMAX follower = Hardware.Motors.sparkMAX(abs(canIDs[n]), MotorType.kBrushless, shouldInvert);
 			follower.getHWSpark().follow(leader.getHWSpark());
-			log.register(false, () -> follower.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[i]);
+			log.register(false, () -> follower.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[n]);
 		}
 		// Reset the scale. Normally velocity is in rpm when normally we'd like rps,
 		// which is easier to reason about. setScale() takes care of the converstion
@@ -203,7 +195,7 @@ public class MotorFactory {
 		log.sub("%s: " + canID, " spark max");
 		int[] canIDs = new int[1];
 		canIDs[0] = canID;
-		return getSparkMAX(canIDs, invert, mode, log, networkTable);
+		return getSparkMAX(canIDs, invert, mode, log, p, i, d, f, networkTable);
 	}
 	
 	private static int abs(int value) {

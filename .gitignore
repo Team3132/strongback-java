@@ -159,5 +159,3 @@ imgui.ini
 
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
-src/main/java/frc/robot/subsystems/Subsystems.java.orig
-src/main/java/frc/robot/lib/MotorFactory.java.orig
