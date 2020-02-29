@@ -121,24 +121,18 @@ public class Constants {
 	public static final int[] OUTTAKE_MOTOR_TALON_CAN_ID_LIST = {15};
 
 	
-	/*
-	* Loader
-	*/
-	public static final int LOADER_SPINNER_CAN_ID = 30; //TODO: find canID for Loader motor
-	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 31; //TODO: find canID for Loader Input motor
-	public static final int LOADER_FEEDER_MOTOR_CAN_ID = 47; //TODO: find canID for Loader Output motor
-	public static final double LOADER_MOTOR_CURRENT = 1.0;
-	public static final int PADDLE_SOLENOID_PORT = 2;
-	public static final double LOADER_IN_MOTOR_SCALE = 4096/10;//1024*10; //ticks per rotation
-	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; //ticks per rotation
-	public static final double LOADER_SPINNER_P = 0.4; //TODO: assign values to PIDF
+	
+
+	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 12;
+	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 11;
+	public static final double LOADER_MOTOR_RPM = 600;
+	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
+	public static final int PADDLE_SOLENOID_PORT = 2; 
+	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; // ticks per rotation
+	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 20;
 	public static final double LOADER_SPINNER_F = 0.225;
-	public static final double LOADER_PASSTHROUGH_P = 0.2;
-	public static final double LOADER_PASSTHROUGH_I = 0;
-	public static final double LOADER_PASSTHROUGH_D = 2.0;
-	public static final double LOADER_PASSTHROUGH_F = 0.1025;
 	
 	/*
 	 * Canifier 

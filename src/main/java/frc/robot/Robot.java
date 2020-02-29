@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
+	private LogDygraph log;
 	private Log log;
 	private NetworkTablesHelper networkTable;
 
@@ -99,13 +100,13 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
 		subsystems = new Subsystems(createDashboard(), config, clock, log);
+		subsystems.createLEDStrip();
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(driverLeftJoystick, driverRightJoystick);
 		subsystems.createIntake();
 		subsystems.createLoader();
 		subsystems.createOverrides();
 		subsystems.createVision();
-		subsystems.createLEDStrip();
 		subsystems.createColourWheel();
 
 		createPowerMonitor();
@@ -165,8 +166,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
+		log.restartLogs();
 		log.info("auto has started");
-
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
@@ -175,6 +176,9 @@ public class Robot extends IterativeRobot implements Executable {
 
 		// Kick off the selected auto program.
 		auto.executedSelectedSequence(controller);
+		// Gets the amount set in SmartDashboard and sets the init ball count
+		int initialNumBalls = auto.getSelectedBallAmount(); 
+		subsystems.loader.setInitBallCount(initialNumBalls);
 	}
 
 	/**
@@ -189,6 +193,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
+		log.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
@@ -211,6 +216,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void testInit() {
+		log.restartLogs();
 		subsystems.enable();
 	}
 

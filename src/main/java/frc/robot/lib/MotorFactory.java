@@ -90,6 +90,10 @@ public class MotorFactory {
 
 	public static HardwareTalonSRX getLoaderSpinnerMotor(int canID, boolean invert, double p, double i, double d, double f,Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+		// In sensor (beambreak) for loader
+		motor.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
+		// Out sensor (beambreak) for loader
+		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
 		motor.setPIDF(0, p, i, d, f);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.LOADER_MAIN_MOTOR_SCALE); // number of ticks per rotation.
@@ -101,20 +105,7 @@ public class MotorFactory {
 		helper.set("f", f);
 		return motor;
 	}
-	public static HardwareTalonSRX getLoaderPassthroughMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {	
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.setPIDF(0, p, i, d, f);
-		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(Constants.LOADER_IN_MOTOR_SCALE); // number of ticks per rotation
-		motor.configClosedloopRamp(0.5, 10);
-		NetworkTablesHelper helper = new NetworkTablesHelper("loader/passthroughmotor/");
-		helper.set("p", p);
-		helper.set("i", i);
-		helper.set("d", d);
-		helper.set("f", f);
-		return motor;
-	}
-	public static HardwareTalonSRX getLoaderFeederMotor(int canID, boolean invert, Log log) {	
+	public static HardwareTalonSRX getLoaderPassthroughMotor(int canID, boolean invert, Log log) {	
 		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
 		motor.configClosedloopRamp(0.5, 10);
 		return motor;
