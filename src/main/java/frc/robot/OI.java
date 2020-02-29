@@ -121,6 +121,20 @@ public class OI implements OIInterface {
 
  	@Override
 	public void configureDiagBox(InputDevice box) {
+		// Shooter overrides.
+		OverridableSubsystem<ShooterInterface> shooterOverride = subsystems.shooterOverride;
+		// Get the interface that the diag box uses.
+		ShooterInterface shooterIF = shooterOverride.getOverrideInterface();
+		// Setup the switch for manual/auto/off modes.
+		mapOverrideSwitch(box, OperatorBoxButtons.SHOOTER_DISABLE, OperatorBoxButtons.SHOOTER_MANUAL, shooterOverride);
+		// While the shooter speed button is pressed, set the target speed. Does not
+		// turn off.
+		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), () -> {
+			shooterIF.setTargetRPM(
+					1.5 * Constants.SHOOTER_TARGET_SPEED_RPM * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
+			log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
+		});
+
 		// Intake overrides.
 		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
 		// Get the interface that the diag box uses.
@@ -135,11 +149,12 @@ public class OI implements OIInterface {
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_RETRACT), 
 			() -> intakeIF.setExtended(false));
 
+
 		// Get the interface that the diag box uses.
 		LoaderInterface loaderIF = subsystems.loaderOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
-	  // While the loader speed button is pressed, set the target speed. Does not turn off.
+		// While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
 			() -> loaderIF.setTargetSpinnerMotorRPM(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
@@ -149,13 +164,11 @@ public class OI implements OIInterface {
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
 			() -> loaderIF.setTargetPassthroughMotorOutput(0));
 		
-		
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING), 
-			() -> loaderIF.setPaddleNotBlocking(false));
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING), 
-			() -> loaderIF.setPaddleNotBlocking(true));
-}
-
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING),
+				() -> loaderIF.setPaddleNotBlocking(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING),
+				() -> loaderIF.setPaddleNotBlocking(true));
+	}
 
 	private void mapOverrideSwitch(InputDevice box, int disableButton, int manualButton, OverridableSubsystem overrideableSubsystem) {
 		onTriggered(box.getButton(disableButton), () -> overrideableSubsystem.turnOff());
@@ -164,7 +177,6 @@ public class OI implements OIInterface {
 					Switch.or(box.getButton(disableButton),
 							  box.getButton(manualButton)),
 					() -> overrideableSubsystem.setAutomaticMode());
-
 	}
     
 	/**

@@ -35,12 +35,17 @@ public class State {
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
+	
+	// Shooter
+	public Double shooterRPM = null;  // Set the shooter target speed.
+	// If this field is not called shooterUpToSpeed plz update applyState() in Controller.java
+	public Boolean shooterUpToSpeed = null;
 
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
 	public Double loaderSpinnerMotorRPM = null;
 	public Boolean loaderPaddleNotBlocking = null;
-	// If this field is not called expectedNumberOfBalls plz update applyState in Controller.java
+	// If this field is not called expectedNumberOfBalls plz update applyState() in Controller.java
 	public Integer expectedNumberOfBalls = null;
 
 	// Vision
@@ -72,6 +77,8 @@ public class State {
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
+		shooterRPM = subsystems.shooter.getTargetRPM();
+		shooterUpToSpeed = subsystems.shooter.isAtTargetSpeed();
 		climber = subsystems.climber.getDesiredAction();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourAction = subsystems.colourWheel.getDesiredAction();
@@ -121,6 +128,15 @@ public class State {
 		return this;
 	}
 
+	public State setShooterRPM(double targetSpeed) {
+		shooterRPM = Double.valueOf(targetSpeed);
+		return this;
+	}
+
+	public State waitForShooter() {
+		shooterUpToSpeed = true;
+		return this;
+	}
 
 	// Loader
 	public State setLoaderSpinnerMotorRPM(double rpm) {
@@ -133,6 +149,14 @@ public class State {
 	}
 	public State setPaddleNotBlocking(boolean blocking) {
 		loaderPaddleNotBlocking = Boolean.valueOf(blocking);
+		return this;
+	}
+	public State unblockShooter() {
+		loaderPaddleNotBlocking = true;
+		return this;
+	}
+	public State blockShooter() {
+		loaderPaddleNotBlocking = false;
 		return this;
 	}
 	public State waitForBalls(int numBalls) {
@@ -319,7 +343,7 @@ public class State {
 			try {
 				if (field.get(desiredState) == null) {
 					// Don't save state for expected balls to avoid race condition
-					if(field.getName() != "expectedNumberOfBalls") {
+					if (field.getName() != "expectedNumberOfBalls" && field.getName() != "shooterUpToSpeed") {
 						field.set(updatedState, field.get(currentState));
 					}	
 				} else {
@@ -354,6 +378,8 @@ public class State {
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
 		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
+		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
+		maybeAdd("shooterRPM", shooterRPM, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("climber", climber, result);
 		maybeAdd("timeAction", timeAction, result);
