@@ -51,7 +51,7 @@ public class RobotConfiguration {
 	public double cameraFromLeftWithBumpers = 0;
 
 	public int teamNumber = 3132;
-	public boolean drivebaseIsPresent = true;
+	public boolean drivebaseIsPresent = false;
 	public String drivebaseMotorControllerType = Constants.DRIVE_DEFAULT_CONTROLLER_TYPE;
 	public int[] drivebaseCanIdsLeftWithEncoders = Constants.DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST;
 	public int[] drivebaseCanIdsLeftWithoutEncoders = Constants.DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST;
@@ -108,7 +108,7 @@ public class RobotConfiguration {
 
 	public boolean navxIsPresent = false;
 
-	public boolean visionIsPresent = true;
+	public boolean visionIsPresent = false;
 	public double visionHMin = Constants.VISION_H_MIN;
 	public double visionHMax = Constants.VISION_S_MAX;
 	public double visionSMin = Constants.VISION_H_MAX;
@@ -116,7 +116,7 @@ public class RobotConfiguration {
 	public double visionVMin = Constants.VISION_S_MIN;
 	public double visionVMax = Constants.VISION_V_MAX;
 	
-	public boolean climberIsPresent = true;
+	public boolean climberIsPresent = false;
 	public int climberFrontCanID = Constants.CLIMBER_FRONT_CAN_ID;
 	public int climberRearCanID = Constants.CLIMBER_REAR_CAN_ID;
 	public int climberDriveMotorCanID = Constants.CLIMBER_DRIVE_MOTOR_CAN_ID;
@@ -209,7 +209,7 @@ public class RobotConfiguration {
 		drivebaseSensorPhase = getAsBoolean("drivebase/sensor/phase", drivebaseSensorPhase);
 		drivebaseCount = getAsDouble("drivebase/count100ms", drivebaseCount);
 	
-		intakeIsPresent = getAsBoolean("intake/present", true);
+		intakeIsPresent = getAsBoolean("intake/present", false);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
 
 		colourWheelIsPresent = getAsBoolean("colourWheel/present", false);
@@ -218,16 +218,16 @@ public class RobotConfiguration {
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
-		loaderIsPresent = getAsBoolean("loader/present", true);
+		loaderIsPresent = getAsBoolean("loader/present", false);
 		loaderCanID = getAsInt("loader/canID", Constants.LOADER_SPINNER_CAN_ID);
 
 		
-		pdpIsPresent = getAsBoolean("pdp/present", true);
+		pdpIsPresent = getAsBoolean("pdp/present", false);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);
 		pdpMonitor = getAsBoolean("pdp/monitor", false);		// by default we do NOT monitor the PDP
 		pdpChannelsToMonitor = getAsIntArray("pdp/channels", new int[0]);	// by default we do NOT monitor and channels
 
-		pcmIsPresent = getAsBoolean("pcm/present", true);
+		pcmIsPresent = getAsBoolean("pcm/present", false);
 		pcmCanId = getAsInt("pcm/canID", Constants.PCM_CAN_ID);
 		
 		navxIsPresent = getAsBoolean("navx/present", false);
@@ -237,7 +237,7 @@ public class RobotConfiguration {
 		cameraFromFrontWithBumpers = getAsDouble("dimensions/cameraFromFrontWithBumpers", 0.0);
 		cameraFromLeftWithBumpers = getAsDouble("dimensions/cameraFromLeftWithBumpers", 0.0);
 		
-		visionIsPresent = getAsBoolean("vision/present", true);
+		visionIsPresent = getAsBoolean("vision/present", false);
 		visionHMin = getAsDouble("vision/hsvFilter/h/min", Constants.VISION_H_MIN);
 		visionHMax = getAsDouble("vision/hsvFilter/h/max", Constants.VISION_H_MAX);
 		visionSMin = getAsDouble("vision/hsvFilter/s/min", Constants.VISION_S_MIN);
