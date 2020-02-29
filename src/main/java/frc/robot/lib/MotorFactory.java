@@ -110,7 +110,20 @@ public class MotorFactory {
 		motor.configClosedloopRamp(0.5, 10);
 		return motor;
 	}
+	
+	public static HardwareTalonSRX getShooterMotor(int[] canIDs, boolean sensorPhase, 
+	double p, double i, double d, double f,	Clock clock, Log log) {
+		HardwareTalonSRX motor = getTalon(canIDs, false, NeutralMode.Coast, log); // don't invert output
+		motor.setPIDF(0, p, i, d, f);
+		motor.setSensorPhase(sensorPhase);
+		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		motor.setScale(36);
+		
+		motor.configClosedloopRamp(0.125, 10);
+		motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
 
+		return motor;
+	}
 
 	/**
      * Code to allow us to log output current per talon using redundant talons so if a talon or encoder

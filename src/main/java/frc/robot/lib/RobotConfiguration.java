@@ -89,6 +89,14 @@ public class RobotConfiguration {
 	public int loaderSpinnerCanID = Constants.LOADER_SPINNER_MOTOR_CAN_ID;
 	public int loaderPassthroughCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
 
+	public boolean shooterIsPresent = false;
+	public int[] shooterCanIds = Constants.SHOOTER_TALON_CAN_ID_LIST;
+
+	public double shooterP = Constants.SHOOTER_P;
+	public double shooterI = Constants.SHOOTER_I;
+	public double shooterD = Constants.SHOOTER_D;
+	public double shooterF = Constants.SHOOTER_F;
+
 	public boolean pdpIsPresent = false;
 	public int pdpCanId = Constants.PDP_CAN_ID;
 	public boolean pdpMonitor = false;  // by default we do NOT monitor the PDP
@@ -214,6 +222,14 @@ public class RobotConfiguration {
 		loaderIsPresent = getAsBoolean("loader/present", true);
 		loaderSpinnerCanID = getAsInt("loader/spinner/canID", Constants.LOADER_SPINNER_MOTOR_CAN_ID);
 		loaderPassthroughCanID = getAsInt("loader/passthrough/canID", Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID);
+
+		shooterIsPresent = getAsBoolean("shooter/present", true);
+		shooterCanIds = getAsIntArray("shooter/shooterCanIDs", Constants.SHOOTER_TALON_CAN_ID_LIST);
+		
+		shooterP = getAsDouble("shooter/p", shooterP);
+		shooterI = getAsDouble("drivebase/i", shooterI);
+		shooterD = getAsDouble("drivebase/d", shooterD);
+		shooterF = getAsDouble("drivebase/f", shooterF);
 		
 		pdpIsPresent = getAsBoolean("pdp/present", false);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);

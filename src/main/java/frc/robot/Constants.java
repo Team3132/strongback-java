@@ -54,9 +54,9 @@ public class Constants {
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
 	public static final double ROBOT_WIDTH_INCHES = 20;
-	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5,6};
+	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1, 2};
 	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5, 6}; 
 	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
 	public static final double DRIVE_WHEEL_DIAMETER         = 6; // inches 
@@ -120,9 +120,20 @@ public class Constants {
 
 	public static final int[] OUTTAKE_MOTOR_TALON_CAN_ID_LIST = {15};
 
-	
-	
+	/*
+	* Shooter constants
+	*/
+	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
+	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
+	public static final double SHOOTER_F = 0.18;
+	public static final double SHOOTER_P = 0.7;
+	public static final double SHOOTER_I = 0;
+	public static final double SHOOTER_D = 0;
+	public static final int SHOOTER_TARGET_SPEED_RPM = 6500;
 
+	/*
+	* Loader
+	*/
 	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 12;
 	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 11;
 	public static final double LOADER_MOTOR_RPM = 600;
@@ -183,28 +194,7 @@ public class Constants {
 	// Climber
 	public static final int CLIMBER_PTOSOLENOID_PORT = 3;
 	public static final int CLIMBER_BRAKESOLENOID_PORT = 0; 
-	public static final double CLIMBER_GEAR_RATIO = 13.5;
-	public static final double CLIMBER_DRUM_CIRCUMFRENCE_METRES = 0.039 * Math.PI;
-
-	public static final double CLIMBER_TOLERANCE = 0.5;
-	public static final double CLIMBER_MAX_DISTANCE_FROM_TOP = 0;
-	public static final double CLIMBER_HEIGHT = 2; //Temporary, unused
-	public static final double CLIMBER_F = 0;
-	public static final double CLIMBER_P = 4;
-	public static final double CLIMBER_I = 0;
-	public static final double CLIMBER_D = 0;
-
-	public static final double CLIMBER_DEPLOY_HEIGHT = 5;
-	public static final double CLIMBER_CLIMB_HEIGHT = -5;
-
-	public static final double CLIMBER_MAX_MOTOR_POWER = 0.1;
-
-	public static final double 	CLIMBER_POWER_NOT_LEVEL_P = 0;
 	
-	public static final int CLIMBER_PEAK_CURRENT_LIMIT = 38;
-	public static final double CLIMBER_WINCH_LEFT_SCALE_FACTOR = 9609/7.9529;     // 7.7953;	// 18" ticks = 20208 ticks
-	public static final double CLIMBER_WINCH_RIGHT_SCALE_FACTOR = 9634/7.9528;
-
 	//Buddy climb
 	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
 

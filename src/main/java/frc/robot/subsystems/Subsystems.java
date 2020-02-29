@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -39,6 +40,7 @@ import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.ShooterInterface;
 import frc.robot.interfaces.VisionInterface;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.GamepadButtonsX;
@@ -57,6 +59,7 @@ import frc.robot.mock.MockIntake;
 import frc.robot.mock.MockLEDStrip;
 import frc.robot.mock.MockLoader;
 import frc.robot.mock.MockLocation;
+import frc.robot.mock.MockShooter;
 import frc.robot.mock.MockVision;
 import frc.robot.simulator.IntakeSimulator;
 
@@ -79,6 +82,8 @@ public class Subsystems implements DashboardUpdater {
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
 	public LoaderInterface loader;
 	public OverridableSubsystem<LoaderInterface> loaderOverride;
+	public ShooterInterface shooter;
+	public OverridableSubsystem<ShooterInterface> shooterOverride;
 	public ColourWheelInterface colourWheel;
 	public PneumaticsModule compressor;
 	public VisionInterface vision;
@@ -101,6 +106,7 @@ public class Subsystems implements DashboardUpdater {
 	public void createOverrides() {
 		createIntakeOverride();
 		createLoaderOverride();
+		createShooterOverride();
 	}
 
 	public void enable() {
@@ -108,6 +114,7 @@ public class Subsystems implements DashboardUpdater {
 		// location is always enabled.
 		drivebase.enable();
 		intake.enable();
+		shooter.enable();
 		loader.enable();
 		colourWheel.enable();
 	}
@@ -116,6 +123,7 @@ public class Subsystems implements DashboardUpdater {
 		log.info("Disabling Subsystems");
 		drivebase.disable();
 		intake.disable();
+		shooter.disable();
 		loader.disable();
 		colourWheel.disable();
 	}
@@ -126,6 +134,7 @@ public class Subsystems implements DashboardUpdater {
 		intake.updateDashboard();
 		location.updateDashboard();
 		loader.updateDashboard();
+		shooter.updateDashboard();
 		vision.updateDashboard();
 		colourWheel.updateDashboard();
 	}
@@ -436,8 +445,7 @@ public class Subsystems implements DashboardUpdater {
 
 		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderSpinnerCanID, false, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log);
 		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, log);
-		// Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
-		Solenoid paddleSolenoid = Mock.Solenoids.singleSolenoid(1);
+		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
 		BooleanSupplier loaderInSensor = () -> spinnerMotor.isAtForwardLimit();
 		BooleanSupplier loaderOutSensor = () -> spinnerMotor.isAtReverseLimit(); 
 		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
@@ -452,6 +460,29 @@ public class Subsystems implements DashboardUpdater {
 		loaderOverride = new OverridableSubsystem<LoaderInterface>("loader", LoaderInterface.class, loader, simulator, mock, log);
 		// Plumb accessing the lift through the override.
 		loader = loaderOverride.getNormalInterface();
+	}
+
+	public void createShooter() {
+		if (!config.shooterIsPresent) {
+			shooter = new MockShooter(log);
+			log.sub("Created a mock shooter!");
+			return;
+		}
+
+		Solenoid shooterSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, false, config.shooterP, config.shooterI,
+				config.shooterD, config.shooterF, clock, log);
+
+		shooter = new Shooter(shooterMotor, shooterSolenoid, dashboard, log);
+	}
+
+	public void createShooterOverride() {
+		// Setup the diagBox so that it can take control.
+		MockShooter simulator = new MockShooter(log);  // Nothing to simulate, use a mock instead.
+		MockShooter mock = new MockShooter(log);
+		shooterOverride = new OverridableSubsystem<ShooterInterface>("shooter", ShooterInterface.class, shooter, simulator, mock, log);
+		// Plumb accessing the shooter through the override.
+		shooter = shooterOverride.getNormalInterface();
 	}
 
 	/**
