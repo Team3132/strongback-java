@@ -37,7 +37,6 @@ public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
 	private LogDygraph log;
-	private Log log;
 	private NetworkTablesHelper networkTable;
 
 	// User interface.
