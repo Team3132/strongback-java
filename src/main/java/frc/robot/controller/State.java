@@ -46,7 +46,10 @@ public class State {
 
 	// Climber
 	public Boolean ptoGearboxExtended = null;  // What the climber should do.
-	public Boolean brakeExtended = null;
+	public Boolean climberBrakeExtended = null;
+
+	// Buddy Climb
+	public Boolean buddyClimbExtended = null;
 
 	// Driving.
 	public DriveRoutineParameters drive = null;
@@ -68,7 +71,8 @@ public class State {
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
 		ptoGearboxExtended = subsystems.drivebase.isPtoExtended();
-		brakeExtended = subsystems.drivebase.isBrakeExtended();
+		climberBrakeExtended = subsystems.drivebase.isBrakeExtended();
+		buddyClimbExtended = subsystems.buddyClimb.isExtended()
 		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
 		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
 		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
@@ -162,12 +166,23 @@ public class State {
 	}
 
 	public State applyClimberBrake() {
-		brakeExtended = Boolean.valueOf(true);
+		climberBrakeExtended = Boolean.valueOf(true);
 		return this;
 	}
 
 	public State retractClimberBrake() {
-		brakeExtended = Boolean.valueOf(false);
+		climberBrakeExtended = Boolean.valueOf(false);
+		return this;
+	}
+
+	// Buddy Climb
+	public State deployBuddyClimb() {
+		buddyClimbExtended = Boolean.valueOf(true);
+		return this;
+	}
+
+	public State retractBuddyClimb() {
+		buddyClimbExtended = Boolean.valueOf(false);
 		return this;
 	}
 	

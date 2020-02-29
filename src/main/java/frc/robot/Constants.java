@@ -214,6 +214,9 @@ public class Constants {
 	public static final double CLIMBER_WINCH_LEFT_SCALE_FACTOR = 9609/7.9529;     // 7.7953;	// 18" ticks = 20208 ticks
 	public static final double CLIMBER_WINCH_RIGHT_SCALE_FACTOR = 9634/7.9528;
 
+	//Buddy climb
+	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
+
 	// logging information constants
 	public static final String WEB_BASE_PATH = "/media/sda1";		// where web server's data lives
 	public static final String LOG_BASE_PATH = WEB_BASE_PATH;		// log files (has to be inside web server)

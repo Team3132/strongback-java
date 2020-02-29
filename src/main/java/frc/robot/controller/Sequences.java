@@ -252,6 +252,19 @@ public class Sequences {
 		return seq;	
 	}
 
+	// Buddy Climb
+	public static Sequence deployBuddyClimber() {
+		Sequence seq = new Sequence("Deploying buddy climb attatchment");
+		seq.add().deployBuddyClimb();
+		return seq;
+	}
+
+	public static Sequence retractBuddyClimber() {
+		Sequence seq = new Sequence("Retracting buddy climb attatchment");
+		seq.add().retractBuddyClimb();
+		return seq;
+	}
+
 	// For testing. Needs to be at the end of the file.
 	public static Sequence[] allSequences = new Sequence[] { 
 		

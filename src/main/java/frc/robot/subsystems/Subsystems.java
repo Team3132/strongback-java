@@ -47,6 +47,7 @@ public class Subsystems implements DashboardUpdater {
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
+	public BuddyClimbInterface buddyClimb;
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
 	public LoaderInterface loader;
 	public OverridableSubsystem<LoaderInterface> loaderOverride;
@@ -338,6 +339,17 @@ public class Subsystems implements DashboardUpdater {
 		intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, intake, simulator, mock, log);
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
+	}
+
+	public void createBuddyClimb() {
+		if (!config.buddyClimbIsPresent) {
+			buddyClimb = new MockBuddyClimb(log);
+			log.sub("Buddy climb not present, using a mock buddy climb instead");
+			return;
+		}
+
+		Solenoid buddyClimbSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.BUDDYCLIMB_SOLENOID_PORT, 0.1, 0.1);
+		buddyClimb = new BuddyClimb(buddyClimbSolenoid, dashboard, log);
 	}
 
 	public void createColourWheel() {

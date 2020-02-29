@@ -74,7 +74,7 @@ public class RobotConfiguration {
 	public double drivebaseCount =  Constants.DRIVE_COUNT_100ms;
 	
 	public boolean intakeIsPresent = false;
-	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
+	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;w
 
 	public boolean colourWheelIsPresent = false;
 	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;
@@ -119,6 +119,9 @@ public class RobotConfiguration {
 	
 	public int climberPtoCanID = Constants.CLIMBER_PTOSOLENOID_CAN_ID;
 	public int climberBrakeCanID = Constants.CLIMBER_BRAKESOLENOID_CAN_ID;
+
+	public boolean buddyClimbIsPresent = false;
+	public int buddyClimbSolenoidPort = Constants.BUDDYCLIMB_SOLENOID_PORT;
 
 	// Logging default is to not log anything to the graph, and to only log local information when we turn it on.
 	// These are the safest defaults.
