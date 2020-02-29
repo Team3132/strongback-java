@@ -34,8 +34,8 @@ public class GamepadButtonsX {
     public static final int RIGHT_X_AXIS = 4;
     public static final int RIGHT_Y_AXIS = 5;
     
-    public static final double TRIGGER_THRESHOLD = 0.2;			// trigger greater than this is considered 'on' as a switch
-    public static final double AXIS_THRESHOLD = 0.1;			// axis greater than this is considered 'on' as a switch
+    public static final double TRIGGER_THRESHOLD = 0.6;			// trigger greater than this is considered 'on' as a switch
+    public static final double AXIS_THRESHOLD = 0.3;			// axis greater than this is considered 'on' as a switch
     
     public static final int DPAD_NORTH = 0;
     public static final int DPAD_NORTH_EAST = 45;
