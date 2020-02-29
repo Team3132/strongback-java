@@ -21,11 +21,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Auto {
 	private final Log log;
 	private SendableChooser<Sequence> autoProgram = new SendableChooser<Sequence>();
+	private SendableChooser<Integer> initBallSelector = new SendableChooser<Integer>();
+	
 	
 	public Auto(Log log) {
 		this.log = log;
-		addAutoSequences();
-		addChooser();
+		addAutoOptions();
+		initAutoChooser();
+		addBallOptions();
+		initBallChooser();
+	}
+
+	private void addBallOptions() {
+		initBallSelector.addOption("0", Integer.valueOf(0));
+		initBallSelector.addOption("1", Integer.valueOf(1));
+		initBallSelector.addOption("2", Integer.valueOf(2));
+		initBallSelector.setDefaultOption("3", Integer.valueOf(3));
+		initBallSelector.addOption("4", Integer.valueOf(4));
+		initBallSelector.addOption("5", Integer.valueOf(5));
 	}
 
 	public void executedSelectedSequence(Controller controller) {
@@ -33,8 +46,13 @@ public class Auto {
 		log.info("Starting selected auto program %s", seq.getName());
 		controller.doSequence(seq);
 	}
+	public int getSelectedBallAmount() {
+		Integer numBalls = initBallSelector.getSelected();
+		log.info("Starting with %s balls", numBalls);
+		return numBalls;
+	}
 
-	private void addAutoSequences() {
+	private void addAutoOptions() {
 		autoProgram.setDefaultOption("Nothing", Sequences.getEmptySequence());
 		autoProgram.addOption("Drive forward 10in", Sequences.getDriveToWaypointSequence(10 * Constants.INCHES_TO_METRES, 0, 0));
 		addDriveTestSequence();
@@ -117,7 +135,10 @@ public class Auto {
 	}
 
 	
-	private void addChooser() {
+	private void initAutoChooser() {
 		SmartDashboard.putData("Auto program", autoProgram);
 	}	
+	private void initBallChooser() {
+		SmartDashboard.putData("Initial balls", initBallSelector);
+	}
 }
