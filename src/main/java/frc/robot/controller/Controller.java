@@ -154,10 +154,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 	
-		
-		// Do the next steps in parallel as they don't mechanically conflict with each other.
-		
-
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
 
@@ -173,7 +169,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
 		waitForClimber();
-		maybeWaitForShooter();
+		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
@@ -206,7 +202,15 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
 	}
 
-	private void maybeWaitForShooter() {
+	/**
+	 * Maybe wait for the shooter to get up to the target speed.
+	 * @param shooterUpToSpeed if not null, blocks waiting for shooter to achieve target speed.
+	 */
+	private void maybeWaitForShooter(Boolean shooterUpToSpeed) {
+		if (shooterUpToSpeed == null) {
+			// Don't wait.
+			return;
+		}
 		try {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {

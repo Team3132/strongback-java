@@ -38,13 +38,14 @@ public class State {
 	
 	// Shooter
 	public Double shooterRPM = null;  // Set the shooter target speed.
+	// If this field is not called shooterUpToSpeed plz update applyState() in Controller.java
 	public Boolean shooterUpToSpeed = null;
 
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
 	public Double loaderSpinnerMotorRPM = null;
 	public Boolean loaderPaddleNotBlocking = null;
-	// If this field is not called expectedNumberOfBalls plz update applyState in Controller.java
+	// If this field is not called expectedNumberOfBalls plz update applyState() in Controller.java
 	public Integer expectedNumberOfBalls = null;
 
 	// Vision
@@ -330,7 +331,7 @@ public class State {
 			try {
 				if (field.get(desiredState) == null) {
 					// Don't save state for expected balls to avoid race condition
-					if(field.getName() != "expectedNumberOfBalls") {
+					if (field.getName() != "expectedNumberOfBalls" && field.getName() != "shooterUpToSpeed") {
 						field.set(updatedState, field.get(currentState));
 					}	
 				} else {
