@@ -54,9 +54,9 @@ public class Constants {
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
 	public static final double ROBOT_WIDTH_INCHES = 20;
-	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5,6};
+	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1, 2};
 	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5, 6}; 
 	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
 	public static final double DRIVE_WHEEL_DIAMETER         = 6; // inches 
@@ -120,7 +120,17 @@ public class Constants {
 
 	public static final int[] OUTTAKE_MOTOR_TALON_CAN_ID_LIST = {15};
 
-	
+	/*
+	* Shooter constants
+	*/
+	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
+	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
+	public static final double SHOOTER_F = 0.18;
+	public static final double SHOOTER_P = 0.7;
+	public static final double SHOOTER_I = 0;
+	public static final double SHOOTER_D = 0;
+	public static final int SHOOTER_TARGET_SPEED_RPM = 6500;
+
 	/*
 	* Loader
 	*/
@@ -180,28 +190,6 @@ public class Constants {
 	// Turn to angle (all need tuning)
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
-
-	// Climber (both level 2 and level 3). Replaces L3.
-	public static final double CLIMBER_TOLERANCE = 0.5;
-	public static final double MAX_WINCH_PAIR_OFFSET = 20./25.4;
-	public static final int CLIMBER_FRONT_CAN_ID = 45;
-	public static final int CLIMBER_REAR_CAN_ID = 47;
-	public static final int CLIMBER_DRIVE_MOTOR_CAN_ID = 48;
-	public static final double CLIMBER_HEIGHT = 2; //Temporary, unused
-	public static final double CLIMBER_L2_CLIMB_HEIGHT = 7.5;
-	public static final double CLIMBER_L3_CLIMB_HEIGHT = 21;
-	public static final double DRIVEBASE_CLIMBER_DRIVE_SPEED = -2.5; // inches/sec
-	//public static final double DRIVEBASE_CLIMBER_DRIVE_SLOW_POWER = -0.15;
-	public static final double CLIMBER_DRIVE_POWER = 1;
-	public static final double CLIMBER_POSITION_F = 0;
-	public static final double CLIMBER_POSITION_P = 4;
-	public static final double CLIMBER_POSITION_I = 0;
-	public static final double CLIMBER_POSITION_D = 0;
-	public static final int CLIMBER_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
-	public static final int CLIMBER_PEAK_CURRENT_LIMIT = 43;
-	public static final int CLIMBER_CURRENT_TIMEOUT_MS = 100;
-	public static final double CLIMBER_WINCH_FRONT_SCALE_FACTOR = 9609/7.9529;     // 7.7953;	// 18" ticks = 20208 ticks
-	public static final double CLIMBER_WINCH_REAR_SCALE_FACTOR = 9634/7.9528;
 
 	// logging information constants
 	public static final String WEB_BASE_PATH = "/media/sda1";		// where web server's data lives

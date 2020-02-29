@@ -110,28 +110,18 @@ public class MotorFactory {
 		motor.configClosedloopRamp(0.5, 10);
 		return motor;
 	}
-
-	public static HardwareTalonSRX getClimberWinchMotor(int canID, boolean sensorPhase, boolean invert, Log log) {
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
+	
+	public static HardwareTalonSRX getShooterMotor(int[] canIDs, boolean sensorPhase, 
+	double p, double i, double d, double f,	Clock clock, Log log) {
+		HardwareTalonSRX motor = getTalon(canIDs, false, NeutralMode.Coast, log); // don't invert output
+		motor.setPIDF(0, p, i, d, f);
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.getSensorCollection().setQuadraturePosition(0, 10);			// reset the encoders on code start. We assume we are on the floor and the lifts are retracted on code restart.
-		motor.set(ControlMode.Position, 0);
-		motor.configContinuousCurrentLimit(Constants.CLIMBER_CONTINUOUS_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
-		motor.configPeakCurrentLimit(Constants.CLIMBER_PEAK_CURRENT_LIMIT, Constants.CLIMBER_CURRENT_TIMEOUT_MS);
-		motor.setPIDF(0, Constants.CLIMBER_POSITION_P, Constants.CLIMBER_POSITION_I, Constants.CLIMBER_POSITION_D, Constants.CLIMBER_POSITION_F);
-		motor.configClosedloopRamp(0, 10);
-		// Set the deadband to zero.
-		motor.configAllowableClosedloopError(0, 0, 10);  // 1" = 20
-		motor.configAllowableClosedloopError(1, 0, 10);
-		return motor;
-	}
-	
-	public static HardwareTalonSRX getClimberDriveMotor(int canID, boolean invert, Log log) {	
-		HardwareTalonSRX motor = getTalon(canID, invert, NeutralMode.Brake, log);
-		motor.configClosedloopRamp(.25, 10);
-		motor.configVoltageCompSaturation(8, 10);
-		motor.enableVoltageCompensation(true);
+		motor.setScale(36);
+		
+		motor.configClosedloopRamp(0.125, 10);
+		motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
+
 		return motor;
 	}
 
