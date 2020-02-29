@@ -114,7 +114,7 @@ public class Constants {
 	public static final double INTAKE_POSITION_I = 0;
 	public static final double INTAKE_POSITION_D = 0;
 
-	public static final int INTAKE_SOLENOID_PORT = 0;
+	public static final int INTAKE_SOLENOID_PORT = 1;
 
 	public static final int[] TEST_SPARK_MOTOR_CAN_ID_LIST = {50, 51};
 
@@ -128,8 +128,7 @@ public class Constants {
 	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 31; //TODO: find canID for Loader Input motor
 	public static final int LOADER_FEEDER_MOTOR_CAN_ID = 47; //TODO: find canID for Loader Output motor
 	public static final double LOADER_MOTOR_CURRENT = 1.0;
-	public static final int LOADER_SOLENOID_PORT = 2; 
-	public static final int PADDLE_SOLENOID_PORT = 1;
+	public static final int PADDLE_SOLENOID_PORT = 2;
 	public static final double LOADER_IN_MOTOR_SCALE = 4096/10;//1024*10; //ticks per rotation
 	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; //ticks per rotation
 	public static final double LOADER_SPINNER_P = 0.4; //TODO: assign values to PIDF
@@ -188,10 +187,8 @@ public class Constants {
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
 
 	// Climber
-	public static final int CLIMBER_PTOSOLENOID_CAN_ID = 11;
-	public static final int CLIMBER_BRAKESOLENOID_CAN_ID = 10;
 	public static final int CLIMBER_PTOSOLENOID_PORT = 3;
-	public static final int CLIMBER_BRAKESOLENOID_PORT = 4; 
+	public static final int CLIMBER_BRAKESOLENOID_PORT = 0; 
 	public static final double CLIMBER_GEAR_RATIO = 13.5;
 	public static final double CLIMBER_DRUM_CIRCUMFRENCE_METRES = 0.039 * Math.PI;
 
