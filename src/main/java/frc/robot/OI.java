@@ -11,6 +11,8 @@ import frc.robot.controller.Controller;
 import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.*;
+import frc.robot.interfaces.ClimberInterface.ClimberAction;
+import frc.robot.interfaces.ClimberInterface.ClimberAction.Type;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
 import frc.robot.lib.WheelColour;
@@ -96,7 +98,7 @@ public class OI implements OIInterface {
 		onTriggered(rightStick.getButton(5), Sequences.getEmptySequence());
 		onUntriggered(rightStick.getButton(5), Sequences.getEmptySequence());		
 
-		//shift PTO mode (empty sequence)
+		//shift PTO mode, toggle (empty sequence)
 		onTriggered(rightStick.getButton(6), Sequences.getEmptySequence());
 		onUntriggered(rightStick.getButton(6), Sequences.getEmptySequence());		
 
@@ -110,7 +112,7 @@ public class OI implements OIInterface {
 		//onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.getStartSequence());
 		
 		//lucas pls finish the colourwheel stuff amogh is confused
-		
+
 		//note: manual adjust doesnt have an untriggered stop on it 
 		//note: drop colourwheel has a seperate button (Y)
 
@@ -186,9 +188,9 @@ public class OI implements OIInterface {
 	    // While the intake speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
 			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
-		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_EXTEND), 
+		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_DEPLOY), 
 			() -> intakeIF.setExtended(true));
-		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_RETRACT), 
+		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_STOW), 
 			() -> intakeIF.setExtended(false));
 
 		// Get the interface that the diag box uses.
@@ -209,11 +211,20 @@ public class OI implements OIInterface {
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_FEEDER_MOTOR),
 			() -> loaderIF.setTargetFeederMotorOutput(0));
 		
-		
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_RETRACT), 
 			() -> loaderIF.setPaddleExtended(false));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_EXTEND), 
 			() -> loaderIF.setPaddleExtended(true));
+
+		
+		ClimberInterface climberIF = subsystems.climberOverride.getOverrideInterface();
+		// Setup the switch for manual/auto/off modes.
+		mapOverrideSwitch(box, OperatorBoxButtons.CLIMBER_DISABLE, OperatorBoxButtons.CLIMBER_MANUAL, subsystems.climberOverride);
+		onTriggered(box.getButton(OperatorBoxButtons.CLIMBER_EXTEND), 
+			() -> climberIF.setDesiredAction(new ClimberAction(Type.SET_BOTH_HEIGHT, 
+			0.2*box.getAxis(OperatorBoxButtons.CLIMBER_POT).read())));
+	
+		
 }
 
 
