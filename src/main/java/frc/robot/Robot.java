@@ -17,6 +17,7 @@ import frc.robot.controller.Controller;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.OIInterface;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.LogDygraph;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
@@ -206,7 +207,11 @@ public class Robot extends IterativeRobot implements Executable {
 
 	@Override
 	public void teleopPeriodic() {
-	
+		if (driverStation.getMatchTime() <= 15) {
+			subsystems.setLEDFinal15Seconds(driverStation.getMatchTime());
+		} else {
+			subsystems.setLEDAllianceColour(allianceLEDColour());
+		}
 	}
 
 	/**
@@ -364,7 +369,8 @@ public class Robot extends IterativeRobot implements Executable {
 		return new Supplier<WheelColour>() {
 			@Override
 			public WheelColour get() {
-				String fmsColour = edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage();
+				String fmsColour = driverStation.getGameSpecificMessage();
+				log.info("FMS Colour: %s", fmsColour);
 				if (fmsColour.length() == 0) {
 					return WheelColour.UNKNOWN;
 				}
@@ -382,5 +388,16 @@ public class Robot extends IterativeRobot implements Executable {
 				}
 			}
 		};
+	}
+
+	private LEDColour allianceLEDColour() {
+		switch (driverStation.getAlliance()) {
+		case Red:
+			return LEDColour.RED;
+		case Blue:
+			return LEDColour.BLUE;
+		default:
+			return LEDColour.WHITE;
+		}
 	}
 }

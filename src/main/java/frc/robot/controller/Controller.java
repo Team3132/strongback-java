@@ -356,5 +356,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		dashboard.putString("Controller: Current sequence", name);
 		dashboard.putBoolean("Controller: Sequence finished", sequenceHasFinished);
 		dashboard.putString("Controller: Blocked by", blockedBy);
+		dashboard.putString("FMS Colour:", edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage());
 	}
 }
