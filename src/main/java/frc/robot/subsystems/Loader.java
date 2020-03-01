@@ -7,6 +7,7 @@ import org.strongback.components.Solenoid;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
@@ -24,6 +25,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     final Counter outSensorCount;
     private int initBallCount = 0;
     final private LEDStripInterface led;
+    private double targetPassthroughMotorOutput;
 
     public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
             final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard,
@@ -35,6 +37,8 @@ public class Loader extends Subsystem implements LoaderInterface {
         this.paddleSolenoid = paddleSolenoid;
         inSensorCount = new Counter("loader:inSensor", inSensor);
         outSensorCount = new Counter("loader:outSensor", outSensor);
+        SmartDashboard.putBoolean("In Sensor State", inSensor.getAsBoolean());
+        SmartDashboard.putBoolean("Out Sensor State", outSensor.getAsBoolean());
 
         log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                 .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
@@ -45,7 +49,9 @@ public class Loader extends Subsystem implements LoaderInterface {
                 .register(true, () -> (double) inSensorCount.count, "%s/spinner/totalBallsIn", name)
                 .register(true, () -> (double) outSensorCount.count, "%s/spinner/totalBallsOut", name)
                 .register(true, () -> (double) initBallCount, "%s/spinner/initialBallCount", name)
-                .register(true, () -> isPaddleBlocking(), "%s/paddleRetracted", name);
+                .register(true, () -> isPaddleBlocking(), "%s/paddleRetracted", name)
+                .register(true, () -> inSensor.getAsBoolean(), "%s/spinner/inSensorState", name)
+                .register(true, () -> outSensor.getAsBoolean(), "%s/spinner/outSensorState", name);
     }
 
     @Override
@@ -64,10 +70,11 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public void setTargetPassthroughMotorOutput(final double percent) {
+    public void setTargetPassthroughMotorOutput(double percent) {
         log.sub("%s: Setting loader in motor percent output to: %f", name, percent);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
+        targetPassthroughMotorOutput = percent;
         passthrough.set(ControlMode.PercentOutput, percent);
 
     }
@@ -147,7 +154,8 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     @Override
     public double getTargetPassthroughMotorOutput() {
-        return passthrough.getOutputPercent();
+        log.sub("%s: passthrough output is currently %f", name, targetPassthroughMotorOutput);
+        return targetPassthroughMotorOutput;
     }
 
     private class Counter implements DashboardUpdater, Executable {
@@ -169,9 +177,8 @@ public class Loader extends Subsystem implements LoaderInterface {
         @Override
         public void execute(final long timeInMillis) {
             final boolean sensorReading = sensor.getAsBoolean();
-            if (sensorReading == lastSensorReading)
-                return;
-            count++;
+            if (sensorReading && !lastSensorReading)
+                count++;
             lastSensorReading = sensorReading;
         }
 

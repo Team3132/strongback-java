@@ -59,10 +59,10 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
     public void setMotorOutput(double current) {
         // Prevent intake wheel from damaging the body of the robot
         if (!isExtended() && current != 0.0) {
-            log.error("Intake retracted, not turning motor on.");
+            log.error("Intake: Intake retracted, not turning motor on.");
             return;
         } 
-        log.sub("Setting intake motor speed to %.1f", current);
+        log.sub("Intake: Setting intake motor speed to %.1f", current);
         targetCurrent = current;
         // TODO: Use current mode instead of percent mode when the hardware
         // has been tested.

@@ -46,10 +46,10 @@ public class MotorFactory {
 			// Falling through to TalonSRX.
 
 		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
-			HardwareTalonSRX talon = getTalon(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Coast, log, p, i, d, f,
+			HardwareTalonSRX talon = getTalon(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Brake, log, p, i, d, f,
 					new NetworkTablesHelper("drive")); // don't invert output
 			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
-			talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+			talon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
 			talon.setSensorPhase(sensorPhase);
 			talon.configClosedloopRamp(rampRate, 10);
 			talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
@@ -126,7 +126,7 @@ public class MotorFactory {
 		leader.configPeakCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
 		TunableMotor.tuneMotor(leader, abs(canIDs[0]), p, i, d, f, networkTable);
 
-    	for (int n = 1; i < canIDs.length; n++) {
+    	for (int n = 1; n < canIDs.length; n++) {
 			boolean shouldInvert = invert;
 			if (canIDs[n] < 0) shouldInvert = !shouldInvert;
     		HardwareTalonSRX follower = Hardware.Motors.talonSRX(abs(canIDs[n]), shouldInvert, mode);

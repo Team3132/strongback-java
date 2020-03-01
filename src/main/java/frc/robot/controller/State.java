@@ -77,7 +77,7 @@ public class State {
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
 		buddyClimbToggle = false;
-		driveClimbModeToggle = true;
+		driveClimbModeToggle = false;
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
@@ -401,6 +401,7 @@ public class State {
 		maybeAdd("shooterRPM", shooterRPM, result);
 		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
 		maybeAdd("timeAction", timeAction, result);
+		maybeAdd("waitForBalls", expectedNumberOfBalls, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }

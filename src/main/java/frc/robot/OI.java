@@ -149,11 +149,17 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.SHOOTER_DISABLE, OperatorBoxButtons.SHOOTER_MANUAL, shooterOverride);
 		// While the shooter speed button is pressed, set the target speed. Does not
 		// turn off.
+		onTriggered(box.getButton(OperatorBoxButtons.SHOOTER_HOOD_UP), 
+			() -> shooterIF.setHoodExtended(true));
+		onTriggered(box.getButton(OperatorBoxButtons.SHOOTER_HOOD_DOWN), 
+			() -> shooterIF.setHoodExtended(false));
 		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), () -> {
 			shooterIF.setTargetRPM(
 					1.5 * Constants.SHOOTER_TARGET_SPEED_RPM * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
 			log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
 		});
+		onUntriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), 
+			() -> shooterIF.setTargetRPM(0));
 
 		// Intake overrides.
 		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
@@ -164,6 +170,8 @@ public class OI implements OIInterface {
 	    // While the intake speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
 			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
+		onUntriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
+			() -> intakeIF.setMotorOutput(0));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_DEPLOY), 
 			() -> intakeIF.setExtended(true));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_STOW), 
@@ -176,7 +184,7 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
 		// While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
-			() -> loaderIF.setTargetSpinnerMotorRPM(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+			() -> loaderIF.setTargetSpinnerMotorRPM(10.5*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
 			() -> loaderIF.setTargetSpinnerMotorRPM(0));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 

@@ -137,7 +137,6 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		logSub("Applying requested state: %s", desiredState);
 		//logSub("Waiting subsystems to finish moving before applying state");
-		waitForIntake();
 
 		// Get the current state of the subsystems.
 		State currentState = new State(subsystems, clock);
@@ -161,7 +160,8 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
 
 		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
-		
+		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
+
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
 
