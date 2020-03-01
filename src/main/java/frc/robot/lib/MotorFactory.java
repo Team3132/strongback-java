@@ -126,7 +126,7 @@ public class MotorFactory {
 		leader.configPeakCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
 		TunableMotor.tuneMotor(leader, abs(canIDs[0]), p, i, d, f, networkTable);
 
-    	for (int n = 1; i < canIDs.length; n++) {
+    	for (int n = 1; n < canIDs.length; n++) {
 			boolean shouldInvert = invert;
 			if (canIDs[n] < 0) shouldInvert = !shouldInvert;
     		HardwareTalonSRX follower = Hardware.Motors.talonSRX(abs(canIDs[n]), shouldInvert, mode);

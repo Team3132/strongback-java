@@ -30,6 +30,7 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot implements Executable {
@@ -50,8 +51,6 @@ public class Robot extends IterativeRobot implements Executable {
 	private Subsystems subsystems;
 	private PowerMonitor pdp;
 	private Auto auto;
-	
-	
 
 	/*
 	 * We wish to delay our full setup until; the driver's station has connected. At
@@ -196,6 +195,7 @@ public class Robot extends IterativeRobot implements Executable {
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
+		subsystems.setLEDAllianceColour(allianceLEDColour());
 	}
 
 	/**
@@ -207,10 +207,9 @@ public class Robot extends IterativeRobot implements Executable {
 
 	@Override
 	public void teleopPeriodic() {
-		if (driverStation.getMatchTime() <= 15) {
+		if (driverStation.getMatchTime() <= 15 && driverStation.getMatchTime() >= 0) { // While in teleop out of a match, the match time is -1.
+			System.out.println(driverStation.getMatchTime());
 			subsystems.setLEDFinal15Seconds(driverStation.getMatchTime());
-		} else {
-			subsystems.setLEDAllianceColour(allianceLEDColour());
 		}
 	}
 
