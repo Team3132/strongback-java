@@ -87,6 +87,8 @@ public class LogDygraph implements Log, Executable {
 	private Clock clock;
 	private boolean onlyLocal = false;	// only log locally defined elements.
 
+	public String timeOffset = "0";
+
 	public LogDygraph(String basePath, String dataDir, String dateDir, Path logInstancePath, boolean onlyLocal, Clock clock) {
 		this.basePath = basePath;
 		this.dataDir = dataDir;
@@ -115,6 +117,9 @@ public class LogDygraph implements Log, Executable {
 
 	public void initLogs() {
 		try {
+			// Get time since robot boot, so chart starts at time = 0.
+			timeOffset = timeToLogString(getCurrentTime());
+
 			// Ensure the directories exist.
 			Files.createDirectories(getDataPath());
 			Files.createDirectories(getDatePath());
@@ -502,7 +507,8 @@ public class LogDygraph implements Log, Executable {
 	}
 	
 	public String getGraphValues() {
-		String value = timeToLogString(getCurrentTime());
+		// Subtracts time offset from current time so graph starts at time = 0
+		String value = timeToLogString(getCurrentTime() - Double.valueOf(timeOffset));
 		for (LogGraphElement e: logGraphElements) {
 			if (e.name != null) {
 				value = value + "," + e.sample.getAsDouble();
