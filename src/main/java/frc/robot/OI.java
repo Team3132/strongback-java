@@ -302,7 +302,7 @@ public class OI implements OIInterface {
 					log.sub("Toggling off " + name);
 					exec.doSequence(offSeq);
 				}
-				toggled = toggled ^ true;
+				toggled = !toggled;
 			});
 		}
 
