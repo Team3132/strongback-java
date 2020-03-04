@@ -38,7 +38,6 @@ public class Shooter extends Subsystem implements ShooterInterface {
      */
     @Override
     public ShooterInterface setTargetRPM(double speed) { 
-        log.sub("Setting target speed");
         flyWheel.setTargetRPM(speed);
         return this;
     }

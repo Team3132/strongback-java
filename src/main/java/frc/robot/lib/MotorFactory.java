@@ -91,7 +91,7 @@ public class MotorFactory {
 		return motor;
 	}
 	public static HardwareSparkMAX getLoaderPassthroughMotor(int canID, boolean invert,double p, double i, double d, double f, Log log) {
-		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("loader passthrough"));
+		HardwareSparkMAX motor = getSparkMAX(canID, false, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("loader passthrough"));
 		return motor;
 	}
 	
@@ -101,7 +101,8 @@ public class MotorFactory {
 				new NetworkTablesHelper("shooter")); // don't invert output
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(36);
+		motor.setScale(Constants.SHOOTER_ENCODER_SCALE);
+		motor.selectProfileSlot(0, 0);
 		
 		motor.configClosedloopRamp(0.125, 10);
 		motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
