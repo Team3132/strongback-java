@@ -126,12 +126,12 @@ public class Constants {
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
 	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
 	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
-	public static final double SHOOTER_F = 0.18;
+	public static final double SHOOTER_F = 0.075;
 	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-	public static final int SHOOTER_TARGET_SPEED_RPM = 6500;
-	public static final int SHOOTER_ENCODER_SCALE = 1;//10/1440; // ticks per rev
+	public static final int SHOOTER_TARGET_SPEED_RPM = 5700;
+	public static final double SHOOTER_ENCODER_SCALE = 1440.0/10/60; // ticks per rev
 	
 	/*
 	* Loader

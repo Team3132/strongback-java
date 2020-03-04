@@ -109,7 +109,7 @@ public class Shooter extends Subsystem implements ShooterInterface {
         }
 
         public double getRPM() {
-            return motor.getSpeed();
+            return motor.getVelocity();
         }
 
         public void setPIDF(double p, double i, double d, double f) {

@@ -481,7 +481,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1);
-		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, true, config.shooterP, config.shooterI,
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, false, config.shooterP, config.shooterI,
 				config.shooterD, config.shooterF, clock, log);
 
 		shooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
