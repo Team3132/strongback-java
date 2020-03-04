@@ -81,7 +81,7 @@ public class Shooter extends Subsystem implements ShooterInterface {
             this.motor = motor;
 
             log.register(false, () -> flyWheel.getTargetRPM(), "shooter/flyWheel/targetSpeed", name)
-            .register(false, motor::getSpeed, "shooter/flyWheel/rpm", name)
+            .register(false, motor::getVelocity, "shooter/flyWheel/rpm", name)
             .register(false, motor::getOutputVoltage, "shooter/flyWheel/outputVoltage", name)
             .register(false, motor::getOutputPercent, "shooter/flyWheel/outputPercent", name)
             .register(false, motor::getOutputCurrent, "shooter/flyWheel/outputCurrent", name);

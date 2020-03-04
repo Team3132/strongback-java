@@ -108,13 +108,14 @@ public class Sequences {
 		seq.add().deployIntake()
 			.setPaddleNotBlocking(false);
 		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
-			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM)
+			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM)
 			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
 		seq.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
 		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_OUTPUT);
-		seq.add().setDelayDelta(0.25);
+		seq.add().setDelayDelta(1);
 		seq.add().setIntakeMotorOutput(0)
+			.setLoaderSpinnerMotorRPM(0)
 			.setLoaderPassthroughMotorOutput(0);
 		return seq;
 	}
@@ -174,7 +175,7 @@ public class Sequences {
 	// This is to test the Loader system
 	public static Sequence startLoader() {
 		Sequence seq = new Sequence("start loader");
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM);
 		return seq;
 	}
 
@@ -206,12 +207,13 @@ public class Sequences {
 			// Shooting from far from the goal at a flat angle.
 			seq.add().extendShooterHood();
 		}
-		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
 		// Wait for the shooter wheel to settle.
 		seq.add().waitForShooter();
 		// Let the balls out of the loader and into the shooter.
 		seq.add().unblockShooter();
+		// Start the loader to push the balls.
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_SHOOTING_RPM);
+		/*
 		// Wait for all of the balls to leave.
 		seq.add().waitForBalls(0);
 		// Turn off everything.
@@ -219,6 +221,7 @@ public class Sequences {
 			.setLoaderPassthroughMotorOutput(0)
 			.setLoaderSpinnerMotorRPM(0)
 			.blockShooter();
+		*/
 		return seq;
 	}
 
@@ -249,7 +252,7 @@ public class Sequences {
 		Sequence seq = new Sequence("vision aim");
 		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
 		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM);
 		seq.add().extendShooterHood();
 		// Allow the robot to move to aim to the vision target while
 		// the shooter wheel spins up.

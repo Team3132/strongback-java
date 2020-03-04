@@ -35,6 +35,16 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
     }
 
     @Override
+    public void enable() {
+        motor.set(ControlMode.PercentOutput, 0);
+    }
+
+    @Override
+    public void disable() {
+        motor.set(ControlMode.PercentOutput, 0);
+    }
+
+    @Override
     public IntakeInterface setExtended(boolean extend) {
         if (extend) {
             solenoid.extend();

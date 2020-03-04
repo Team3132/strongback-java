@@ -161,6 +161,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
 		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
+		subsystems.loader.setPaddleNotBlocking(desiredState.loaderPaddleNotBlocking);
 
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
@@ -181,6 +182,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
+		waitForBlocker();
 		waitForShooterHood();
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
@@ -206,6 +208,13 @@ public class Controller implements Runnable, DashboardUpdater {
 	 */
 	private void waitForIntake() {
 		waitUntil(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
+	}
+
+	/**
+	 * Blocks waiting till the blocker is in position.
+	 */
+	private void waitForBlocker() {
+		waitUntil(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
 	}
 
 	/**

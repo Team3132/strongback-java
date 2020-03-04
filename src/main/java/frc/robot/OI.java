@@ -124,15 +124,15 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
 
 		// Close shot
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/true));
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startShooting(/*close=*/true));
+		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopShooting());
 
 		// Far shot
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/false));
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startShooting(/*close=*/false));
+		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopShooting());
 
 		// Spin up shooter. Touch and release the close or far shot buttons to stop shooter wheel.
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpShooter());
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpShooter());
 
 		// Buddy climb toggle
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.toggleBuddyClimb());

@@ -91,7 +91,7 @@ public class MotorFactory {
 		return motor;
 	}
 	public static HardwareSparkMAX getLoaderPassthroughMotor(int canID, boolean invert,double p, double i, double d, double f, Log log) {
-		HardwareSparkMAX motor = getSparkMAX(canID, false, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("loader passthrough"));
+		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("loader passthrough"));
 		return motor;
 	}
 	

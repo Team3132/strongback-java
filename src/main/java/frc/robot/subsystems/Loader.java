@@ -7,14 +7,12 @@ import org.strongback.components.Solenoid;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.LEDColour;
-import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Subsystem;
 
 public class Loader extends Subsystem implements LoaderInterface {
@@ -31,14 +29,12 @@ public class Loader extends Subsystem implements LoaderInterface {
             final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard,
             final Log log) {
         super("Loader", dashboard, log);
-        this.led = led;
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
         this.paddleSolenoid = paddleSolenoid;
+        this.led = led;
         inSensorCount = new Counter("loader:inSensor", inSensor);
         outSensorCount = new Counter("loader:outSensor", outSensor);
-        SmartDashboard.putBoolean("In Sensor State", inSensor.getAsBoolean());
-        SmartDashboard.putBoolean("Out Sensor State", outSensor.getAsBoolean());
 
         log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                 .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
@@ -124,9 +120,15 @@ public class Loader extends Subsystem implements LoaderInterface {
                 isPaddleNotBlocking() ? "not blocking" : isPaddleBlocking() ? "blocking" : "moving");
         dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
-        dashboard.putNumber("Current Number of Balls", getCurrentBallCount());
+        dashboard.putNumber("Current number of balls", getCurrentBallCount());
         inSensorCount.updateDashboard();
         outSensorCount.updateDashboard();
+    }
+
+    @Override
+    public void enable() {
+        spinner.set(ControlMode.PercentOutput, 0);
+        passthrough.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
@@ -178,6 +180,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         @Override
         public void updateDashboard() {
             dashboard.putNumber(name + " ball count", getCount());
-        }
+            dashboard.putBoolean(name + " sensor state", sensor.getAsBoolean());
+            }
     }
 }

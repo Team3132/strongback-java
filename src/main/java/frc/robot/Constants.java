@@ -108,7 +108,7 @@ public class Constants {
 	 */
 	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
 	
-	public static final double INTAKE_MOTOR_OUTPUT = 0.5;  
+	public static final double INTAKE_MOTOR_OUTPUT = 0.25;  
 	public static final double INTAKE_POSITION_F = 0;
 	public static final double INTAKE_POSITION_P = 0;
 	public static final double INTAKE_POSITION_I = 0;
@@ -141,7 +141,8 @@ public class Constants {
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
 	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
 	public static final int PADDLE_SOLENOID_PORT = 2; 
-	public static final double LOADER_MOTOR_RPM = 600;
+	public static final double LOADER_MOTOR_INTAKING_RPM = 600;
+	public static final double LOADER_MOTOR_SHOOTING_RPM = 60 * 0.5;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
 	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; // ticks per rotation
 	public static final double LOADER_SPINNER_P = 0.4;
