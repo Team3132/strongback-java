@@ -207,7 +207,7 @@ public class Robot extends IterativeRobot implements Executable {
 
 	@Override
 	public void teleopPeriodic() {
-		if (driverStation.getMatchTime() <= 15 && driverStation.getMatchTime() >= 0) { // While in teleop out of a match, the match time is -1.
+		if (0 <= driverStation.getMatchTime() && driverStation.getMatchTime() <= 15) { // While in teleop out of a match, the match time is -1.
 			System.out.println(driverStation.getMatchTime());
 			subsystems.setLEDFinal15Seconds(driverStation.getMatchTime());
 		}
