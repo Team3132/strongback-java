@@ -97,8 +97,8 @@ public class MotorFactory {
 	
 	public static HardwareTalonSRX getShooterMotor(int[] canIDs, boolean sensorPhase, 
 			double p, double i, double d, double f,	Clock clock, Log log) {
-		HardwareTalonSRX motor = getTalon(canIDs, false, NeutralMode.Coast, log, p, i, d, f,
-				new NetworkTablesHelper("shooter")); // don't invert output
+		HardwareTalonSRX motor = getTalon(canIDs, true, NeutralMode.Coast, log, p, i, d, f,
+				new NetworkTablesHelper("shooter"));
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 		motor.setScale(Constants.SHOOTER_ENCODER_SCALE);
