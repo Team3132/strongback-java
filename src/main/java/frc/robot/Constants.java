@@ -131,7 +131,7 @@ public class Constants {
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
 	public static final int SHOOTER_TARGET_SPEED_RPM = 6500;
-	public static final int SHOOTER_ENCODER_SCALE = 1;//10/1440; // ticks per rev
+	public static final double SHOOTER_ENCODER_SCALE = 1440.0/10; // ticks per rev
 	
 	/*
 	* Loader
