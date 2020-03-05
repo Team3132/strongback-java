@@ -33,7 +33,7 @@ public class State {
 
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
-	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
+	public Double intakeRPM = null; 
 	
 	// Shooter
 	public Double shooterRPM = null;  // Set the shooter target speed.
@@ -74,8 +74,8 @@ public class State {
 	 */
 	public State(Subsystems subsystems, Clock clock) {
 		setDelayUntilTime(clock.currentTime());
-		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
+		intakeRPM = subsystems.intake.getTargetRPM();
 		buddyClimbToggle = false;
 		driveClimbModeToggle = false;
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
@@ -128,8 +128,8 @@ public class State {
 		return this;
 	}
 
-	public State setIntakeMotorOutput(double output) {
-		intakeMotorOutput = Double.valueOf(output);
+	public State setIntakeRPM(double rpm) {
+		intakeRPM = Double.valueOf(rpm);
 		return this;
 	}
 
@@ -393,7 +393,7 @@ public class State {
 		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
-		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
+		maybeAdd("intakeRPM", intakeRPM, result);
 		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);

@@ -107,8 +107,8 @@ public class Constants {
 	 *  Intake constants 
 	 */
 	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
-	
-	public static final double INTAKE_MOTOR_OUTPUT = 0.2;  
+	public static final double INTAKE_ENCODER_SCALE = 3;
+	public static final double INTAKE_TARGET_RPM = 600;
 	public static final double INTAKE_POSITION_F = 0;
 	public static final double INTAKE_POSITION_P = 0;
 	public static final double INTAKE_POSITION_I = 0;

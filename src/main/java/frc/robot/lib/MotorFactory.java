@@ -70,6 +70,7 @@ public class MotorFactory {
 	
 	public static HardwareSparkMAX getIntakeMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {
 		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p , i, d, f, new NetworkTablesHelper("intake"));
+		motor.setScale(Constants.INTAKE_ENCODER_SCALE);
 		return motor;
 	}
 

@@ -168,9 +168,9 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.INTAKE_DISABLE, OperatorBoxButtons.INTAKE_MANUAL, intakeOverride);
 	    // While the intake speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
-			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
+			() -> intakeIF.setTargetRPM(box.getAxis(OperatorBoxButtons.INTAKE_POT).read() * Constants.INTAKE_TARGET_RPM));
 		onUntriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
-			() -> intakeIF.setMotorOutput(0));
+			() -> intakeIF.setTargetRPM(0));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_DEPLOY), 
 			() -> intakeIF.setExtended(true));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_STOW), 

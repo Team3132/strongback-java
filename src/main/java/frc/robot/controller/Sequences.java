@@ -107,14 +107,15 @@ public class Sequences {
 		// Wait for the intake to extend before turning motor
 		seq.add().deployIntake()
 			.setPaddleNotBlocking(false);
-		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
+		//seq.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
+		seq.add().setIntakeRPM(INTAKE_TARGET_RPM)
 			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM)
 			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
 		seq.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_OUTPUT);
+		seq.add().setIntakeRPM(-INTAKE_TARGET_RPM);
 		seq.add().setDelayDelta(1);
-		seq.add().setIntakeMotorOutput(0)
+		seq.add().setIntakeRPM(0)
 			.setLoaderSpinnerMotorRPM(0)
 			.setLoaderPassthroughMotorOutput(0);
 		return seq;
@@ -123,7 +124,7 @@ public class Sequences {
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
 
-		seq.add().setIntakeMotorOutput(0);
+		seq.add().setIntakeRPM(0);
 		// Let passthrough run for 0.25s longer to get all balls through
 		seq.add().setDelayDelta(0.25);
 		seq.add().setLoaderPassthroughMotorOutput(0);
@@ -161,13 +162,13 @@ public class Sequences {
 	public static Sequence startIntakingOnly() {
 		Sequence seq = new Sequence("start intaking");
 		seq.add().deployIntake();
-		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT).deployIntake();
+		seq.add().setIntakeRPM(INTAKE_TARGET_RPM).deployIntake();
 		return seq;
 	}
 
 	public static Sequence stopIntakingOnly() {
 		Sequence seq = new Sequence("stop intaking");
-		seq.add().setIntakeMotorOutput(0.0);
+		seq.add().setIntakeRPM(0);
 		seq.add().stowIntake();
 		return seq;
 	}

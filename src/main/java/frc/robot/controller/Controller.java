@@ -157,7 +157,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
-		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
+		subsystems.intake.setTargetRPM(desiredState.intakeRPM);
 
 		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
 		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
