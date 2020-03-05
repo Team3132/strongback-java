@@ -155,7 +155,7 @@ public class OI implements OIInterface {
 			() -> shooterIF.setHoodExtended(false));
 		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), () -> {
 			shooterIF.setTargetRPM(
-					1.5 * Constants.SHOOTER_TARGET_SPEED_RPM * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
+					1.5 * Constants.SHOOTER_CLOSE_TARGET_SPEED_RPM * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
 		});
 		onUntriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), 
 			() -> shooterIF.setTargetRPM(0));
