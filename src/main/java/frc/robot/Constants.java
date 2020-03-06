@@ -278,4 +278,5 @@ public class Constants {
 	 */
 	public static final int LED_STRIP_PWM_PORT = 9;
 	public static final int LED_STRIP_NUMBER_OF_LEDS = 30;
+	public static final int LED_STRIP_COUNTDOWN = 15;
 }

@@ -37,7 +37,6 @@ public class State {
 	
 	// Shooter
 	public Double shooterRPM = null;  // Set the shooter target speed.
-	// If this field is not called shooterUpToSpeed plz update applyState() in Controller.java
 	public Boolean shooterUpToSpeed = null;
 	public Boolean shooterHoodExtended = null;
 
@@ -45,7 +44,6 @@ public class State {
 	public Double loaderPassthroughMotorOutput = null;
 	public Double loaderSpinnerMotorRPM = null;
 	public Boolean loaderPaddleNotBlocking = null;
-	// If this field is not called expectedNumberOfBalls plz update applyState() in Controller.java
 	public Integer expectedNumberOfBalls = null;
 
 	// Vision
@@ -76,19 +74,19 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPM = subsystems.intake.getTargetRPM();
-		buddyClimbToggle = false;
-		driveClimbModeToggle = false;
+		buddyClimbToggle = false;  // Don't toggle unless requested.
+		driveClimbModeToggle = false;  // Don't toggle unless requested.
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
 		shooterRPM = subsystems.shooter.getTargetRPM();
-		shooterUpToSpeed = subsystems.shooter.isAtTargetSpeed();
+		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
 		shooterHoodExtended = subsystems.shooter.isHoodExtended();
 		drive = subsystems.drivebase.getDriveRoutine();
 		colourAction = subsystems.colourWheel.getDesiredAction();
 		extendColourWheel = subsystems.colourWheel.isArmExtended();
-		expectedNumberOfBalls = subsystems.loader.getCurrentBallCount();
+		expectedNumberOfBalls = null;  // Leave as null so it can be ignored downstream.
 	}
 
 	// Time
@@ -354,10 +352,8 @@ public class State {
 			// if (!field.canAccess(current)) continue;
 			try {
 				if (field.get(desiredState) == null) {
-					// Don't save state for expected balls to avoid race condition
-					if (field.getName() != "expectedNumberOfBalls" && field.getName() != "shooterUpToSpeed") {
-						field.set(updatedState, field.get(currentState));
-					}	
+					// In some cases this field in currentState can also be null.
+					field.set(updatedState, field.get(currentState));
 				} else {
 					field.set(updatedState, field.get(desiredState));
 				}

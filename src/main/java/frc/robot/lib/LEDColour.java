@@ -5,7 +5,6 @@ public enum LEDColour {
     YELLOW(51,51,0),
     BLUE(0,0,51),
     GREEN(0,51,0),
-    UNKNOWN(0,0,0),
     ORANGE(51,26,0),
     PINK(51,0,51),
     WHITE(51,51,51),
