@@ -47,6 +47,7 @@ import frc.robot.interfaces.VisionInterface;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.Jevois;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.MotorFactory;
 import frc.robot.lib.NavXGyroscope;
@@ -442,6 +443,14 @@ public class Subsystems implements DashboardUpdater {
 
 	public void updateIdleLED() {
 		ledStrip.setIdle();
+	}
+
+	public void setLEDColour(LEDColour c) {
+		ledStrip.setColour(c);
+	}
+
+	public void setLEDFinalCountdown(double time) {
+		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time/Constants.LED_STRIP_COUNTDOWN);
 	}
 
 	public void createLoader() {
