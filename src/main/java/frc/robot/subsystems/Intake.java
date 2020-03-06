@@ -136,6 +136,7 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         dashboard.putNumber("Intake motor current", motor.getOutputCurrent());
         dashboard.putNumber("Intake motor target RPM", intakeWheel.getTargetRPM());
         dashboard.putNumber("Intake motor actual RPM", intakeWheel.getRPM());
+        dashboard.putNumber("Intake motor position", motor.getPosition());
 
 	}
 }

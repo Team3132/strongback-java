@@ -24,7 +24,7 @@ public class IntakeSimulator implements IntakeInterface, Executable {
 	
 	@Override
 	public IntakeInterface setExtended(boolean extend) {
-		arm.setTargetPos(kMaxAngle);
+		arm.setTargetPos(extend?kMaxAngle:kMinAngle);
 		return this;
 	}
 

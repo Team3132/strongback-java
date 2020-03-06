@@ -107,8 +107,6 @@ public class HardwareTalonSRX implements Motor {
 			demand /= talon.getBusVoltage();
 		}
 		lastDemand = demand;
-		System.out.println("Talon get velocity: " + talon.getSelectedSensorVelocity());
-		System.out.println("Talon.set " + demand);
 		talon.set(mode.talonControlMode, demand);
 	}
 

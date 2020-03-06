@@ -381,6 +381,7 @@ public class Subsystems implements DashboardUpdater {
 		intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, intake, simulator, mock, log);
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
+		Strongback.executor().register(simulator, Priority.HIGH);
 	}
 
 	public void createBuddyClimb() {

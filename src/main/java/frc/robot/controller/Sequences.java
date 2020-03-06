@@ -200,6 +200,7 @@ public class Sequences {
 	public static Sequence startShooting(boolean closeToGoal) {
 		Sequence seq = new Sequence("start shooting");
 		// Shooter wheel may already be up to speed.
+		seq.add().deployIntake();
 		if (closeToGoal) {
 			// Shooter wheel may already be up to speed.
 			seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM);
@@ -214,7 +215,7 @@ public class Sequences {
 		// Wait for the shooter wheel to settle.
 		seq.add().waitForShooter();
 		// Briefly back off loader to prevent balls jamming against shooter blocker
-		seq.add().setLoaderSpinnerMotorRPM(-LOADER_MOTOR_SHOOTING_RPM);
+		// seq.add().setLoaderSpinnerMotorRPM(-LOADER_MOTOR_SHOOTING_RPM);
 		// Let the balls out of the loader and into the shooter.
 		seq.add().unblockShooter();
 		// Spin passthrough

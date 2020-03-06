@@ -107,12 +107,14 @@ public class Constants {
 	 *  Intake constants 
 	 */
 	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
-	public static final double INTAKE_ENCODER_SCALE = 3;
-	public static final double INTAKE_TARGET_RPM = 600;
-	public static final double INTAKE_POSITION_F = 0;
-	public static final double INTAKE_POSITION_P = 0;
+	public static final double INTAKE_ENCODER_SCALE = 60/3; // change from rps to rpm, 3:1 gear ratio
+	public static final double INTAKE_TARGET_RPM = 300;
+	public static final double INTAKE_POSITION_F = 0.015;
+	public static final double INTAKE_POSITION_P = 0.001;
 	public static final double INTAKE_POSITION_I = 0;
 	public static final double INTAKE_POSITION_D = 0;
+
+
 
 	public static final int INTAKE_SOLENOID_PORT = 1;
 
