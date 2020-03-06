@@ -449,8 +449,8 @@ public class Subsystems implements DashboardUpdater {
 		ledStrip.setColour(c);
 	}
 
-	public void setLEDFinal15Seconds(double time) {
-		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time/15);
+	public void setLEDFinalCountdown(double time) {
+		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time/Constants.LED_STRIP_COUNTDOWN);
 	}
 
 	public void createLoader() {
