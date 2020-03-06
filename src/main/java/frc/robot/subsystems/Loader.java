@@ -147,7 +147,7 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     @Override
     public double getTargetPassthroughMotorOutput() {
-        return passthrough.getOutputPercent();
+        return passthrough.get();
     }
 
     private class Counter implements DashboardUpdater, Executable {
