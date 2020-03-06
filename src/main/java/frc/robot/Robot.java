@@ -36,7 +36,7 @@ public class Robot extends IterativeRobot implements Executable {
 	private RobotConfiguration config;
 	private LogDygraph log;
 
-	// User interface.s
+	// User interface.
 	private DriverStation driverStation;
 	private OIInterface oi;
 	private FlightStick driverLeftJoystick, driverRightJoystick;

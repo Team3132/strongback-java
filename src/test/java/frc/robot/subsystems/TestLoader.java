@@ -53,14 +53,12 @@ public class TestLoader {
 
     @Test
     public void testSpinnerMotor() {
-        // spinner.set(ControlMode.Velocity, 0);
         loader.setTargetSpinnerMotorRPM(600);
         assertEquals(600, loader.getTargetSpinnerMotorRPM(), 0.01);
     }
 
     @Test
     public void testPassthroughMotor() {
-        // spinner.set(ControlMode.Velocity, 0);
         loader.setTargetPassthroughMotorOutput(0.5);
         assertEquals(0.5, loader.getTargetPassthroughMotorOutput(),0.01);
     }
@@ -74,7 +72,7 @@ public class TestLoader {
 
     @Test
     public void testCounting() {
-        // inSensorCounts.addAll(Arrays.asList({true,false,true,false}));
+        // TODO: Finishing Implementing functionality
     }
 }
 
