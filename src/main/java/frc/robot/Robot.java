@@ -194,7 +194,7 @@ public class Robot extends IterativeRobot implements Executable {
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
-		subsystems.setLEDAllianceColour(allianceLEDColour());
+		subsystems.setLEDColour(allianceLEDColour());
 	}
 
 	/**

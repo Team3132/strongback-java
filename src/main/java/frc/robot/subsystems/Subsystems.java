@@ -445,7 +445,7 @@ public class Subsystems implements DashboardUpdater {
 		ledStrip.setIdle();
 	}
 
-	public void setLEDAllianceColour(LEDColour c) {
+	public void setLEDColour(LEDColour c) {
 		ledStrip.setColour(c);
 	}
 
