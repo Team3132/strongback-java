@@ -511,7 +511,7 @@ public class LogDygraph implements Log, Executable {
 	
 	public String getGraphValues() {
 		// Subtracts time offset from current time so graph starts at time = 0
-		String value = timeToLogString(getCurrentTime() - Double.valueOf(enableOffset));
+		String value = timeToLogString(getCurrentTime() - enableOffset);
 		for (LogGraphElement e: logGraphElements) {
 			if (e.name != null) {
 				value = value + "," + e.sample.getAsDouble();
