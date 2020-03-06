@@ -17,11 +17,11 @@ import frc.robot.lib.Subsystem;
 public class Shooter extends Subsystem implements ShooterInterface {
 
     private final ShooterWheel flyWheel;
-    private final Solenoid solenoid;
+    private final Solenoid hood;
 
     public Shooter(Motor shooterMotor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
         super("Shooter", dashboard, log);
-        this.solenoid = solenoid;
+        this.hood = solenoid;
         flyWheel = new ShooterWheel(shooterMotor);
         log.register(true, () -> isHoodExtended(), "%s/extended", name)
             .register(true, () -> isHoodRetracted(), "%s/retracted", name);
@@ -56,21 +56,21 @@ public class Shooter extends Subsystem implements ShooterInterface {
     @Override
     public ShooterInterface setHoodExtended(boolean extend) {
         if (extend) {
-            solenoid.extend();
+            hood.extend();
         } else {
-            solenoid.retract();
+            hood.retract();
         }
         return this;
     }
 
     @Override
     public boolean isHoodExtended() {
-        return solenoid.isExtended();
+        return hood.isExtended();
     }
 
     @Override
     public boolean isHoodRetracted() {
-        return solenoid.isRetracted();
+        return hood.isRetracted();
     }
 
     protected class ShooterWheel {

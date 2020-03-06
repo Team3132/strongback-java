@@ -114,7 +114,7 @@ public class Constants {
 	public static final double INTAKE_POSITION_I = 0;
 	public static final double INTAKE_POSITION_D = 0;
 
-	public static final int INTAKE_SOLENOID_PORT = 0;
+	public static final int INTAKE_SOLENOID_PORT = 1;
 
 	public static final int[] TEST_SPARK_MOTOR_CAN_ID_LIST = {50, 51};
 
@@ -124,6 +124,7 @@ public class Constants {
 	* Shooter constants
 	*/
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
+	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
 	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
 	public static final double SHOOTER_F = 0.18;
 	public static final double SHOOTER_P = 0.7;
@@ -136,9 +137,11 @@ public class Constants {
 	*/
 	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 12;
 	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 11;
+	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
+	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
+	public static final int PADDLE_SOLENOID_PORT = 2; 
 	public static final double LOADER_MOTOR_RPM = 600;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
-	public static final int PADDLE_SOLENOID_PORT = 2; 
 	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; // ticks per rotation
 	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;
@@ -190,6 +193,13 @@ public class Constants {
 	// Turn to angle (all need tuning)
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
+
+	// Climber
+	public static final int CLIMBER_PTO_SOLENOID_PORT = 3;
+	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
+	
+	// Buddy climb
+	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
 
 	// logging information constants
 	public static final String WEB_BASE_PATH = "/media/sda1";		// where web server's data lives

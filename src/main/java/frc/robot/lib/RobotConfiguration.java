@@ -68,6 +68,9 @@ public class RobotConfiguration {
 	public String drivebaseMode = Constants.DRIVE_DEFAULT_MODE;
 	public double drivebaseMaxSpeed = Constants.DRIVE_MAX_SPEED;
 
+	public int climberPtoPort = Constants.CLIMBER_PTO_SOLENOID_PORT;
+	public int climberBrakePort = Constants.CLIMBER_BRAKE_SOLENOID_PORT;
+
 
 	public boolean drivebaseSwapLeftRight = false;
 	public boolean drivebaseSensorPhase = false;
@@ -109,12 +112,14 @@ public class RobotConfiguration {
 
 	public boolean visionIsPresent = false;
 	public double visionHMin = Constants.VISION_H_MIN;
-	public double visionHMax = Constants.VISION_S_MAX;
-	public double visionSMin = Constants.VISION_H_MAX;
-	public double visionSMax = Constants.VISION_V_MIN;
-	public double visionVMin = Constants.VISION_S_MIN;
+	public double visionHMax = Constants.VISION_H_MAX;
+	public double visionSMin = Constants.VISION_S_MIN;
+	public double visionSMax = Constants.VISION_S_MAX;
+	public double visionVMin = Constants.VISION_V_MIN;
 	public double visionVMax = Constants.VISION_V_MAX;
-
+	
+	public boolean buddyClimbIsPresent = false;
+	public int buddyClimbSolenoidPort = Constants.BUDDYCLIMB_SOLENOID_PORT;
 
 	// Logging default is to not log anything to the graph, and to only log local information when we turn it on.
 	// These are the safest defaults.
@@ -202,6 +207,8 @@ public class RobotConfiguration {
 		drivebaseSwapLeftRight = getAsBoolean("drivebase/swapLeftRight", drivebaseSwapLeftRight);
 		drivebaseSensorPhase = getAsBoolean("drivebase/sensor/phase", drivebaseSensorPhase);
 		drivebaseCount = getAsDouble("drivebase/count100ms", drivebaseCount);
+
+		
 	
 		intakeIsPresent = getAsBoolean("intake/present", false);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
@@ -212,11 +219,11 @@ public class RobotConfiguration {
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
-		loaderIsPresent = getAsBoolean("loader/present", true);
+		loaderIsPresent = getAsBoolean("loader/present", false);
 		loaderSpinnerCanID = getAsInt("loader/spinner/canID", Constants.LOADER_SPINNER_MOTOR_CAN_ID);
 		loaderPassthroughCanID = getAsInt("loader/passthrough/canID", Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID);
 
-		shooterIsPresent = getAsBoolean("shooter/present", true);
+		shooterIsPresent = getAsBoolean("shooter/present", false);
 		shooterCanIds = getAsIntArray("shooter/shooterCanIDs", Constants.SHOOTER_TALON_CAN_ID_LIST);
 		
 		shooterP = getAsDouble("shooter/p", shooterP);

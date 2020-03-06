@@ -13,7 +13,6 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.WheelColour;
-import frc.robot.mock.MockClimber;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLocation;
@@ -55,7 +54,6 @@ public class TestController {
 		subsystems = new Subsystems(new MockDashboard(), null, clock, log);
 
 		subsystems.intake = intake = new IntakeSimulator();
-		subsystems.climber = new MockClimber(log);
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase(log);
 		subsystems.loader = new MockLoader(log);

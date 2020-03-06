@@ -47,75 +47,95 @@ public class OI implements OIInterface {
 	 *      (left thumbstick)   (right thumbstick)
 	 * 
 	 * Driver Controls:
-	 * Left Flight Joystick: Back/Forward
-	 * Right Flight Joystick: Left/Right
-	 * Left Joystick Trigger (Button 1): Half speed mode.
+	 * Left flight joystick: move back/forward, climb up
+	 * Right flight joystick: left/right, climb up
+	 * While held, right joystick top far left button (Button 5): release ratchets
+	 * While not held, right joystick top far left button (Button 5): enable ratchets
+	 * Right joystick top far right button (Button 6): shift PTO mode
+	 * Right joystick trigger (Button 1): intake
+	 * Right joystick thumb button (Button 2): vision lineup
+	 * Left joystick trigger (Button 1): slow/half speed
+	 * 
 	 * 
 	 * Operator Controls:
+	 * Pushing (A) begins positional control 
+	 * Pushing (B) deploys/stows buddy climber	 
+	 * Pushing (X) begins rotational control 
+	 * Pushing (Y) deploy/stow the colourwheel 
+	 * Left trigger: shoot
+	 * Pushing left stick to the left rotates colourwheel anticlockwise
+	 * Pushing left stick to the right rotates colourwheel clockwise
+	 * Pushing (left bumper) sets the hood and shooter to preset shot 1
+	 * Pushing (right bumper) sets the hood and shooter to preset shot 2
 	 * 
-	 * The hat vertical controls the lift height. Repeatedly pushing makes it go to the next height.
-	 * The hat horizontal controls the sideways scoring.
-	 * Pushing (A) starts intaking. Releasing it, stops intaking.
-	 * Pushing (B) does an intake eject. Releasing it, stops ejecting.
-	 * Pushing (left bumper) does a front eject (ie the outtake opens for the cube to fall out).
-	 * Pushing both triggers deploys the ramp (safety)
-	 * Pushing (Y) gets the robot ready for climbing.
-	 * While (X) is held, the robot will climb. 
-	 * (start) resets the robot lift at the bottom and intake stowed.
 	 * 
-	 * The following buttons are unused:
-	 *  (back)(mode)(left bumper).
+	 * The following operator buttons are unused:
+	 * (back)(mode)(right stick up/down/left/right)(left stick up/down)(left trigger)
+	 * (right trigger)(back)(start)(left joystick click)(right joystick click)
+	 * (D-pad up/down/left/right)
+	 * 
 	 */
 	public void configureJoysticks(FlightStick driverLeft, FlightStick driverRight, InputDevice operator) {
-		// Left and RIght driver joysticks have separate mappings, as well as Operator controller.
+		// Left and Right driver joysticks have separate mappings, as well as Operator controller.
 		configureDriverJoystick(driverLeft, driverRight, "driverSticks");
     	configureOperatorJoystick(operator, "operator");
 	}
 		
 	
-	public void configureDriverJoystick(FlightStick leftStick, FlightStick rightStick, String name) {
+	private void configureDriverJoystick(FlightStick leftStick, FlightStick rightStick, String name) {
 
-		// Left Stick's onTrigger drive slowly mode is handled in Robot.java, not here
-		// Hatch Vision
-		// Intaking is on this button.
-		onTriggered(leftStick.getButton(1), Sequences.startDriveByVision());
-		onUntriggered(leftStick.getButton(1), Sequences.stopDriveByVision());
-
-		// Intake - Right Stick Button 2 (on/off)
-		onTriggered(rightStick.getButton(2), Sequences.startIntaking());
+		// Intake 
+		onTriggered(rightStick.getButton(1), Sequences.startIntaking());
+		onUntriggered(rightStick.getButton(1), Sequences.stopIntaking());
 		
-		onUntriggered(rightStick.getButton(2), Sequences.stopIntaking());
+		// Slow drive
+		onTriggered(leftStick.getButton(1), Sequences.startSlowDriveForward());
+		onUntriggered(leftStick.getButton(1), Sequences.setDrivebaseToArcade());
 
-		onTriggered(leftStick.getButton(6), Sequences.startSlowDriveForward());
-		onUntriggered(leftStick.getButton(6), Sequences.setDrivebaseToArcade());
+		// Release/enable ratchets (empty sequence)
+		onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake());
+		onUntriggered(rightStick.getButton(5), Sequences.applyClimberBrake());		
 
-		onTriggered(rightStick.getButton(3), Sequences.turnToWall());  // Face the drivers station wall.
-		onUntriggered(rightStick.getButton(3), Sequences.setDrivebaseToArcade());
+		// Toggle drive / climb mode
+		onTriggered(rightStick.getButton(6), Sequences.toggleDriveClimbModes());
+
+		// Vision lineup
+		onTriggered(rightStick.getButton(2), Sequences.visionAim());
+		onUntriggered(rightStick.getButton(2), Sequences.setDrivebaseToArcade());	
+
+		//onTriggered(rightStick.getButton(4), Sequences.toggleBuddyClimb());
 	}
 
-	public void configureOperatorJoystick(InputDevice stick, String name) {
-		// Reset robot: intake stowed and lift at bottom.
-		// TODO: update
-		// onTriggered(stick.getButton(GamepadButtonsX.START_BUTTON), Sequences.getStartSequence());
-		
-		// Intake
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD),
-		() -> {
-			return Sequences.startIntaking();
-		});
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopIntaking());
-
-		// Colour Wheel testing.
+	private void configureOperatorJoystick(InputDevice stick, String name) {
+		// Colourwheel positional
 		onTriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.startColourWheelPositional(WheelColour.UNKNOWN));
 		onUntriggered(stick.getButton(GamepadButtonsX.A_BUTTON), Sequences.stopColourWheel());
+
+		// Colourwheel rotational
 		onTriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.startColourWheelRotational());
 		onUntriggered(stick.getButton(GamepadButtonsX.X_BUTTON), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.colourWheelAnticlockwise());
-		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopColourWheel());
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.colourWheelClockwise());
-		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopColourWheel());
 
+		// Colourwheel manual adjust clockwise  
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.colourWheelClockwise());
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
 
+		// Colourwheel manual adjust anticlockwise  
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, -GamepadButtonsX.AXIS_THRESHOLD), Sequences.colourWheelAnticlockwise());
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
+
+		// Close shot
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/true));
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
+
+		// Far shot
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/false));
+		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
+
+		// Spin up shooter. Touch and release the close or far shot buttons to stop shooter wheel.
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpShooter());
+
+		// Buddy climb toggle
+		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.toggleBuddyClimb());
 	}
 
 
@@ -144,9 +164,9 @@ public class OI implements OIInterface {
 	    // While the intake speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
 			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
-		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_EXTEND), 
+		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_DEPLOY), 
 			() -> intakeIF.setExtended(true));
-		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_RETRACT), 
+		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_STOW), 
 			() -> intakeIF.setExtended(false));
 
 
@@ -164,11 +184,13 @@ public class OI implements OIInterface {
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
 			() -> loaderIF.setTargetPassthroughMotorOutput(0));
 		
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING),
-				() -> loaderIF.setPaddleNotBlocking(false));
-		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING),
-				() -> loaderIF.setPaddleNotBlocking(true));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING), 
+			() -> loaderIF.setPaddleNotBlocking(false));
+		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING), 
+			() -> loaderIF.setPaddleNotBlocking(true));
 	}
+
+
 
 	private void mapOverrideSwitch(InputDevice box, int disableButton, int manualButton, OverridableSubsystem overrideableSubsystem) {
 		onTriggered(box.getButton(disableButton), () -> overrideableSubsystem.turnOff());
@@ -178,7 +200,8 @@ public class OI implements OIInterface {
 							  box.getButton(manualButton)),
 					() -> overrideableSubsystem.setAutomaticMode());
 	}
-    
+
+	
 	/**
 	 * Configure the rules for the user interfaces
 	 */

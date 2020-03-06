@@ -1,5 +1,5 @@
 package frc.robot.controller;
-
+  
 import java.util.Iterator;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -11,33 +11,33 @@ import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.WheelColour;
-import frc.robot.subsystems.ColourWheel;
 import frc.robot.subsystems.Subsystems;
 
 /**
- * The controller of State Sequences while ensuring the robot is safe at every step.
+ * The controller of State Sequences while ensuring the robot is safe at every
+ * step.
  * 
- * Allows higher level code to specify just the states that the robot needs
- * to pass through but it doesn't need to care how it gets there - this code
- * will ensure it gets there safely.
+ * Allows higher level code to specify just the states that the robot needs to
+ * pass through but it doesn't need to care how it gets there - this code will
+ * ensure it gets there safely.
  * 
  * This is very similar to commands, with the differences to a command-based
- * approach being:
- *  - Unlike commands, the activation logic is concentrated in one place, making
- *    it much safer to add new functionality.
- *  - Every state doesn't need to be aware of every other state (much simpler).
- *  - Creating strings of sequences is much simpler and shorter than commands.
- *  - Arbitrary combinations of parallel and sequential commands aren't supported,
- *    only a series of parallel operations.
+ * approach being: - Unlike commands, the activation logic is concentrated in
+ * one place, making it much safer to add new functionality. - Every state
+ * doesn't need to be aware of every other state (much simpler). - Creating
+ * strings of sequences is much simpler and shorter than commands. - Arbitrary
+ * combinations of parallel and sequential commands aren't supported, only a
+ * series of parallel operations.
  * 
- * This could be made faster, but we need to be careful it doesn't make it unsafe.
+ * This could be made faster, but we need to be careful it doesn't make it
+ * unsafe.
  */
 public class Controller implements Runnable, DashboardUpdater {
 	private final Subsystems subsystems;
 	private final Clock clock;
 	private final DashboardInterface dashboard;
 	private final Log log;
-	private Sequence sequence = new Sequence("idle");  // Current sequence we are working through.
+	private Sequence sequence = new Sequence("idle"); // Current sequence we are working through.
 	private boolean sequenceHasChanged = true;
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
@@ -52,18 +52,19 @@ public class Controller implements Runnable, DashboardUpdater {
 		this.fmsColour = fmsColour;
 		(new Thread(this)).start();
 	}
-	
+
 	synchronized public void doSequence(Sequence sequence) {
 		if (this.sequence == sequence) {
 			// Exactly the same same sequence. Only start it again if it has
 			// finished. Used in the whileTriggered(...) case.
 			// Intentionally using == instead of .equalTo().
-			if (!sequenceHasFinished) return;
+			if (!sequenceHasFinished)
+				return;
 		}
 		this.sequence = sequence;
 		sequenceHasChanged = true;
 		logSub("Sequence has changed to %s sequence", sequence.getName());
-		notifyAll();  // Tell the run() method that there is a new sequence.
+		notifyAll(); // Tell the run() method that there is a new sequence.
 	}
 
 	/**
@@ -111,28 +112,22 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * For use by unit tests only. 
+	 * For use by unit tests only.
+	 * 
 	 * @return if an unhandled excpetions has occured in the controller
 	 */
 	public boolean isAlive() {
 		return isAlive;
 	}
-	
+
 	/**
 	 * Does the simple, dumb and most importantly, safe thing.
 	 * 
-	 * See the design doc before changing this.
-	 * 
-	 * Steps through:
-	 *  - Wait for all subsystems to finish moving.
-	 *  - Deploy or retract the intake if necessary.
-	 *  - 
-	 *  
 	 * Note if the step asks for something which will cause harm to the robot, the
 	 * request will be ignored. For example if the lift was moved into a position
 	 * the intake could hit it and then the intake was moved into the lift, the
 	 * intake move would be ignored.
-	 *  
+	 * 
 	 * @param desiredState The state to leave the robot in.
 	 */
 	private void applyState(State desiredState) {
@@ -143,7 +138,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Applying requested state: %s", desiredState);
 		//logSub("Waiting subsystems to finish moving before applying state");
 		waitForIntake();
-		
+
 		// Get the current state of the subsystems.
 		State currentState = new State(subsystems, clock);
 		logSub("Current state: %s", currentState);
@@ -155,27 +150,38 @@ public class Controller implements Runnable, DashboardUpdater {
 		logSub("Calculated new 'safe' state: %s", desiredState);
 
 		// The time beyond which we are allowed to move onto the next state
-		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());	
+		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());
 
 		
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
+		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
 
 		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
-
-		subsystems.climber.setDesiredAction(desiredState.climber);
 		
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
+
 		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
+		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
+
+		// Toggle buddy climb if needed
+		if (desiredState.buddyClimbToggle) {
+			subsystems.buddyClimb.setExtended(!subsystems.buddyClimb.isExtended());
+		}
+
+		// Toggle between drive and climb modes if needed
+		if (desiredState.driveClimbModeToggle) {
+			subsystems.drivebase.activateClimbMode(!subsystems.drivebase.isClimbModeEnabled());
+		}
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
-		waitForClimber();
+		waitForShooterHood();
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
 		// Wait for driving to finish if needed.
@@ -203,10 +209,10 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * Blocks waiting till the climber is in position.
+	 * Blocks waiting till the shooter hood is in position.
 	 */
-	private void waitForClimber() {
-		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
+	private void waitForShooterHood() {
+		waitUntil(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
 	}
 
 	/**
