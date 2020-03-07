@@ -1,16 +1,14 @@
 package frc.robot.lib;
 
 public enum LEDColour {
-    RED(255,0,0),
-    YELLOW(255,255,0),
-    BLUE(0,0,255),
-    GREEN(0,255,0),
-    UNKNOWN(0,0,0),
-    ORANGE(255,128,0),
-    PINK(255,0,255),
-    GOLD(212,175,55),
-    WHITE(255,255,255),
-    PURPLE(102,51,153);
+    RED(51,0,0),
+    YELLOW(51,51,0),
+    BLUE(0,0,51),
+    GREEN(0,51,0),
+    ORANGE(51,26,0),
+    PINK(51,0,51),
+    WHITE(51,51,51),
+    PURPLE(20,10,31);
 
     public final int r;
     public final int g;

@@ -6,11 +6,11 @@ import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+
 import org.strongback.components.Clock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import frc.robot.interfaces.ClimberInterface.ClimberAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.WheelColour;
@@ -28,31 +28,38 @@ public class State {
 	// Double and Boolean are used instead of double and boolean
 	// so that null can be used to indicate that the state shouldn't
 	// be changed and the current state be preserved.
-
 	// Time
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
 
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
+	
+	// Shooter
+	public Double shooterRPM = null;  // Set the shooter target speed.
+	public Boolean shooterUpToSpeed = null;
+	public Boolean shooterHoodExtended = null;
 
 	// Loader
-	public Double loaderFeederMotorOutput = null;
-	public Double loaderPassthroughMotorVelocity = null;
-	public Double loaderSpinnerMotorVelocity = null;
-	public Boolean loaderPaddleExtended = null;
+	public Double loaderPassthroughMotorOutput = null;
+	public Double loaderSpinnerMotorRPM = null;
+	public Boolean loaderPaddleNotBlocking = null;
+	public Integer expectedNumberOfBalls = null;
 
 	// Vision
 	public CameraMode cameraMode = null;
 
-	// Climber
-	public ClimberAction climber = null;  // What the climber should do.
-
-	// Driving.
+	// Driving / Climbing
 	public DriveRoutineParameters drive = null;
+	public Boolean driveClimbModeToggle = null;
+	public Boolean climberBrakeApplied = null;
+
+	// Buddy Climb
+	public Boolean buddyClimbToggle = null;
 
 	//Colour Wheel
-	public ColourAction colourWheel = null;
+	public ColourAction colourAction = null;
+	public Boolean extendColourWheel = null;
 
 	/**
 	 * Create a blank state
@@ -67,13 +74,19 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		loaderSpinnerMotorVelocity = subsystems.loader.getTargetSpinnerMotorVelocity();
-		loaderPassthroughMotorVelocity = subsystems.loader.getTargetPassthroughMotorVelocity();
-		loaderFeederMotorOutput = subsystems.loader.getTargetFeederMotorOutput();
-		loaderPaddleExtended = subsystems.loader.isPaddleExtended();
-		climber = subsystems.climber.getDesiredAction();
+		buddyClimbToggle = false;  // Don't toggle unless requested.
+		driveClimbModeToggle = false;  // Don't toggle unless requested.
+		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
+		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
+		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
+		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
+		shooterRPM = subsystems.shooter.getTargetRPM();
+		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
+		shooterHoodExtended = subsystems.shooter.isHoodExtended();
 		drive = subsystems.drivebase.getDriveRoutine();
-		colourWheel = subsystems.colourWheel.getDesiredAction();
+		colourAction = subsystems.colourWheel.getDesiredAction();
+		extendColourWheel = subsystems.colourWheel.isArmExtended();
+		expectedNumberOfBalls = null;  // Leave as null so it can be ignored downstream.
 	}
 
 	// Time
@@ -104,7 +117,7 @@ public class State {
 	}
 
 	public State stowIntake() {
-		intakeExtended = Boolean.valueOf(true);
+		intakeExtended = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -118,22 +131,49 @@ public class State {
 		return this;
 	}
 
+	public State setShooterRPM(double targetSpeed) {
+		shooterRPM = Double.valueOf(targetSpeed);
+		return this;
+	}
+
+	public State waitForShooter() {
+		shooterUpToSpeed = true;
+		return this;
+	}
+
+	public State extendShooterHood() {
+		shooterHoodExtended = true;
+		return this;
+	}
+
+	public State retractShooterHood() {
+		shooterHoodExtended = false;
+		return this;
+	}
 
 	// Loader
-	public State setLoaderSpinnerMotorOutput(double output) {
-		loaderSpinnerMotorVelocity = Double.valueOf(output);
+	public State setLoaderSpinnerMotorRPM(double rpm) {
+		loaderSpinnerMotorRPM = Double.valueOf(rpm);
 		return this;
 	}
 	public State setLoaderPassthroughMotorOutput(double output) {
-		loaderPassthroughMotorVelocity = Double.valueOf(output);
+		loaderPassthroughMotorOutput = Double.valueOf(output);
 		return this;
 	}
-	public State setLoaderFeederMotorOutput(double output) {
-		loaderFeederMotorOutput = Double.valueOf(output);
+	public State setPaddleNotBlocking(boolean blocking) {
+		loaderPaddleNotBlocking = Boolean.valueOf(blocking);
 		return this;
 	}
-	public State setPaddleExtended(boolean extended) {
-		loaderPaddleExtended = Boolean.valueOf(extended);
+	public State unblockShooter() {
+		loaderPaddleNotBlocking = true;
+		return this;
+	}
+	public State blockShooter() {
+		loaderPaddleNotBlocking = false;
+		return this;
+	}
+	public State waitForBalls(int numBalls) {
+		expectedNumberOfBalls = Integer.valueOf(numBalls);
 		return this;
 	}
 
@@ -148,56 +188,65 @@ public class State {
 		return this;
 	}
 
-
-	// Climber
-	public State setFrontHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_FRONT_HEIGHT, height);
+	
+	// Toggle between drive and climb modes
+	public State toggleDriveClimbMode() {
+		driveClimbModeToggle = true;
 		return this;
 	}
 
-	public State stopBothHeight() {
-		climber = new ClimberAction(ClimberAction.Type.STOP_BOTH_HEIGHT, 0);
+	public State applyClimberBrake() {
+		climberBrakeApplied = true;
 		return this;
 	}
 
-	public State setRearHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_REAR_HEIGHT, height);
+	public State releaseClimberBrake() {
+		climberBrakeApplied = false;
 		return this;
 	}
 
-	public State setBothHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
+	/**
+	 * Calling this will retract the buddy climb if it was deployed
+	 * and deploy it if it was retracted.
+	 */
+	public State toggleBuddyClimb() {
+		buddyClimbToggle = true;
 		return this;
 	}
-
-	public State setClimberDriveSpeed(double speed) {
-		climber = new ClimberAction(ClimberAction.Type.SET_DRIVE_SPEED, speed);
-		return this;
-	}
-
+	
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelPositional(WheelColour colour) {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
+	public State startColourWheelPositional(WheelColour colour) {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelLeft() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
+	public State colourWheelAnticlockwise() {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelRight() {
-		colourWheel = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
+	public State colourWheelClockwise() {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
+		return this;
+	}
+
+	public State extendedColourWheel() {
+		extendColourWheel = Boolean.valueOf(true);
+		return this;
+	}
+
+	public State retractColourWheel() {
+		extendColourWheel = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -270,8 +319,6 @@ public class State {
 		return this;
 	}
 
-
-
 	/**
 	 * Add waypoints for the drive base to drive through.
 	 * Note: The robot will come to a complete halt after each list
@@ -305,6 +352,7 @@ public class State {
 			// if (!field.canAccess(current)) continue;
 			try {
 				if (field.get(desiredState) == null) {
+					// In some cases this field in currentState can also be null.
 					field.set(updatedState, field.get(currentState));
 				} else {
 					field.set(updatedState, field.get(desiredState));
@@ -333,18 +381,22 @@ public class State {
 	@Override
 	public String toString() {
 		ArrayList<String> result = new ArrayList<String>();
+		maybeAdd("buddyClimbToggle", buddyClimbToggle, result);
+		maybeAdd("cameraMode", cameraMode, result);
+		maybeAdd("colourWheelExtended", extendColourWheel, result);
+		maybeAdd("colourwheelMode", colourAction, result);
+		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
+		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
+		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("loaderPassthroughMotorVelocity", loaderPassthroughMotorVelocity, result);
-		maybeAdd("loaderSpinnerMotorVelocity", loaderSpinnerMotorVelocity, result);
-		maybeAdd("loaderFeederMotorVelocity", loaderFeederMotorOutput, result);
-		maybeAdd("loaderPaddleExtended", loaderPaddleExtended, result);
-		maybeAdd("drive", drive, result);
-		maybeAdd("climber", climber, result);
+		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
+		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
+		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
+		maybeAdd("shooterHoodExtended", shooterHoodExtended, result);
+		maybeAdd("shooterRPM", shooterRPM, result);
+		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
 		maybeAdd("timeAction", timeAction, result);
-		maybeAdd("cameraMode", cameraMode, result);
-		maybeAdd("colourwheelMode", colourWheel, result);
-	
 		return "[" + String.join(",", result) + "]";
 	}
 }

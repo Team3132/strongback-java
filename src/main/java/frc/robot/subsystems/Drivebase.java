@@ -1,8 +1,12 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
+import org.strongback.components.Solenoid;
 
 import frc.robot.Constants;
 import frc.robot.drive.routines.ConstantDrive;
@@ -14,10 +18,6 @@ import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
-
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Subsystem responsible for the drivetrain
@@ -34,13 +34,18 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
 	private final Motor left;
 	private final Motor right;
+	private Solenoid ptoSolenoid;
+	private Solenoid brakeSolenoid;
 	private final Log log;
 	private DriveMotion currentMotion;
 
-	public Drivebase(Motor left, Motor right, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
-		super("Drive", networkTable , dashboard, log);
+	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, 
+			NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+		super("Drive", networkTable, dashboard, log);
 		this.left = left;
 		this.right = right;
+		this.ptoSolenoid = ptoSolenoid;
+		this.brakeSolenoid = brakeSolenoid;
 		this.log = log;
 
 		currentMotion = new DriveMotion(0, 0);
@@ -57,7 +62,33 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(false, () -> left.getOutputPercent(), "%s/outputPercentage/Left", name)
 				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
-				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name);
+				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name)
+				.register(true, () -> isClimbModeEnabled(), "%s/extended", name)
+				.register(true, () -> isDriveModeEnabled(), "%s/retracted", name)
+				.register(true, () -> isBrakeApplied(), "%s/extended", name)
+          		.register(true, () -> isBrakeReleased(), "%s/retracted", name);
+	}
+
+	@Override
+	public DrivebaseInterface activateClimbMode(boolean extend) {
+		if (extend) {
+			ptoSolenoid.extend();
+		} else {
+			ptoSolenoid.retract();
+		}
+
+		return this;
+	}
+
+	@Override
+	public DrivebaseInterface applyBrake(boolean extend) {
+		if (extend) {
+			brakeSolenoid.extend();
+		} else {
+			brakeSolenoid.retract();
+		}
+
+		return this;
 	}
 
 	@Override
@@ -166,4 +197,30 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		log.sub("%s: Registered %s drive routine", name, routine.getName());
 		driveModes.put(mode, new DriveMode(routine, controlMode));
 	}
+
+	@Override
+	public boolean isClimbModeEnabled() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return ptoSolenoid.isExtended();
+	}
+
+	@Override
+	public boolean isDriveModeEnabled() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return ptoSolenoid.isRetracted();
+	}
+
+	@Override
+	public boolean isBrakeApplied() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return brakeSolenoid.isExtended();
+	}
+
+	@Override
+	public boolean isBrakeReleased() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return brakeSolenoid.isRetracted();
+	}
+
+	
 }
