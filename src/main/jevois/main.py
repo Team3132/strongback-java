@@ -182,7 +182,7 @@ class FirstPython:
     # ###################################################################################################
     ## Load camera calibration from JeVois share directory
     def loadCameraCalibration(self, w, h):
-        cpf = "/jevois/share/camera/calibration{}x{}.yaml".format(w, h)
+        cpf = "/jevois/share/camera/newcalibration{}x{}.yaml".format(w, h)
         fs = cv2.FileStorage(cpf, cv2.FILE_STORAGE_READ)
         if (fs.isOpened()):
             self.camMatrix = fs.getNode("camera_matrix").mat()

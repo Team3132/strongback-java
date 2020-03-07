@@ -54,13 +54,13 @@ public class Constants {
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
 	public static final double ROBOT_WIDTH_INCHES = 20;
-	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1, 2};
+	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {4,5};
 	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5, 6}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {2,1}; 
 	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
 	public static final double DRIVE_WHEEL_DIAMETER         = 6; // inches 
-	public static final int DRIVE_ENCODER_CODES_PER_REV		= 4 * 360;
+	public static final int DRIVE_ENCODER_CODES_PER_REV		=  2048; //4 * 360;
 	public static final double DRIVE_GEABOX_RATIO = 11;
 	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
@@ -70,8 +70,8 @@ public class Constants {
 	// distance the robot moves per revolution of the encoders. Gearing needs to be taken into account here.
 	// at full speed in a static environment the encoders are producing 2000 count differences per 100ms
 	public static final double DRIVE_DISTANCE_PER_REV = DRIVE_WHEEL_DIAMETER * Math.PI;
-	//public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
-	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_DISTANCE_PER_REV / DRIVE_GEABOX_RATIO;
+	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
+	//public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_DISTANCE_PER_REV / DRIVE_GEABOX_RATIO;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
@@ -107,12 +107,14 @@ public class Constants {
 	 *  Intake constants 
 	 */
 	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
-	
-	public static final double INTAKE_MOTOR_CURRENT = 0.5;  
-	public static final double INTAKE_POSITION_F = 0;
-	public static final double INTAKE_POSITION_P = 0;
+	public static final double INTAKE_ENCODER_SCALE = 60/3; // change from rps to rpm, 3:1 gear ratio
+	public static final double INTAKE_TARGET_RPM = 600;
+	public static final double INTAKE_POSITION_F = 0.015;
+	public static final double INTAKE_POSITION_P = 0.001;
 	public static final double INTAKE_POSITION_I = 0;
 	public static final double INTAKE_POSITION_D = 0;
+
+
 
 	public static final int INTAKE_SOLENOID_PORT = 1;
 
@@ -126,12 +128,14 @@ public class Constants {
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
 	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
 	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
-	public static final double SHOOTER_F = 0.18;
+	public static final double SHOOTER_F = 0.15;//0.075;
 	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-	public static final int SHOOTER_TARGET_SPEED_RPM = 6500;
-
+	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPM = 4700;
+	public static final int SHOOTER_FAR_TARGET_SPEED_RPM = 5700;
+	public static final double SHOOTER_ENCODER_SCALE = 1440.0/10/60; // ticks per rev
+	
 	/*
 	* Loader
 	*/
@@ -140,12 +144,13 @@ public class Constants {
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
 	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
 	public static final int PADDLE_SOLENOID_PORT = 2; 
-	public static final double LOADER_MOTOR_RPM = 600;
-	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
-	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; // ticks per rotation
+	public static final double LOADER_MOTOR_INTAKING_RPM = 720;//120;//600;
+	public static final double LOADER_MOTOR_SHOOTING_RPM = 480;
+	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
+	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10/60; // ticks per rotation
 	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;
-	public static final double LOADER_SPINNER_D = 20;
+	public static final double LOADER_SPINNER_D = 30;
 	public static final double LOADER_SPINNER_F = 0.225;
 	
 	/*
@@ -195,7 +200,7 @@ public class Constants {
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
 
 	// Climber
-	public static final int CLIMBER_PTO_SOLENOID_PORT = 3;
+	public static final int CLIMBER_PTO_SOLENOID_PORT = 6;
 	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
 	
 	// Buddy climb
