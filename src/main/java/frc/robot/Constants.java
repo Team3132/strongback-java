@@ -2,16 +2,13 @@ package frc.robot;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
 import com.revrobotics.ColorMatch;
 
-import edu.wpi.first.wpilibj.util.Color;
-
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
@@ -53,25 +50,23 @@ public class Constants {
 	 * 
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
-	public static final double ROBOT_WIDTH_INCHES = 20;
 	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {4,5};
 	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
 	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {2,1}; 
 	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
-	public static final double DRIVE_WHEEL_DIAMETER         = 6; // inches 
-	public static final int DRIVE_ENCODER_CODES_PER_REV		=  2048; //4 * 360;
+	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 0.15; // 6" in metres 
+	public static final double DRIVE_ENCODER_CODES_PER_REV  =  2048;
 	public static final double DRIVE_GEABOX_RATIO = 11;
 	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
 	public static final String DRIVE_DEFAULT_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
 
-	// distance the robot moves per revolution of the encoders. Gearing needs to be taken into account here.
-	// at full speed in a static environment the encoders are producing 2000 count differences per 100ms
-	public static final double DRIVE_DISTANCE_PER_REV = DRIVE_WHEEL_DIAMETER * Math.PI;
-	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
-	//public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_DISTANCE_PER_REV / DRIVE_GEABOX_RATIO;
+	// Distance the robot moves per revolution of the wheels. Gearing needs to be taken into account here.
+	public static final double DRIVE_METRES_PER_REV = DRIVE_WHEEL_DIAMETER_METRES * Math.PI;
+	// FIXME: This scale factor inside Motor should be inverted because it's confusing this way.
+	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV * DRIVE_GEABOX_RATIO / DRIVE_METRES_PER_REV;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
@@ -248,8 +243,8 @@ public class Constants {
 		public static final double kPDriveVel = 0.01; // should be 12.1
 		// kD should be 0
 
-		public static final double kMaxSpeedMetersPerSecond = 6;// 3;
-		public static final double kMaxAccelerationMetersPerSecondSquared = 2;// 1;
+		public static final double kMaxSpeedMetersPerSecond = 4;
+		public static final double kMaxAccelerationMetersPerSecondSquared = 2;
 
 		// Reasonable baseline values for a RAMSETE follower in units of meters and
 		// seconds

@@ -249,7 +249,7 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Override the position of the quadrature position.
+     * Override the position of the quadrature encoder.
      */
     public default Motor setPosition(double position) {
         // Not implmented by default.
