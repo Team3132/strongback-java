@@ -161,7 +161,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
 		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
-		subsystems.loader.setPaddleNotBlocking(desiredState.loaderPaddleNotBlocking);
+		subsystems.loader.setPaddleBlocking(desiredState.loaderPaddleBlocking);
 
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);

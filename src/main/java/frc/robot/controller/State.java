@@ -43,7 +43,7 @@ public class State {
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
 	public Double loaderSpinnerMotorRPM = null;
-	public Boolean loaderPaddleNotBlocking = null;
+	public Boolean loaderPaddleBlocking = null;
 	public Integer expectedNumberOfBalls = null;
 
 	// Vision
@@ -79,7 +79,7 @@ public class State {
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
-		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
+		loaderPaddleBlocking = subsystems.loader.isPaddleBlocking();
 		shooterRPM = subsystems.shooter.getTargetRPM();
 		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
 		shooterHoodExtended = subsystems.shooter.isHoodExtended();
@@ -160,16 +160,8 @@ public class State {
 		loaderPassthroughMotorOutput = Double.valueOf(output);
 		return this;
 	}
-	public State setPaddleNotBlocking(boolean blocking) {
-		loaderPaddleNotBlocking = Boolean.valueOf(blocking);
-		return this;
-	}
-	public State unblockShooter() {
-		loaderPaddleNotBlocking = true;
-		return this;
-	}
-	public State blockShooter() {
-		loaderPaddleNotBlocking = false;
+	public State setPaddleBlocking(boolean blocking) {
+		loaderPaddleBlocking = Boolean.valueOf(blocking);
 		return this;
 	}
 	public State waitForBalls(int numBalls) {
@@ -390,7 +382,7 @@ public class State {
 		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("intakeRPM", intakeRPM, result);
-		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
+		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
 		maybeAdd("shooterHoodExtended", shooterHoodExtended, result);

@@ -106,7 +106,7 @@ public class Sequences {
 		Sequence seq = new Sequence("Start intake");
 		// Wait for the intake to extend before turning motor
 		seq.add().deployIntake()
-			.setPaddleNotBlocking(false);
+			.setPaddleBlocking(true);
 		//seq.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
 		seq.add().setIntakeRPM(INTAKE_TARGET_RPM)
 			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM)
@@ -216,7 +216,7 @@ public class Sequences {
 		// Briefly back off loader to prevent balls jamming against shooter blocker
 		// seq.add().setLoaderSpinnerMotorRPM(-LOADER_MOTOR_SHOOTING_RPM);
 		// Let the balls out of the loader and into the shooter.
-		seq.add().unblockShooter();
+		seq.add().setPaddleBlocking(false);
 		// Spin passthrough
 		seq.add().setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
 		// Start the loader to push the balls.
@@ -239,7 +239,7 @@ public class Sequences {
 		seq.add().setShooterRPM(0)
 			.setLoaderPassthroughMotorOutput(0)
 			.setLoaderSpinnerMotorRPM(0)
-			.blockShooter();
+			.setPaddleBlocking(true);
 		return seq;
 	}
 
@@ -270,14 +270,14 @@ public class Sequences {
 		// Back to normal driving so it can be adjusted while shooting.
 		seq.add().doArcadeDrive();
 		// Let the balls out of the loader and into the shooter.
-		seq.add().unblockShooter();
+		seq.add().setPaddleBlocking(false);
 		// Wait for all of the balls to leave.
 		seq.add().waitForBalls(0);
 		// Turn off everything.
 		seq.add().setShooterRPM(0)
 			.setLoaderPassthroughMotorOutput(0)
 			.setLoaderSpinnerMotorRPM(0)
-			.blockShooter();
+			.setPaddleBlocking(true);
 		return seq;
 	}
 
