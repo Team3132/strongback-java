@@ -19,7 +19,7 @@ import frc.robot.lib.Subsystem;
 public class Loader extends Subsystem implements LoaderInterface {
     final private Motor spinner, passthrough;
     final private Solenoid paddleSolenoid;
-    private double spinnerRPM = 0;
+    private double spinnerRPM = 0, passthroughOutput = 0;
     final Counter inSensorCount;
     final Counter outSensorCount;
     private int initBallCount = 0;
@@ -64,12 +64,22 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
+    public double getTargetSpinnerMotorRPM() {
+        return spinnerRPM;
+    }
+
+    @Override
     public void setTargetPassthroughMotorOutput(final double percent) {
         log.sub("%s: Setting loader in motor percent output to: %f", name, percent);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
         passthrough.set(ControlMode.PercentOutput, percent);
+        passthroughOutput = percent;
+    }
 
+    @Override
+    public double getTargetPassthroughMotorOutput() {
+        return passthroughOutput;
     }
     
     @Override
@@ -138,16 +148,6 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public int getCurrentBallCount() {
         return inSensorCount.getCount() - outSensorCount.getCount() + initBallCount;
-    }
-
-    @Override
-    public double getTargetSpinnerMotorRPM() {
-        return spinnerRPM;
-    }
-
-    @Override
-    public double getTargetPassthroughMotorOutput() {
-        return passthrough.get();
     }
 
     private class Counter implements DashboardUpdater, Executable {
