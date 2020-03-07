@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import math # for cos, sin, etc
 import time
-from angle_util import *
 
 GOAL_HEIGHT = 98.25 #inches to the center of goal
 GOAL_WIDTH = 39.25 #inches
@@ -16,6 +15,39 @@ CAMERA_HORI_FOV = 65 #horizontal
 CAMERA_VERT_FOV = CAMERA_HORI_FOV * (3/4)
 
 CAMERA_ANGLE = 25 # degrees from horizontal
+
+
+
+def deg_to_rad(degrees):
+    return degrees * (math.pi / 180)
+
+# converts radians to degrees
+def rad_to_deg(radians):
+    return radians * (180 / math.pi)
+
+# sine function which uses degrees
+def sin(degrees):
+    return math.sin(deg_to_rad(degrees))
+
+# cosine function which uses degrees
+def cos(degrees):
+    return math.cos(deg_to_rad(degrees))
+
+# tan function which uses degrees
+def tan(degrees):
+    return math.tan(deg_to_rad(degrees))
+
+# inverse sine function which returns degrees
+def asin(ratio):
+    return rad_to_deg(math.asin(ratio))
+
+# inverse cosine function which returns degrees
+def acos(ratio):
+    return rad_to_deg(math.acos(ratio))
+
+# inverse tan function which returns degrees
+def atan(degrees):
+    return rad_to_deg(math.atan(degrees))
 
 def cal_point_distance(p, q):
     x = math.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)
@@ -115,8 +147,10 @@ class FirstPython:
         self.epsilon = 0.015               # Shape smoothing factor (higher for smoother)
         self.hullarea = ( 15*15, 300*300 ) # Range of object area (in pixels) to track 
         self.hullfill = 35                 # Max fill ratio of the convex hull (percent)
-        self.ethresh = 1500                 # Shape error threshold (lower is stricter for exact shape)
+        self.ethresh = 1500                # Shape error threshold (lower is stricter for exact shape)
         self.margin = 5                    # Margin from from frame borders (pixels)
+        self.img_rotate_angle = 20         #angle the outimg rotates in degrees, positive value is counter clockwise
+        self.scale =1.0                    #isotropic scale factor
     
         # Instantiate a JeVois Timer to measure our processing framerate:
         self.timer = jevois.Timer("FirstPython", 100, jevois.LOG_INFO)  
@@ -310,15 +344,15 @@ class FirstPython:
     ## Draw corners and center of goal
     def drawDetections(self, outimg, TL,TR,BL,BR):        
         try: 
-            drawPoint(outimg, TL)
-            drawPoint(outimg, TR)
-            drawPoint(outimg, BL)
-            drawPoint(outimg, BR)
+            self.drawPoint(outimg, TL)
+            self.drawPoint(outimg, TR)
+            self.drawPoint(outimg, BL)
+            self.drawPoint(outimg, BR)
             
             mx = int((TL[0]+TR[0])/2)
             my = int((TL[1]+TR[1])/2)
 
-            drawPoint(outimg, [mx,my])
+            self.drawPoint(outimg, [mx,my])
 
         except:
             print("Unable to draw detections.")
@@ -326,7 +360,7 @@ class FirstPython:
     # Draws a dot for a given point
     def drawPoint(self, outimg, point):
         try:
-            jevois.drawLine(outimg,point[0], point[1], point[0], point[1], 1 , jevois.YUYV.LightGreen)
+            jevois.drawLine(outimg,int(point[0]), int(point[1]), int(point[0]), int(point[1]), 1 , jevois.YUYV.LightGreen)
         except:
             print("Unable to draw point.")
 
@@ -375,16 +409,23 @@ class FirstPython:
         
         h, w, chans = imgbgr.shape
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
+        
+        #center of imgbgr
+        center = (w/2,h/2)
 
         imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
         h, w, chans = imgbgr.shape
         # Get pre-allocated but blank output image which we will send over USB:
+            
         outimg = outframe.get()
+    
         outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
-        jevois.convertCvBGRtoRawImage(imgbgr, inimg, 0)
+        M = cv2.getRotationMatrix2D(center, self.img_rotate_angle, self.scale)
+        imgbgr_rotate = cv2.warpAffine(imgbgr, M, (w, h))
+        jevois.convertCvBGRtoRawImage(imgbgr_rotate, inimg, 0)
         jevois.paste(inimg, outimg, 0, 0)
-        jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
-
+        jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)    
+        
         imgbgr = self.thresholding(imgbgr)
    
         # Get a list of quadrilateral convex hulls for all good objects:
