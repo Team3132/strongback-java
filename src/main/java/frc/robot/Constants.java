@@ -129,7 +129,7 @@ public class Constants {
 	public static final double SHOOTER_D = 0;
 	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPM = 4700;
 	public static final int SHOOTER_FAR_TARGET_SPEED_RPM = 5700;
-	public static final double SHOOTER_ENCODER_SCALE = 1440.0/10/60; // ticks per rev
+	public static final double SHOOTER_ENCODER_SCALE = 1440.0/60; // ticks per rev
 	
 	/*
 	* Loader
@@ -142,7 +142,7 @@ public class Constants {
 	public static final double LOADER_MOTOR_INTAKING_RPM = 720;//120;//600;
 	public static final double LOADER_MOTOR_SHOOTING_RPM = 480;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
-	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10/60; // ticks per rotation
+	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/60; // ticks per rotation
 	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 30;
