@@ -149,7 +149,7 @@ class FirstPython:
         self.hullfill = 35                 # Max fill ratio of the convex hull (percent)
         self.ethresh = 1500                # Shape error threshold (lower is stricter for exact shape)
         self.margin = 5                    # Margin from from frame borders (pixels)
-        self.img_rotate_angle = 20         #angle the outimg rotates in degrees, positive value is counter clockwise
+        self.img_rotate_angle = 0.0        #angle the outimg rotates in degrees, positive value is counter clockwise
         self.scale =1.0                    #isotropic scale factor
     
         # Instantiate a JeVois Timer to measure our processing framerate:
