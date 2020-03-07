@@ -13,7 +13,6 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.LEDColour;
-import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Subsystem;
 
 public class Loader extends Subsystem implements LoaderInterface {
@@ -24,15 +23,16 @@ public class Loader extends Subsystem implements LoaderInterface {
     final Counter outSensorCount;
     private int initBallCount = 0;
     final private LEDStripInterface led;
+    private double targetPassthroughMotorOutput;
 
     public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
             final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard,
             final Log log) {
         super("Loader", dashboard, log);
-        this.led = led;
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
         this.paddleSolenoid = paddleSolenoid;
+        this.led = led;
         inSensorCount = new Counter("loader:inSensor", inSensor);
         outSensorCount = new Counter("loader:outSensor", outSensor);
 
@@ -45,13 +45,14 @@ public class Loader extends Subsystem implements LoaderInterface {
                 .register(true, () -> (double) inSensorCount.count, "%s/spinner/totalBallsIn", name)
                 .register(true, () -> (double) outSensorCount.count, "%s/spinner/totalBallsOut", name)
                 .register(true, () -> (double) initBallCount, "%s/spinner/initialBallCount", name)
-                .register(true, () -> isPaddleBlocking(), "%s/paddleRetracted", name);
+                .register(true, () -> isPaddleBlocking(), "%s/paddleRetracted", name)
+                .register(true, () -> inSensor.getAsBoolean(), "%s/spinner/inSensorState", name)
+                .register(true, () -> outSensor.getAsBoolean(), "%s/spinner/outSensorState", name);
     }
 
     @Override
     public void setTargetSpinnerMotorRPM(final double rpm) {
-        final NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
-        spinnerHelper.set("targetRPM", rpm);
+
         spinnerRPM = rpm;
         log.sub("%s: Setting loader motor rpm to: %f", name, rpm);
         // If motor is zero in velocity the PID will try and reverse the motor in order
@@ -64,10 +65,11 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public void setTargetPassthroughMotorOutput(final double percent) {
+    public void setTargetPassthroughMotorOutput(double percent) {
         log.sub("%s: Setting loader in motor percent output to: %f", name, percent);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
+        targetPassthroughMotorOutput = percent;
         passthrough.set(ControlMode.PercentOutput, percent);
 
     }
@@ -99,13 +101,7 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     @Override
     public void execute(final long timeInMillis) {
-        final NetworkTablesHelper spinnerHelper = new NetworkTablesHelper("loader/spinnermotor/");
-        final double p = spinnerHelper.get("p", 0);
-        final double i = spinnerHelper.get("i", 0);
-        final double d = spinnerHelper.get("d", 0);
-        final double f = spinnerHelper.get("f", 0);
-        spinner.setPIDF(0, p, i, d, f);
-        spinnerHelper.set("actualRPM", spinner.getVelocity());
+        
         inSensorCount.execute(0);
         outSensorCount.execute(0);
         
@@ -124,9 +120,15 @@ public class Loader extends Subsystem implements LoaderInterface {
                 isPaddleNotBlocking() ? "not blocking" : isPaddleBlocking() ? "blocking" : "moving");
         dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
-        dashboard.putNumber("Current Number of Balls", getCurrentBallCount());
+        dashboard.putNumber("Current number of balls", getCurrentBallCount());
         inSensorCount.updateDashboard();
         outSensorCount.updateDashboard();
+    }
+
+    @Override
+    public void enable() {
+        spinner.set(ControlMode.PercentOutput, 0);
+        passthrough.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
@@ -147,7 +149,8 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     @Override
     public double getTargetPassthroughMotorOutput() {
-        return passthrough.get();
+        log.sub("%s: passthrough output is currently %f", name, targetPassthroughMotorOutput);
+        return targetPassthroughMotorOutput;
     }
 
     private class Counter implements DashboardUpdater, Executable {
@@ -169,15 +172,15 @@ public class Loader extends Subsystem implements LoaderInterface {
         @Override
         public void execute(final long timeInMillis) {
             final boolean sensorReading = sensor.getAsBoolean();
-            if (sensorReading == lastSensorReading)
-                return;
-            count++;
+            if (sensorReading && !lastSensorReading)
+                count++;
             lastSensorReading = sensorReading;
         }
 
         @Override
         public void updateDashboard() {
             dashboard.putNumber(name + " ball count", getCount());
-        }
+            dashboard.putBoolean(name + " sensor state", sensor.getAsBoolean());
+            }
     }
 }

@@ -105,28 +105,27 @@ public class Sequences {
 	public static Sequence startIntaking() {
 		Sequence seq = new Sequence("Start intake");
 		// Wait for the intake to extend before turning motor
-		seq.add().deployIntake();
-		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT)
-			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM)
-			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
+		seq.add().deployIntake()
 			.setPaddleNotBlocking(false);
-		seq.add().waitForBalls(5);
+		//seq.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
+		seq.add().setIntakeRPM(INTAKE_TARGET_RPM)
+			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM)
+			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
+		//seq.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT) 
-				.setLoaderSpinnerMotorRPM(0);
-		seq.add().setDelayDelta(0.5);
-		seq.add().setIntakeMotorOutput(0)
-			.setLoaderPassthroughMotorOutput(0);
+		/*seq.add().setIntakeRPM(-INTAKE_TARGET_RPM);
+		seq.add().setDelayDelta(1);
+		seq.add().setIntakeRPM(0)
+			.setLoaderSpinnerMotorRPM(0)
+			.setLoaderPassthroughMotorOutput(0);*/
 		return seq;
 	}
 
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
 
-		// Reverse to eject excess > 5 balls to avoid penalty
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
-		seq.add().setDelayDelta(0.25);
-		seq.add().setIntakeMotorOutput(0);
+		seq.add().setIntakeRPM(0);
+		// Let passthrough run for 0.25s longer to get all balls through
 		seq.add().setDelayDelta(0.25);
 		seq.add().setLoaderPassthroughMotorOutput(0);
 		seq.add().setLoaderSpinnerMotorRPM(0);
@@ -163,13 +162,13 @@ public class Sequences {
 	public static Sequence startIntakingOnly() {
 		Sequence seq = new Sequence("start intaking");
 		seq.add().deployIntake();
-		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT).deployIntake();
+		seq.add().setIntakeRPM(INTAKE_TARGET_RPM).deployIntake();
 		return seq;
 	}
 
 	public static Sequence stopIntakingOnly() {
 		Sequence seq = new Sequence("stop intaking");
-		seq.add().setIntakeMotorOutput(0.0);
+		seq.add().setIntakeRPM(0);
 		seq.add().stowIntake();
 		return seq;
 	}
@@ -177,7 +176,7 @@ public class Sequences {
 	// This is to test the Loader system
 	public static Sequence startLoader() {
 		Sequence seq = new Sequence("start loader");
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM);
 		return seq;
 	}
 
@@ -194,27 +193,35 @@ public class Sequences {
 	 */
 	public static Sequence spinUpShooter() {
 		Sequence seq = new Sequence("spin up shooter");
-		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
+		seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM);
 		return seq;
 	}
 
 	public static Sequence startShooting(boolean closeToGoal) {
 		Sequence seq = new Sequence("start shooting");
 		// Shooter wheel may already be up to speed.
-		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
 		if (closeToGoal) {
+			// Shooter wheel may already be up to speed.
+			seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM);
 			// Shooting from just below the goal straight up.
-			seq.add().retractShooterHood();
-		} else {
-			// Shooting from far from the goal at a flat angle.
 			seq.add().extendShooterHood();
+		} else {
+			// Shooter wheel may already be up to speed.
+			seq.add().setShooterRPM(SHOOTER_FAR_TARGET_SPEED_RPM);
+			// Shooting from far from the goal at a flat angle.
+			seq.add().retractShooterHood();
 		}
-		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
 		// Wait for the shooter wheel to settle.
 		seq.add().waitForShooter();
+		// Briefly back off loader to prevent balls jamming against shooter blocker
+		// seq.add().setLoaderSpinnerMotorRPM(-LOADER_MOTOR_SHOOTING_RPM);
 		// Let the balls out of the loader and into the shooter.
 		seq.add().unblockShooter();
+		// Spin passthrough
+		seq.add().setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
+		// Start the loader to push the balls.
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_SHOOTING_RPM);
+		/*
 		// Wait for all of the balls to leave.
 		seq.add().waitForBalls(0);
 		// Turn off everything.
@@ -222,6 +229,7 @@ public class Sequences {
 			.setLoaderPassthroughMotorOutput(0)
 			.setLoaderSpinnerMotorRPM(0)
 			.blockShooter();
+		*/
 		return seq;
 	}
 
@@ -250,9 +258,9 @@ public class Sequences {
 
 	public static Sequence visionAim(){
 		Sequence seq = new Sequence("vision aim");
-		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
+		seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM);
 		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM);
 		seq.add().extendShooterHood();
 		// Allow the robot to move to aim to the vision target while
 		// the shooter wheel spins up.

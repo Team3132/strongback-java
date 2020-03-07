@@ -31,11 +31,13 @@ public class MockIntake implements IntakeInterface {
 	}
 
 	@Override
-	public void setMotorOutput(double current){
-		output = current;
+	public IntakeInterface setTargetRPM(double rpm){
+		output = rpm;
+		return this;
 	}
 	
-	public double getMotorOutput(){
+	@Override
+	public double getTargetRPM(){
 		return output;
 	}
 
