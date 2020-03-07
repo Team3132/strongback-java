@@ -108,7 +108,7 @@ public class Constants {
 	 */
 	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
 	public static final double INTAKE_ENCODER_SCALE = 60/3; // change from rps to rpm, 3:1 gear ratio
-	public static final double INTAKE_TARGET_RPM = 300;
+	public static final double INTAKE_TARGET_RPM = 600;
 	public static final double INTAKE_POSITION_F = 0.015;
 	public static final double INTAKE_POSITION_P = 0.001;
 	public static final double INTAKE_POSITION_I = 0;
@@ -128,7 +128,7 @@ public class Constants {
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
 	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
 	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
-	public static final double SHOOTER_F = 0.075;
+	public static final double SHOOTER_F = 0.15;//0.075;
 	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
@@ -144,10 +144,10 @@ public class Constants {
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
 	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
 	public static final int PADDLE_SOLENOID_PORT = 2; 
-	public static final double LOADER_MOTOR_INTAKING_RPM = 100;//600;
-	public static final double LOADER_MOTOR_SHOOTING_RPM = 60 * 0.5;
-	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
-	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10; // ticks per rotation
+	public static final double LOADER_MOTOR_INTAKING_RPM = 720;//120;//600;
+	public static final double LOADER_MOTOR_SHOOTING_RPM = 480;
+	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
+	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10/60; // ticks per rotation
 	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 30;

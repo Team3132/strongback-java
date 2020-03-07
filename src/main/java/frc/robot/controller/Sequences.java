@@ -111,13 +111,13 @@ public class Sequences {
 		seq.add().setIntakeRPM(INTAKE_TARGET_RPM)
 			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM)
 			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
-		seq.add().waitForBalls(5);
+		//seq.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
-		seq.add().setIntakeRPM(-INTAKE_TARGET_RPM);
+		/*seq.add().setIntakeRPM(-INTAKE_TARGET_RPM);
 		seq.add().setDelayDelta(1);
 		seq.add().setIntakeRPM(0)
 			.setLoaderSpinnerMotorRPM(0)
-			.setLoaderPassthroughMotorOutput(0);
+			.setLoaderPassthroughMotorOutput(0);*/
 		return seq;
 	}
 
@@ -200,17 +200,16 @@ public class Sequences {
 	public static Sequence startShooting(boolean closeToGoal) {
 		Sequence seq = new Sequence("start shooting");
 		// Shooter wheel may already be up to speed.
-		seq.add().deployIntake();
 		if (closeToGoal) {
 			// Shooter wheel may already be up to speed.
 			seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM);
 			// Shooting from just below the goal straight up.
-			seq.add().retractShooterHood();
+			seq.add().extendShooterHood();
 		} else {
 			// Shooter wheel may already be up to speed.
 			seq.add().setShooterRPM(SHOOTER_FAR_TARGET_SPEED_RPM);
 			// Shooting from far from the goal at a flat angle.
-			seq.add().extendShooterHood();
+			seq.add().retractShooterHood();
 		}
 		// Wait for the shooter wheel to settle.
 		seq.add().waitForShooter();
