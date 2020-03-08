@@ -149,7 +149,7 @@ public class HardwareTalonSRX implements Motor {
 	@Override
 	public double getVelocity() {
 		// Convert from ticks / 100ms to ticks / second.
-		return 10 * talon.getSelectedSensorVelocity() / scale;
+		return talon.getSelectedSensorVelocity() / scale;
 	}
 
 	public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeoutMs) {
