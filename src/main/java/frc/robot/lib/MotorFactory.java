@@ -48,7 +48,7 @@ public class MotorFactory {
 		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
 			HardwareTalonSRX talon = getTalon(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Brake, log, p, i, d, f,
 					new NetworkTablesHelper("drive")); // don't invert output
-			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
+			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // Number of turns per metre of travel.
 			talon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
 			talon.setSensorPhase(sensorPhase);
 			talon.configClosedloopRamp(rampRate, 10);

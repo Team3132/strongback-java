@@ -143,9 +143,9 @@ public class Subsystems implements DashboardUpdater {
 	}
 
 	/**
-	 * Create the drivebase and location subsystems.
-	 * Creates the motors and gyro as needed by both.
-	 * Registers all of the available drive routines that can be requested by the controller.
+	 * Create the drivebase and location subsystems. Creates the motors and gyro as
+	 * needed by both. Registers all of the available drive routines that can be
+	 * requested by the controller.
 	 */
 	public void createDrivebaseLocation(InputDevice leftStick, InputDevice rightStick) {
 		if (!config.drivebaseIsPresent) {
@@ -157,16 +157,20 @@ public class Subsystems implements DashboardUpdater {
 		}
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
-		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsLeftWithEncoders,
-				!config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,config.drivebaseRampRate, config.drivebaseCurrentLimiting,
-				config.drivebaseContCurrent, config.drivebasePeakCurrent,config.drivebaseP, config.drivebaseI, config.drivebaseD,
-				config.drivebaseF, clock, log);
-		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
-				config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate, config.drivebaseCurrentLimiting, 
-				config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI,
-				 config.drivebaseD, config.drivebaseF, clock, log);
-		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT, 0.1, 0.1);
-		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
+		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
+				config.drivebaseCanIdsLeftWithEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
+				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
+				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
+				clock, log);
+		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
+				config.drivebaseCanIdsRightWithEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
+				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
+				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
+				clock, log);
+		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT,
+				0.1, 0.1);
+		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId,
+				Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
 
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
@@ -175,6 +179,11 @@ public class Subsystems implements DashboardUpdater {
 
 		leftMotor.setPosition(0);
 		rightMotor.setPosition(0);
+		try {
+			// Let the encoders get the message and have time to send it back to us.
+			Thread.sleep(100);
+		} catch (InterruptedException e) {}
+		log.error("Reset drive encoders to zero, currently are: %f, %f", leftMotor.getPosition(), rightMotor.getPosition());
 
 		// Save PID values into Network Tables
 		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
@@ -188,7 +197,7 @@ public class Subsystems implements DashboardUpdater {
 		gyro.zero();
 		location = new Location(() -> {	leftMotor.setPosition(0);
 			rightMotor.setPosition(0); },
-			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
+			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return metres.
 		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, driveHelper ,dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
