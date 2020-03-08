@@ -191,9 +191,9 @@ public class Sequences {
 	 * it up in advance.
 	 * Use the button mapped for near/far shooting to halt.
 	 */
-	public static Sequence spinUpShooter() {
-		Sequence seq = new Sequence("spin up shooter");
-		seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM);
+	public static Sequence spinUpShooter(double speed) {
+		Sequence seq = new Sequence("spin up shooter " + speed);
+		seq.add().setShooterRPM(speed);
 		return seq;
 	}
 
@@ -202,14 +202,14 @@ public class Sequences {
 		// Shooter wheel may already be up to speed.
 		if (closeToGoal) {
 			// Shooter wheel may already be up to speed.
-			seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM);
+			seq.add().setShooterRPM(SHOOTER_CLOSE_TARGET_SPEED_RPM)
 			// Shooting from just below the goal straight up.
-			seq.add().extendShooterHood();
+					.extendShooterHood();
 		} else {
 			// Shooter wheel may already be up to speed.
-			seq.add().setShooterRPM(SHOOTER_FAR_TARGET_SPEED_RPM);
+			seq.add().setShooterRPM(SHOOTER_FAR_TARGET_SPEED_RPM)
 			// Shooting from far from the goal at a flat angle.
-			seq.add().retractShooterHood();
+				.retractShooterHood();
 		}
 		// Wait for the shooter wheel to settle.
 		seq.add().waitForShooter();
@@ -218,9 +218,9 @@ public class Sequences {
 		// Let the balls out of the loader and into the shooter.
 		seq.add().unblockShooter();
 		// Spin passthrough
-		seq.add().setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
+		seq.add().setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
 		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_SHOOTING_RPM);
+				.setLoaderSpinnerMotorRPM(LOADER_MOTOR_SHOOTING_RPM);
 		/*
 		// Wait for all of the balls to leave.
 		seq.add().waitForBalls(0);
