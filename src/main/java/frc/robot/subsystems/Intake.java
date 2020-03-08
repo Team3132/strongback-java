@@ -88,7 +88,7 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         public IntakeWheel(Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> intakeWheel.getTargetRPM(), "%s/targetSpeed", name)
+            log.register(false, () -> intakeWheel.getTargetRPM(), "%s/targetRPM", name)
             .register(false, motor::getVelocity, "%s/rpm", name)
             .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
             .register(false, motor::getOutputPercent, "%s/outputPercent", name)

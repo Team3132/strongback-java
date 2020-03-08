@@ -4,6 +4,7 @@ import frc.robot.controller.Controller;
 import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.Log;
+import static frc.robot.Constants.*;
 
 import java.util.List;
 
@@ -57,17 +58,19 @@ public class Auto {
 		addDriveTestSequence();
 		addDriveTestSplineSequence();
 		addDriveTestUSequence();
+		addBasicShootIntakeDriveShootSequence();
 	}
 	
 	private void addDriveTestSequence() {
 		Sequence seq = new Sequence("Drive backwards 2m then forwards 2m"); 
+		// Go backwards 2m
 		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d end1 = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);
-		// Go backwards 2m
+		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
+		// Go forwards 2m
 		Pose2d start = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);  // backwards.
+		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
 		autoProgram.addOption("Drive test 2m", seq); 
 	}
 
@@ -131,6 +134,58 @@ public class Auto {
 		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
 		seq.add().setDelayDelta(1);
 		autoProgram.addOption("Drive u-turn 2m", seq); 
+	}
+
+	private void addShootStates(Sequence seq) {
+		// Shooter wheel may already be up to speed.
+		seq.add().setShooterRPM(SHOOTER_FAR_TARGET_SPEED_RPM);
+		// Shooting from far from the goal at a flat angle.
+		seq.add().retractShooterHood();
+		// Wait for the shooter wheel to settle.
+		seq.add().waitForShooter();
+		// Let the balls out of the loader and into the shooter.
+		seq.add().unblockShooter();
+		// Start the loader to push the balls.
+		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_SHOOTING_RPM);
+		// Wait for all of the balls to leave.
+		seq.add().waitForBalls(0);
+		// Turn off everything.
+		seq.add().setShooterRPM(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPM(0)
+			.blockShooter();		
+	}
+
+	private void addBasicShootIntakeDriveShootSequence() {
+		Sequence seq = new Sequence("Basic shoot intake drive shoot");
+
+		addShootStates(seq);
+
+		// Start intaking
+		seq.add().deployIntake()
+			.blockShooter();
+		seq.add().setIntakeRPM(INTAKE_TARGET_RPM)
+			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM)
+			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
+
+		// Drive backwards to pick up the three balls.
+		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		Pose2d thirdBall = new Pose2d(-4, -1, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(start1, List.of(), thirdBall, false);  // backwards.
+
+		// Stop intaking
+		seq.add().setIntakeRPM(0)
+			.setLoaderSpinnerMotorRPM(0)
+			.setLoaderPassthroughMotorOutput(0);
+
+		// Go forwards 2m to shoot.
+		Pose2d end = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(thirdBall, List.of(), end, true);
+
+		// Shoot the balls.
+		addShootStates(seq);
+
+		autoProgram.addOption("Basic shoot intake drive shoot", seq); 
 	}
 
 	
