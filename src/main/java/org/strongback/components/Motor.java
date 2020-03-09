@@ -141,7 +141,7 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Scale the values to/from the motors into more intutitive values.
+     * Scale the values to/from the motors into more intuitive values.
      * 
      * getPosition() returns revolutions.
      * getVelocity() returns revolutions/second.
@@ -159,7 +159,7 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Scale the values to/from the motors into more intutitive values.
+     * Scale the values to/from the motors into more intuitive values.
      * 
      * getPosition() returns the number of metres.
      * getVelocity() returns metres/second.

@@ -118,7 +118,7 @@ public class HardwareSparkMAX implements Motor {
 	}
 
 	/**
-     * Scale the values to/from the motors into more intutitive values.
+     * Scale the values to/from the motors into more intuitive values.
      * 
      * getPosition() returns the number of metres.
      * getVelocity() returns metres/second.
