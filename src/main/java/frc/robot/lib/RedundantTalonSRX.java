@@ -372,9 +372,9 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements Motor, TalonS
 	}
 
 	@Override
-	public Motor setScale(double scale) {
-		otherLeaders.forEach((talon) -> talon.setScale(scale));
-		return leader.setScale(scale);
+	public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameterMetres) {
+		otherLeaders.forEach((talon) -> talon.setScale(ticksPerTurn, gearRatio, wheelDiameterMetres));
+		return leader.setScale(ticksPerTurn, gearRatio, wheelDiameterMetres);
 	}
 
 	///// TalonSensorCollection methods from here.

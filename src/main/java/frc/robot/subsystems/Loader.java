@@ -38,7 +38,8 @@ public class Loader extends Subsystem implements LoaderInterface {
 
         log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                 .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
-                .register(true, () -> spinner.getVelocity(), "%s/spinner/RPM", name)
+                .register(true, () -> getSpinnerMotorRPM(), "%s/spinner/RPM", name)
+                .register(true, () -> getTargetSpinnerMotorRPM(), "%s/spinner/targetRPM", name)
                 .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                 .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
                 .register(true, () -> (double) getCurrentBallCount(), "%s/spinner/CurrentBallCount", name)
@@ -60,8 +61,19 @@ public class Loader extends Subsystem implements LoaderInterface {
         if (rpm == 0) {
             spinner.set(ControlMode.PercentOutput, 0);
         } else {
-            spinner.set(ControlMode.Velocity, rpm);
+            // Convert from rpm to rps.
+            spinner.set(ControlMode.Velocity, rpm / 60);
         }
+    }
+
+    @Override
+    public double getTargetSpinnerMotorRPM() {
+        return spinnerRPM;
+    }
+
+    public double getSpinnerMotorRPM() {
+        // Convert from rps to rpm.
+        return 60 * spinner.getVelocity();
     }
 
     @Override
@@ -71,7 +83,11 @@ public class Loader extends Subsystem implements LoaderInterface {
         // to slow down
         targetPassthroughMotorOutput = percent;
         passthrough.set(ControlMode.PercentOutput, percent);
+    }
 
+    @Override
+    public double getTargetPassthroughMotorOutput() {
+        return targetPassthroughMotorOutput;
     }
     
     @Override
@@ -118,7 +134,8 @@ public class Loader extends Subsystem implements LoaderInterface {
     public void updateDashboard() {
         dashboard.putString("Loader Paddle position",
                 isPaddleNotBlocking() ? "not blocking" : isPaddleBlocking() ? "blocking" : "moving");
-        dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
+        dashboard.putNumber("Loader spinner rpm", getSpinnerMotorRPM());
+        dashboard.putNumber("Loader spinner target rpm", getTargetSpinnerMotorRPM());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
         dashboard.putNumber("Current number of balls", getCurrentBallCount());
         inSensorCount.updateDashboard();
@@ -140,17 +157,6 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public int getCurrentBallCount() {
         return inSensorCount.getCount() - outSensorCount.getCount() + initBallCount;
-    }
-
-    @Override
-    public double getTargetSpinnerMotorRPM() {
-        return spinnerRPM;
-    }
-
-    @Override
-    public double getTargetPassthroughMotorOutput() {
-        log.sub("%s: passthrough output is currently %f", name, targetPassthroughMotorOutput);
-        return targetPassthroughMotorOutput;
     }
 
     private class Counter implements DashboardUpdater, Executable {
