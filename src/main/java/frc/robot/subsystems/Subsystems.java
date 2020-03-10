@@ -383,7 +383,7 @@ public class Subsystems implements DashboardUpdater {
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		// TODO: replace 0 with appropriate subsystem PIDF values
 		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, true, Constants.INTAKE_POSITION_P, Constants.INTAKE_POSITION_I, Constants.INTAKE_POSITION_D, Constants.INTAKE_POSITION_F, log);
-		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
+		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
 
 	public void createIntakeOverride() {
@@ -481,7 +481,7 @@ public class Subsystems implements DashboardUpdater {
 		DigitalInput outBallSensor = new DigitalInput(Constants.OUT_BALL_DETECTOR_DIO_PORT);
 		BooleanSupplier loaderInSensor = () -> !inBallSensor.get();
 		BooleanSupplier loaderOutSensor = () -> !outBallSensor.get(); 
-		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
+		loader = hwLoader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
 		Strongback.executor().register(loader, Priority.LOW);
 
 	}
