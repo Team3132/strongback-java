@@ -134,8 +134,6 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopShooting());
 		// Spin up shooter. Touch and release the close or far shot buttons to stop shooter wheel.
 		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpShooter(Constants.SHOOTER_FAR_TARGET_SPEED_RPS));
-		
-
 
 		// Buddy climb toggle
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.toggleBuddyClimb());

@@ -138,7 +138,7 @@ public class Auto {
 
 	private void addShootStates(Sequence seq) {
 		// Shooter wheel may already be up to speed.
-		seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS);
+		seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS - 300);
 		// Shooting from far from the goal at a flat angle.
 		seq.add().retractShooterHood();
 		// Wait for the shooter wheel to settle.
@@ -147,8 +147,7 @@ public class Auto {
 		seq.add().unblockShooter();
 		// Start the loader to push the balls.
 		seq.add().setLoaderSpinnerMotorRPS(LOADER_MOTOR_SHOOTING_RPS);
-		// Wait for all of the balls to leave.
-		seq.add().waitForBalls(0);
+		seq.add().setDelayDelta(3);
 		// Turn off everything.
 		seq.add().setShooterRPS(0)
 			.setLoaderPassthroughMotorOutput(0)

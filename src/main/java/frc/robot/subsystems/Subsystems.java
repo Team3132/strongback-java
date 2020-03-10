@@ -322,7 +322,7 @@ public class Subsystems implements DashboardUpdater {
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
-		return distance; 
+		return 0; //distance; 
 	}
 	
 	public Position getVisionWaypoint() {
@@ -500,7 +500,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1);
-		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, false, config.shooterP, config.shooterI,
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, true, config.shooterP, config.shooterI,
 				config.shooterD, config.shooterF, clock, log);
 
 		shooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
