@@ -69,7 +69,7 @@ public class Constants {
 	// Distance the robot moves per revolution of the wheels.
 	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 6 * INCHES_TO_METRES; // 6" wheels.
 	public static final double DRIVE_METRES_PER_REV = DRIVE_WHEEL_DIAMETER_METRES * Math.PI;
-	public static final double DRIVE_GEABOX_RATIO = 189.0/17.0;;
+	public static final double DRIVE_GEABOX_RATIO = 189.0/17.0;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
