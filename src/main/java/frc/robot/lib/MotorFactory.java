@@ -26,7 +26,7 @@ public class MotorFactory {
 		switch (motorControllerType) {
 		case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: {
 			HardwareSparkMAX spark = getSparkMAX(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Brake, log, p, i, d, f, new NetworkTablesHelper("drive"));
-			spark.setScale(Constants.DRIVE_MOTOR_SPARKMAX_ENCODER_TICKS, Constants.DRIVE_GEABOX_RATIO, Constants.DRIVE_METRES_PER_REV);
+			spark.setScale(Constants.SPARKMAX_ENCODER_TICKS, Constants.DRIVE_GEABOX_RATIO, Constants.DRIVE_METRES_PER_REV);
 			spark.setSensorPhase(sensorPhase);
 
 			/*
@@ -48,7 +48,7 @@ public class MotorFactory {
 		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
 			HardwareTalonSRX talon = getTalon(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Brake, log, p, i, d, f,
 					new NetworkTablesHelper("drive")); // don't invert output
-			talon.setScale(Constants.DRIVE_MOTOR_FALCON_ENCODER_TICKS, Constants.DRIVE_GEABOX_RATIO, Constants.DRIVE_METRES_PER_REV);
+			talon.setScale(Constants.FALCON_ENCODER_TICKS, Constants.DRIVE_GEABOX_RATIO, Constants.DRIVE_METRES_PER_REV);
 			talon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
 			talon.setSensorPhase(sensorPhase);
 			talon.configClosedloopRamp(rampRate, 10);
@@ -70,7 +70,7 @@ public class MotorFactory {
 	
 	public static HardwareSparkMAX getIntakeMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {
 		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p , i, d, f, new NetworkTablesHelper("intake"));
-		motor.setScale(Constants.INTAKE_ENCODER_TICKS, Constants.INTAKE_ENCODER_GEARBOX_RATIO);
+		motor.setScale(Constants.SPARKMAX_ENCODER_TICKS, Constants.INTAKE_ENCODER_GEARBOX_RATIO);
 		return motor;
 	}
 
@@ -87,7 +87,7 @@ public class MotorFactory {
 		// Out sensor (beambreak) for loader
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(Constants.LOADER_MAIN_MOTOR_ENCODER_TICKS, Constants.LOADER_MAIN_MOTOR_GEARBOX_RATIO);
+		motor.setScale(Constants.VERSA_INTEGRATED_ENCODER_TICKS, Constants.LOADER_MAIN_MOTOR_GEARBOX_RATIO);
 		motor.configClosedloopRamp(0, 10);
 		return motor;
 	}
@@ -103,7 +103,7 @@ public class MotorFactory {
 				new NetworkTablesHelper("shooter"));
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(Constants.SHOOTER_ENCODER_TICKS, Constants.SHOOTER_GEARBOX_RATIO);
+		motor.setScale(Constants.S4T_ENCODER_TICKS, Constants.SHOOTER_GEARBOX_RATIO);
 		motor.selectProfileSlot(0, 0);
 		
 		motor.configClosedloopRamp(0.125, 10);

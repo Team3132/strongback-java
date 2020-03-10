@@ -16,7 +16,7 @@ public interface IntakeInterface extends SubsystemInterface, Executable, Dashboa
 	public boolean isRetracted();
 
 	//Set intake speed
-	public IntakeInterface setTargetRPM(double rpm);
+	public IntakeInterface setTargetRPS(double rps);
 
-	public double getTargetRPM();
+	public double getTargetRPS();
 }
