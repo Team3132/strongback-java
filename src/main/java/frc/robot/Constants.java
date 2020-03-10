@@ -106,7 +106,7 @@ public class Constants {
 	 */
 	public static final int INTAKE_CAN_ID = 10;
 	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
-	public static final double INTAKE_TARGET_RPS = 60;
+	public static final double INTAKE_TARGET_RPS = 10;
 	public static final double INTAKE_POSITION_F = 0.015;
 	public static final double INTAKE_POSITION_P = 0.001;
 	public static final double INTAKE_POSITION_I = 0;
