@@ -60,12 +60,16 @@ public class Constants {
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
 	public static final String DRIVE_DEFAULT_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
 
+	// Encoder values
+	public static final double FALCON_ENCODER_TICKS = 2048;  // Falon inbuilt encoders.
+	public static final double SPARKMAX_ENCODER_TICKS = 42; // SparkMAX inbuild encoders.
+	public static final double S4T_ENCODER_TICKS = 1440; // ticks per rev.
+	public static final double VERSA_INTEGRATED_ENCODER_TICKS = 4096; // ticks per rotation
+
 	// Distance the robot moves per revolution of the wheels.
 	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 6 * INCHES_TO_METRES; // 6" wheels.
 	public static final double DRIVE_METRES_PER_REV = DRIVE_WHEEL_DIAMETER_METRES * Math.PI;
-	public static final double DRIVE_GEABOX_RATIO = 11;
-	public static final double DRIVE_MOTOR_FALCON_ENCODER_TICKS = 2048;  // Falon inbuilt encoders.
-	public static final double DRIVE_MOTOR_SPARKMAX_ENCODER_TICKS = 42; // SparkMAX inbuild encoders.
+	public static final double DRIVE_GEABOX_RATIO = 189.0/17.0;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
@@ -101,9 +105,8 @@ public class Constants {
 	 *  Intake constants 
 	 */
 	public static final int INTAKE_CAN_ID = 10;
-	public static final double INTAKE_ENCODER_TICKS = 42;  // Not used by scale function.
 	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
-	public static final double INTAKE_TARGET_RPM = 600;
+	public static final double INTAKE_TARGET_RPS = 10;
 	public static final double INTAKE_POSITION_F = 0.015;
 	public static final double INTAKE_POSITION_P = 0.001;
 	public static final double INTAKE_POSITION_I = 0;
@@ -122,14 +125,13 @@ public class Constants {
 	*/
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
 	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
-	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 200;
+	public static final double SHOOTER_SPEED_TOLERANCE_RPS = 3.33;
 	public static final double SHOOTER_F = 0.08;//0.075;
 	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPM = 3700;
-	public static final int SHOOTER_FAR_TARGET_SPEED_RPM = 5700;
-	public static final double SHOOTER_ENCODER_TICKS = 1440.0; // ticks per rev.
+	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPS = 62;
+	public static final int SHOOTER_FAR_TARGET_SPEED_RPS = 95;
 	public static final double SHOOTER_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	
 	/*
@@ -140,10 +142,9 @@ public class Constants {
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
 	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
 	public static final int PADDLE_SOLENOID_PORT = 2; 
-	public static final double LOADER_MOTOR_INTAKING_RPM = 720;//120;//600;
-	public static final double LOADER_MOTOR_SHOOTING_RPM = 480;
+	public static final double LOADER_MOTOR_INTAKING_RPS = 12;
+	public static final double LOADER_MOTOR_SHOOTING_RPS = 8;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
-	public static final double LOADER_MAIN_MOTOR_ENCODER_TICKS = 4096; // ticks per rotation
 	public static final double LOADER_MAIN_MOTOR_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;

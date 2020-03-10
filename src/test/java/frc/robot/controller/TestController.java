@@ -180,13 +180,13 @@ public class TestController {
 			}
 			@Override
 			public void setState() {
-				subsystems.intake.setTargetRPM(rpm);
+				subsystems.intake.setTargetRPS(rpm);
 			}
 			@Override
 			public void assertState() throws AssertionError {
-				if (Math.abs(subsystems.intake.getTargetRPM() - rpm) > 0.1) {
+				if (Math.abs(subsystems.intake.getTargetRPS() - rpm) > 0.1) {
 					throw new AssertionError("Expected intake motor to have rpm " + rpm + " but it is "
-							+ subsystems.intake.getTargetRPM());
+							+ subsystems.intake.getTargetRPS());
 				}
 			}
 		};

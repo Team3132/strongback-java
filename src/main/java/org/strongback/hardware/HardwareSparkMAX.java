@@ -132,6 +132,9 @@ public class HardwareSparkMAX implements Motor {
 	 */
 	@Override
     public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameter) {
+		if (ticksPerTurn * gearRatio * wheelDiameter == 0) {
+			throw new RuntimeException("WARNING: HardwareSparkMAX::setScale() was passed zero, this isn't what you want!");
+		}
 		// Encoder.getVelocity() returns RPM by default, so this needs to be converted to RPS.
 		encoder.setVelocityConversionFactor(wheelDiameter / gearRatio / 60);
 		// Encoder getPosition() returns rotations by default.
