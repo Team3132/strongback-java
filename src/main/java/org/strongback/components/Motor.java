@@ -215,6 +215,8 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
 
     /**
      * Returns the velocity after dividing by the scaling factor.
+     * Should be in rps, but can be scaled by calling setScale().
+     * 
      * Not supported by all motor controllers.
      */
     public default double getVelocity() {
@@ -249,7 +251,7 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Override the position of the quadrature position.
+     * Override the position of the quadrature encoder.
      */
     public default Motor setPosition(double position) {
         // Not implmented by default.
@@ -270,14 +272,13 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Gets the current speed.
-     * Not supported on all motor controllers.
-     *
+     * Gets the current duty cycle as set by setSpeed().
+     * This is a value from -1...1 not a speed.
+     * 
      * @return the speed, will be between -1.0 and 1.0 inclusive
      */
     @Override
     public default double getSpeed() {
-        // Not implmented by default.
         return get();
     }
 

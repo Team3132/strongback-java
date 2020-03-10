@@ -7,6 +7,7 @@ import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
 import org.strongback.components.Motor.ControlMode;
 
+import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.IntakeInterface;
@@ -20,18 +21,28 @@ import frc.robot.lib.Subsystem;
 public class Intake extends Subsystem implements IntakeInterface, Executable, DashboardUpdater {
     private Motor motor;
     private Solenoid solenoid;
-    private double targetCurrent;
+    private IntakeWheel intakeWheel;
 
     public Intake(Motor motor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
         super("Intake", dashboard, log);   
         this.motor = motor;
         this.solenoid = solenoid;
-
+        intakeWheel = new IntakeWheel(motor);
         log.register(true, () -> isExtended(), "%s/extended", name)
                .register(true, () -> isRetracted(), "%s/retracted", name)
 			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
 			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
 			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
+    }
+
+    @Override
+    public void enable() {
+        motor.set(ControlMode.PercentOutput, 0);
+    }
+
+    @Override
+    public void disable() {
+        motor.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
@@ -55,24 +66,66 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         return solenoid.isRetracted();
     }
     
+    /**
+     * Set the speed on the intake wheels.
+     */
     @Override
-    public void setMotorOutput(double current) {
-        // Prevent intake wheel from damaging the body of the robot
-        if (!isExtended() && current != 0.0) {
-            log.error("Intake retracted, not turning motor on.");
-            return;
-        } 
-        log.sub("Setting intake motor speed to %.1f", current);
-        targetCurrent = current;
-        // TODO: Use current mode instead of percent mode when the hardware
-        // has been tested.
-        motor.set(ControlMode.PercentOutput, current);
+    public IntakeInterface setTargetRPM(double speed) { 
+        intakeWheel.setTargetRPM(speed);
+        return this;
     }
 
     @Override
-    public double getMotorOutput() {
-        return targetCurrent;
+    public double getTargetRPM() {
+        return intakeWheel.getTargetRPM(); 
     }
+
+    protected class IntakeWheel {
+
+        private final Motor motor;
+        private double targetRPM;
+    
+        public IntakeWheel(Motor motor) {
+            this.motor = motor;
+
+            log.register(false, () -> intakeWheel.getTargetRPM(), "%s/targetRPM", name)
+            .register(false, motor::getVelocity, "%s/rpm", name)
+            .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
+            .register(false, motor::getOutputPercent, "%s/outputPercent", name)
+            .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
+        }
+        
+        public void setTargetRPM(double rpm) {
+            if (rpm == targetRPM) {
+                 return;
+            }
+            targetRPM = rpm;
+            // Note that if velocity mode is used and the speed is ever set to 0, 
+            // change the control mode from percent output, to avoid putting
+            // unnecessary load on the battery and motor.
+            if (rpm == 0) { 
+                log.sub("Turning intake wheel off.");
+                motor.set(ControlMode.PercentOutput, 0); 
+            } else {
+                motor.set(ControlMode.Velocity, rpm);
+            }
+            log.sub("Setting intake target speed to %f", targetRPM);
+        }
+
+        public double getTargetRPM() {
+            return targetRPM;
+        }
+
+        public double getRPM() {
+            return motor.getVelocity();
+        }
+
+        public void setPIDF(double p, double i, double d, double f) {
+            motor.setPIDF(0, p, i, d, f);
+        }
+    }
+
+
     
     /**
      * Update the operator console with the status of the intake subsystem.
@@ -81,7 +134,10 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
 	public void updateDashboard() {
         dashboard.putString("Intake position", isExtended() ? "extended" : isRetracted() ? "retracted" : "moving");
         dashboard.putNumber("Intake motor current", motor.getOutputCurrent());
-		dashboard.putNumber("Intake motor percent", motor.getOutputPercent());
+        dashboard.putNumber("Intake motor target RPM", intakeWheel.getTargetRPM());
+        dashboard.putNumber("Intake motor actual RPM", intakeWheel.getRPM());
+        dashboard.putNumber("Intake motor position", motor.getPosition());
+
 	}
 }
 

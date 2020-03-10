@@ -115,6 +115,11 @@ public class HardwareTalonSRX implements Motor {
 		return lastDemand;
 	}
 
+	@Override
+	public double getSpeed() {
+		return sensorCollection.getQuadratureVelocity();
+	}
+
 	public void neutralOutput() {
 		talon.neutralOutput();
 	}
@@ -131,9 +136,29 @@ public class HardwareTalonSRX implements Motor {
 
 	@Override
     public Motor setPosition(double position) {
-        sensorCollection.setQuadraturePosition(position, 10);
+		System.out.printf("Calling setPosition(%f)\n", position);
+		setSelectedSensorPosition(position, 0, 30);
         return this;        
-    }
+	}
+	
+	@Override
+	public double getPosition() {
+		return talon.getSelectedSensorPosition(0) / scale;
+	}
+
+	@Override
+	public double getVelocity() {
+		// Convert from ticks / 100ms to ticks / second.
+		return talon.getSelectedSensorVelocity() / scale;
+	}
+
+	public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeoutMs) {
+		if (scalable(lastMode)) {
+			sensorPos = (int) (sensorPos * scale);
+		}
+		System.out.printf("Calling setSelectedSensorPosition(%f)\n", sensorPos);
+		return talon.setSelectedSensorPosition((int) sensorPos, pidIdx, timeoutMs);
+	}
 
 	@Override
 	public Motor setInverted(boolean invert) {
@@ -221,23 +246,6 @@ public class HardwareTalonSRX implements Motor {
 
 	public ErrorCode configSensorTerm(SensorTerm sensorTerm, FeedbackDevice feedbackDevice, int timeoutMs) {
 		return talon.configSensorTerm(sensorTerm, feedbackDevice, timeoutMs);
-	}
-
-	@Override
-	public double getPosition() {
-		return talon.getSelectedSensorPosition(0) / scale;
-	}
-
-	@Override
-	public double getVelocity() {
-		return talon.getSelectedSensorVelocity(0) / scale;
-	}
-
-	public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeoutMs) {
-		if (scalable(lastMode)) {
-			sensorPos = (int) (sensorPos * scale);
-		}
-		return talon.setSelectedSensorPosition((int) sensorPos, pidIdx, timeoutMs);
 	}
 
 	public ErrorCode setControlFramePeriod(ControlFrame frame, int periodMs) {
@@ -454,7 +462,6 @@ public class HardwareTalonSRX implements Motor {
 	@Override
 	public Motor setScale(double scale) {
 		this.scale = scale;
-		sensorCollection.setScale(scale);
 		return this;
 	}
 

@@ -108,7 +108,7 @@ public class RobotConfiguration {
 	public boolean canifierIsPresent = false;
 	public int canifierCanId;
 
-	public boolean navxIsPresent = false;
+	public boolean navxIsPresent = true;
 
 	public boolean visionIsPresent = false;
 	public double visionHMin = Constants.VISION_H_MIN;
@@ -239,7 +239,7 @@ public class RobotConfiguration {
 		pcmIsPresent = getAsBoolean("pcm/present", false);
 		pcmCanId = getAsInt("pcm/canID", Constants.PCM_CAN_ID);
 		
-		navxIsPresent = getAsBoolean("navx/present", false);
+		navxIsPresent = getAsBoolean("navx/present", true);
 
 		robotLengthWithBumpers = getAsDouble("dimensions/robot/lengthWithBumpers", 0.0);
 		robotWidthWithBumpers = getAsDouble("dimensions/robot/widthWithBumpers", 0.0);

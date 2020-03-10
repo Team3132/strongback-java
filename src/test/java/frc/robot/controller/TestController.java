@@ -172,21 +172,21 @@ public class TestController {
 	 * @param power to set/expect to/from the motor.
 	 * @return a setter or asserter object to pass to the TestHelper.
 	 */
-	private StateSetterOrAsserter intakeMotorPower(double power) {
+	private StateSetterOrAsserter intakeMotorRPM(double rpm) {
 		return new StateSetterOrAsserter() {
 			@Override
 			public String name() {
-				return String.format("IntakeMotorPower(%.1f)", power);
+				return String.format("IntakeMotorPower(%.1f)", rpm);
 			}
 			@Override
 			public void setState() {
-				subsystems.intake.setMotorOutput(power);
+				subsystems.intake.setTargetRPM(rpm);
 			}
 			@Override
 			public void assertState() throws AssertionError {
-				if (Math.abs(subsystems.intake.getMotorOutput() - power) > 0.1) {
-					throw new AssertionError("Expected intake motor to have power " + power + " but it is "
-							+ subsystems.intake.getMotorOutput());
+				if (Math.abs(subsystems.intake.getTargetRPM() - rpm) > 0.1) {
+					throw new AssertionError("Expected intake motor to have rpm " + rpm + " but it is "
+							+ subsystems.intake.getTargetRPM());
 				}
 			}
 		};

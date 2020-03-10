@@ -46,10 +46,10 @@ public class MotorFactory {
 			// Falling through to TalonSRX.
 
 		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
-			HardwareTalonSRX talon = getTalon(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Coast, log, p, i, d, f,
+			HardwareTalonSRX talon = getTalon(drivebaseCanIdsLeftWithEncoders, leftMotor, NeutralMode.Brake, log, p, i, d, f,
 					new NetworkTablesHelper("drive")); // don't invert output
-			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // number of ticks per inch of travel.
-			talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+			talon.setScale(Constants.DRIVE_MOTOR_POSITION_SCALE); // Number of turns per metre of travel.
+			talon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
 			talon.setSensorPhase(sensorPhase);
 			talon.configClosedloopRamp(rampRate, 10);
 			talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
@@ -70,6 +70,7 @@ public class MotorFactory {
 	
 	public static HardwareSparkMAX getIntakeMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {
 		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p , i, d, f, new NetworkTablesHelper("intake"));
+		motor.setScale(Constants.INTAKE_ENCODER_SCALE);
 		return motor;
 	}
 
@@ -97,11 +98,12 @@ public class MotorFactory {
 	
 	public static HardwareTalonSRX getShooterMotor(int[] canIDs, boolean sensorPhase, 
 			double p, double i, double d, double f,	Clock clock, Log log) {
-		HardwareTalonSRX motor = getTalon(canIDs, false, NeutralMode.Coast, log, p, i, d, f,
-				new NetworkTablesHelper("shooter")); // don't invert output
+		HardwareTalonSRX motor = getTalon(canIDs, true, NeutralMode.Coast, log, p, i, d, f,
+				new NetworkTablesHelper("shooter"));
 		motor.setSensorPhase(sensorPhase);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(36);
+		motor.setScale(Constants.SHOOTER_ENCODER_SCALE);
+		motor.selectProfileSlot(0, 0);
 		
 		motor.configClosedloopRamp(0.125, 10);
 		motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
@@ -126,7 +128,7 @@ public class MotorFactory {
 		leader.configPeakCurrentLimit(Constants.DEFAULT_TALON_PEAK_CURRENT_LIMIT, 10);
 		TunableMotor.tuneMotor(leader, abs(canIDs[0]), p, i, d, f, networkTable);
 
-    	for (int n = 1; i < canIDs.length; n++) {
+    	for (int n = 1; n < canIDs.length; n++) {
 			boolean shouldInvert = invert;
 			if (canIDs[n] < 0) shouldInvert = !shouldInvert;
     		HardwareTalonSRX follower = Hardware.Motors.talonSRX(abs(canIDs[n]), shouldInvert, mode);
