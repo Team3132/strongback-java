@@ -128,6 +128,9 @@ public class HardwareTalonSRX implements Motor {
 	@Override
     public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameter) {
 		scale = ticksPerTurn * gearRatio / wheelDiameter;
+		if (scale == 0) {
+			throw new RuntimeException("WARNING: HardwareSparkMAX::setScale() was passed zero, this isn't what you want!");
+		}
 		return this;
 	}
 	

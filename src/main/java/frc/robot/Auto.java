@@ -138,7 +138,7 @@ public class Auto {
 
 	private void addShootStates(Sequence seq) {
 		// Shooter wheel may already be up to speed.
-		seq.add().setShooterRPM(SHOOTER_FAR_TARGET_SPEED_RPM);
+		seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS);
 		// Shooting from far from the goal at a flat angle.
 		seq.add().retractShooterHood();
 		// Wait for the shooter wheel to settle.
@@ -146,13 +146,13 @@ public class Auto {
 		// Let the balls out of the loader and into the shooter.
 		seq.add().unblockShooter();
 		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_SHOOTING_RPM);
+		seq.add().setLoaderSpinnerMotorRPS(LOADER_MOTOR_SHOOTING_RPS);
 		// Wait for all of the balls to leave.
 		seq.add().waitForBalls(0);
 		// Turn off everything.
-		seq.add().setShooterRPM(0)
+		seq.add().setShooterRPS(0)
 			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPM(0)
+			.setLoaderSpinnerMotorRPS(0)
 			.blockShooter();		
 	}
 
@@ -164,8 +164,8 @@ public class Auto {
 		// Start intaking
 		seq.add().deployIntake()
 			.blockShooter();
-		seq.add().setIntakeRPM(INTAKE_TARGET_RPM)
-			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_INTAKING_RPM)
+		seq.add().setIntakeRPS(INTAKE_TARGET_RPS)
+			.setLoaderSpinnerMotorRPS(LOADER_MOTOR_INTAKING_RPS)
 			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT);
 
 		// Drive backwards to pick up the three balls.
@@ -174,8 +174,8 @@ public class Auto {
 		seq.add().driveRelativeWaypoints(start1, List.of(), thirdBall, false);  // backwards.
 
 		// Stop intaking
-		seq.add().setIntakeRPM(0)
-			.setLoaderSpinnerMotorRPM(0)
+		seq.add().setIntakeRPS(0)
+			.setLoaderSpinnerMotorRPS(0)
 			.setLoaderPassthroughMotorOutput(0);
 
 		// Go forwards 2m to shoot.

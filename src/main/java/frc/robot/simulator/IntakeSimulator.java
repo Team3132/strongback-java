@@ -17,7 +17,7 @@ public class IntakeSimulator implements IntakeInterface, Executable {
 	private MovementSimulator arm = new MovementSimulator("arm intake", kMaxSpeed, kMaxAccel, kMinAngle, kMaxAngle, kMovementTolerance);
 	private long lastTimeMs = 0;
 
-	private double rpm;
+	private double rps;
 	
 	public IntakeSimulator() {
 	}
@@ -40,14 +40,14 @@ public class IntakeSimulator implements IntakeInterface, Executable {
 
 
 	@Override
-	public IntakeInterface setTargetRPM(double rpm) {
-		this.rpm = rpm;
+	public IntakeInterface setTargetRPS(double rps) {
+		this.rps = rps;
 		return this;
 	}
 
 	@Override
-	public double getTargetRPM() {
-		return rpm;
+	public double getTargetRPS() {
+		return rps;
 	}
 
 	@Override

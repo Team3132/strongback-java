@@ -157,16 +157,16 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
-		subsystems.intake.setTargetRPM(desiredState.intakeRPM);
+		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
 
-		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
+		subsystems.loader.setTargetSpinnerMotorRPS(desiredState.loaderSpinnerMotorRPS);
 		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
 		subsystems.loader.setPaddleNotBlocking(desiredState.loaderPaddleNotBlocking);
 
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
 
-		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
+		subsystems.shooter.setTargetRPS(desiredState.shooterRPS);
 		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
 
 		// Toggle buddy climb if needed
@@ -237,7 +237,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while spinning up shooter, stopping shooter");
-			subsystems.shooter.setTargetRPM(0);
+			subsystems.shooter.setTargetRPS(0);
 		}
 	}
 	
