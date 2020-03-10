@@ -80,11 +80,14 @@ public class Subsystems implements DashboardUpdater {
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
+	public IntakeInterface hwIntake;
 	public BuddyClimbInterface buddyClimb;
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
 	public LoaderInterface loader;
+	public LoaderInterface hwLoader; // Keep track of the real hardware for dashboard update
 	public OverridableSubsystem<LoaderInterface> loaderOverride;
 	public ShooterInterface shooter;
+	public ShooterInterface hwShooter;
 	public OverridableSubsystem<ShooterInterface> shooterOverride;
 	public ColourWheelInterface colourWheel;
 	public PneumaticsModule compressor;
@@ -133,10 +136,10 @@ public class Subsystems implements DashboardUpdater {
 	@Override
 	public void updateDashboard() {
 		drivebase.updateDashboard();
-		intake.updateDashboard();
+		hwIntake.updateDashboard();
 		location.updateDashboard();
-		loader.updateDashboard();
-		shooter.updateDashboard();
+		hwLoader.updateDashboard();
+		hwShooter.updateDashboard();
 		vision.updateDashboard();
 		colourWheel.updateDashboard();
 	}
@@ -370,7 +373,7 @@ public class Subsystems implements DashboardUpdater {
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		// TODO: replace 0 with appropriate subsystem PIDF values
 		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, 0, 0, 0, 0, log);
-		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
+		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
 
 	public void createIntakeOverride() {
@@ -460,7 +463,7 @@ public class Subsystems implements DashboardUpdater {
 		DigitalInput outBallSensor = new DigitalInput(Constants.OUT_BALL_DETECTOR_DIO_PORT);
 		BooleanSupplier loaderInSensor = () -> inBallSensor.get();
 		BooleanSupplier loaderOutSensor = () -> outBallSensor.get(); 
-		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
+		loader = hwLoader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
 		Strongback.executor().register(loader, Priority.LOW);
 
 	}
@@ -485,7 +488,7 @@ public class Subsystems implements DashboardUpdater {
 		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, false, config.shooterP, config.shooterI,
 				config.shooterD, config.shooterF, clock, log);
 
-		shooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
+		shooter = hwShooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
 	}
 
 	public void createShooterOverride() {
