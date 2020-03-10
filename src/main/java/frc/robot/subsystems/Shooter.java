@@ -80,8 +80,8 @@ public class Shooter extends Subsystem implements ShooterInterface {
         public ShooterWheel(Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> flyWheel.getTargetRPM(), "shooter/flyWheel/targetSpeed", name)
-            .register(false, motor::getVelocity, "shooter/flyWheel/rpm", name)
+            log.register(false, () -> getTargetRPM(), "shooter/flyWheel/targetSpeed", name)
+            .register(false, () -> getRPM(), "shooter/flyWheel/rpm", name)
             .register(false, motor::getOutputVoltage, "shooter/flyWheel/outputVoltage", name)
             .register(false, motor::getOutputPercent, "shooter/flyWheel/outputPercent", name)
             .register(false, motor::getOutputCurrent, "shooter/flyWheel/outputCurrent", name);
@@ -99,7 +99,8 @@ public class Shooter extends Subsystem implements ShooterInterface {
                 log.sub("Turning shooter wheel off.");
                 motor.set(ControlMode.PercentOutput, 0); 
             } else {
-                motor.set(ControlMode.Velocity, rpm);
+                // Convert from rpm to rps.
+                motor.set(ControlMode.Velocity, rpm / 60);
             }
             log.sub("Setting shooter target speed to %f", targetRPM);
         }
@@ -109,7 +110,8 @@ public class Shooter extends Subsystem implements ShooterInterface {
         }
 
         public double getRPM() {
-            return motor.getVelocity();
+            // Convert from rps to rpm
+            return 60 * motor.getVelocity();
         }
 
         public void setPIDF(double p, double i, double d, double f) {

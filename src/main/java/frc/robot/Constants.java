@@ -55,18 +55,17 @@ public class Constants {
 	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {2,1}; 
 	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
-	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 0.15; // 6" in metres 
-	public static final double DRIVE_ENCODER_CODES_PER_REV  =  2048;
-	public static final double DRIVE_GEABOX_RATIO = 11;
 	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
 	public static final String DRIVE_DEFAULT_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
 
-	// Distance the robot moves per revolution of the wheels. Gearing needs to be taken into account here.
+	// Distance the robot moves per revolution of the wheels.
+	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 6 * INCHES_TO_METRES; // 6" wheels.
 	public static final double DRIVE_METRES_PER_REV = DRIVE_WHEEL_DIAMETER_METRES * Math.PI;
-	// FIXME: This scale factor inside Motor should be inverted because it's confusing this way.
-	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV * DRIVE_GEABOX_RATIO / DRIVE_METRES_PER_REV;
+	public static final double DRIVE_GEABOX_RATIO = 11;
+	public static final double DRIVE_MOTOR_FALCON_ENCODER_TICKS = 2048;  // Falon inbuilt encoders.
+	public static final double DRIVE_MOTOR_SPARKMAX_ENCODER_TICKS = 42; // SparkMAX inbuild encoders.
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
@@ -101,8 +100,9 @@ public class Constants {
 	/*
 	 *  Intake constants 
 	 */
-	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
-	public static final double INTAKE_ENCODER_SCALE = 60/3; // change from rps to rpm, 3:1 gear ratio
+	public static final int INTAKE_CAN_ID = 10;
+	public static final double INTAKE_ENCODER_TICKS = 42;  // Not used by scale function.
+	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
 	public static final double INTAKE_TARGET_RPM = 600;
 	public static final double INTAKE_POSITION_F = 0.015;
 	public static final double INTAKE_POSITION_P = 0.001;
@@ -129,7 +129,8 @@ public class Constants {
 	public static final double SHOOTER_D = 0;
 	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPM = 3700;
 	public static final int SHOOTER_FAR_TARGET_SPEED_RPM = 5700;
-	public static final double SHOOTER_ENCODER_SCALE = 1440.0/60/10; // ticks per rev
+	public static final double SHOOTER_ENCODER_TICKS = 1440.0; // ticks per rev.
+	public static final double SHOOTER_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	
 	/*
 	* Loader
@@ -142,7 +143,8 @@ public class Constants {
 	public static final double LOADER_MOTOR_INTAKING_RPM = 720;//120;//600;
 	public static final double LOADER_MOTOR_SHOOTING_RPM = 480;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
-	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/60/10; // ticks per rotation
+	public static final double LOADER_MAIN_MOTOR_ENCODER_TICKS = 4096; // ticks per rotation
+	public static final double LOADER_MAIN_MOTOR_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 30;

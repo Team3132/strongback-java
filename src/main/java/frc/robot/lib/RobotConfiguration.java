@@ -77,7 +77,7 @@ public class RobotConfiguration {
 	public double drivebaseCount =  Constants.DRIVE_COUNT_100ms;
 	
 	public boolean intakeIsPresent = false;
-	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
+	public int intakeCanID = Constants.INTAKE_CAN_ID;
 
 	public boolean colourWheelIsPresent = false;
 	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;
@@ -211,7 +211,7 @@ public class RobotConfiguration {
 		
 	
 		intakeIsPresent = getAsBoolean("intake/present", false);
-		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
+		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_CAN_ID);
 
 		colourWheelIsPresent = getAsBoolean("colourWheel/present", false);
 		colourWheelCanID = getAsInt("colourWheel/canID", Constants.COLOUR_WHEEL_CAN_ID);

@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
 import org.strongback.components.Motor.ControlMode;
 
-import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.IntakeInterface;
@@ -32,7 +29,10 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
                .register(true, () -> isRetracted(), "%s/retracted", name)
 			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
 			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
-			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
+               .register(false, motor::getOutputCurrent, "%s/outputCurrent", name)
+               .register(false, () -> intakeWheel.getTargetRPM(), "%s/targetRPM", name)
+               .register(false, () -> intakeWheel.getRPM(), "%s/rpm", name);
+   
     }
 
     @Override
@@ -87,12 +87,6 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
     
         public IntakeWheel(Motor motor) {
             this.motor = motor;
-
-            log.register(false, () -> intakeWheel.getTargetRPM(), "%s/targetRPM", name)
-            .register(false, motor::getVelocity, "%s/rpm", name)
-            .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
-            .register(false, motor::getOutputPercent, "%s/outputPercent", name)
-            .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
         }
         
         public void setTargetRPM(double rpm) {
@@ -107,7 +101,8 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
                 log.sub("Turning intake wheel off.");
                 motor.set(ControlMode.PercentOutput, 0); 
             } else {
-                motor.set(ControlMode.Velocity, rpm);
+                // Convert from rpm to rps
+                motor.set(ControlMode.Velocity, rpm / 60);
             }
             log.sub("Setting intake target speed to %f", targetRPM);
         }
@@ -117,15 +112,14 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         }
 
         public double getRPM() {
-            return motor.getVelocity();
+            // Convert from RPS to RPM
+            return 60 * motor.getVelocity();
         }
 
         public void setPIDF(double p, double i, double d, double f) {
             motor.setPIDF(0, p, i, d, f);
         }
     }
-
-
     
     /**
      * Update the operator console with the status of the intake subsystem.
@@ -136,8 +130,6 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         dashboard.putNumber("Intake motor current", motor.getOutputCurrent());
         dashboard.putNumber("Intake motor target RPM", intakeWheel.getTargetRPM());
         dashboard.putNumber("Intake motor actual RPM", intakeWheel.getRPM());
-        dashboard.putNumber("Intake motor position", motor.getPosition());
-
 	}
 }
 

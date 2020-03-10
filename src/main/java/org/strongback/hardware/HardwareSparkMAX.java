@@ -35,6 +35,7 @@ public class HardwareSparkMAX implements Motor {
 	
 	public HardwareSparkMAX(com.revrobotics.CANSparkMax spark) {
 		this.spark = spark;
+		setScale(1, 1);  // Change from rpm to rps.
 		// Assume built in hall effect sensor.
 		encoder = spark.getEncoder();
 		fwdLimitSwitch = spark.getForwardLimitSwitch(CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
@@ -112,15 +113,29 @@ public class HardwareSparkMAX implements Motor {
 
 	@Override
 	public double getVelocity() {
+		// CANEncoder returns RPM by default. This has been scaled to divide by 60.
 		return encoder.getVelocity();
 	}
 
+	/**
+     * Scale the values to/from the motors into more intuitive values.
+     * 
+     * getPosition() returns the number of metres.
+     * getVelocity() returns metres/second.
+     * 
+     * Also consider setScale(double ticksPerTurn, double gearRatio).
+     * 
+     * @param ticksPerTurn Not used for the HardwareSparkMAX with a builtin encoder.
+     * @param gearRatio How many turns of the motor to turn the output shaft, eg 11
+     * @param wheelDiameterMetres How many metres does the wheel move for every turn.
+     * @return this.
+	 */
 	@Override
-	public Motor setScale(double scale) {
-		// Position is in turns.
-		encoder.setPositionConversionFactor(scale);
-		// Velocity is in rpm by default. Use rps instead.
-		encoder.setVelocityConversionFactor(scale / 60);
+    public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameter) {
+		// Encoder.getVelocity() returns RPM by default, so this needs to be converted to RPS.
+		encoder.setVelocityConversionFactor(wheelDiameter / gearRatio / 60);
+		// Encoder getPosition() returns rotations by default.
+		encoder.setPositionConversionFactor(wheelDiameter / gearRatio);
 		return this;
 	}
 

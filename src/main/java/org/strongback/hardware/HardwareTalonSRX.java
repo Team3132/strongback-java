@@ -97,16 +97,21 @@ public class HardwareTalonSRX implements Motor {
 
 	@Override
 	public void set(ControlMode mode, double demand) {
+		lastMode = mode;
+		lastDemand = demand;  // Pre-scaling.
 		if (scalable(mode)) {
 			demand *= scale;
 		}
-		lastMode = mode;
 		if (mode.equals(Motor.ControlMode.Voltage)) {
 			// TalonSRX doesn't support voltage as a control mode, so percent output is used instead.
 			mode = ControlMode.PercentOutput;
 			demand /= talon.getBusVoltage();
 		}
-		lastDemand = demand;
+		if (mode.equals(Motor.ControlMode.Velocity)) {
+			// In Velocity mode, the talon expects position change / 100ms.
+			// Convert ticks / sec to ticks / 100ms.
+			demand /= 10;
+		}
 		talon.set(mode.talonControlMode, demand);
 	}
 
@@ -120,6 +125,12 @@ public class HardwareTalonSRX implements Motor {
 		return sensorCollection.getQuadratureVelocity();
 	}
 
+	@Override
+    public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameter) {
+		scale = ticksPerTurn * gearRatio / wheelDiameter;
+		return this;
+	}
+	
 	public void neutralOutput() {
 		talon.neutralOutput();
 	}
@@ -148,8 +159,9 @@ public class HardwareTalonSRX implements Motor {
 
 	@Override
 	public double getVelocity() {
-		// Convert from ticks / 100ms to ticks / second.
-		return talon.getSelectedSensorVelocity() / scale;
+		// TalonSRX::getSelectedSensorVelocity() returns ticks / 100ms.
+		// Convert from ticks / 100ms to ticks / second and then scale.
+		return 10 * talon.getSelectedSensorVelocity() / scale;
 	}
 
 	public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeoutMs) {
@@ -457,12 +469,6 @@ public class HardwareTalonSRX implements Motor {
 
 	public TalonSensorCollection getSensorCollection() {
 		return sensorCollection;
-	}
-
-	@Override
-	public Motor setScale(double scale) {
-		this.scale = scale;
-		return this;
 	}
 
 	public HardwareTalonSRX follow(IMotorController master) {

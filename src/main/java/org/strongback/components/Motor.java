@@ -98,6 +98,7 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     /**
      * Tell the motor what control mode and how fast/far.
      * Some motor controllers don't support some modes.
+     * Normally for Velocity mode, this is in rps, not ticks / 100ms.
      * 
      * @param mode percent output, position, velocity etc.
      * @param demand for percent [-1,1].
@@ -119,18 +120,61 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Scale the incoming and outgoing velocity and position parameters to
-     * convert them from ticks[/100ms] to a useful unit.
-     * @param scale set to 0.5 to halve set(...) values and double get*() results.
-     * @return this
+     * Returns the velocity after scaling.
+     * Normally in rps or in metres/sec.
+     * 
+     * Not supported by all motor controllers.
      */
-    public default Motor setScale(double scale) {
+    public default double getVelocity() {
+        // Not implmented by default.
+        return 0;
+    }
+
+    /**
+     * Returns the position in metres after scaling.
+     * 
+     * Not supported by all motor controllers.
+     */
+    public default double getPosition() {
+        // Not implmented by default.
+        return 0;
+    }
+
+    /**
+     * Scale the values to/from the motors into more intuitive values.
+     * 
+     * getPosition() returns revolutions.
+     * getVelocity() returns revolutions/second.
+     * 
+     * Also consider setScale(double ticksPerTurn, double gearRatio, double wheelDiameterMetres).
+     * 
+     * @param ticksPerTurn How many encoder ticks per turn, eg 4096 or 42.
+     * @param gearRatio How many turns of the motor to turn the output shaft, eg 11
+     * @param wheelDiameterMetres How many metres does the wheel move for every turn.
+     * @return this.
+     */
+    public default Motor setScale(double ticksPerTurn, double gearRatio) {
+        setScale(ticksPerTurn, gearRatio, 1);
         return this;
     }
 
-    public default double getScale() {
-        return 1;
-    };
+    /**
+     * Scale the values to/from the motors into more intuitive values.
+     * 
+     * getPosition() returns the number of metres.
+     * getVelocity() returns metres/second.
+     * 
+     * Also consider setScale(double ticksPerTurn, double gearRatio).
+     * 
+     * @param ticksPerTurn How many encoder ticks per turn, eg 4096 or 42.
+     * @param gearRatio How many turns of the motor to turn the output shaft, eg 11
+     * @param wheelDiameterMetres How many metres does the wheel move for every turn.
+     * @return this.
+     */
+    public default Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameterMetres) {
+        // Default implementation does nothing.
+        return this;
+    }
 
     public default Motor enable() {
         return this;
@@ -214,26 +258,6 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Returns the velocity after dividing by the scaling factor.
-     * Should be in rps, but can be scaled by calling setScale().
-     * 
-     * Not supported by all motor controllers.
-     */
-    public default double getVelocity() {
-        // Not implmented by default.
-        return 0;
-    }
-
-    /**
-     * Returns the position after dividing by the scaling factor.
-     * Not supported by all motor controllers.
-     */
-    public default double getPosition() {
-        // Not implmented by default.
-        return 0;
-    }
-
-    /**
      * returns the temperature of the motor controller.
      * Not supported by all motor controllers.
      */
@@ -274,6 +298,8 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     /**
      * Gets the current duty cycle as set by setSpeed().
      * This is a value from -1...1 not a speed.
+     * 
+     * TODO: Fix this by removing it and renaming getVelocity() to getSpeed().
      * 
      * @return the speed, will be between -1.0 and 1.0 inclusive
      */
