@@ -322,6 +322,8 @@ public class Subsystems implements DashboardUpdater {
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
+		// returning zero for now so visionAim just aims the robot (doesn't drive to a distance)
+		// TODO: reincorporate the distance measurment into how we shoot
 		return 0; //distance; 
 	}
 	
