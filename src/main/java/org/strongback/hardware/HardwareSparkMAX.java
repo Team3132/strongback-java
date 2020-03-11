@@ -35,9 +35,9 @@ public class HardwareSparkMAX implements Motor {
 	
 	public HardwareSparkMAX(com.revrobotics.CANSparkMax spark) {
 		this.spark = spark;
-		setScale(1, 1);  // Change from rpm to rps.
 		// Assume built in hall effect sensor.
 		encoder = spark.getEncoder();
+		setScale(1, 1);  // Change from rpm to rps.
 		fwdLimitSwitch = spark.getForwardLimitSwitch(CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
 		revLimitSwitch = spark.getReverseLimitSwitch(CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
 	}

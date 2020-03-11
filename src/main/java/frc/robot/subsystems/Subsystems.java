@@ -260,7 +260,7 @@ public class Subsystems implements DashboardUpdater {
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
 				new PositionalPIDDrive("visionAim",
-				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_RANGE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_RANGE), 
+				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_TOLERANCE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_TOLERANCE), 
 				() -> MathUtil.clamp(getVisionDistance()*Constants.VISION_AIM_DISTANCE_SCALE, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED),
 				() -> getVisionTurnAdjustment(),
 				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
@@ -325,7 +325,9 @@ public class Subsystems implements DashboardUpdater {
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
-		return distance; 
+		// returning zero for now so visionAim just aims the robot (doesn't drive to a distance)
+		// TODO: reincorporate the distance measurment into how we shoot
+		return 0; //distance; 
 	}
 	
 	public Position getVisionWaypoint() {
@@ -503,7 +505,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1);
-		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, false, config.shooterP, config.shooterI,
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, true, config.shooterP, config.shooterI,
 				config.shooterD, config.shooterF, clock, log);
 
 		shooter = hwShooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);

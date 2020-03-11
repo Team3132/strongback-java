@@ -52,7 +52,7 @@ public class Constants {
 	 */
 	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {4,5};
 	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {2,1}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
 	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
 	
@@ -142,7 +142,7 @@ public class Constants {
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
 	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
 	public static final int PADDLE_SOLENOID_PORT = 2; 
-	public static final double LOADER_MOTOR_INTAKING_RPS = 12;
+	public static final double LOADER_MOTOR_INTAKING_RPS = 10;
 	public static final double LOADER_MOTOR_SHOOTING_RPS = 8;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
 	public static final double LOADER_MAIN_MOTOR_GEARBOX_RATIO = 1; // Encoder is on output shaft.
@@ -177,10 +177,10 @@ public class Constants {
 	public static final double VISION_AIM_ANGLE_SCALE = 0.4;
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
-	public static final double VISION_STOP_DISTANCE = 230; // inches 
-	public static final double VISION_MAX_DRIVE_SPEED = 15;
-	public static final double VISION_AIM_ANGLE_RANGE = 2; //degrees
-	public static final double VISION_AIM_DISTANCE_RANGE = 5; //inches
+	public static final double VISION_STOP_DISTANCE = 6; // metres 
+	public static final double VISION_MAX_DRIVE_SPEED = 0.4; // metres per second
+	public static final double VISION_AIM_ANGLE_TOLERANCE = 2; //degrees
+	public static final double VISION_AIM_DISTANCE_TOLERANCE = 0.1; //metres
 	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
 
 

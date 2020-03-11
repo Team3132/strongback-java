@@ -72,8 +72,8 @@ public class PositionalPIDDrive implements DriveRoutine {
 		 DoubleSupplier distance, DoubleSupplier speed, Clock clock, Log log) {
 		PositionPID pid = new PositionPID(name, targetSpeed, maxJerk, distance, speed, clock, log);
 		double kV = 0.018;
-		double kA = 0, kI = 0, kD = 1.05;
-		double kP = 0.1;
+		double kA = 0, kI = 0, kD = 0.5;//1.05;
+		double kP = 0.0125;
 		// double kA = 0, kP = 0.03, kI = 0, kD = 0; // from offseason 
 		pid.setVAPID(kV, kA, kP, kI, kD);
 		return pid;

@@ -95,9 +95,9 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     public LoaderInterface setPaddleNotBlocking(final boolean extend) {
         if (extend) {
-            paddleSolenoid.extend();
-        } else {
             paddleSolenoid.retract();
+        } else {
+            paddleSolenoid.extend();
         }
         return this;
     }
@@ -105,12 +105,12 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public boolean isPaddleNotBlocking() {
         // log.sub("Is intake extended: " + solenoid.isExtended());
-        return paddleSolenoid.isExtended();
+        return paddleSolenoid.isRetracted();
     }
 
     @Override
     public boolean isPaddleBlocking() {
-        return paddleSolenoid.isRetracted();
+        return paddleSolenoid.isExtended();
     }
 
     @Override

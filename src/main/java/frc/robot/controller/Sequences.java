@@ -258,26 +258,8 @@ public class Sequences {
 
 	public static Sequence visionAim(){
 		Sequence seq = new Sequence("vision aim");
-		seq.add().setShooterRPS(SHOOTER_CLOSE_TARGET_SPEED_RPS);
-		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPS(LOADER_MOTOR_INTAKING_RPS);
-		seq.add().extendShooterHood();
-		// Allow the robot to move to aim to the vision target while
-		// the shooter wheel spins up.
 		seq.add().doVisionAim(); 
-		// Wait for the shooter wheel to settle if it hasn't already.
-		seq.add().waitForShooter();
-		// Back to normal driving so it can be adjusted while shooting.
-		seq.add().doArcadeDrive();
-		// Let the balls out of the loader and into the shooter.
-		seq.add().unblockShooter();
-		// Wait for all of the balls to leave.
-		seq.add().waitForBalls(0);
-		// Turn off everything.
-		seq.add().setShooterRPS(0)
-			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPS(0)
-			.blockShooter();
+	
 		return seq;
 	}
 
