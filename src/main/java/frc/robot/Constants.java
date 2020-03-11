@@ -178,9 +178,9 @@ public class Constants {
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
 	public static final double VISION_STOP_DISTANCE = 6; // metres 
-	public static final double VISION_MAX_DRIVE_SPEED = 0.4; // metres
-	public static final double VISION_AIM_ANGLE_RANGE = 2; //degrees
-	public static final double VISION_AIM_DISTANCE_RANGE = 0.1; //metres
+	public static final double VISION_MAX_DRIVE_SPEED = 0.4; // metres per second
+	public static final double VISION_AIM_ANGLE_TOLERANCE = 2; //degrees
+	public static final double VISION_AIM_DISTANCE_TOLERANCE = 0.1; //metres
 	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
 
 
