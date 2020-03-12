@@ -10,6 +10,7 @@ import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -138,7 +139,7 @@ public class Auto {
 
 	private void addShootStates(Sequence seq) {
 		// Shooter wheel may already be up to speed.
-		seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS - 300);
+		seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS - 5);
 		// Shooting from far from the goal at a flat angle.
 		seq.add().retractShooterHood();
 		// Wait for the shooter wheel to settle.
@@ -147,12 +148,7 @@ public class Auto {
 		seq.add().unblockShooter();
 		// Start the loader to push the balls.
 		seq.add().setLoaderSpinnerMotorRPS(LOADER_MOTOR_SHOOTING_RPS);
-		seq.add().setDelayDelta(3);
-		// Turn off everything.
-		seq.add().setShooterRPS(0)
-			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPS(0)
-			.blockShooter();		
+		seq.add().setDelayDelta(2);		
 	}
 
 	private void addBasicShootIntakeDriveShootSequence() {
@@ -169,7 +165,9 @@ public class Auto {
 
 		// Drive backwards to pick up the three balls.
 		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		Pose2d thirdBall = new Pose2d(-4, -1, new Rotation2d(Math.toRadians(0)));
+		Pose2d thirdBall = new Pose2d(-4, -1.5, new Rotation2d(Math.toRadians(0)));
+		// Drive to first ball 
+		// Translation2d firstBall = new Translation2d(-2,-1.25);
 		seq.add().driveRelativeWaypoints(start1, List.of(), thirdBall, false);  // backwards.
 
 		// Stop intaking
@@ -181,8 +179,14 @@ public class Auto {
 		Pose2d end = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
 		seq.add().driveRelativeWaypoints(thirdBall, List.of(), end, true);
 
+		seq.add().doVisionAim();
 		// Shoot the balls.
 		addShootStates(seq);
+		// Turn off everything.
+		seq.add().setShooterRPS(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPS(0)
+			.blockShooter();
 
 		autoProgram.addOption("Basic shoot intake drive shoot", seq); 
 	}

@@ -118,7 +118,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 
 	@Override
 	public boolean hasFinished() {
-		return clock.currentTime() - timestamp > 1;  // Always ready for the next state.
+		return clock.currentTime() - timestamp > 0.5;  // Always ready for the next state.
 	}
 
 }
