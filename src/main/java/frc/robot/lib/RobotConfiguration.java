@@ -77,7 +77,7 @@ public class RobotConfiguration {
 	public double drivebaseCount =  Constants.DRIVE_COUNT_100ms;
 	
 	public boolean intakeIsPresent = false;
-	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
+	public int intakeCanID = Constants.INTAKE_CAN_ID;
 
 	public boolean colourWheelIsPresent = false;
 	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;
@@ -108,7 +108,7 @@ public class RobotConfiguration {
 	public boolean canifierIsPresent = false;
 	public int canifierCanId;
 
-	public boolean navxIsPresent = false;
+	public boolean navxIsPresent = true;
 
 	public boolean visionIsPresent = false;
 	public double visionHMin = Constants.VISION_H_MIN;
@@ -211,7 +211,7 @@ public class RobotConfiguration {
 		
 	
 		intakeIsPresent = getAsBoolean("intake/present", false);
-		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
+		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_CAN_ID);
 
 		colourWheelIsPresent = getAsBoolean("colourWheel/present", false);
 		colourWheelCanID = getAsInt("colourWheel/canID", Constants.COLOUR_WHEEL_CAN_ID);
@@ -239,7 +239,7 @@ public class RobotConfiguration {
 		pcmIsPresent = getAsBoolean("pcm/present", false);
 		pcmCanId = getAsInt("pcm/canID", Constants.PCM_CAN_ID);
 		
-		navxIsPresent = getAsBoolean("navx/present", false);
+		navxIsPresent = getAsBoolean("navx/present", true);
 
 		robotLengthWithBumpers = getAsDouble("dimensions/robot/lengthWithBumpers", 0.0);
 		robotWidthWithBumpers = getAsDouble("dimensions/robot/widthWithBumpers", 0.0);

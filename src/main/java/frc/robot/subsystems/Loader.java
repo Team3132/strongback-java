@@ -18,7 +18,7 @@ import frc.robot.lib.Subsystem;
 public class Loader extends Subsystem implements LoaderInterface {
     final private Motor spinner, passthrough;
     final private Solenoid paddleSolenoid;
-    private double spinnerRPM = 0;
+    private double spinnerRPS = 0;
     final Counter inSensorCount;
     final Counter outSensorCount;
     private int initBallCount = 0;
@@ -38,7 +38,8 @@ public class Loader extends Subsystem implements LoaderInterface {
 
         log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                 .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
-                .register(true, () -> spinner.getVelocity(), "%s/spinner/RPM", name)
+                .register(true, () -> getSpinnerMotorRPS(), "%s/spinner/rps", name)
+                .register(true, () -> getTargetSpinnerMotorRPS(), "%s/spinner/targetRPS", name)
                 .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                 .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
                 .register(true, () -> (double) getCurrentBallCount(), "%s/spinner/CurrentBallCount", name)
@@ -51,17 +52,26 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public void setTargetSpinnerMotorRPM(final double rpm) {
+    public void setTargetSpinnerMotorRPS(final double rps) {
 
-        spinnerRPM = rpm;
-        log.sub("%s: Setting loader motor rpm to: %f", name, rpm);
+        spinnerRPS = rps;
+        log.sub("%s: Setting loader motor rps to: %f", name, rps);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
-        if (rpm == 0) {
+        if (rps == 0) {
             spinner.set(ControlMode.PercentOutput, 0);
         } else {
-            spinner.set(ControlMode.Velocity, rpm);
+            spinner.set(ControlMode.Velocity, rps);
         }
+    }
+
+    @Override
+    public double getTargetSpinnerMotorRPS() {
+        return spinnerRPS;
+    }
+
+    public double getSpinnerMotorRPS() {
+        return spinner.getVelocity();
     }
 
     @Override
@@ -71,7 +81,11 @@ public class Loader extends Subsystem implements LoaderInterface {
         // to slow down
         targetPassthroughMotorOutput = percent;
         passthrough.set(ControlMode.PercentOutput, percent);
+    }
 
+    @Override
+    public double getTargetPassthroughMotorOutput() {
+        return targetPassthroughMotorOutput;
     }
     
     @Override
@@ -91,12 +105,12 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public boolean isPaddleNotBlocking() {
         // log.sub("Is intake extended: " + solenoid.isExtended());
-        return paddleSolenoid.isExtended();
+        return paddleSolenoid.isRetracted();
     }
 
     @Override
     public boolean isPaddleBlocking() {
-        return paddleSolenoid.isRetracted();
+        return paddleSolenoid.isExtended();
     }
 
     @Override
@@ -118,7 +132,8 @@ public class Loader extends Subsystem implements LoaderInterface {
     public void updateDashboard() {
         dashboard.putString("Loader Paddle position",
                 isPaddleNotBlocking() ? "not blocking" : isPaddleBlocking() ? "blocking" : "moving");
-        dashboard.putNumber("Loader spinner velocity", spinner.getVelocity());
+        dashboard.putNumber("Loader spinner rps", getSpinnerMotorRPS());
+        dashboard.putNumber("Loader spinner target rps", getTargetSpinnerMotorRPS());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
         dashboard.putNumber("Current number of balls", getCurrentBallCount());
         inSensorCount.updateDashboard();
@@ -140,17 +155,6 @@ public class Loader extends Subsystem implements LoaderInterface {
     @Override
     public int getCurrentBallCount() {
         return inSensorCount.getCount() - outSensorCount.getCount() + initBallCount;
-    }
-
-    @Override
-    public double getTargetSpinnerMotorRPM() {
-        return spinnerRPM;
-    }
-
-    @Override
-    public double getTargetPassthroughMotorOutput() {
-        log.sub("%s: passthrough output is currently %f", name, targetPassthroughMotorOutput);
-        return targetPassthroughMotorOutput;
     }
 
     private class Counter implements DashboardUpdater, Executable {

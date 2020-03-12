@@ -30,26 +30,26 @@ public class Shooter extends Subsystem implements ShooterInterface {
     @Override
 	public void disable() {
 		super.disable();
-        flyWheel.setTargetRPM(0);
+        flyWheel.setTargetRPS(0);
 	}
     
     /**
      * Set the speed on the shooter wheels.
      */
     @Override
-    public ShooterInterface setTargetRPM(double speed) { 
-        flyWheel.setTargetRPM(speed);
+    public ShooterInterface setTargetRPS(double rps) { 
+        flyWheel.setTargetRPS(rps);
         return this;
     }
 
     @Override
-    public double getTargetRPM() {
-        return flyWheel.getTargetRPM(); 
+    public double getTargetRPS() {
+        return flyWheel.getTargetRPS(); 
     }
     
     @Override
     public boolean isAtTargetSpeed() {
-        return Math.abs(flyWheel.getRPM() - flyWheel.getTargetRPM()) < Constants.SHOOTER_SPEED_TOLERANCE_RPM;
+        return Math.abs(flyWheel.getRPS() - flyWheel.getTargetRPS()) < Constants.SHOOTER_SPEED_TOLERANCE_RPS;
     }
 
     @Override
@@ -75,40 +75,40 @@ public class Shooter extends Subsystem implements ShooterInterface {
     protected class ShooterWheel {
 
         private final Motor motor;
-        private double targetRPM;
+        private double targetRPS;
     
         public ShooterWheel(Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> flyWheel.getTargetRPM(), "shooter/flyWheel/targetSpeed", name)
-            .register(false, motor::getVelocity, "shooter/flyWheel/rpm", name)
+            log.register(false, () -> getTargetRPS(), "shooter/flyWheel/targetSpeed", name)
+            .register(false, () -> getRPS(), "shooter/flyWheel/rps", name)
             .register(false, motor::getOutputVoltage, "shooter/flyWheel/outputVoltage", name)
             .register(false, motor::getOutputPercent, "shooter/flyWheel/outputPercent", name)
             .register(false, motor::getOutputCurrent, "shooter/flyWheel/outputCurrent", name);
         }
         
-        public void setTargetRPM(double rpm) {
-            if (rpm == targetRPM) {
+        public void setTargetRPS(double rps) {
+            if (rps == targetRPS) {
                  return;
             }
-            targetRPM = rpm;
+            targetRPS = rps;
             // Note that if velocity mode is used and the speed is ever set to 0, 
             // change the control mode from percent output, to avoid putting
             // unnecessary load on the battery and motor.
-            if (rpm == 0) { 
+            if (rps == 0) { 
                 log.sub("Turning shooter wheel off.");
                 motor.set(ControlMode.PercentOutput, 0); 
             } else {
-                motor.set(ControlMode.Velocity, rpm);
+                motor.set(ControlMode.Velocity, rps);
             }
-            log.sub("Setting shooter target speed to %f", targetRPM);
+            log.sub("Setting shooter target speed to %f", targetRPS);
         }
 
-        public double getTargetRPM() {
-            return targetRPM;
+        public double getTargetRPS() {
+            return targetRPS;
         }
 
-        public double getRPM() {
+        public double getRPS() {
             return motor.getVelocity();
         }
 
@@ -119,8 +119,8 @@ public class Shooter extends Subsystem implements ShooterInterface {
 
     @Override
     public void updateDashboard() {
-        dashboard.putNumber("Shooter target rpm", flyWheel.getTargetRPM());
-        dashboard.putNumber("Shooter actual rpm", flyWheel.getRPM());
+        dashboard.putNumber("Shooter target rps", flyWheel.getTargetRPS());
+        dashboard.putNumber("Shooter actual rps", flyWheel.getRPS());
         dashboard.putString("Shooter status", isAtTargetSpeed() ? "At target" : "Not at target");
         dashboard.putString("Shooter hood", isHoodExtended() ? "extended" : (isHoodRetracted() ? "retracted" : "moving"));
     }

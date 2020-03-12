@@ -162,14 +162,9 @@ public interface LimitedMotor extends Motor {
             }
 
             @Override
-            public Motor setScale(double scale) {
-                motor.setScale(scale);
-                return null;
-            }
-
-            @Override
-            public double getScale() {
-                return motor.getScale();
+            public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameterMetres) {
+                motor.setScale(ticksPerTurn, gearRatio, wheelDiameterMetres);
+                return this;
             }
 
             @Override

@@ -8,14 +8,14 @@ import frc.robot.lib.MovementSimulator;
  * Very basic intake simulator used for unit testing.
  * Does not do gravity/friction etc.
  */
-public class ShooterSimulator implements ShooterInterface{
+public class ShooterSimulator implements ShooterInterface {
 
 	private final double kMaxSpeed = 180;  // degrees/sec
 	private final double kMaxAccel = 200;   // degrees/sec/sec
 	private final double kMinAngle = 0;
 	private final double kMaxAngle = 45;
 	private final double kMovementTolerance = 1;  // How close before it's classed as being in position.
-    private double targetRPM = 0;
+    private double targetRPS = 0;
     private double shooterTime = 0;
 	private MovementSimulator arm = new MovementSimulator("hood", kMaxSpeed, kMaxAccel, kMinAngle, kMaxAngle, kMovementTolerance);
 
@@ -50,15 +50,15 @@ public class ShooterSimulator implements ShooterInterface{
     }
 
     @Override
-    public ShooterInterface setTargetRPM(double rpm) {
-        this.targetRPM = rpm;
+    public ShooterInterface setTargetRPS(double rps) {
+        this.targetRPS = rps;
         this.shooterTime = System.currentTimeMillis();
         return this;
     }
 
     @Override
-    public double getTargetRPM() {
-        return targetRPM;
+    public double getTargetRPS() {
+        return targetRPS;
     }
 
 

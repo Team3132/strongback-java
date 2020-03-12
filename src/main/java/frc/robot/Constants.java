@@ -2,16 +2,13 @@ package frc.robot;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
 import com.revrobotics.ColorMatch;
 
-import edu.wpi.first.wpilibj.util.Color;
-
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
@@ -53,25 +50,26 @@ public class Constants {
 	 * 
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
-	public static final double ROBOT_WIDTH_INCHES = 20;
 	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {4,5};
 	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {2,1}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
 	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
-	public static final double DRIVE_WHEEL_DIAMETER         = 6; // inches 
-	public static final int DRIVE_ENCODER_CODES_PER_REV		=  2048; //4 * 360;
-	public static final double DRIVE_GEABOX_RATIO = 11;
 	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
 	public static final String DRIVE_DEFAULT_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
 
-	// distance the robot moves per revolution of the encoders. Gearing needs to be taken into account here.
-	// at full speed in a static environment the encoders are producing 2000 count differences per 100ms
-	public static final double DRIVE_DISTANCE_PER_REV = DRIVE_WHEEL_DIAMETER * Math.PI;
-	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
-	//public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_DISTANCE_PER_REV / DRIVE_GEABOX_RATIO;
+	// Encoder values
+	public static final double FALCON_ENCODER_TICKS = 2048;  // Falon inbuilt encoders.
+	public static final double SPARKMAX_ENCODER_TICKS = 42; // SparkMAX inbuild encoders.
+	public static final double S4T_ENCODER_TICKS = 1440; // ticks per rev.
+	public static final double VERSA_INTEGRATED_ENCODER_TICKS = 4096; // ticks per rotation
+
+	// Distance the robot moves per revolution of the wheels.
+	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 6 * INCHES_TO_METRES; // 6" wheels.
+	public static final double DRIVE_METRES_PER_REV = DRIVE_WHEEL_DIAMETER_METRES * Math.PI;
+	public static final double DRIVE_GEABOX_RATIO = 189.0/17.0;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
@@ -106,9 +104,9 @@ public class Constants {
 	/*
 	 *  Intake constants 
 	 */
-	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
-	public static final double INTAKE_ENCODER_SCALE = 60/3; // change from rps to rpm, 3:1 gear ratio
-	public static final double INTAKE_TARGET_RPM = 600;
+	public static final int INTAKE_CAN_ID = 10;
+	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
+	public static final double INTAKE_TARGET_RPS = 10;
 	public static final double INTAKE_POSITION_F = 0.015;
 	public static final double INTAKE_POSITION_P = 0.001;
 	public static final double INTAKE_POSITION_I = 0;
@@ -127,14 +125,14 @@ public class Constants {
 	*/
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
 	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
-	public static final double SHOOTER_SPEED_TOLERANCE_RPM = 600;
-	public static final double SHOOTER_F = 0.15;//0.075;
+	public static final double SHOOTER_SPEED_TOLERANCE_RPS = 3.33;
+	public static final double SHOOTER_F = 0.08;//0.075;
 	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPM = 4700;
-	public static final int SHOOTER_FAR_TARGET_SPEED_RPM = 5700;
-	public static final double SHOOTER_ENCODER_SCALE = 1440.0/10/60; // ticks per rev
+	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPS = 62;
+	public static final int SHOOTER_FAR_TARGET_SPEED_RPS = 95;
+	public static final double SHOOTER_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	
 	/*
 	* Loader
@@ -144,10 +142,10 @@ public class Constants {
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
 	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
 	public static final int PADDLE_SOLENOID_PORT = 2; 
-	public static final double LOADER_MOTOR_INTAKING_RPM = 720;//120;//600;
-	public static final double LOADER_MOTOR_SHOOTING_RPM = 480;
+	public static final double LOADER_MOTOR_INTAKING_RPS = 10;
+	public static final double LOADER_MOTOR_SHOOTING_RPS = 8;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
-	public static final double LOADER_MAIN_MOTOR_SCALE = 4096/10/60; // ticks per rotation
+	public static final double LOADER_MAIN_MOTOR_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	public static final double LOADER_SPINNER_P = 0.4;
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 30;
@@ -179,10 +177,10 @@ public class Constants {
 	public static final double VISION_AIM_ANGLE_SCALE = 0.4;
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
-	public static final double VISION_STOP_DISTANCE = 230; // inches 
-	public static final double VISION_MAX_DRIVE_SPEED = 15;
-	public static final double VISION_AIM_ANGLE_RANGE = 2; //degrees
-	public static final double VISION_AIM_DISTANCE_RANGE = 5; //inches
+	public static final double VISION_STOP_DISTANCE = 6; // metres 
+	public static final double VISION_MAX_DRIVE_SPEED = 0.4; // metres per second
+	public static final double VISION_AIM_ANGLE_TOLERANCE = 2; //degrees
+	public static final double VISION_AIM_DISTANCE_TOLERANCE = 0.1; //metres
 	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
 
 
@@ -240,16 +238,16 @@ public class Constants {
 
 		// The Robot Characterization Toolsuite provides a convenient tool for obtaining
 		// these values for your robot.
-		public static final double ksVolts = 0.177;
-		public static final double kvVoltSecondsPerMeter = 3.3;// Calculated value = 2.94;
-		public static final double kaVoltSecondsSquaredPerMeter = 0.4;// Calculated value = 0.368;
+		public static final double ksVolts = 0.283;
+		public static final double kvVoltSecondsPerMeter = 2.49;
+		public static final double kaVoltSecondsSquaredPerMeter = 0.316;
 
-		// Example value only - as above, this must be tuned for your drive!
-		public static final double kPDriveVel = 0.01;// 3//13.3; // should be 13.3
+		// PID values.
+		public static final double kPDriveVel = 0.01; // should be 12.1
 		// kD should be 0
 
-		public static final double kMaxSpeedMetersPerSecond = 6;// 3;
-		public static final double kMaxAccelerationMetersPerSecondSquared = 2;// 1;
+		public static final double kMaxSpeedMetersPerSecond = 4;
+		public static final double kMaxAccelerationMetersPerSecondSquared = 2;
 
 		// Reasonable baseline values for a RAMSETE follower in units of meters and
 		// seconds

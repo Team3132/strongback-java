@@ -4,7 +4,7 @@ import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.Log;
 
 public class MockLoader implements LoaderInterface {
-    private double spinnerRPM = 0;
+    private double spinnerRPS = 0;
 
     public MockLoader(Log log) {
     }
@@ -28,8 +28,8 @@ public class MockLoader implements LoaderInterface {
     }
 
     @Override
-    public void setTargetSpinnerMotorRPM(double rpm) {
-        spinnerRPM = rpm;
+    public void setTargetSpinnerMotorRPS(double rps) {
+        spinnerRPS = rps;
     }
 
     @Override
@@ -69,8 +69,8 @@ public class MockLoader implements LoaderInterface {
 
 
     @Override
-    public double getTargetSpinnerMotorRPM() {
-        return spinnerRPM;
+    public double getTargetSpinnerMotorRPS() {
+        return spinnerRPS;
        
     }
     @Override

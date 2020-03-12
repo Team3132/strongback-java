@@ -33,17 +33,17 @@ public class State {
 
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
-	public Double intakeRPM = null; 
+	public Double intakeRPS = null; 
 	
 	// Shooter
-	public Double shooterRPM = null;  // Set the shooter target speed.
+	public Double shooterRPS = null;  // Set the shooter target speed.
 	public Boolean shooterUpToSpeed = null;
 	public Boolean shooterHoodExtended = null;
 
 	// Loader
 	public Double loaderPassthroughMotorOutput = null;
-	public Double loaderSpinnerMotorRPM = null;
 	public Boolean loaderPaddleBlocking = null;
+	public Double loaderSpinnerMotorRPS = null;
 	public Integer expectedNumberOfBalls = null;
 
 	// Vision
@@ -73,14 +73,14 @@ public class State {
 	public State(Subsystems subsystems, Clock clock) {
 		setDelayUntilTime(clock.currentTime());
 		intakeExtended = subsystems.intake.isExtended();
-		intakeRPM = subsystems.intake.getTargetRPM();
+		intakeRPS = subsystems.intake.getTargetRPS();
 		buddyClimbToggle = false;  // Don't toggle unless requested.
 		driveClimbModeToggle = false;  // Don't toggle unless requested.
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
-		loaderSpinnerMotorRPM = subsystems.loader.getTargetSpinnerMotorRPM();
+		loaderSpinnerMotorRPS = subsystems.loader.getTargetSpinnerMotorRPS();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
 		loaderPaddleBlocking = subsystems.loader.isPaddleBlocking();
-		shooterRPM = subsystems.shooter.getTargetRPM();
+		shooterRPS = subsystems.shooter.getTargetRPS();
 		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
 		shooterHoodExtended = subsystems.shooter.isHoodExtended();
 		drive = subsystems.drivebase.getDriveRoutine();
@@ -126,13 +126,13 @@ public class State {
 		return this;
 	}
 
-	public State setIntakeRPM(double rpm) {
-		intakeRPM = Double.valueOf(rpm);
+	public State setIntakeRPS(double rps) {
+		intakeRPS = Double.valueOf(rps);
 		return this;
 	}
 
-	public State setShooterRPM(double targetSpeed) {
-		shooterRPM = Double.valueOf(targetSpeed);
+	public State setShooterRPS(double rps) {
+		shooterRPS = Double.valueOf(rps);
 		return this;
 	}
 
@@ -152,8 +152,8 @@ public class State {
 	}
 
 	// Loader
-	public State setLoaderSpinnerMotorRPM(double rpm) {
-		loaderSpinnerMotorRPM = Double.valueOf(rpm);
+	public State setLoaderSpinnerMotorRPS(double rps) {
+		loaderSpinnerMotorRPS = Double.valueOf(rps);
 		return this;
 	}
 	public State setLoaderPassthroughMotorOutput(double output) {
@@ -164,6 +164,16 @@ public class State {
 		loaderPaddleBlocking = Boolean.valueOf(blocking);
 		return this;
 	}
+
+	public State unblockShooter() {
+		loaderPaddleBlocking = false;
+		return this;
+	}
+	public State blockShooter() {
+		loaderPaddleBlocking = true;
+		return this;
+	}
+
 	public State waitForBalls(int numBalls) {
 		expectedNumberOfBalls = Integer.valueOf(numBalls);
 		return this;
@@ -381,12 +391,12 @@ public class State {
 		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
-		maybeAdd("intakeRPM", intakeRPM, result);
 		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);
+		maybeAdd("intakeRPS", intakeRPS, result);
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
-		maybeAdd("loaderSpinnerMotorRPM", loaderSpinnerMotorRPM, result);
+		maybeAdd("loaderSpinnerMotorRPS", loaderSpinnerMotorRPS, result);
 		maybeAdd("shooterHoodExtended", shooterHoodExtended, result);
-		maybeAdd("shooterRPM", shooterRPM, result);
+		maybeAdd("shooterRPS", shooterRPS, result);
 		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("waitForBalls", expectedNumberOfBalls, result);
