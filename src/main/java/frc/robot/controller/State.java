@@ -79,7 +79,11 @@ public class State {
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerMotorRPS = subsystems.loader.getTargetSpinnerMotorRPS();
 		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
+<<<<<<< HEAD
 		loaderPaddleBlocking = subsystems.loader.isPaddleBlocking();
+=======
+		loaderPaddleNotBlocking = subsystems.loader.isPaddleNotBlocking();
+>>>>>>> 117fe9d14fba46d5f401a1bfc547e7864d674e28
 		shooterRPS = subsystems.shooter.getTargetRPS();
 		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
 		shooterHoodExtended = subsystems.shooter.isHoodExtended();
@@ -391,8 +395,13 @@ public class State {
 		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
+<<<<<<< HEAD
 		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);
 		maybeAdd("intakeRPS", intakeRPS, result);
+=======
+		maybeAdd("intakeRPS", intakeRPS, result);
+		maybeAdd("loaderPaddleNotBlocking", loaderPaddleNotBlocking, result);
+>>>>>>> 117fe9d14fba46d5f401a1bfc547e7864d674e28
 		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
 		maybeAdd("loaderSpinnerMotorRPS", loaderSpinnerMotorRPS, result);
 		maybeAdd("shooterHoodExtended", shooterHoodExtended, result);
