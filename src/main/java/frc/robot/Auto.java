@@ -139,11 +139,7 @@ public class Auto {
 
 	private void addShootStates(Sequence seq) {
 		// Shooter wheel may already be up to speed.
-<<<<<<< HEAD
 		seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS - 5);
-=======
-		seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS - 300);
->>>>>>> 117fe9d14fba46d5f401a1bfc547e7864d674e28
 		// Shooting from far from the goal at a flat angle.
 		seq.add().retractShooterHood();
 		// Wait for the shooter wheel to settle.
@@ -152,16 +148,7 @@ public class Auto {
 		seq.add().unblockShooter();
 		// Start the loader to push the balls.
 		seq.add().setLoaderSpinnerMotorRPS(LOADER_MOTOR_SHOOTING_RPS);
-<<<<<<< HEAD
 		seq.add().setDelayDelta(2);		
-=======
-		seq.add().setDelayDelta(3);
-		// Turn off everything.
-		seq.add().setShooterRPS(0)
-			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPS(0)
-			.blockShooter();		
->>>>>>> 117fe9d14fba46d5f401a1bfc547e7864d674e28
 	}
 
 	private void addBasicShootIntakeDriveShootSequence() {
@@ -192,7 +179,6 @@ public class Auto {
 		Pose2d end = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
 		seq.add().driveRelativeWaypoints(thirdBall, List.of(), end, true);
 
-<<<<<<< HEAD
 		seq.add().doVisionAim();
 		// Shoot the balls.
 		addShootStates(seq);
@@ -201,10 +187,6 @@ public class Auto {
 			.setLoaderPassthroughMotorOutput(0)
 			.setLoaderSpinnerMotorRPS(0)
 			.blockShooter();
-=======
-		// Shoot the balls.
-		addShootStates(seq);
->>>>>>> 117fe9d14fba46d5f401a1bfc547e7864d674e28
 
 		autoProgram.addOption("Basic shoot intake drive shoot", seq); 
 	}
