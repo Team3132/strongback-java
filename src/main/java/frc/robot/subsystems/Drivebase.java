@@ -1,8 +1,12 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
+import org.strongback.components.Solenoid;
 
 import frc.robot.Constants;
 import frc.robot.drive.routines.ConstantDrive;
@@ -12,11 +16,8 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.lib.NetworkTablesHelper;
+import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Subsystem responsible for the drivetrain
@@ -33,13 +34,18 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
 	private final Motor left;
 	private final Motor right;
+	private Solenoid ptoSolenoid;
+	private Solenoid brakeSolenoid;
 	private final Log log;
 	private DriveMotion currentMotion;
 
-	public Drivebase(Motor left, Motor right,	DashboardInterface dashboard, Log log) {
-		super("Drive", dashboard, log);
+	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, 
+			NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+		super("Drive", networkTable, dashboard, log);
 		this.left = left;
 		this.right = right;
+		this.ptoSolenoid = ptoSolenoid;
+		this.brakeSolenoid = brakeSolenoid;
 		this.log = log;
 
 		currentMotion = new DriveMotion(0, 0);
@@ -56,12 +62,39 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 				.register(false, () -> left.getOutputPercent(), "%s/outputPercentage/Left", name)
 				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
 				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
-				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name);
+				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name)
+				.register(true, () -> isClimbModeEnabled(), "%s/extended", name)
+				.register(true, () -> isDriveModeEnabled(), "%s/retracted", name)
+				.register(true, () -> isBrakeApplied(), "%s/extended", name)
+          		.register(true, () -> isBrakeReleased(), "%s/retracted", name);
+	}
+
+	@Override
+	public DrivebaseInterface activateClimbMode(boolean extend) {
+		if (extend) {
+			ptoSolenoid.extend();
+		} else {
+			ptoSolenoid.retract();
+		}
+
+		return this;
+	}
+
+	@Override
+	public DrivebaseInterface applyBrake(boolean extend) {
+		if (extend) {
+			brakeSolenoid.extend();
+		} else {
+			brakeSolenoid.retract();
+		}
+
+		return this;
 	}
 
 	@Override
 	public void setDriveRoutine(DriveRoutineParameters parameters) {
 		if (this.parameters != null && parameters.equals(this.parameters)) {
+			log.sub("%s: Parameters are identical not setting these", name);
 			return;
 		}
 		// Drive routine has changed.
@@ -74,15 +107,10 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		}
 		// Tell the drive routine to change what it is doing.
 		mode.routine.reset(parameters);
-		log.sub("%s: Switching to %s drive routine", name, mode.routine.getName());
+		log.sub("%s: Switching to %s drive routine using ControlMode %s", name, mode.routine.getName(), mode.controlMode);
 		if (routine != null) routine.disable();
 		mode.routine.enable();
 		routine = mode.routine;
-		if (mode.controlMode == ControlMode.PercentOutput) {
-			log.sub("%s: PercentOutput Control Mode", name);
-		} else {
-			log.sub("%s: Other Control Mode", name);
-		}
 		this.controlMode = mode.controlMode;
 	}
 
@@ -95,7 +123,9 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	synchronized public void update() {
 		// Query the drive routine for the desired wheel speed/power.
 		if (routine == null) return;  // No drive routine set yet.
-		DriveMotion motion = routine.getMotion();
+		// Ask for the power to supply to each side. Pass in the current wheel speeds.
+		// TODO: Ensure that this is in meters/sec (not inches/100ms). See comment above.
+		DriveMotion motion = routine.getMotion(left.getVelocity(), right.getVelocity());
 		//log.debug("drive subsystem motion = %.1f, %.1f", motion.left, motion.right);
 		if (motion.equals(currentMotion)) {
 			return; // No change.
@@ -109,24 +139,20 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 
 	@Override
 	public void enable() {
-		NetworkTablesHelper helper = new NetworkTablesHelper("drive");
-		double leftP = helper.get("p", Constants.DRIVE_P);
-		double leftI = helper.get("i", Constants.DRIVE_I);
-		double leftD = helper.get("d", Constants.DRIVE_D);
-		double leftF = helper.get("f", Constants.DRIVE_F);
-		double rightP = helper.get("p", Constants.DRIVE_P);
-		double rightI = helper.get("i", Constants.DRIVE_I);
-		double rightD = helper.get("d", Constants.DRIVE_F);
-		double rightF = helper.get("f", Constants.DRIVE_P);
-		left.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
-				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
-		right.setPIDF(0, helper.get("p", Constants.DRIVE_P), helper.get("i", Constants.DRIVE_I),
-				helper.get("d", Constants.DRIVE_D), helper.get("f", Constants.DRIVE_F));
-		super.enable();
-		log.info("Drivebase LEFT PID values: %f %f %f %f", leftP, leftI, leftD, leftF);
-		log.info("Drivebase RIGHT PID values: %f %f %f %f", rightP, rightI, rightD, rightF);
+			double p = networkTable.get("p", Constants.DRIVE_P);
+			double i = networkTable.get("i", Constants.DRIVE_I);
+			double d = networkTable.get("d", Constants.DRIVE_D);
+			double f = networkTable.get("f", Constants.DRIVE_F);
+			left.setPIDF(0, p, i, d, f);
+					
+			super.enable();
+	
+			log.info("Drivebase  PID values: %f %f %f %f", p, i, d, f);
+	
 		if (routine != null) routine.enable();
 	}
+
+
 
 	public void disable() {
 		super.disable();
@@ -141,6 +167,8 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	public void updateDashboard() {
 		dashboard.putNumber("Left drive motor", currentMotion.left);
 		dashboard.putNumber("Right drive motor", currentMotion.right);
+		dashboard.putNumber("Left drive pos", left.getPosition());
+		dashboard.putNumber("Right drive pos", right.getPosition());
 		dashboard.putString("Drive control", routine.getName());
 	}
 
@@ -171,4 +199,30 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 		log.sub("%s: Registered %s drive routine", name, routine.getName());
 		driveModes.put(mode, new DriveMode(routine, controlMode));
 	}
+
+	@Override
+	public boolean isClimbModeEnabled() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return ptoSolenoid.isExtended();
+	}
+
+	@Override
+	public boolean isDriveModeEnabled() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return ptoSolenoid.isRetracted();
+	}
+
+	@Override
+	public boolean isBrakeApplied() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return brakeSolenoid.isExtended();
+	}
+
+	@Override
+	public boolean isBrakeReleased() {
+		// log.sub("Is intake extended: " + solenoid.isExtended());
+		return brakeSolenoid.isRetracted();
+	}
+
+	
 }

@@ -5,6 +5,10 @@ import java.util.function.DoubleSupplier;
 import org.strongback.Executable;
 import org.strongback.components.Clock;
 import org.strongback.components.Gyroscope;
+
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
@@ -18,6 +22,14 @@ import frc.robot.lib.Subsystem;
 
 /**
  *	Location Subsystem.
+ *
+ * DANGER: This is in the process of being gutted and replaced with the DifferentialDriveOdometry
+ * class which uses a different frame of reference.
+ * There are two implementations of location tracking in this file. The old-style is used for
+ * the vision processing. The new style is used for the RamseteController for auto driving.
+ * In the 2020 offseason the plan is to remove the old style and update the vision driving to
+ * use the style. This is not scheduled to happen during the 2020 build season, so both implementations
+ * are left in this file to smooth the transition to new new Ramsete driving code.
  *
  * The location subsystem is responsible for tracking the location of the robot on the field.
  * It does this through reading the encoders and the gyro and plotting where the robot has moved.
@@ -33,6 +45,7 @@ import frc.robot.lib.Subsystem;
  *  
  * X is along the "horizontal line", and Y is the "vertical" line with 
  * (0,0) at the bottom left of the diagram below.
+ * DANGER: This is changing to having X away from the drivers' stations.
  *
  *          ^ X +ve 
  *          |
@@ -82,18 +95,24 @@ public class Location extends Subsystem implements LocationInterface, Executable
     private Clock clock;            // Source of time.
     /**
      * current the current Position:
-     * x: current left/right offset from 0 at start point (inches). +x is forward.
-	 * y: current forward/backward offset from 0 at start point (inches). +y is left.
+     * x: current left/right offset from 0 at start point (metres). +x is forward.
+	 * y: current forward/backward offset from 0 at start point (metres). +y is left.
 	 * h: current heading from facing directly down the field (degrees). +ve is anticlockwise.
-	 * s: current speed (inches/sec)
+	 * s: current speed (metres/sec)
 	 * t: time of the last update. (seconds)
 	 */
 	private Position current;  // Where the robot actually is based on the encoders and gyro.
 	private Position desired;  // Where the auto driving hopes the robot is at.
 	private LocationHistory history; // history of points we have been on the field.
 	private boolean debug = false;
-	
-	
+
+	private Runnable resetEncoders;
+
+
+	// Odometry class for tracking robot pose
+	private final DifferentialDriveOdometry odometry;	
+	private final DoubleSupplier leftDistance;
+	private final DoubleSupplier rightDistance;
 	
 	/**
 	 * Calculates the delta since last called.
@@ -125,12 +144,17 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	 * where we are on the field, and then to inform the location subsystem of that fact.
 	 * 
 	 * @param name The name to be used in the logs
-	 * @param leftDistance The distance travelled by the left wheel (in inches)
+	 * @param leftDistance The distance travelled by the left wheel (in metres)
 	 * @param gyro The gyro to get angles
 	 * @param log The log to store debug and other logging messages
 	 */
-    public Location(DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard, Log log) {
+    public Location(Runnable resetEncoders, DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard, Log log) {
 		super("Location", dashboard, log);	// always present!
+		this.resetEncoders = resetEncoders;
+		this.leftDistance = leftDistance;
+		this.rightDistance = rightDistance;
+		odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getAngle()));
+
 		leftDistanceDelta = new DoubleDelta(leftDistance);
 		rightDistanceDelta = new DoubleDelta(rightDistance);
 		this.gyro = gyro;
@@ -165,8 +189,22 @@ public class Location extends Subsystem implements LocationInterface, Executable
     	((NavXGyroscope) gyro).setAngle(location.heading);
     	current.speed = 0;
     	current.timeSec = clock.currentTime();  // time of last update
-    	history.setInitial(current);
-    }
+		history.setInitial(current);
+		resetEncoders.run();
+		odometry.resetPosition(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)), Rotation2d.fromDegrees(0));
+	}
+	
+	/**
+	 * Resets the odometry to the specified pose.
+	 *
+	 * @param pose The pose to which to set the odometry.
+	 */
+	/*
+	public void resetOdometry(Pose2d pose) {
+		resetEncoders();
+		odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
+	}
+	*/
     
     /**
      * Return the location on the field at the current time.
@@ -194,6 +232,15 @@ public class Location extends Subsystem implements LocationInterface, Executable
      */
 	public Position getHistoricalLocation(double timeSec) {
 		return history.getLocation(timeSec);
+	}
+
+	/**
+	 * Returns the currently-estimated pose of the robot.
+	 *
+	 * @return The pose.
+	 */
+	public Pose2d getPose() {
+		return odometry.getPoseMeters();
 	}
 
 	@Override
@@ -229,7 +276,11 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	public void update() {
 		if (!enabled) return;			// The location subsystem should never be disabled.
 
-		double newLeft = leftDistanceDelta.getAsDouble();  // The change in inches since last call.
+		// odometry expects degrees and metres
+		odometry.update(Rotation2d.fromDegrees(gyro.getAngle()), leftDistance.getAsDouble(),
+				rightDistance.getAsDouble());
+
+		double newLeft = leftDistanceDelta.getAsDouble();  // The change in metres since last call.
 		double newRight = rightDistanceDelta.getAsDouble();
 		double newHeading = gyro.getAngle();
 		double newTime = clock.currentTime();  // Time of last update

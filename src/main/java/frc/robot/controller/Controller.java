@@ -1,78 +1,70 @@
 package frc.robot.controller;
-
+  
 import java.util.Iterator;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
-import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.Type;
-import frc.robot.lib.Position;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
-import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Waypoint;
-
 /**
- * The controller of State Sequences while ensuring the robot is safe at every step.
+ * The controller of State Sequences while ensuring the robot is safe at every
+ * step.
  * 
- * Allows higher level code to specify just the states that the robot needs
- * to pass through but it doesn't need to care how it gets there - this code
- * will ensure it gets there safely.
+ * Allows higher level code to specify just the states that the robot needs to
+ * pass through but it doesn't need to care how it gets there - this code will
+ * ensure it gets there safely.
  * 
  * This is very similar to commands, with the differences to a command-based
- * approach being:
- *  - Unlike commands, the activation logic is concentrated in one place, making
- *    it much safer to add new functionality.
- *  - Every state doesn't need to be aware of every other state (much simpler).
- *  - Creating strings of sequences is much simpler and shorter than commands.
- *  - Arbitrary combinations of parallel and sequential commands aren't supported,
- *    only a series of parallel operations.
+ * approach being: - Unlike commands, the activation logic is concentrated in
+ * one place, making it much safer to add new functionality. - Every state
+ * doesn't need to be aware of every other state (much simpler). - Creating
+ * strings of sequences is much simpler and shorter than commands. - Arbitrary
+ * combinations of parallel and sequential commands aren't supported, only a
+ * series of parallel operations.
  * 
- * This could be made faster, but we need to be careful it doesn't make it unsafe.
+ * This could be made faster, but we need to be careful it doesn't make it
+ * unsafe.
  */
 public class Controller implements Runnable, DashboardUpdater {
 	private final Subsystems subsystems;
 	private final Clock clock;
 	private final DashboardInterface dashboard;
 	private final Log log;
-	private Sequence sequence = new Sequence("idle");  // Current sequence we are working through.
+	private Sequence sequence = new Sequence("idle"); // Current sequence we are working through.
 	private boolean sequenceHasChanged = true;
 	private boolean sequenceHasFinished = false;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
+	private Supplier<WheelColour> fmsColour;
 
-	/**
-	 * The Pathfinder library can't be run on x86 without recompiling, which makes it
-	 * hard to unit test. Instead it's abstracted out.
-	 */
-	public interface TrajectoryGenerator {
-		Trajectory[] generate(Waypoint[] waypoints);
-	}
-
-	public Controller(Subsystems subsystems) {
+	public Controller(Subsystems subsystems, Supplier<WheelColour> fmsColour) {
 		this.subsystems = subsystems;
 		this.clock = subsystems.clock;
 		this.dashboard = subsystems.dashboard;
 		this.log = subsystems.log;
+		this.fmsColour = fmsColour;
 		(new Thread(this)).start();
 	}
-	
+
 	synchronized public void doSequence(Sequence sequence) {
 		if (this.sequence == sequence) {
 			// Exactly the same same sequence. Only start it again if it has
 			// finished. Used in the whileTriggered(...) case.
 			// Intentionally using == instead of .equalTo().
-			if (!sequenceHasFinished) return;
+			if (!sequenceHasFinished)
+				return;
 		}
 		this.sequence = sequence;
 		sequenceHasChanged = true;
 		logSub("Sequence has changed to %s sequence", sequence.getName());
-		notifyAll();  // Tell the run() method that there is a new sequence.
+		notifyAll(); // Tell the run() method that there is a new sequence.
 	}
 
 	/**
@@ -120,28 +112,22 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * For use by unit tests only. 
+	 * For use by unit tests only.
+	 * 
 	 * @return if an unhandled excpetions has occured in the controller
 	 */
 	public boolean isAlive() {
 		return isAlive;
 	}
-	
+
 	/**
 	 * Does the simple, dumb and most importantly, safe thing.
 	 * 
-	 * See the design doc before changing this.
-	 * 
-	 * Steps through:
-	 *  - Wait for all subsystems to finish moving.
-	 *  - Deploy or retract the intake if necessary.
-	 *  - 
-	 *  
 	 * Note if the step asks for something which will cause harm to the robot, the
 	 * request will be ignored. For example if the lift was moved into a position
 	 * the intake could hit it and then the intake was moved into the lift, the
 	 * intake move would be ignored.
-	 *  
+	 * 
 	 * @param desiredState The state to leave the robot in.
 	 */
 	private void applyState(State desiredState) {
@@ -151,76 +137,55 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		logSub("Applying requested state: %s", desiredState);
 		//logSub("Waiting subsystems to finish moving before applying state");
-		// waitForLift();
-		waitForIntake();
-		
+
 		// Get the current state of the subsystems.
 		State currentState = new State(subsystems, clock);
 		logSub("Current state: %s", currentState);
 		// Fill in the blanks in the desired state.
 		desiredState = State.calculateUpdatedState(desiredState, currentState);
+		if (desiredState.colourAction.movingToUnknownColour()) { // If the colour wheel is set to positional but the colour is unknown, work out the desired colour using FMS.
+			desiredState.colourAction = new ColourAction(ColourWheelType.POSITION, fmsColour.get());
+		}
 		logSub("Calculated new 'safe' state: %s", desiredState);
 
 		// The time beyond which we are allowed to move onto the next state
-		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());	
+		double endTime = desiredState.timeAction.calculateEndTime(clock.currentTime());
 
-		// Calculate the height that we want to use.
-		// We cannot just use desiredState.liftAction.value because it
-		// might not be of type SET_HEIGHT
-		double desiredLiftHeight = desiredState.liftAction.calculateHeight(
-			subsystems.lift.getHeight(),
-			subsystems.lift.getTargetHeight()
-		);
-		
-		maybeResetPosition(desiredState.resetPosition, subsystems);
 		
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
-		
-		// Retract the lift if the lift is going to the bottom so the spitter doesn't hit the bumpers.
-		// In updatedesiredState.liftAction was set to type SET_HEIGHT
-		if (desiredLiftHeight < Constants.LIFT_DEFAULT_MIN_HEIGHT) { // FIXME: This will never evaluate to true
-			if (subsystems.lift.isDeployed()) {
-				log.sub("Lift has been asked to move to 0, retracting spitter");
-			}
-			subsystems.lift.retract();
-			waitForLiftDeployer();
-		}
-		subsystems.lift.setTargetHeight(desiredLiftHeight);
-		
-		// Do the next steps in parallel as they don't mechanically conflict with each other.
-		
-		if (desiredState.liftDeploy) {
-			subsystems.lift.deploy();
-			waitForLiftDeployer();
-		} else {
-			subsystems.lift.retract();
-		}
-
+		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
+	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
-		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
+		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
 
-		subsystems.passthrough.setTargetMotorOutput(desiredState.passthroughMotorOutput);
+		subsystems.loader.setTargetSpinnerMotorRPS(desiredState.loaderSpinnerMotorRPS);
+		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
+		subsystems.loader.setPaddleBlocking(desiredState.loaderPaddleBlocking);
 
-		subsystems.climber.setDesiredAction(desiredState.climber);
+		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
+		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
 
-		subsystems.hatch.setAction(desiredState.hatchAction);
-		subsystems.hatch.setHeld(desiredState.hatchHolderEnabled);
-		
-		subsystems.spitter.setTargetDutyCycle(desiredState.spitterDutyCycle);
+		subsystems.shooter.setTargetRPS(desiredState.shooterRPS);
+		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
 
-		subsystems.colourWheel.setDesiredAction(desiredState.colourWheel);
+		// Toggle buddy climb if needed
+		if (desiredState.buddyClimbToggle) {
+			subsystems.buddyClimb.setExtended(!subsystems.buddyClimb.isExtended());
+		}
+
+		// Toggle between drive and climb modes if needed
+		if (desiredState.driveClimbModeToggle) {
+			subsystems.drivebase.activateClimbMode(!subsystems.drivebase.isClimbModeEnabled());
+		}
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
-		
-		maybeWaitForLift();  // This be aborted, so the intake needs to be wary below.
-		waitForHatch();
+		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
-		waitForClimber();
+		waitForBlocker();
+		waitForShooterHood();
+		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
-		//waitForLiftDeployer();
-		waitForCargo(desiredState.hasCargo); // FIX ME: This shouldn't pass in a parameter.
-		
 		// Wait for driving to finish if needed.
 		// If the sequence is interrupted it drops back to arcade.
 		maybeWaitForAutoDriving();
@@ -228,37 +193,6 @@ public class Controller implements Runnable, DashboardUpdater {
 		// Last thing: wait for the delay time if it's set.
 		waitForTime(endTime);
 	}
-
-	/**
-	 * If not null, reset the current location in the Location subsystem to be position.
-	 * Useful when starting autonomous.
-	 * @param position
-	 * @param subsystems
-	 */
-	private void maybeResetPosition(Waypoint position, Subsystems subsystems) {
-		if (position == null) return;
-		subsystems.location.setCurrentLocation(new Position(position.x, position.y, position.angle));
-	}
-
-	/**
-	 * Blocks waiting till the lift is in position.
-	 * If the sequence changes it will stop the lift.
-	 */
-	private void maybeWaitForLift() {
-		try {
-			waitUntilOrAbort(() -> subsystems.lift.isInPosition(), "lift");
-		} catch (SequenceChangedException e) {
-			logSub("Sequence changed while moving lift, stopping lift");
-			// The sequence has changed, grab the current position
-			// and set that as the target so the lift quickly stops.
-			double height = subsystems.lift.getHeight();
-			subsystems.lift.setTargetHeight(height);
-			logSub("Resetting lift target height to " + height);
-			// Give it a chance to stop moving.
-			clock.sleepSeconds(0.1);
-		}
-	}
-
 
 	private void maybeWaitForAutoDriving() {
 		try {
@@ -270,13 +204,6 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * Blocks waiting till the lift is in position.
-	 */
-	private void waitForLift() {
-		waitUntil(() -> subsystems.lift.isInPosition(), String.format("lift to move to %.0f", subsystems.lift.getTargetHeight()));
-	}
-
-	/**
 	 * Blocks waiting till the intake is in position.
 	 */
 	private void waitForIntake() {
@@ -284,53 +211,67 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
-	 * Blocks waiting till the climber is in position.
+	 * Blocks waiting till the blocker is in position.
 	 */
-	private void waitForClimber() {
-		waitUntil(() -> subsystems.climber.isInPosition(), "climber");
+	private void waitForBlocker() {
+		waitUntil(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
 	}
 
 	/**
-	 * Blocks waiting till cargo is found, spat, or sequence is aborted.
+	 * Blocks waiting till the shooter hood is in position.
 	 */
-	private void waitForCargo(boolean expectCargo) {
-		if (subsystems.spitter.hasCargo() == expectCargo) return;
-		logSub("Waiting for Cargo");
-		try {
-			waitUntilOrAbort(() -> subsystems.spitter.hasCargo() == expectCargo, "cargo");
-		} catch (SequenceChangedException e) {
-			// Desired state has changed underneath us, give up waiting
-			//and return.
+	private void waitForShooterHood() {
+		waitUntil(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
+	}
+
+	/**
+	 * Maybe wait for the shooter to get up to the target speed.
+	 * @param shooterUpToSpeed if not null, blocks waiting for shooter to achieve target speed.
+	 */
+	private void maybeWaitForShooter(Boolean shooterUpToSpeed) {
+		if (shooterUpToSpeed == null) {
+			// Don't wait.
 			return;
 		}
-	}
-
-	/**
-	 * Blocks waiting till the hatch has moved into position.
-	 */
-	private void waitForHatch() {
-		waitUntil(() -> subsystems.hatch.isInPosition(), "hatch to finish moving");
+		try {
+			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while spinning up shooter, stopping shooter");
+			subsystems.shooter.setTargetRPS(0);
+		}
 	}
 	
-	/**
-	 * Blocks until the lift deployer has stopped moving.
-	 */
-	private void waitForLiftDeployer() {
-		waitUntil(() -> subsystems.lift.isDeployed() || !subsystems.lift.isDeployed(), "lift deployer to stop moving");
-	}
-
-
 	private void maybeWaitForColourWheel() {
 		try {
 			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while moving colour wheel");
 			// The sequence has changed, setting action to null.
-			subsystems.colourWheel.setDesiredAction(new ColourAction(Type.NONE, Colour.UNKNOWN));
-			logSub("Resetting colour wheel to no action.");
+			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
+			subsystems.colourWheel.setArmExtended(false);
 		}
 	}
 
+	/**
+	 * Waits until loader has specific number of balls, or sequence is aborted.
+	 * @param expectBalls the number of balls to wait for. If null, it won't wait.
+	 */
+	private void maybeWaitForBalls(Integer expectBalls) {
+		if (expectBalls == null) {
+			// This state doesn't specify the number of balls to wait for.
+			return;
+		}
+		if (subsystems.loader.getCurrentBallCount() == expectBalls) return;
+		logSub("Waiting for balls");
+		try {
+			waitUntilOrAbort(() -> subsystems.loader.getCurrentBallCount() == expectBalls, "numBalls");
+		} catch (SequenceChangedException e) {
+			// Desired state has changed underneath us, give up waiting
+			//and return.
+			return;
+		}
+	}
+	
 	/**
 	 * Blocks waiting until endtime has passed.
 	 */

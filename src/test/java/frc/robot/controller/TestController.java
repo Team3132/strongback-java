@@ -3,27 +3,23 @@ package frc.robot.controller;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.mock.MockClock;
 import org.strongback.mock.MockPneumaticsModule;
-import frc.robot.Constants;
-import frc.robot.Constants.LiftSetpoint;
-import frc.robot.interfaces.ClimberInterface;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.LiftInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.mock.MockClimber;
+import frc.robot.interfaces.NetworkTableHelperInterface;
+import frc.robot.lib.WheelColour;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
-import frc.robot.mock.MockHatch;
 import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLog;
-import frc.robot.mock.MockPassthrough;
-import frc.robot.mock.MockSpitter;
+import frc.robot.mock.MockLoader;
+import frc.robot.mock.MockShooter;
 import frc.robot.simulator.IntakeSimulator;
-import frc.robot.simulator.LiftSimulator;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -43,10 +39,10 @@ public class TestController {
 	// Store direct access to the simulators so the simulator-only
 	// methods can be called.
 	private IntakeSimulator intake;
-	private LiftSimulator lift;
 	private TestHelper test;
 	// The bit that is being tested under test.
 	private Controller exec;
+	private NetworkTableHelperInterface networkTable;
 		
 	/**
 	 * Setup fields used by this test.
@@ -58,29 +54,24 @@ public class TestController {
 		subsystems = new Subsystems(new MockDashboard(), null, clock, log);
 
 		subsystems.intake = intake = new IntakeSimulator();
-		subsystems.lift = lift = new LiftSimulator();
-		subsystems.climber = new MockClimber(log);
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase(log);
-		subsystems.passthrough = new MockPassthrough(log);
-		subsystems.spitter = new MockSpitter(log);
-		subsystems.hatch = new MockHatch(log);
+		subsystems.loader = new MockLoader(log);
+		subsystems.shooter = new MockShooter(log);
 		subsystems.location = new MockLocation();
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
 		
-		exec = new Controller(subsystems);
+		exec = new Controller(subsystems, getFMSColour());
 
 		test = new TestHelper(() -> {
 			clock.incrementByMilliseconds(ktestStepMs);
 			//long now = clock.currentTimeInMillis();
 			//System.out.printf("==== Cycle starting at time %.03fms ====\n", now/1000.);
 			subsystems.intake.execute(clock.currentTimeInMillis());
-			subsystems.lift.execute(clock.currentTimeInMillis());
 			return clock.currentTime();
 		},() -> {
 			System.out.println(subsystems.intake.toString());
-			System.out.println(subsystems.lift.toString());
 		});
 		// Add safety functions to be called every step off the way.
 		test.registerSafetyFunc(() -> checkIntakeVsLift());
@@ -136,62 +127,6 @@ public class TestController {
 		assertTrue(test.run());
 	}
     */	
-		
-	/**
-	 * Test the lift setpoints.
-	 * 
-	 * Setpoints are fixed points that can be jumped between.
-	 */
-	@Test
-	public void testLiftSetpoints() {
-		System.out.println("testLiftSetpoints");
-		// Setup initial state, starting on a setpoint.
-		test.thenSet(liftHeight(LiftSetpoint.LIFT_BOTTOM_HEIGHT.height));
-		
-		// Tell it to move up to the next setpoint.
-		test.thenSet(sequence(Sequences.liftSetpointUp()));
-		
-		// Should now be at switch height.
-		//test.thenAssert(liftHeight(Constants.LIFT_CARGO_SHIP_HEIGHT));
-		
-		// Wait for the sequence to finish before running it again.
-		test.thenWait(1);
-
-		// Tell it to move up to the next setpoint.
-		test.thenSet(sequence(Sequences.liftSetpointUp()));
-		
-		// Should now be at scale height.
-		test.thenAssert(liftHeight(LiftSetpoint.LIFT_BOTTOM_HEIGHT.height));
-		
-		// Wait for the sequence to finish before running it again.
-		test.thenWait(1);
-
-		// Drop it down more than the lift tolerance and tell it to go back
-		// up to the same setpoint.
-		test.thenSet(sequence(Sequences.getMicroAdjustSequence(-4)));
-		test.thenSet(sequence(Sequences.liftSetpointUp()));
-		
-		// Should now be back at the scale height.
-		test.thenAssert(liftHeight(LiftSetpoint.LIFT_BOTTOM_HEIGHT.height));
-		
-		// Wait for the sequence to finish before running it again.
-		test.thenWait(1);
-
-		// Move down a setpoint.
-		test.thenSet(sequence(Sequences.liftSetpointDown()));
-
-		// Should now be at switch height.
-		test.thenAssert(liftHeight(Constants.LIFT_DEFAULT_MIN_HEIGHT));
-
-		// Lift it up more than the lift tolerance and tell it to go back
-		// down to the same setpoint.
-		test.thenSet(sequence(Sequences.getMicroAdjustSequence(4)));
-		test.thenSet(sequence(Sequences.liftSetpointDown()));
-
-		// Walk through setting the states and asserting that the robot eventually
-		// moves through the required state.
-		assertTrue(test.run());
-	}
 
 	/**
 	 * Pretends to be a crazy operator that keeps changing their mind.
@@ -230,39 +165,6 @@ public class TestController {
 		return Sequences.allSequences[generator.nextInt(Sequences.allSequences.length)];
 	}
 
-	/**
-	 * Either sets the lift carriage to be deployed or retracted, OR asserts it's deployed or
-	 * retracted depending if it's in a thenSet() or a thenAssert().
-	 * @param deployed which is the desired state.
-	 * @return a setter or asserter object to pass to the TestHelper.
-	 */
-	private StateSetterOrAsserter liftDeployed(boolean deployed) {
-		return new StateSetterOrAsserter() {
-			@Override
-			public String name() {
-				return String.format("LiftExtended(%s)", deployed);
-			}
-			@Override
-			public void setState() {
-				if (deployed) {
-					subsystems.lift.deploy();
-				} else {
-					subsystems.lift.retract();
-				}
-			}
-			@Override
-			public void assertState() throws AssertionError {
-				boolean isDeployed = subsystems.lift.isDeployed();
-				if (isDeployed == deployed) {
-					if (deployed) {
-						throw new AssertionError("Expected lift to be deployed, but it's retracted.");
-					} else {
-						throw new AssertionError("Expected lift to be retracted, but it's deployed");
-					}
-				}
-			}
-		};
-	}
 
 	/**
 	 * Either sets the intake motor power, OR asserts the power the motor has
@@ -270,54 +172,26 @@ public class TestController {
 	 * @param power to set/expect to/from the motor.
 	 * @return a setter or asserter object to pass to the TestHelper.
 	 */
-	private StateSetterOrAsserter intakeMotorPower(double power) {
+	private StateSetterOrAsserter intakeMotorRPM(double rpm) {
 		return new StateSetterOrAsserter() {
 			@Override
 			public String name() {
-				return String.format("IntakeMotorPower(%.1f)", power);
+				return String.format("IntakeMotorPower(%.1f)", rpm);
 			}
 			@Override
 			public void setState() {
-				subsystems.intake.setMotorOutput(power);
+				subsystems.intake.setTargetRPS(rpm);
 			}
 			@Override
 			public void assertState() throws AssertionError {
-				if (Math.abs(subsystems.intake.getMotorOutput() - power) > 0.1) {
-					throw new AssertionError("Expected intake motor to have power " + power + " but it is "
-							+ subsystems.intake.getMotorOutput());
+				if (Math.abs(subsystems.intake.getTargetRPS() - rpm) > 0.1) {
+					throw new AssertionError("Expected intake motor to have rpm " + rpm + " but it is "
+							+ subsystems.intake.getTargetRPS());
 				}
 			}
 		};
 	}
 
-	/**
-	 * Either sets the lift height, OR asserts the lift height has
-	 * been set to, depending if it's in a thenSet() or a thenAssert().
-	 * @param height the position of the lift.
-	 * @return a setter or asserter object to pass to the TestHelper.
-	 */
-	private StateSetterOrAsserter liftHeight(double height) {
-		return new StateSetterOrAsserter() {
-			@Override
-			public String name() {
-				return String.format("LiftHeight(%f)", height);
-			}
-			@Override
-			public void setState() {
-				// Use the override.
-				lift.setLiftHeightActual(height);
-			}
-			@Override
-			public void assertState() throws AssertionError {
-				if (Math.abs(subsystems.lift.getHeight() - height) > Constants.LIFT_DEFAULT_TOLERANCE) {
-					//System.out.println("Expected lift to be at position " + pos.toString() + "(" + pos.value
-					//		+ ") but it is " + subsystems.lift.getLiftHeight());
-					throw new AssertionError("Expected lift to be at position " + height + "(" + height
-							+ ") but it is " + subsystems.lift.getHeight());
-				}
-			}
-		};
-	}
 
 	/**
 	 * Tells the Controller to run the desired sequence. Only makes sense in a
@@ -361,5 +235,14 @@ public class TestController {
 		// Intake isn't in stowed or wide, this is a problem.
 		throw new AssertionError("Lift (" + subsystems.lift.getHeight() + ") is below intake threshold (" + subsystems.lift.getHeight() + ") and intake is in configuration " + config);
 		*/
+	}
+
+	private Supplier<WheelColour> getFMSColour() {
+		return new Supplier<WheelColour>() {
+			@Override
+			public WheelColour get() {
+				return WheelColour.UNKNOWN;
+			}
+		};
 	}
 }

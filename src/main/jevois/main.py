@@ -16,8 +16,6 @@ CAMERA_VERT_FOV = CAMERA_HORI_FOV * (3/4)
 
 CAMERA_ANGLE = 25 # degrees from horizontal
 
-
-
 def deg_to_rad(degrees):
     return degrees * (math.pi / 180)
 
@@ -186,7 +184,7 @@ class FirstPython:
     # ###################################################################################################
     ## Load camera calibration from JeVois share directory
     def loadCameraCalibration(self, w, h):
-        cpf = "/jevois/share/camera/calibration{}x{}.yaml".format(w, h)
+        cpf = "/jevois/share/camera/newcalibration{}x{}.yaml".format(w, h)
         fs = cv2.FileStorage(cpf, cv2.FILE_STORAGE_READ)
         if (fs.isOpened()):
             self.camMatrix = fs.getNode("camera_matrix").mat()

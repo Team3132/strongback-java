@@ -73,37 +73,46 @@ public class OperatorBoxButtons {
 	public static final int BLUE_DISABLE = 32;
 
 	// This years game-specific mappings
-	// Spitter
-	public static final int SPITTER_DISABLE = WHITE_DISABLE;
-	public static final int SPITTER_MANUAL = WHITE_MANUAL;
-	public static final int SPITTER_POT = WHITE_POT;
-	public static final int SPITTER_SPEED = WHITE_BUTTON1;
+	
+	//Shooter
+	public static final int SHOOTER_DISABLE = RED_DISABLE;
+	public static final int SHOOTER_MANUAL = RED_MANUAL;
+	public static final int SHOOTER_POT = RED_POT;
+	public static final int SHOOTER_SPEED = RED_BUTTON1;
+	public static final int SHOOTER_HOOD_UP = RED_BUTTON2;
+	public static final int SHOOTER_HOOD_DOWN = RED_BUTTON3;
 
 	// Climber
 	public static final int CLIMBER_DISABLE = RED_DISABLE;
 	public static final int CLIMBER_MANUAL = RED_MANUAL;
 	public static final int CLIMBER_POT = RED_POT;
-	public static final int CLIMBER_FRONT_HEIGHT = RED_BUTTON1;
-	public static final int CLIMBER_REAR_HEIGHT = RED_BUTTON2;
-	public static final int CLIMBER_BOTH_HEIGHT = RED_BUTTON3;
-	public static final int CLIMBER_DRIVE_SPEED = RED_BUTTON4;
-
+	public static final int CLIMBER_EXTEND = RED_BUTTON1;
+	public static final int CLIMBER_RETRACT = RED_BUTTON2;
+	
 	// Intake (shares with passthru)
 	public static final int INTAKE_DISABLE = YELLOW_DISABLE;
 	public static final int INTAKE_MANUAL = YELLOW_MANUAL;
 	public static final int INTAKE_POT = YELLOW_POT;
-
-	// Passthru (shares with intake)
-	public static final int PASSTHRU_DISABLE = YELLOW_DISABLE;
-	public static final int PASSTHRU_MANUAL = YELLOW_MANUAL;
-	public static final int PASSTHRU_POT = YELLOW_POT;
 	public static final int INTAKE_MOTOR = YELLOW_BUTTON1;
-	public static final int PASSTHRU_MOTOR = YELLOW_BUTTON2;
-	public static final int INTAKE_EXTEND = YELLOW_BUTTON3;
-	public static final int INTAKE_RETRACT = YELLOW_BUTTON4;
+	public static final int INTAKE_DEPLOY = YELLOW_BUTTON2;
+	public static final int INTAKE_STOW = YELLOW_BUTTON3;
+	
+	// Loader
+	public static final int LOADER_DISABLE = GREEN_DISABLE;
+	public static final int LOADER_MANUAL = GREEN_MANUAL;
+	public static final int LOADER_PADDLE_BLOCKING = GREEN_BUTTON3; //Undecided/Unassigned Buttons
+	public static final int LOADER_PADDLE_NOTBLOCKING = GREEN_BUTTON2;
+	public static final int LOADER_SPINNER_POT = GREEN_POT;
+	public static final int LOADER_SPINNER_MOTOR = GREEN_BUTTON1;
+	public static final int LOADER_PASSTHROUGH_POT = BLUE_POT;
+	public static final int LOADER_PASSTHROUGH_MOTOR = BLUE_BUTTON1;
+	 
+	
 
+
+	/*
 	// Hatch
-	public static final int HATCH_DISABLE = GREEN_DISABLE;
+	public static final int HATCH_DISABLE = GREEN_DISABLE; //There is no hatch
 	public static final int HATCH_MANUAL = GREEN_MANUAL;
 	public static final int HATCH_POT = GREEN_POT;
 	public static final int HATCH_MOVE_LEFT = GREEN_BUTTON1;
@@ -118,6 +127,7 @@ public class OperatorBoxButtons {
 	public static final int LIFT_SET_HEIGHT = BLUE_BUTTON1;
 	public static final int LIFT_DEPLOY_CARRIAGE = BLUE_BUTTON2;
 	public static final int LIFT_RETRACT_CARRIAGE = BLUE_BUTTON3;  // Button 3 is broken?
+	*/
 
 	// Spark test (shared with lift, ensure that one or the other is disabled).
 	public static final int SPARK_DISABLE = BLUE_DISABLE;

@@ -2,21 +2,20 @@ package frc.robot.controller;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+
 import org.strongback.components.Clock;
 
-import frc.robot.interfaces.ClimberInterface.ClimberAction;
-import frc.robot.interfaces.ColourWheelInterface.Colour;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.HatchInterface.HatchAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
-import frc.robot.interfaces.LiftInterface.LiftAction;
+import frc.robot.lib.WheelColour;
 import frc.robot.lib.TimeAction;
 import frc.robot.subsystems.Subsystems;
-
-import jaci.pathfinder.Waypoint;
 
 /**
  * Top level class to hold / specify some sort of current or target state.
@@ -29,42 +28,38 @@ public class State {
 	// Double and Boolean are used instead of double and boolean
 	// so that null can be used to indicate that the state shouldn't
 	// be changed and the current state be preserved.
-
 	// Time
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
 
-	// Lift
-	public LiftAction liftAction = null;  // Lift position.
-	public Boolean liftDeploy = null;
-
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
-	public Double intakeMotorOutput = null;  // How much current to give the intake motors.
+	public Double intakeRPS = null; 
 	
-	// Spitter
-	public Double spitterDutyCycle = null;  // Power level to supply to spitter. -1..0..1
-	public Boolean hasCargo = null; // Should the robot wait for cargo to arrive or leave?
+	// Shooter
+	public Double shooterRPS = null;  // Set the shooter target speed.
+	public Boolean shooterUpToSpeed = null;
+	public Boolean shooterHoodExtended = null;
 
-	// Passthrough
-	public Double passthroughMotorOutput = null;
-
-	// Hatch
-	public HatchAction hatchAction = null;  // How the hatch should be positioned.
-	public Boolean hatchHolderEnabled = null;
+	// Loader
+	public Double loaderPassthroughMotorOutput = null;
+	public Boolean loaderPaddleBlocking = null;
+	public Double loaderSpinnerMotorRPS = null;
+	public Integer expectedNumberOfBalls = null;
 
 	// Vision
 	public CameraMode cameraMode = null;
 
-	// Climber
-	public ClimberAction climber = null;  // What the climber should do.
-
-	// Driving.
+	// Driving / Climbing
 	public DriveRoutineParameters drive = null;
+	public Boolean driveClimbModeToggle = null;
+	public Boolean climberBrakeApplied = null;
 
-	public Waypoint resetPosition = null;  // Reset where the location subsystem thinks the robot is
+	// Buddy Climb
+	public Boolean buddyClimbToggle = null;
 
 	//Colour Wheel
-	public ColourAction colourWheel = null;
+	public ColourAction colourAction = null;
+	public Boolean extendColourWheel = null;
 
 	/**
 	 * Create a blank state
@@ -77,18 +72,21 @@ public class State {
 	 */
 	public State(Subsystems subsystems, Clock clock) {
 		setDelayUntilTime(clock.currentTime());
-		setLiftHeight(subsystems.lift.getTargetHeight());
-		intakeMotorOutput = subsystems.intake.getMotorOutput();
 		intakeExtended = subsystems.intake.isExtended();
-		passthroughMotorOutput = subsystems.passthrough.getTargetMotorOutput();
-		spitterDutyCycle = subsystems.spitter.getTargetDutyCycle();
-		hasCargo = subsystems.spitter.hasCargo();
-		climber = subsystems.climber.getDesiredAction();
-		hatchAction = subsystems.hatch.getAction();
-		hatchHolderEnabled = subsystems.hatch.getHeld();
-		liftDeploy = subsystems.lift.shouldBeDeployed();
+		intakeRPS = subsystems.intake.getTargetRPS();
+		buddyClimbToggle = false;  // Don't toggle unless requested.
+		driveClimbModeToggle = false;  // Don't toggle unless requested.
+		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
+		loaderSpinnerMotorRPS = subsystems.loader.getTargetSpinnerMotorRPS();
+		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
+		loaderPaddleBlocking = subsystems.loader.isPaddleBlocking();
+		shooterRPS = subsystems.shooter.getTargetRPS();
+		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
+		shooterHoodExtended = subsystems.shooter.isHoodExtended();
 		drive = subsystems.drivebase.getDriveRoutine();
-		colourWheel = subsystems.colourWheel.getDesiredAction();
+		colourAction = subsystems.colourWheel.getDesiredAction();
+		extendColourWheel = subsystems.colourWheel.isArmExtended();
+		expectedNumberOfBalls = null;  // Leave as null so it can be ignored downstream.
 	}
 
 	// Time
@@ -112,60 +110,6 @@ public class State {
 		return this;
 	}
 
-
-
-	// Lift
-	/**
-	 * Set absolute lift height.
-	 * @param height in inches from the bottom of the lift.
-	 */
-	public State setLiftHeight(double height) {
-		liftAction = new LiftAction(LiftAction.Type.SET_HEIGHT, height);
-		return this;
-	}
-
-	/**
-	 * Adjust the current lift height by delta.
-	 * @param delta to apply to the current height.
-	 */
-	public State setLiftHeightDelta(double delta) {
-		liftAction = new LiftAction(LiftAction.Type.ADJUST_HEIGHT, delta);
-		return this;
-	}
-
-	/**
-	 * Move the lift down a setpoint
-	 */
-	public State setLiftSetpointUp() {
-		liftAction = new LiftAction(LiftAction.Type.SETPOINT_UP, 0); // the zero does nothing
-		return this;
-	}
-
-	/**
-	 * Move the lift down a setpoint
-	 */
-	public State setLiftSetpointDown() {
-		liftAction = new LiftAction(LiftAction.Type.SETPOINT_DOWN, 0); // the zero does nothing
-		return this;
-	}
-
-
-	public State deployLift() {
-		liftDeploy = Boolean.valueOf(true);
-		return this;
-	}
-
-	public State retractLift() {
-		liftDeploy = Boolean.valueOf(false);
-		return this;
-	}
-
-	public State setLiftDeployer(boolean state) {
-		liftDeploy = Boolean.valueOf(state);
-		return this;
-	}
-
-
 	// Intake
 	public State deployIntake() {
 		intakeExtended = Boolean.valueOf(true);
@@ -173,7 +117,7 @@ public class State {
 	}
 
 	public State stowIntake() {
-		intakeExtended = Boolean.valueOf(true);
+		intakeExtended = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -182,87 +126,58 @@ public class State {
 		return this;
 	}
 
-	public State setIntakeMotorOutput(double output) {
-		intakeMotorOutput = Double.valueOf(output);
+	public State setIntakeRPS(double rps) {
+		intakeRPS = Double.valueOf(rps);
 		return this;
 	}
 
-
-	// Spitter
-	public State setSpitterDutyCycle(double dutyCycle) {
-		spitterDutyCycle = Double.valueOf(dutyCycle);
+	public State setShooterRPS(double rps) {
+		shooterRPS = Double.valueOf(rps);
 		return this;
 	}
 
-	public State waitForCargo() {
-		hasCargo = Boolean.valueOf(true);
+	public State waitForShooter() {
+		shooterUpToSpeed = true;
 		return this;
 	}
 
-	public State waitForCargoToLeave() {
-		hasCargo = Boolean.valueOf(false);
+	public State extendShooterHood() {
+		shooterHoodExtended = true;
 		return this;
 	}
 
-	public State setHasCargo(boolean hasCargo) {
-		this.hasCargo = Boolean.valueOf(hasCargo);
+	public State retractShooterHood() {
+		shooterHoodExtended = false;
 		return this;
 	}
 
-
-	// Passthrough
-	public State setPassthroughMotorOutput(double output) {
-		passthroughMotorOutput = Double.valueOf(output);
+	// Loader
+	public State setLoaderSpinnerMotorRPS(double rps) {
+		loaderSpinnerMotorRPS = Double.valueOf(rps);
+		return this;
+	}
+	public State setLoaderPassthroughMotorOutput(double output) {
+		loaderPassthroughMotorOutput = Double.valueOf(output);
+		return this;
+	}
+	public State setPaddleBlocking(boolean blocking) {
+		loaderPaddleBlocking = Boolean.valueOf(blocking);
 		return this;
 	}
 
-
-	// Hatch
-	/**
-	 * Sets the target position of the hatch in inches from
-	 * the right side of the robot. zero is stowed.
-	 */
-	public State setHatchPosition(double position) {
-		hatchAction = new HatchAction(HatchAction.Type.SET_POSITION, position);
+	public State unblockShooter() {
+		loaderPaddleBlocking = false;
+		return this;
+	}
+	public State blockShooter() {
+		loaderPaddleBlocking = true;
 		return this;
 	}
 
-	/**
-	 * [Micro]adjust the position of the hatch relative to it's current target.
-	 */
-	public State setHatchPositionDelta(double delta) {
-		hatchAction = new HatchAction(HatchAction.Type.ADJUST_POSITION, delta);
+	public State waitForBalls(int numBalls) {
+		expectedNumberOfBalls = Integer.valueOf(numBalls);
 		return this;
 	}
-
-	/**
-	 * Set the hatch motor power to the nominated power value.
-	 */
-	public State setHatchPower(double power) {
-		hatchAction = new HatchAction(HatchAction.Type.SET_MOTOR_POWER, power);
-		return this;
-	}
-
-	public State calibrateHatch() {
-		hatchAction = new HatchAction(HatchAction.Type.CALIBRATE, 0);
-		return this;
-	}
-
-	public State grabHatch() {
-		hatchHolderEnabled = Boolean.valueOf(true);
-		return this;
-	}
-
-	public State releaseHatch() {
-		hatchHolderEnabled = Boolean.valueOf(false);
-		return this;
-	}
-
-	public State setHatchHolderEnabled(boolean grabbed) {
-		hatchHolderEnabled = Boolean.valueOf(grabbed);
-		return this;
-	}
-
 
 	// Vision
 	public State doCameraWebcam() {
@@ -275,56 +190,65 @@ public class State {
 		return this;
 	}
 
-
-	// Climber
-	public State setFrontHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_FRONT_HEIGHT, height);
+	
+	// Toggle between drive and climb modes
+	public State toggleDriveClimbMode() {
+		driveClimbModeToggle = true;
 		return this;
 	}
 
-	public State stopBothHeight() {
-		climber = new ClimberAction(ClimberAction.Type.STOP_BOTH_HEIGHT, 0);
+	public State applyClimberBrake() {
+		climberBrakeApplied = true;
 		return this;
 	}
 
-	public State setRearHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_REAR_HEIGHT, height);
+	public State releaseClimberBrake() {
+		climberBrakeApplied = false;
 		return this;
 	}
 
-	public State setBothHeight(double height) {
-		climber = new ClimberAction(ClimberAction.Type.SET_BOTH_HEIGHT, height);
+	/**
+	 * Calling this will retract the buddy climb if it was deployed
+	 * and deploy it if it was retracted.
+	 */
+	public State toggleBuddyClimb() {
+		buddyClimbToggle = true;
 		return this;
 	}
-
-	public State setClimberDriveSpeed(double speed) {
-		climber = new ClimberAction(ClimberAction.Type.SET_DRIVE_SPEED, speed);
-		return this;
-	}
-
+	
 	// Color Wheel
 	public State colourWheelRotational() {
-		colourWheel = new ColourAction(ColourAction.Type.ROTATION, Colour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ROTATION, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelPositional(Colour colour) {
-		colourWheel = new ColourAction(ColourAction.Type.POSITION, colour);
+	public State startColourWheelPositional(WheelColour colour) {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.POSITION, colour);
 		return this;
 	}
 
 	public State stopColourWheel() {
-		colourWheel = new ColourAction(ColourAction.Type.NONE, Colour.UNKNOWN);
+		colourAction = new ColourAction(ColourAction.ColourWheelType.NONE, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelLeft() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_ANTICLOCKWISE, Colour.UNKNOWN);
+	public State colourWheelAnticlockwise() {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN);
 		return this;
 	}
 
-	public State colourWheelRight() {
-		colourWheel = new ColourAction(ColourAction.Type.ADJUST_WHEEL_CLOCKWISE, Colour.UNKNOWN);
+	public State colourWheelClockwise() {
+		colourAction = new ColourAction(ColourAction.ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN);
+		return this;
+	}
+
+	public State extendedColourWheel() {
+		extendColourWheel = Boolean.valueOf(true);
+		return this;
+	}
+
+	public State retractColourWheel() {
+		extendColourWheel = Boolean.valueOf(false);
 		return this;
 	}
 
@@ -397,22 +321,22 @@ public class State {
 		return this;
 	}
 
-
-
 	/**
 	 * Add waypoints for the drive base to drive through.
 	 * Note: The robot will come to a complete halt after each list
 	 * of Waypoints, so each State will cause the robot to drive and then
 	 * halt ready for the next state. This should be improved.
-	 * Wayoints are relative to the robots position.
+	 * Waypoints are relative to the robots position.
+	 * @param start the assumed starting point and angle. 
 	 * @param waypoints list of Waypoints to drive through.
+	 * @param end the end point and angle.
 	 * @param forward drive forward through waypoints.
 	 */
-	public State driveRelativeWaypoints(Waypoint[] waypoints, boolean forward) {
-		drive = DriveRoutineParameters.getDriveWaypoints(waypoints, forward, true);
+	public State driveRelativeWaypoints(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end,
+			boolean forward) {
+		drive = DriveRoutineParameters.getDriveWaypoints(start, interiorWaypoints, end, forward, true);
 		return this;
-	}
-	
+	}	
 
 	/**
 	 * Creates a copy of desiredState whose null variables are replaced by values in currentState
@@ -430,6 +354,7 @@ public class State {
 			// if (!field.canAccess(current)) continue;
 			try {
 				if (field.get(desiredState) == null) {
+					// In some cases this field in currentState can also be null.
 					field.set(updatedState, field.get(currentState));
 				} else {
 					field.set(updatedState, field.get(desiredState));
@@ -458,21 +383,23 @@ public class State {
 	@Override
 	public String toString() {
 		ArrayList<String> result = new ArrayList<String>();
-		maybeAdd("intakeExtended", intakeExtended, result);
-		maybeAdd("intakeMotorOutput", intakeMotorOutput, result);
-		maybeAdd("passthroughMotorOutput", passthroughMotorOutput, result);
-		maybeAdd("spitterDutyCycle", spitterDutyCycle, result);
-		maybeAdd("hasCargo", hasCargo, result);
-		maybeAdd("hatchAction", hatchAction, result);
-		maybeAdd("hatchHolderGrabbed", hatchHolderEnabled, result);
-		maybeAdd("liftDeploy", liftDeploy, result);
-		maybeAdd("liftAction", liftAction, result);
-		maybeAdd("drive", drive, result);
-		maybeAdd("climber", climber, result);
-		maybeAdd("timeAction", timeAction, result);
+		maybeAdd("buddyClimbToggle", buddyClimbToggle, result);
 		maybeAdd("cameraMode", cameraMode, result);
-		maybeAdd("colourwheelMode", colourWheel, result);
-	
+		maybeAdd("colourWheelExtended", extendColourWheel, result);
+		maybeAdd("colourwheelMode", colourAction, result);
+		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
+		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
+		maybeAdd("drive", drive, result);
+		maybeAdd("intakeExtended", intakeExtended, result);
+		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);
+		maybeAdd("intakeRPS", intakeRPS, result);
+		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
+		maybeAdd("loaderSpinnerMotorRPS", loaderSpinnerMotorRPS, result);
+		maybeAdd("shooterHoodExtended", shooterHoodExtended, result);
+		maybeAdd("shooterRPS", shooterRPS, result);
+		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
+		maybeAdd("timeAction", timeAction, result);
+		maybeAdd("waitForBalls", expectedNumberOfBalls, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }

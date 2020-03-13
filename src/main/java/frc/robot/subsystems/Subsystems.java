@@ -3,7 +3,10 @@ package frc.robot.subsystems;
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 
 import org.strongback.Executor.Priority;
@@ -11,24 +14,57 @@ import org.strongback.Strongback;
 import org.strongback.components.Clock;
 import org.strongback.components.Gyroscope;
 import org.strongback.components.Motor;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.PneumaticsModule;
 import org.strongback.components.Solenoid;
-import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
-import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.mock.Mock;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
+
 import frc.robot.Constants;
-import frc.robot.controller.Controller.TrajectoryGenerator;
-import frc.robot.drive.routines.*;
-import frc.robot.interfaces.*;
+import frc.robot.drive.routines.ArcadeDrive;
+import frc.robot.drive.routines.CheesyDpadDrive;
+import frc.robot.drive.routines.ConstantDrive;
+import frc.robot.drive.routines.PositionalPIDDrive;
+import frc.robot.drive.routines.TrajectoryDrive;
+import frc.robot.interfaces.BuddyClimbInterface;
+import frc.robot.interfaces.ColourWheelInterface;
+import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.DashboardUpdater;
+import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+import frc.robot.interfaces.IntakeInterface;
+import frc.robot.interfaces.JevoisInterface;
+import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.LoaderInterface;
+import frc.robot.interfaces.LocationInterface;
+import frc.robot.interfaces.Log;
+import frc.robot.interfaces.ShooterInterface;
+import frc.robot.interfaces.VisionInterface;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
-import frc.robot.lib.*;
-import frc.robot.mock.*;
-import frc.robot.simulator.*;
+import frc.robot.lib.GamepadButtonsX;
+import frc.robot.lib.Jevois;
+import frc.robot.lib.LEDColour;
+import frc.robot.lib.MathUtil;
+import frc.robot.lib.MotorFactory;
+import frc.robot.lib.NavXGyroscope;
+import frc.robot.lib.NetworkTablesHelper;
+import frc.robot.lib.Position;
+import frc.robot.lib.RobotConfiguration;
+import frc.robot.lib.WheelColour;
+import frc.robot.mock.MockBuddyClimb;
+import frc.robot.mock.MockColourWheel;
+import frc.robot.mock.MockDrivebase;
+import frc.robot.mock.MockIntake;
+import frc.robot.mock.MockLEDStrip;
+import frc.robot.mock.MockLoader;
+import frc.robot.mock.MockLocation;
+import frc.robot.mock.MockShooter;
+import frc.robot.mock.MockVision;
+import frc.robot.simulator.IntakeSimulator;
 
 /**
  * Contains the subsystems for the robot.
@@ -41,24 +77,20 @@ public class Subsystems implements DashboardUpdater {
 	public RobotConfiguration config;
 	public Clock clock;
 	public Log log;
-
+	public LEDStripInterface ledStrip;
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
+	public IntakeInterface hwIntake;
+	public BuddyClimbInterface buddyClimb;
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
-	public SparkTestInterface spark;
-	public OverridableSubsystem<SparkTestInterface> sparkTestOverride;
-	public PassthroughInterface passthrough;
-	public OverridableSubsystem<PassthroughInterface> passthroughOverride;
-	public SpitterInterface spitter;
-	public OverridableSubsystem<SpitterInterface> spitterOverride;
-	public HatchInterface hatch;
-	public OverridableSubsystem<HatchInterface> hatchOverride;
-	public LiftInterface lift;
-	public OverridableSubsystem<LiftInterface> liftOverride;
-	public ClimberInterface climber;
+	public LoaderInterface loader;
+	public LoaderInterface hwLoader; // Keep track of the real hardware for dashboard update
+	public OverridableSubsystem<LoaderInterface> loaderOverride;
+	public ShooterInterface shooter;
+	public ShooterInterface hwShooter;
+	public OverridableSubsystem<ShooterInterface> shooterOverride;
 	public ColourWheelInterface colourWheel;
-	public OverridableSubsystem<ClimberInterface> climberOverride;
 	public PneumaticsModule compressor;
 	public VisionInterface vision;
 	public JevoisInterface jevois;
@@ -69,12 +101,6 @@ public class Subsystems implements DashboardUpdater {
 	public DoubleSupplier rightDriveSpeed;
 
 	private final I2C.Port i2cPort = I2C.Port.kOnboard;
-	/**
-	 * A Rev Color Sensor V3 object is constructed with an I2C port as a 
-	 * parameter. The device will be automatically initialized with default 
-	 * parameters.
-	 */
-	private final ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 
 	public Subsystems(DashboardInterface dashboard, RobotConfiguration config, Clock clock, Log log) {
 		this.dashboard = dashboard;
@@ -85,12 +111,8 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createOverrides() {
 		createIntakeOverride();
-		createPassthrougOverride();
-		createSpitterOverride();
-		createHatchOverride();
-		createClimberOverride();
-		createLiftOverride();
-		createSparkTestOverride();
+		createLoaderOverride();
+		createShooterOverride();
 	}
 
 	public void enable() {
@@ -98,47 +120,37 @@ public class Subsystems implements DashboardUpdater {
 		// location is always enabled.
 		drivebase.enable();
 		intake.enable();
-		passthrough.enable();
-		spitter.enable();
-		climber.enable();
-		lift.enable();
-		hatch.enable();
-		spark.enable();
+		shooter.enable();
+		loader.enable();
+		colourWheel.enable();
 	}
 
 	public void disable() {
 		log.info("Disabling Subsystems");
 		drivebase.disable();
 		intake.disable();
-		passthrough.disable();
-		spitter.disable();
-		climber.disable();
-		lift.disable();
-		hatch.disable();
-		spark.disable();
+		shooter.disable();
+		loader.disable();
+		colourWheel.disable();
 	}
 
 	@Override
 	public void updateDashboard() {
 		drivebase.updateDashboard();
-		hatch.updateDashboard();
-		intake.updateDashboard();
-		climber.updateDashboard();
+		hwIntake.updateDashboard();
 		location.updateDashboard();
-		passthrough.updateDashboard();
-		spitter.updateDashboard();
-		lift.updateDashboard();
+		hwLoader.updateDashboard();
+		hwShooter.updateDashboard();
 		vision.updateDashboard();
-		spark.updateDashboard();
 		colourWheel.updateDashboard();
 	}
 
 	/**
-	 * Create the drivebase and location subsystems.
-	 * Creates the motors and gyro as needed by both.
-	 * Registers all of the available drive routines that can be requested by the controller.
+	 * Create the drivebase and location subsystems. Creates the motors and gyro as
+	 * needed by both. Registers all of the available drive routines that can be
+	 * requested by the controller.
 	 */
-	public void createDrivebaseLocation(TrajectoryGenerator generator, InputDevice leftStick, InputDevice rightStick) {
+	public void createDrivebaseLocation(InputDevice leftStick, InputDevice rightStick) {
 		if (!config.drivebaseIsPresent) {
 			log.sub("Using mock drivebase");
 			drivebase = new MockDrivebase(log);
@@ -148,22 +160,48 @@ public class Subsystems implements DashboardUpdater {
 		}
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
-		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsLeftWithEncoders,
-				config.drivebaseCanIdsLeftWithoutEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
-				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, 
-				config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
-		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
-				config.drivebaseCanIdsRightWithoutEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate,
-				config.drivebaseCurrentLimiting, config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF, clock, log);
+		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
+				config.drivebaseCanIdsLeftWithEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
+				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
+				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
+				clock, log);
+		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
+				config.drivebaseCanIdsRightWithEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
+				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
+				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
+				clock, log);
+		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT,
+				0.1, 0.1);
+		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId,
+				Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
+
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
 		leftDriveSpeed = () -> leftMotor.getVelocity();
 		rightDriveSpeed = () -> rightMotor.getVelocity();
 
+		leftMotor.setPosition(0);
+		rightMotor.setPosition(0);
+		try {
+			// Let the encoders get the message and have time to send it back to us.
+			Thread.sleep(100);
+		} catch (InterruptedException e) {}
+		log.error("Reset drive encoders to zero, currently are: %f, %f", leftMotor.getPosition(), rightMotor.getPosition());
+
+		// Save PID values into Network Tables
+		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
+		driveHelper.set("p", config.drivebaseP);
+		driveHelper.set("i", config.drivebaseI);
+		driveHelper.set("d", config.drivebaseD);
+		driveHelper.set("f", config.drivebaseF);
+
+
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
-		location = new Location(leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
-		drivebase = new Drivebase(leftMotor, rightMotor, dashboard, log);
+		location = new Location(() -> {	leftMotor.setPosition(0);
+			rightMotor.setPosition(0); },
+			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return metres.
+		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, driveHelper ,dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -208,8 +246,8 @@ public class Subsystems implements DashboardUpdater {
 				leftStick.getButton(GamepadButtonsX.RIGHT_TRIGGER_AXIS), // Is quick turn
 				log));
 		// Drive through supplied waypoints using splines.
-		drivebase.registerDriveRoutine(DriveRoutineType.WAYPOINTS,
-				new SplineDrive(generator, leftDriveDistance, rightDriveDistance, location, clock, log));
+		drivebase.registerDriveRoutine(DriveRoutineType.TRAJECTORY,
+				new TrajectoryDrive(location, clock, log), ControlMode.Voltage);
 		// Driving using the vision targets to help with alignment. Overrides the
 		// steering but not the speed.
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_ASSIST,
@@ -222,18 +260,12 @@ public class Subsystems implements DashboardUpdater {
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
 				new PositionalPIDDrive("visionAim",
-				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_RANGE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_RANGE), 
+				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_TOLERANCE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_TOLERANCE), 
 				() -> MathUtil.clamp(getVisionDistance()*Constants.VISION_AIM_DISTANCE_SCALE, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED),
 				() -> getVisionTurnAdjustment(),
 				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
 				Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 				rightDriveSpeed, clock, log));
-		// Driving using the tape on the floor to help with alignment. Overrides the
-		// steering but not the speed.
-		drivebase.registerDriveRoutine(DriveRoutineType.TAPE_ASSIST,
-				new PositionalPIDDrive("tape", () -> -leftStick.getAxis(1).read(), () -> getTapeTurnAdjustment(),
-						Constants.TAPE_JOYSTICK_SCALE, Constants.TAPE_ANGLE_SCALE, Constants.TAPE_MAX_VELOCITY_JERK,
-						leftDriveDistance, leftDriveSpeed, rightDriveDistance, rightDriveSpeed, clock, log));
 		// Turns on the spot to a specified angle.
 		drivebase.registerDriveRoutine(DriveRoutineType.TURN_TO_ANGLE,
 				new PositionalPIDDrive("angle", () -> 0, () -> getTurnToAngleTurnAdjustment(), 0,
@@ -293,7 +325,9 @@ public class Subsystems implements DashboardUpdater {
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
-		return distance; 
+		// returning zero for now so visionAim just aims the robot (doesn't drive to a distance)
+		// TODO: reincorporate the distance measurment into how we shoot
+		return 0; //distance; 
 	}
 	
 	public Position getVisionWaypoint() {
@@ -334,13 +368,6 @@ public class Subsystems implements DashboardUpdater {
 		return Math.min(distance, maxSpeed);
 	}
 
-
-
-	public double getTapeTurnAdjustment() {
-		// TODO: Implement
-		return 0;
-	}
-
 	public double getTurnToAngleTurnAdjustment() {
 		double target = drivebase.getDriveRoutine().value;
 		double actual = location.getBearing();
@@ -354,11 +381,11 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Intake not present, using a mock intake instead");
 			return;
 		}
-
+		
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
-		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, log);
-		BooleanSupplier intakeSensor = () -> intakeMotor.isAtReverseLimit();
-		intake = new Intake(intakeMotor, intakeSensor, intakeSolenoid, dashboard, log);
+		// TODO: replace 0 with appropriate subsystem PIDF values
+		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, true, Constants.INTAKE_POSITION_P, Constants.INTAKE_POSITION_I, Constants.INTAKE_POSITION_D, Constants.INTAKE_POSITION_F, log);
+		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
 
 	public void createIntakeOverride() {
@@ -368,6 +395,18 @@ public class Subsystems implements DashboardUpdater {
 		intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, intake, simulator, mock, log);
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
+		Strongback.executor().register(simulator, Priority.HIGH);
+	}
+
+	public void createBuddyClimb() {
+		if (!config.buddyClimbIsPresent) {
+			buddyClimb = new MockBuddyClimb(log);
+			log.sub("Buddy climb not present, using a mock buddy climb instead");
+			return;
+		}
+
+		Solenoid buddyClimbSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.BUDDYCLIMB_SOLENOID_PORT, 0.1, 0.1);
+		buddyClimb = new BuddyClimb(buddyClimbSolenoid, dashboard, log);
 	}
 
 	public void createColourWheel() {
@@ -376,102 +415,109 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Colour Sensor not present, using a mock colour sensor instead");
 			return;
 		}
-		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, log);
-		colourWheel = new ColourWheel(motor, colourSensor, dashboard, log);
+		 // TODO: replace 0 with appropriate subsystem PIDF values
+		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, 0, 0, 0, 0, log);
+		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
+
+		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
+		ColorMatch colourMatcher = new ColorMatch();
+		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); //Adding colours to the colourMatcher
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_RED_TARGET);
+    	colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
+		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
+
+		colourWheel = new ColourWheel(motor, colourWheelSolenoid, new Supplier<WheelColour>() {
+			@Override
+			public WheelColour get() {
+				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
+				WheelColour sensedColour = WheelColour.UNKNOWN;
+				if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
+					sensedColour = WheelColour.BLUE;
+				} else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
+					sensedColour = WheelColour.RED;
+				} else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
+					sensedColour = WheelColour.GREEN;
+				} else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
+					sensedColour = WheelColour.YELLOW;
+				}
+				return sensedColour;
+			}
+		}, ledStrip, clock, dashboard, log);
 		Strongback.executor().register(colourWheel, Priority.HIGH);
 	}
 
-	public void createSparkTest() {
-		if (config.liftIsPresent && config.sparkTestIsPresent) {
-			// As the use the same buttons on the diag box, disable this
-			// subsystem if both subsystems are enabled.
-			log.error("Disabling Test spark subsystem as lift subsystem is enabled");
-			config.sparkTestIsPresent = false;
+	public void createLEDStrip() {
+		if (!config.ledStripIsPresent) {
+			ledStrip = new MockLEDStrip();
+			log.sub("LED Strip not present, using a mock LED Strip instead.");
+			return;
 		}
-		if (!config.sparkTestIsPresent) {
-			spark = new MockSparkTest(log);
-			log.sub("Test spark not present, using a mock instead");
+		ledStrip = new LEDStrip(Constants.LED_STRIP_PWM_PORT, Constants.LED_STRIP_NUMBER_OF_LEDS, log);
+	}
+
+	public void updateIdleLED() {
+		ledStrip.setIdle();
+	}
+
+	public void setLEDColour(LEDColour c) {
+		ledStrip.setColour(c);
+	}
+
+	public void setLEDFinalCountdown(double time) {
+		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time/Constants.LED_STRIP_COUNTDOWN);
+	}
+
+	public void createLoader() {
+		if (!config.loaderIsPresent) {
+			loader = new MockLoader(log);
+			log.sub("Created a mock loader!");
 			return;
 		}
 
-		HardwareSparkMAX motor = MotorFactory.getSparkTestMotor(config.sparkTestCanIds, false, log);
-		spark = new SparkTest(motor, dashboard, log);
+		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderSpinnerCanID, false, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log);
+		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, true, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log); 
+		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
+		// The ball sensors are connected to the DIO ports on the rio.
+		DigitalInput inBallSensor = new DigitalInput(Constants.IN_BALL_DETECTOR_DIO_PORT);
+		DigitalInput outBallSensor = new DigitalInput(Constants.OUT_BALL_DETECTOR_DIO_PORT);
+		BooleanSupplier loaderInSensor = () -> !inBallSensor.get();
+		BooleanSupplier loaderOutSensor = () -> !outBallSensor.get(); 
+		loader = hwLoader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
+		Strongback.executor().register(loader, Priority.LOW);
+
 	}
 
-	public void createSparkTestOverride() {
+	public void createLoaderOverride() {
 		// Setup the diagBox so that it can take control.
-		MockSparkTest mock = new MockSparkTest(log);
-		sparkTestOverride = new OverridableSubsystem<SparkTestInterface>("spark", SparkTestInterface.class, spark, mock, mock, log);
-		// Plumb accessing the sparkTest through the override.
-		spark = sparkTestOverride.getNormalInterface();
-	}
-
-	public void createPassthrough() {
-		if (!config.passthroughIsPresent) {
-			passthrough = new MockPassthrough(log);
-			log.sub("Created a mock passthrough!");
-			return;
-		}
-
-		Motor passthroughMotor = MotorFactory.getPassthroughMotor(config.passthroughCanID, false, log);
-		passthrough = new Passthrough(config.teamNumber, passthroughMotor, dashboard, log);
-	}
-
-	public void createPassthrougOverride() {
-		// Setup the diagBox so that it can take control.
-		MockPassthrough simulator = new MockPassthrough(log);  // Nothing to simulate, use the mock
-		MockPassthrough mock = new MockPassthrough(log);
-		passthroughOverride = new OverridableSubsystem<PassthroughInterface>("passthrough", PassthroughInterface.class, passthrough, simulator, mock, log);
+		MockLoader simulator = new MockLoader(log);  // Nothing to simulate, use the mock
+		MockLoader mock = new MockLoader(log);
+		loaderOverride = new OverridableSubsystem<LoaderInterface>("loader", LoaderInterface.class, loader, simulator, mock, log);
 		// Plumb accessing the lift through the override.
-		passthrough = passthroughOverride.getNormalInterface();
+		loader = loaderOverride.getNormalInterface();
 	}
 
-	public void createSpitter() {
-		if (!config.spitterIsPresent) {
-			spitter = new MockSpitter(log);
-			log.sub("Created a mock spitter!");
+	public void createShooter() {
+		if (!config.shooterIsPresent) {
+			shooter = new MockShooter(log);
+			log.sub("Created a mock shooter!");
 			return;
 		}
 
-		Motor spitterLeftMotor = MotorFactory.getSpitterMotor(config.spitterLeftCanID, true, true, log);
-		Motor spitterRightMotor = MotorFactory.getSpitterMotor(config.spitterRightCanID, true, false, log);
-		BooleanSupplier cargoSupplier = () -> spitterLeftMotor.isAtForwardLimit();
-		spitter = new Spitter(cargoSupplier, spitterLeftMotor, spitterRightMotor, dashboard, log);
+		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1);
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, true, config.shooterP, config.shooterI,
+				config.shooterD, config.shooterF, clock, log);
+
+		shooter = hwShooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
 	}
 
-	public void createSpitterOverride() {
+	public void createShooterOverride() {
 		// Setup the diagBox so that it can take control.
-		MockSpitter simulator = new MockSpitter(log);  // Nothing to simulate, use a mock instead.
-		MockSpitter mock = new MockSpitter(log);
-		spitterOverride = new OverridableSubsystem<SpitterInterface>("spitter", SpitterInterface.class, spitter, simulator, mock, log);
-		// Plumb accessing the spitter through the override.
-		spitter = spitterOverride.getNormalInterface();
-	}
-
-	public void createHatch() {
-		if (!config.hatchIsPresent) {
-			hatch = new MockHatch(log);
-			log.sub("Created a mock hatch");
-			return;
-		}
-
-		Motor motor = MotorFactory.getHatchMotor(config.hatchCanID, true, false, log);
-		Solenoid holder = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.HATCH_HOLDER_PORT);
-		hatch = new Hatch(motor, holder, dashboard, clock, log);
-		Strongback.executor().register(hatch, Priority.LOW);
-	}
-
-	public void createHatchOverride() {
-		// Setup the diagBox so that it can take control.
-		HatchSimulator simulator = new HatchSimulator(log);
-		MockHatch mock = new MockHatch(log);
-		hatchOverride = new OverridableSubsystem<HatchInterface>("hatch", HatchInterface.class, hatch, simulator, mock, log);
-		// Plumb accessing the hatch through the override.
-		hatch = hatchOverride.getNormalInterface();
-	}
-
-	public void createTape() {
-
+		MockShooter simulator = new MockShooter(log);  // Nothing to simulate, use a mock instead.
+		MockShooter mock = new MockShooter(log);
+		shooterOverride = new OverridableSubsystem<ShooterInterface>("shooter", ShooterInterface.class, shooter, simulator, mock, log);
+		// Plumb accessing the shooter through the override.
+		shooter = shooterOverride.getNormalInterface();
 	}
 
 	/**
@@ -484,59 +530,6 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		compressor = Hardware.pneumaticsModule(config.pcmCanId);
-	}
-
-
-	public void createClimber() {
-		if (!config.climberIsPresent) {
-			climber = new MockClimber(log);
-			return;
-		}
-		Motor frontWinchMotor = MotorFactory.getClimberWinchMotor(config.climberFrontCanID, false, false, log);
-		frontWinchMotor.setInverted(true);
-		frontWinchMotor.setScale(Constants.CLIMBER_WINCH_FRONT_SCALE_FACTOR); // 18" ticks = 20208 ticks
-		Motor rearWinchMotor = MotorFactory.getClimberWinchMotor(config.climberRearCanID, false, false, log);
-		rearWinchMotor.setScale(Constants.CLIMBER_WINCH_REAR_SCALE_FACTOR); // 18" ticks = 20208 ticks
-		Motor driveMotor = MotorFactory.getClimberDriveMotor(config.climberDriveMotorCanID, true, log);
-		climber = new Climber(frontWinchMotor, rearWinchMotor, driveMotor, dashboard, log);
-		Strongback.executor().register(climber, Priority.HIGH);
-	}
-
-	public void createClimberOverride() {
-		// Setup the diagBox so that it can take control.
-		MockClimber simulator = new MockClimber(log);
-		MockClimber mock = new MockClimber(log);
-		climberOverride = new OverridableSubsystem<ClimberInterface>("climber", ClimberInterface.class, climber, simulator, mock, log);
-		// Plumb accessing the climber through the override.
-		climber = climberOverride.getNormalInterface();
-	}
-
-	/**
-	 * Create the lift subsystem.
-	 * Also plumb in the lift override, so the lift can be disconnected from the
-	 * main logic and controlled directly by the diag box.
-	 */
-	public void createLift() {
-		if (!config.liftIsPresent) {
-			lift = new MockLift(clock, log);
-			log.sub("Created a mock lift");
-			return;
-		}
-
-		Solenoid deploy = Hardware.Solenoids.singleSolenoid(config.pcmCanId, config.liftSolenoidID,
-				config.liftSolenoidRetractTime, config.liftSolenoidExtendTime);
-		Motor motor = MotorFactory.getLiftMotor(config.liftCanIds, false, false, log);
-		lift = new Lift(motor, deploy, dashboard, log);
-		Strongback.executor().register(lift, Priority.HIGH);
-	}
-
-	public void createLiftOverride() {
-		// Setup the diagBox so that it can take control.
-		LiftSimulator simulator = new LiftSimulator();
-		MockLift mock = new MockLift(clock, log);
-		liftOverride = new OverridableSubsystem<LiftInterface>("lift", LiftInterface.class, lift, simulator, mock, log);
-		// Plumb accessing the intake through the override.
-		lift = liftOverride.getNormalInterface();
 	}
 
 	public void createVision() {

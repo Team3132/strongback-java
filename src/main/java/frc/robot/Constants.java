@@ -2,13 +2,12 @@ package frc.robot;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
 import com.revrobotics.ColorMatch;
 
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.util.Color;
 
 /**
@@ -51,23 +50,26 @@ public class Constants {
 	 * 
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
-	public static final double ROBOT_WIDTH_INCHES = 20;
-	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1};
-	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {2};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {5}; 
-	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {6};
+	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {4,5};
+	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
+	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
+	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
 	public static final boolean DRIVE_BRAKE_MODE			= true;
-	public static final double DRIVE_WHEEL_DIAMETER         = 3.79;
-	public static final int DRIVE_ENCODER_CODES_PER_REV		= 4 * 360;
 	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
 	public static final String DRIVE_DEFAULT_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
 
-	// distance the robot moves per revolution of the encoders. Gearing needs to be taken into account here.
-	// at full speed in a static environment the encoders are producing 2000 count differences per 100ms
-	public static final double DRIVE_DISTANCE_PER_REV = DRIVE_WHEEL_DIAMETER * Math.PI;
-	public static final double DRIVE_MOTOR_POSITION_SCALE = DRIVE_ENCODER_CODES_PER_REV / DRIVE_DISTANCE_PER_REV;
+	// Encoder values
+	public static final double FALCON_ENCODER_TICKS = 2048;  // Falon inbuilt encoders.
+	public static final double SPARKMAX_ENCODER_TICKS = 42; // SparkMAX inbuild encoders.
+	public static final double S4T_ENCODER_TICKS = 1440; // ticks per rev.
+	public static final double VERSA_INTEGRATED_ENCODER_TICKS = 4096; // ticks per rotation
+
+	// Distance the robot moves per revolution of the wheels.
+	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 6 * INCHES_TO_METRES; // 6" wheels.
+	public static final double DRIVE_METRES_PER_REV = DRIVE_WHEEL_DIAMETER_METRES * Math.PI;
+	public static final double DRIVE_GEABOX_RATIO = 189.0/17.0;
 	
 	// This magic number is the "fastest" we want the motor to go. It is calculated
 	// by running the motor at full speed and observing what the quad encoder
@@ -102,180 +104,64 @@ public class Constants {
 	/*
 	 *  Intake constants 
 	 */
-	public static final int INTAKE_MOTOR_TALON_CAN_ID = 10;
-	
-	public static final double INTAKE_MOTOR_CURRENT = 0.5;  // Running at 0.6 with the PT and spitter can cause brownouts.s
-	public static final double INTAKE_POSITION_F = 0;
-	public static final double INTAKE_POSITION_P = 0;
+	public static final int INTAKE_CAN_ID = 10;
+	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
+	public static final double INTAKE_TARGET_RPS = 10;
+	public static final double INTAKE_POSITION_F = 0.015;
+	public static final double INTAKE_POSITION_P = 0.001;
 	public static final double INTAKE_POSITION_I = 0;
 	public static final double INTAKE_POSITION_D = 0;
 
-	public static final int INTAKE_SOLENOID_PORT = 0;
+
+
+	public static final int INTAKE_SOLENOID_PORT = 1;
 
 	public static final int[] TEST_SPARK_MOTOR_CAN_ID_LIST = {50, 51};
 
 	public static final int[] OUTTAKE_MOTOR_TALON_CAN_ID_LIST = {15};
 
 	/*
-	* Spitter Constant
-	* TODO: add the actual can Id values to the constants.
-	* TODO: Tune the Spitter F, P, I, D values.
-	* TODO: Find the tolerance and spitter_speed value.
+	* Shooter constants
 	*/
-	public static final int SPITTER_LEFT_TALON_CAN_ID = 40; 
-	public static final int SPITTER_RIGHT_TALON_CAN_ID = 41; 
-	public static final double SPITTER_SPEED = 0.15;  // Power 0...1
-	public static final double SPITTER_SCORE_SPEED = 1; //0.55; //was 0.75; 
-	public static final double SPITTER_SPEED_TOLERANCE = 0;
-	public static final double SPITTER_SPEED_F = 10.0/6;
-	public static final double SPITTER_SPEED_P = 1;
-	public static final double SPITTER_SPEED_I = 0;
-	public static final double SPITTER_SPEED_D = 0;
-
-	/**
-	 * Tape Constants
-	 */
-	public static final double COLOUR_SENSOR_TOLERANCE = 0; // TODO: Find the tolerance for the colour sensor.
-	public static final double GRADIENT_CONSTANT = 0;
-	public static final double Y_AXIS_CONSTANT = 0;
-	public static final double BAND_ON = 0;
-	public static final double BAND_OFF = 0;
-	public static final int COLOUR_SENSOR_LEFT = 0;
-	public static final int COLOUR_SENSOR_RIGHT = 1;
-	public static final int CENTER_OF_WHITE = 1450;
-	public static final int OVER_THE_EDGE_VALUE = 2200;
-	public static final int MIDDLE_OF_CARPET = 13500;
-
-	/**
-	 * Hatch constants.
-	 */
-
-	public static final double HATCH_POSITION_F = 0;
-	public static final double HATCH_POSITION_P = 5;  // Not too high or the belt skips.
-	public static final double HATCH_POSITION_I = 0;
-	public static final double HATCH_POSITION_D = 0;
-	public static final int HATCH_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
-	public static final int HATCH_PEAK_CURRENT_LIMIT = 43;
-	public static final int HATCH_CURRENT_TIMEOUT_MS = 100;
-	public static final int HATCH_POSITION_MOTOR_CAN_ID = 25;
-	public static final double HATCH_STOWED_POSITION = 0;  //0;  // 2 while tuning PID
-	public static final double HATCH_READY_POSITION = 7;
-	public static final double HATCH_INTAKE_HOLD_POSITION = 2.5;
-	public static final double HATCH_POSITION_TOLERANCE = 0.5;
-	public static final double HATCH_CALIBRATION_SPEED = -0.4; // Percentage of motor power needed for calibration.
+	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
+	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
+	public static final double SHOOTER_SPEED_TOLERANCE_RPS = 3.33;
+	public static final double SHOOTER_F = 0.08;//0.075;
+	public static final double SHOOTER_P = 0.7;
+	public static final double SHOOTER_I = 0;
+	public static final double SHOOTER_D = 0;
+	public static final double SHOOTER_CLOSE_TARGET_SPEED_RPS = 62;
+	public static final double SHOOTER_AUTO_LINE_TARGET_SPEED_RPS = 90;
+	public static final double SHOOTER_FAR_TARGET_SPEED_RPS = 95;
+	public static final double SHOOTER_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	
 	/*
-	* Passthrough
+	* Loader
 	*/
-	public static final int PASSTHROUGH_MOTOR_TALON_CAN_ID = 20; //TODO: find canID for Passthrough motor
-	public static final double PASSTHROUGH_MOTOR_CURRENT = 1.0;
+	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 12;
+	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 11;
+	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
+	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
+	public static final int PADDLE_SOLENOID_PORT = 2; 
+	public static final double LOADER_MOTOR_INTAKING_RPS = 10;
+	public static final double LOADER_MOTOR_SHOOTING_RPS = 8;
+	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
+	public static final double LOADER_MAIN_MOTOR_GEARBOX_RATIO = 1; // Encoder is on output shaft.
+	public static final double LOADER_SPINNER_P = 0.4;
+	public static final double LOADER_SPINNER_I = 0;
+	public static final double LOADER_SPINNER_D = 30;
+	public static final double LOADER_SPINNER_F = 0.225;
 	
 	/*
 	 * Canifier 
 	 */
 	public static final int LED_CANIFIER_CAN_ID = 21;
 
-	/*
-	 * Lift
-	 */
-	public static final int[] LIFT_MOTOR_TALON_CAN_ID_LIST = {30, 31};
-	public static final int LIFT_SOLENOID_ID = 2;  // Listed as hatch mech in/out in the DDD.
-	public static final double LIFT_SOLENOID_RETRACT_TIME = 0.1;
-	public static  final double LEFT_SOLENOID_EXTEND_TIME = 0.1;
-
-	public static final double LIFT_P_UP = 40.0;
-	public static final double LIFT_I_UP = 0.0;
-	public static final double LIFT_D_UP = 0.0;
-	public static final double LIFT_F_UP = 0.0;
-
-	public static final double LIFT_P_DOWN = 25.0;
-	public static final double LIFT_I_DOWN = 0.0;
-	public static final double LIFT_D_DOWN = 0.0;
-	public static final double LIFT_F_DOWN = 0.0;
-
-	public static final int LIFT_MOTION_MAX = 40;  // was 100
-	public static final int LIFT_MOTION_ACCEL = 5 * LIFT_MOTION_MAX;
-
-	// public static final double LIFT_SCALE = 6.313;	// 638 ticks to 59.44 inches
-	public static final double LIFT_SCALE = ((638/59.44)*1.07);	// 638 ticks to 59.44 inches
-
-	public static final double LIFT_DEFAULT_TOLERANCE = 1.0;
-	public static final double LIFT_MICRO_ADJUST_HEIGHT = 0.5; // The smallest height by which the operator can raise the lift
-	public static final int LIFT_CONTINUOUS_CURRENT_LIMIT = 38;
-	public static final int LIFT_PEAK_CURRENT_LIMIT = 43;
-	public static final int LIFT_CURRENT_TIMEOUT_MS = 100;
-	public static final int LIFT_FWD_SOFT_LIMIT = 775;
-	public static final int LIFT_REV_SOFT_LIMIT = -10;
-
-	public enum LiftSetpoint {
-		LIFT_BOTTOM_HEIGHT(0),
-		LIFT_FEEDER_STATION_HEIGHT(0),
-		LIFT_CARGO_SHIP_HATCH_HEIGHT(0),
-		LIFT_CARGO_SHIP_CARGO_HEIGHT(16.0),
-		LIFT_ROCKET_BOTTOM_HATCH_HEIGHT(0),
-		LIFT_ROCKET_BOTTOM_CARGO_HEIGHT(7),
-		LIFT_ROCKET_MIDDLE_HATCH_HEIGHT(17),
-		LIFT_ROCKET_MIDDLE_CARGO_HEIGHT(22.5),
-		LIFT_ROCKET_TOP_HATCH_HEIGHT(32.5),
-		LIFT_ROCKET_TOP_CARGO_HEIGHT(38), // Was 38
-		LIFT_MAX_HEIGHT(39); // 39.3 inches
-
-		public final double height;
-		private LiftSetpoint(double height) {
-			this.height = height;
-		}
-	}
-																	
-	public static final List<LiftSetpoint> LIFT_SETPOINTS = Arrays.asList(
-		LiftSetpoint.LIFT_BOTTOM_HEIGHT, 
-		LiftSetpoint.LIFT_CARGO_SHIP_HATCH_HEIGHT, //Cargo ship, Lower Rocket and feeder station hatch heights are identical
-		LiftSetpoint.LIFT_CARGO_SHIP_CARGO_HEIGHT, 
-		LiftSetpoint.LIFT_ROCKET_BOTTOM_HATCH_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_BOTTOM_CARGO_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_MIDDLE_HATCH_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_MIDDLE_CARGO_HEIGHT,
-		LiftSetpoint.LIFT_ROCKET_TOP_HATCH_HEIGHT, 
-		LiftSetpoint.LIFT_ROCKET_TOP_CARGO_HEIGHT,
-		LiftSetpoint.LIFT_MAX_HEIGHT
-	);
-
-
-	// Position Constants
-	public static final double LIFT_DEFAULT_MIN_HEIGHT = 0;
-	public static final double LIFT_DEFAULT_MAX_HEIGHT = 39; // 42
-	public static final double LIFT_DEPLOY_THRESHOLD_HEIGHT = 0; //18 / 25.4; // cannot deploy the spitter unless it is 18mm above the lift base height 
-
 	// Power distribution Panel (PDP)
 	public static final int PDP_CAN_ID = 62;
 	
 	// Pneumatic Control Modules (PCM)
 	public static final int PCM_CAN_ID = 61;
-
-	// Hatch Solenoids
-	public static final int HATCH_HOLDER_PORT = 1;
-
-	// Level two (step climb)
-	public static final int LEVEL_TWO_SOLENOID_ID = 3;
-	public static final double LEVEL_TWO_SOLENOID_RETRACT_TIME = 0.3;  // Faster to retract with the robot sitting on it.
-	public static final double LEVEL_TWO_SOLENOID_EXTEND_TIME = 0.5;
-	public static final double LEVEL_TWO_HEIGHT = 12; //Temporary
-
-	// Level three (higher step climb)
-	public static final int LEVEL_THREE_REAR_CAN_ID = 47;
-	public static final int LEVEL_THREE_DRIVE_MOTOR_CAN_ID = 48;
-	public static final double LEVEL_THREE_HEIGHT = 24; //Temporary
-	public static final double L3_CLIMB_HEIGHT = 10;
-	public static final double L3_DRIVE_POWER = 0.2;
-	public static final double DRIVEBASE_L3_DRIVE_POWER = 0.2;
-	public static final double DRIVEBASE_L3_DRIVE_SLOW_POWER = 0.25;
-	public static final double L3_POSITION_F = 0;  // TODO: Needs tuning.
-	public static final double L3_POSITION_P = 0.01;
-	public static final double L3_POSITION_I = 0;
-	public static final double L3_POSITION_D = 0;
-	public static final int L3_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
-	public static final int L3_PEAK_CURRENT_LIMIT = 43;
-	public static final int L3_CURRENT_TIMEOUT_MS = 100;
-
 
 	/*
 	 * Camera server constants
@@ -292,11 +178,12 @@ public class Constants {
 	public static final double VISION_AIM_ANGLE_SCALE = 0.4;
 	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
-	public static final double VISION_STOP_DISTANCE = 230; // inches 
-	public static final double VISION_MAX_DRIVE_SPEED = 15;
-	public static final double VISION_AIM_ANGLE_RANGE = 2; //degrees
-	public static final double VISION_AIM_DISTANCE_RANGE = 5; //inches
+	public static final double VISION_STOP_DISTANCE = 6; // metres 
+	public static final double VISION_MAX_DRIVE_SPEED = 0.4; // metres per second
+	public static final double VISION_AIM_ANGLE_TOLERANCE = 2; //degrees
+	public static final double VISION_AIM_DISTANCE_TOLERANCE = 0.1; //metres
 	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
+	public static final double VISION_AIM_TIME_COMPLETE = 0.5; // seconds
 
 
 
@@ -308,36 +195,16 @@ public class Constants {
 	public static final double VISION_V_MIN = 40;
 	public static final double VISION_V_MAX = 255;
 
-	// Tape (all need tuning)
-	public static final double TAPE_MAX_VELOCITY_JERK = 10;
-	public static final double TAPE_JOYSTICK_SCALE = 1;
-	public static final double TAPE_ANGLE_SCALE = 0.2;
-
 	// Turn to angle (all need tuning)
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
 
-	// Climber (both level 2 and level 3). Replaces L3.
-	public static final double CLIMBER_TOLERANCE = 0.5;
-	public static final double MAX_WINCH_PAIR_OFFSET = 20./25.4;
-	public static final int CLIMBER_FRONT_CAN_ID = 45;
-	public static final int CLIMBER_REAR_CAN_ID = 47;
-	public static final int CLIMBER_DRIVE_MOTOR_CAN_ID = 48;
-	public static final double CLIMBER_HEIGHT = 2; //Temporary, unused
-	public static final double CLIMBER_L2_CLIMB_HEIGHT = 7.5;
-	public static final double CLIMBER_L3_CLIMB_HEIGHT = 21;
-	public static final double DRIVEBASE_CLIMBER_DRIVE_SPEED = -2.5; // inches/sec
-	//public static final double DRIVEBASE_CLIMBER_DRIVE_SLOW_POWER = -0.15;
-	public static final double CLIMBER_DRIVE_POWER = 1;
-	public static final double CLIMBER_POSITION_F = 0;
-	public static final double CLIMBER_POSITION_P = 4;
-	public static final double CLIMBER_POSITION_I = 0;
-	public static final double CLIMBER_POSITION_D = 0;
-	public static final int CLIMBER_CONTINUOUS_CURRENT_LIMIT = 20;  // Likely to hit the end, so let's use a low current to begin with.
-	public static final int CLIMBER_PEAK_CURRENT_LIMIT = 43;
-	public static final int CLIMBER_CURRENT_TIMEOUT_MS = 100;
-	public static final double CLIMBER_WINCH_FRONT_SCALE_FACTOR = 9609/7.9529;     // 7.7953;	// 18" ticks = 20208 ticks
-	public static final double CLIMBER_WINCH_REAR_SCALE_FACTOR = 9634/7.9528;
+	// Climber
+	public static final int CLIMBER_PTO_SOLENOID_PORT = 6;
+	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
+	
+	// Buddy climb
+	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
 
 	// logging information constants
 	public static final String WEB_BASE_PATH = "/media/sda1";		// where web server's data lives
@@ -359,10 +226,41 @@ public class Constants {
 	public static final double TIME_LOCATION_PERIOD = (1.0/(double)LOCATION_HISTORY_CYCLE_SPEED);	// update the location subsystem 100 times a second
 	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
 
+	public static final class DriveConstants {
+		public static final double kTrackwidthMeters = 0.71;
+
+		public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
+				kTrackwidthMeters);
+
+		public static final double kWheelDiameterMeters = 0.15; // 6" wheels
+		public static final double kGearboxRatio = 11;
+		public static final double kEncoderDistancePerRev =
+				// Encoders are mounted on the motors. Wheels are by 11:1 gearbox
+				(kWheelDiameterMeters * Math.PI) / kGearboxRatio;
+
+		// The Robot Characterization Toolsuite provides a convenient tool for obtaining
+		// these values for your robot.
+		public static final double ksVolts = 0.283;
+		public static final double kvVoltSecondsPerMeter = 2.49;
+		public static final double kaVoltSecondsSquaredPerMeter = 0.316;
+
+		// PID values.
+		public static final double kPDriveVel = 0.01; // should be 12.1
+		// kD should be 0
+
+		public static final double kMaxSpeedMetersPerSecond = 4;
+		public static final double kMaxAccelerationMetersPerSecondSquared = 2;
+
+		// Reasonable baseline values for a RAMSETE follower in units of meters and
+		// seconds
+		public static final double kRamseteB = 2;
+		public static final double kRamseteZeta = 0.7;
+	}
 	/*
 	 * Colour Wheel
 	 */
 	public static final int COLOUR_WHEEL_CAN_ID = 7;
+	public static final int COLOUR_WHEEL_SOLENOID_PORT = 5;
 	// Values callibrated using vynl sticker for control panel.
 	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); //Values from the colour sensor used to match colours.
 	//public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); //This is the real green value.
@@ -374,4 +272,13 @@ public class Constants {
 	public static final double COLOUR_WHEEL_MOTOR_ADJUST = 0.3;
 	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
 	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
+	public static final int COLOUR_WHEEL_ROTATION_TARGET = 3*8 + 2; //Counting in eights aiming for 3.25 full rotations.
+	public static final int COLOUR_WHEEL_DELAY = 15; //Time in miliseconds to wait before disabling motor when correct colour found.
+
+	/*
+	 * LED Strip
+	 */
+	public static final int LED_STRIP_PWM_PORT = 9;
+	public static final int LED_STRIP_NUMBER_OF_LEDS = 30;
+	public static final int LED_STRIP_COUNTDOWN = 15;
 }

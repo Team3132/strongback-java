@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-
 import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
@@ -17,24 +15,35 @@ import frc.robot.lib.Subsystem;
  * Intake Subsystem 2019:
  * On the 2019 robot the intake is pneumatically driven and using one motor to intake game objects 
  */
-public class Intake extends Subsystem implements IntakeInterface, Executable, DashboardUpdater {
+public class Intake extends Subsystem implements IntakeInterface
+ {
     private Motor motor;
     private Solenoid solenoid;
-    private BooleanSupplier sensor;
-    private double targetCurrent;
+    private IntakeWheel intakeWheel;
 
-    public Intake(Motor motor, BooleanSupplier sensor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
+    public Intake(Motor motor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
         super("Intake", dashboard, log);   
         this.motor = motor;
         this.solenoid = solenoid;
-        this.sensor = sensor;
-
+        intakeWheel = new IntakeWheel(motor);
         log.register(true, () -> isExtended(), "%s/extended", name)
                .register(true, () -> isRetracted(), "%s/retracted", name)
-               .register(true, () -> hasCargo(), "%s/cargoOnBoard", name)
 			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
 			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
-			   .register(false, motor::getOutputCurrent, "%s/outputCurrent", name);
+               .register(false, motor::getOutputCurrent, "%s/outputCurrent", name)
+               .register(false, () -> intakeWheel.getTargetRPS(), "%s/targetRPS", name)
+               .register(false, () -> intakeWheel.getRPS(), "%s/rps", name);
+   
+    }
+
+    @Override
+    public void enable() {
+        motor.set(ControlMode.PercentOutput, 0);
+    }
+
+    @Override
+    public void disable() {
+        motor.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
@@ -58,28 +67,57 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
         return solenoid.isRetracted();
     }
     
+    /**
+     * Set the speed on the intake wheels.
+     */
     @Override
-    public boolean hasCargo() {
-        return sensor.getAsBoolean();
-    }
-    
-    @Override
-    public void setMotorOutput(double current) {
-        // Prevent intake wheel from damaging the body of the robot
-        if (!isExtended() && current != 0.0) {
-            log.error("Intake retracted, not turning motor on.");
-            return;
-        } 
-        log.sub("Setting intake motor speed to %.1f", current);
-        targetCurrent = current;
-        // TODO: Use current mode instead of percent mode when the hardware
-        // has been tested.
-        motor.set(ControlMode.PercentOutput, current);
+    public IntakeInterface setTargetRPS(double rps) { 
+        intakeWheel.setTargetRPS(rps);
+        return this;
     }
 
     @Override
-    public double getMotorOutput() {
-        return targetCurrent;
+    public double getTargetRPS() {
+        return intakeWheel.getTargetRPS(); 
+    }
+
+    protected class IntakeWheel {
+
+        private final Motor motor;
+        private double targetRPS;
+    
+        public IntakeWheel(Motor motor) {
+            this.motor = motor;
+        }
+        
+        public void setTargetRPS(double rps) {
+            if (rps == targetRPS) {
+                 return;
+            }
+            targetRPS = rps;
+            // Note that if velocity mode is used and the speed is ever set to 0, 
+            // change the control mode from percent output, to avoid putting
+            // unnecessary load on the battery and motor.
+            if (rps == 0) { 
+                log.sub("Turning intake wheel off.");
+                motor.set(ControlMode.PercentOutput, 0); 
+            } else {
+                motor.set(ControlMode.Velocity, rps);
+            }
+            log.sub("Setting intake target speed to %f", targetRPS);
+        }
+
+        public double getTargetRPS() {
+            return targetRPS;
+        }
+
+        public double getRPS() {
+            return motor.getVelocity();
+        }
+
+        public void setPIDF(double p, double i, double d, double f) {
+            motor.setPIDF(0, p, i, d, f);
+        }
     }
     
     /**
@@ -88,9 +126,9 @@ public class Intake extends Subsystem implements IntakeInterface, Executable, Da
 	@Override
 	public void updateDashboard() {
         dashboard.putString("Intake position", isExtended() ? "extended" : isRetracted() ? "retracted" : "moving");
-        dashboard.putString("Intake cargo status", hasCargo() ? "has cargo" : "empty");
         dashboard.putNumber("Intake motor current", motor.getOutputCurrent());
-		dashboard.putNumber("Intake motor percent", motor.getOutputPercent());
+        dashboard.putNumber("Intake motor target RPS", intakeWheel.getTargetRPS());
+        dashboard.putNumber("Intake motor actual RPS", intakeWheel.getRPS());
 	}
 }
 

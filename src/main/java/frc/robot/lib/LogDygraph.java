@@ -83,9 +83,11 @@ public class LogDygraph implements Log, Executable {
 	private GraphLogState graphLogState = GraphLogState.INVALID;
 	private ArrayList<LogGraphElement> logGraphElements;	// list of registered graph elements
 	private String matchDescription;
-	private boolean createdDateFiles;
+	private boolean createdDateFiles;	
 	private Clock clock;
 	private boolean onlyLocal = false;	// only log locally defined elements.
+
+	public Double enableOffset = 0.0;
 
 	public LogDygraph(String basePath, String dataDir, String dateDir, Path logInstancePath, boolean onlyLocal, Clock clock) {
 		this.basePath = basePath;
@@ -97,7 +99,30 @@ public class LogDygraph implements Log, Executable {
 		this.onlyLocal = onlyLocal;
 		createdDateFiles = false;
 		
+		initLogs();
+	}
+
+	/**
+	 * Restarts logging, called each time robot is enabled or initialised.
+	 */
+
+	public void restartLogs() {
+		initLogs();
+		graphLogState = GraphLogState.CONFIGURED;
+	}
+
+	/**
+	 * Creates new log files on request.
+	 */
+
+	public void initLogs() {
 		try {
+			// Set the graphLogState to INVALID as the new files have not yet been created.
+			graphLogState = GraphLogState.INVALID;
+
+			// Get time since robot boot, so chart starts at time = 0.
+			enableOffset = getCurrentTime();
+
 			// Ensure the directories exist.
 			Files.createDirectories(getDataPath());
 			Files.createDirectories(getDatePath());
@@ -119,6 +144,7 @@ public class LogDygraph implements Log, Executable {
 			graphLogState = GraphLogState.ERRORED;
 		}
 	}
+
 	
 	/**
 	 * Create the date based symbolic links. These create symbolic links from date stamped
@@ -484,7 +510,8 @@ public class LogDygraph implements Log, Executable {
 	}
 	
 	public String getGraphValues() {
-		String value = timeToLogString(getCurrentTime());
+		// Subtracts time offset from current time so graph starts at time = 0
+		String value = timeToLogString(getCurrentTime() - enableOffset);
 		for (LogGraphElement e: logGraphElements) {
 			if (e.name != null) {
 				value = value + "," + e.sample.getAsDouble();
@@ -596,6 +623,7 @@ public class LogDygraph implements Log, Executable {
 			}
 		}
 	}
+
 
 	@Override
 	public Log flush() {

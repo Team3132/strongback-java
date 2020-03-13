@@ -51,7 +51,7 @@ public class RobotConfiguration {
 	public double cameraFromLeftWithBumpers = 0;
 
 	public int teamNumber = 3132;
-	public boolean drivebaseIsPresent = true;
+	public boolean drivebaseIsPresent = false;
 	public String drivebaseMotorControllerType = Constants.DRIVE_DEFAULT_CONTROLLER_TYPE;
 	public int[] drivebaseCanIdsLeftWithEncoders = Constants.DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST;
 	public int[] drivebaseCanIdsLeftWithoutEncoders = Constants.DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST;
@@ -68,20 +68,16 @@ public class RobotConfiguration {
 	public String drivebaseMode = Constants.DRIVE_DEFAULT_MODE;
 	public double drivebaseMaxSpeed = Constants.DRIVE_MAX_SPEED;
 
+	public int climberPtoPort = Constants.CLIMBER_PTO_SOLENOID_PORT;
+	public int climberBrakePort = Constants.CLIMBER_BRAKE_SOLENOID_PORT;
+
 
 	public boolean drivebaseSwapLeftRight = false;
 	public boolean drivebaseSensorPhase = false;
 	public double drivebaseCount =  Constants.DRIVE_COUNT_100ms;
-
-
-	public boolean liftIsPresent = false;
-	public int[] liftCanIds = Constants.LIFT_MOTOR_TALON_CAN_ID_LIST;
-	public int liftSolenoidID = Constants.LIFT_SOLENOID_ID;
-	public double liftSolenoidRetractTime = Constants.LIFT_SOLENOID_RETRACT_TIME;
-	public double liftSolenoidExtendTime = Constants.LEFT_SOLENOID_EXTEND_TIME;
-
+	
 	public boolean intakeIsPresent = false;
-	public int intakeCanID = Constants.INTAKE_MOTOR_TALON_CAN_ID;
+	public int intakeCanID = Constants.INTAKE_CAN_ID;
 
 	public boolean colourWheelIsPresent = false;
 	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;
@@ -89,12 +85,17 @@ public class RobotConfiguration {
 	public boolean sparkTestIsPresent = false;
 	public int[] sparkTestCanIds = Constants.TEST_SPARK_MOTOR_CAN_ID_LIST;
 
-	public boolean passthroughIsPresent = false;
-	public int passthroughCanID = Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID;
+	public boolean loaderIsPresent = false;
+	public int loaderSpinnerCanID = Constants.LOADER_SPINNER_MOTOR_CAN_ID;
+	public int loaderPassthroughCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
 
-	public boolean spitterIsPresent = false;
-	public int spitterRightCanID = Constants.SPITTER_RIGHT_TALON_CAN_ID;
-	public int spitterLeftCanID = Constants.SPITTER_LEFT_TALON_CAN_ID;
+	public boolean shooterIsPresent = false;
+	public int[] shooterCanIds = Constants.SHOOTER_TALON_CAN_ID_LIST;
+
+	public double shooterP = Constants.SHOOTER_P;
+	public double shooterI = Constants.SHOOTER_I;
+	public double shooterD = Constants.SHOOTER_D;
+	public double shooterF = Constants.SHOOTER_F;
 
 	public boolean pdpIsPresent = false;
 	public int pdpCanId = Constants.PDP_CAN_ID;
@@ -107,29 +108,25 @@ public class RobotConfiguration {
 	public boolean canifierIsPresent = false;
 	public int canifierCanId;
 
-	public boolean navxIsPresent = false;
+	public boolean navxIsPresent = true;
 
-	public boolean hatchIsPresent = true;
-	public int hatchCanID = Constants.HATCH_POSITION_MOTOR_CAN_ID;
-
-	public boolean visionIsPresent = true;
+	public boolean visionIsPresent = false;
 	public double visionHMin = Constants.VISION_H_MIN;
-	public double visionHMax = Constants.VISION_S_MAX;
-	public double visionSMin = Constants.VISION_H_MAX;
-	public double visionSMax = Constants.VISION_V_MIN;
-	public double visionVMin = Constants.VISION_S_MIN;
+	public double visionHMax = Constants.VISION_H_MAX;
+	public double visionSMin = Constants.VISION_S_MIN;
+	public double visionSMax = Constants.VISION_S_MAX;
+	public double visionVMin = Constants.VISION_V_MIN;
 	public double visionVMax = Constants.VISION_V_MAX;
 	
-	public boolean climberIsPresent = true;
-	public int climberFrontCanID = Constants.CLIMBER_FRONT_CAN_ID;
-	public int climberRearCanID = Constants.CLIMBER_REAR_CAN_ID;
-	public int climberDriveMotorCanID = Constants.CLIMBER_DRIVE_MOTOR_CAN_ID;
-
+	public boolean buddyClimbIsPresent = false;
+	public int buddyClimbSolenoidPort = Constants.BUDDYCLIMB_SOLENOID_PORT;
 
 	// Logging default is to not log anything to the graph, and to only log local information when we turn it on.
 	// These are the safest defaults.
 	public boolean doLogging = false;
 	public boolean onlyLocal = true;
+
+	public boolean ledStripIsPresent = false;
 
 	public RobotConfiguration(String filePath, Log log) {
 		this(filePath, TeamNumber.get(), log);
@@ -211,15 +208,10 @@ public class RobotConfiguration {
 		drivebaseSensorPhase = getAsBoolean("drivebase/sensor/phase", drivebaseSensorPhase);
 		drivebaseCount = getAsDouble("drivebase/count100ms", drivebaseCount);
 
-		liftIsPresent = getAsBoolean("lift/present", false);
-		liftCanIds = getAsIntArray("lift/canIDs", Constants.LIFT_MOTOR_TALON_CAN_ID_LIST);
-		liftSolenoidID = getAsInt("lift/solenoidID", Constants.LIFT_SOLENOID_ID);
-		liftSolenoidRetractTime = getAsDouble("lift/solenoidRetractTime", Constants.LIFT_SOLENOID_RETRACT_TIME);
-		liftSolenoidExtendTime = getAsDouble("lift/solenoidExtendTime", Constants.LEFT_SOLENOID_EXTEND_TIME);
-	
 		
-		intakeIsPresent = getAsBoolean("intake/present", true);
-		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_MOTOR_TALON_CAN_ID);
+	
+		intakeIsPresent = getAsBoolean("intake/present", false);
+		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_CAN_ID);
 
 		colourWheelIsPresent = getAsBoolean("colourWheel/present", false);
 		colourWheelCanID = getAsInt("colourWheel/canID", Constants.COLOUR_WHEEL_CAN_ID);
@@ -227,31 +219,34 @@ public class RobotConfiguration {
 		sparkTestIsPresent = getAsBoolean("sparkTest/present", false);
 		sparkTestCanIds = getAsIntArray("sparkTest/canID", Constants.TEST_SPARK_MOTOR_CAN_ID_LIST);
 
-		passthroughIsPresent = getAsBoolean("passthrough/present", true);
-		passthroughCanID = getAsInt("passthrough/canID", Constants.PASSTHROUGH_MOTOR_TALON_CAN_ID);
+		loaderIsPresent = getAsBoolean("loader/present", false);
+		loaderSpinnerCanID = getAsInt("loader/spinner/canID", Constants.LOADER_SPINNER_MOTOR_CAN_ID);
+		loaderPassthroughCanID = getAsInt("loader/passthrough/canID", Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID);
 
-		spitterIsPresent = getAsBoolean("spitter/present", true);
-		spitterRightCanID = getAsInt("spitter/canID", Constants.SPITTER_RIGHT_TALON_CAN_ID);
-		spitterLeftCanID = getAsInt("spitter/canID", Constants.SPITTER_LEFT_TALON_CAN_ID);
+		shooterIsPresent = getAsBoolean("shooter/present", false);
+		shooterCanIds = getAsIntArray("shooter/shooterCanIDs", Constants.SHOOTER_TALON_CAN_ID_LIST);
 		
-		pdpIsPresent = getAsBoolean("pdp/present", true);
+		shooterP = getAsDouble("shooter/p", shooterP);
+		shooterI = getAsDouble("drivebase/i", shooterI);
+		shooterD = getAsDouble("drivebase/d", shooterD);
+		shooterF = getAsDouble("drivebase/f", shooterF);
+		
+		pdpIsPresent = getAsBoolean("pdp/present", false);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);
 		pdpMonitor = getAsBoolean("pdp/monitor", false);		// by default we do NOT monitor the PDP
 		pdpChannelsToMonitor = getAsIntArray("pdp/channels", new int[0]);	// by default we do NOT monitor and channels
 
-		pcmIsPresent = getAsBoolean("pcm/present", true);
+		pcmIsPresent = getAsBoolean("pcm/present", false);
 		pcmCanId = getAsInt("pcm/canID", Constants.PCM_CAN_ID);
 		
-		navxIsPresent = getAsBoolean("navx/present", false);
+		navxIsPresent = getAsBoolean("navx/present", true);
 
 		robotLengthWithBumpers = getAsDouble("dimensions/robot/lengthWithBumpers", 0.0);
 		robotWidthWithBumpers = getAsDouble("dimensions/robot/widthWithBumpers", 0.0);
 		cameraFromFrontWithBumpers = getAsDouble("dimensions/cameraFromFrontWithBumpers", 0.0);
 		cameraFromLeftWithBumpers = getAsDouble("dimensions/cameraFromLeftWithBumpers", 0.0);
-	
-		hatchIsPresent = getAsBoolean("hatch/present", false);
-			
-		visionIsPresent = getAsBoolean("vision/present", true);
+		
+		visionIsPresent = getAsBoolean("vision/present", false);
 		visionHMin = getAsDouble("vision/hsvFilter/h/min", Constants.VISION_H_MIN);
 		visionHMax = getAsDouble("vision/hsvFilter/h/max", Constants.VISION_H_MAX);
 		visionSMin = getAsDouble("vision/hsvFilter/s/min", Constants.VISION_S_MIN);
@@ -259,11 +254,6 @@ public class RobotConfiguration {
 		visionVMin = getAsDouble("vision/hsvFilter/v/min", Constants.VISION_V_MIN);
 		visionVMax = getAsDouble("vision/hsvFilter/v/max", Constants.VISION_V_MAX);
 
-		climberIsPresent = getAsBoolean("climber/present", false);
-		climberFrontCanID = getAsInt("climber/frontCanID", Constants.CLIMBER_FRONT_CAN_ID);
-		climberRearCanID = getAsInt("climber/rearCanID", Constants.CLIMBER_REAR_CAN_ID);
-		climberDriveMotorCanID = getAsInt("climber/driveMotorCanID", Constants.CLIMBER_DRIVE_MOTOR_CAN_ID);
-			
 		// logging default is to not log anything to the graph, and to only log local information when we turn it on.
 		// These are the safest defaults.
 		doLogging = getAsBoolean("logging/enabled", true);
@@ -271,6 +261,8 @@ public class RobotConfiguration {
 
 		canifierIsPresent = getAsBoolean("canifier/present", false);
 		canifierCanId = getAsInt("canifier/canID", Constants.LED_CANIFIER_CAN_ID);
+
+		ledStripIsPresent = getAsBoolean("ledStrip/present", false);
 
 		if (!ignoredEntries.isEmpty()) {
 			log.warning("WARNING: These config file lines weren't used:");
