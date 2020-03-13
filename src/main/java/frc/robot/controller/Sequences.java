@@ -199,7 +199,7 @@ public class Sequences {
 
 	// This sequence is used for both auto and teleop 
 	public static Sequence startShooting(double speed) {
-		Sequence seq = new Sequence("start shooting");
+		Sequence seq = new Sequence("start shooting" + speed);
 		// Only shoot straight up when we are shooting from target zone
 		// All other shots are at the faster speed
 		if (speed == SHOOTER_CLOSE_TARGET_SPEED_RPS) {
