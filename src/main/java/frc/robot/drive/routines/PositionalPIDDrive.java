@@ -119,7 +119,8 @@ public class PositionalPIDDrive implements DriveRoutine {
 
 	@Override
 	public boolean hasFinished() {
-		return clock.currentTime() - timestamp > Constants.VISION_AIM_TIME_COMPLETE;  // Always ready for the next state.
+		// Check that aiming has stayed within tolerance before next state
+		return clock.currentTime() - timestamp > Constants.VISION_AIM_TIME_COMPLETE;  
 	}
 
 }
