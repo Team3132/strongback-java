@@ -9,22 +9,22 @@ public class MockLoader implements LoaderInterface {
     public MockLoader(Log log) {
     }
     // Paddle
-    private boolean isPaddleNotBlocking = false;
+    private boolean isPaddleBlocking = false;
 
     @Override
-	public LoaderInterface setPaddleNotBlocking(boolean notBlocking) {
-		isPaddleNotBlocking = notBlocking;
+	public LoaderInterface setPaddleBlocking(boolean blocking) {
+		isPaddleBlocking = blocking;
 		return this;
 	}
 
 	@Override
 	public boolean isPaddleNotBlocking() {
-		return isPaddleNotBlocking;
+		return !isPaddleBlocking;
 	}
 
 	@Override
 	public boolean isPaddleBlocking() {
-		return !isPaddleNotBlocking;
+		return !isPaddleBlocking;
     }
 
     @Override

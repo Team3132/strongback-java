@@ -106,7 +106,7 @@ public class Sequences {
 		Sequence seq = new Sequence("Start intake");
 		// Wait for the intake to extend before turning motor
 		seq.add().deployIntake()
-			.setPaddleNotBlocking(false);
+			.blockShooter();
 		//seq.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
 		seq.add().setIntakeRPS(INTAKE_TARGET_RPS)
 			.setLoaderSpinnerMotorRPS(LOADER_MOTOR_INTAKING_RPS)
@@ -197,17 +197,19 @@ public class Sequences {
 		return seq;
 	}
 
-	public static Sequence startShooting(boolean closeToGoal) {
-		Sequence seq = new Sequence("start shooting");
-		// Shooter wheel may already be up to speed.
-		if (closeToGoal) {
+	// This sequence is used for both auto and teleop 
+	public static Sequence startShooting(double speed) {
+		Sequence seq = new Sequence("start shooting" + speed);
+		// Only shoot straight up when we are shooting from target zone
+		// All other shots are at the faster speed
+		if (speed == SHOOTER_CLOSE_TARGET_SPEED_RPS) {
 			// Shooter wheel may already be up to speed.
-			seq.add().setShooterRPS(SHOOTER_CLOSE_TARGET_SPEED_RPS)
+			seq.add().setShooterRPS(speed)
 			// Shooting from just below the goal straight up.
 					.extendShooterHood();
 		} else {
 			// Shooter wheel may already be up to speed.
-			seq.add().setShooterRPS(SHOOTER_FAR_TARGET_SPEED_RPS)
+			seq.add().setShooterRPS(speed)
 			// Shooting from far from the goal at a flat angle.
 				.retractShooterHood();
 		}
@@ -334,7 +336,7 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		startShooting(true),
+		startShooting(SHOOTER_CLOSE_TARGET_SPEED_RPS),
 		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),

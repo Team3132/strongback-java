@@ -130,8 +130,9 @@ public class Constants {
 	public static final double SHOOTER_P = 0.7;
 	public static final double SHOOTER_I = 0;
 	public static final double SHOOTER_D = 0;
-	public static final int SHOOTER_CLOSE_TARGET_SPEED_RPS = 62;
-	public static final int SHOOTER_FAR_TARGET_SPEED_RPS = 95;
+	public static final double SHOOTER_CLOSE_TARGET_SPEED_RPS = 62;
+	public static final double SHOOTER_AUTO_LINE_TARGET_SPEED_RPS = 90;
+	public static final double SHOOTER_FAR_TARGET_SPEED_RPS = 95;
 	public static final double SHOOTER_GEARBOX_RATIO = 1; // Encoder is on output shaft.
 	
 	/*
@@ -182,6 +183,7 @@ public class Constants {
 	public static final double VISION_AIM_ANGLE_TOLERANCE = 2; //degrees
 	public static final double VISION_AIM_DISTANCE_TOLERANCE = 0.1; //metres
 	public static final double VISION_AIM_DISTANCE_SCALE = 0.4;
+	public static final double VISION_AIM_TIME_COMPLETE = 0.5; // seconds
 
 
 

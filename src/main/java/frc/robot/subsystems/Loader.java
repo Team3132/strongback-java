@@ -93,11 +93,11 @@ public class Loader extends Subsystem implements LoaderInterface {
         this.initBallCount = initBallCount;
     }
 
-    public LoaderInterface setPaddleNotBlocking(final boolean extend) {
-        if (extend) {
-            paddleSolenoid.retract();
-        } else {
+    public LoaderInterface setPaddleBlocking(final boolean block) {
+        if (block) {
             paddleSolenoid.extend();
+        } else {
+            paddleSolenoid.retract();
         }
         return this;
     }
