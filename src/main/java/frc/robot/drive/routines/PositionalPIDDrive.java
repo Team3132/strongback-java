@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import org.strongback.components.Clock;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.Constants;
 import frc.robot.drive.util.LowPassFilter;
 import frc.robot.drive.util.PositionPID;
 
@@ -118,7 +119,7 @@ public class PositionalPIDDrive implements DriveRoutine {
 
 	@Override
 	public boolean hasFinished() {
-		return clock.currentTime() - timestamp > 0.5;  // Always ready for the next state.
+		return clock.currentTime() - timestamp > Constants.VISION_AIM_TIME_COMPLETE;  // Always ready for the next state.
 	}
 
 }
