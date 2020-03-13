@@ -16,6 +16,8 @@ CAMERA_VERT_FOV = CAMERA_HORI_FOV * (3/4)
 
 CAMERA_ANGLE = 25 # degrees from horizontal
 
+
+
 def deg_to_rad(degrees):
     return degrees * (math.pi / 180)
 
@@ -99,7 +101,7 @@ def cal_distance(center_y):
     
     # angle between the line to the goal and the horizontal
     goalAngle = lowerAngle + (((SCREEN_HEIGHT-center_y)/SCREEN_HEIGHT) * CAMERA_VERT_FOV) 
-
+a
     distance = (GOAL_HEIGHT - CAMERA_HEIGHT)/tan(goalAngle)
     return distance
 
@@ -138,7 +140,7 @@ class FirstPython:
         # S: 0 for unsaturated (whitish discolored object) to 255 for fully saturated (solid color)
         # V: 0 for dark to 255 for maximally bright
                
-        self.HSVmin = np.array([ 40,  20, 40], dtype=np.uint8)
+        self.HSVmin = np.array([ 40, 20, 40], dtype=np.uint8)
         self.HSVmax = np.array([ 100, 255, 255], dtype=np.uint8)
 
         # Other processing parameters:
@@ -411,8 +413,8 @@ class FirstPython:
         #center of imgbgr
         center = (w/2,h/2)
 
-        imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
-        h, w, chans = imgbgr.shape
+        #imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
+        
         # Get pre-allocated but blank output image which we will send over USB:
             
         outimg = outframe.get()
@@ -424,6 +426,7 @@ class FirstPython:
         jevois.paste(inimg, outimg, 0, 0)
         jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)    
         
+        imgbgr = cv2.warpAffine(imgbgr, M, (w, h))
         imgbgr = self.thresholding(imgbgr)
    
         # Get a list of quadrilateral convex hulls for all good objects:
