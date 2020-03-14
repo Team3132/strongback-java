@@ -18,6 +18,7 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpiutil.net.PortForwarder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.controller.Controller;
 import frc.robot.controller.Sequences;
@@ -140,6 +141,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledInit() {
+		PortForwarder.add(Constants.RSYNC_PORT, Constants.RSYNC_HOSTNAME, 22); // Start forwarding to port 22 (ssh port) for pulling logs using rsync.
 		maybeInit();  // Called before robotPeriodic().
 		log.info("disabledInit");
 		// Log any failures again on disable.
@@ -163,6 +165,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
+		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
 		log.restartLogs();
 		log.info("auto has started");
 		subsystems.enable();
@@ -190,6 +193,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
+		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
 		log.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();

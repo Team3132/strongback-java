@@ -262,8 +262,8 @@ public class Constants {
 	public static final int COLOUR_WHEEL_CAN_ID = 7;
 	public static final int COLOUR_WHEEL_SOLENOID_PORT = 5;
 	// Values callibrated using vynl sticker for control panel.
-	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); //Values from the colour sensor used to match colours.
-	//public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); //This is the real green value.
+	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); // Values from the colour sensor used to match colours.
+	// public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); // This is the real green value.
 	public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.209, 0.608, 0.182);
 	public static final Color COLOUR_WHEEL_RED_TARGET = ColorMatch.makeColor(0.484, 0.366, 0.150);
 	public static final Color COLOUR_WHEEL_YELLOW_TARGET = ColorMatch.makeColor(0.322, 0.546, 0.131);
@@ -272,13 +272,19 @@ public class Constants {
 	public static final double COLOUR_WHEEL_MOTOR_ADJUST = 0.3;
 	public static final double COLOUR_WHEEL_MOTOR_FULL = 1;
 	public static final double COLOUR_WHEEL_MOTOR_HALF = 0.5;
-	public static final int COLOUR_WHEEL_ROTATION_TARGET = 3*8 + 2; //Counting in eights aiming for 3.25 full rotations.
-	public static final int COLOUR_WHEEL_DELAY = 15; //Time in miliseconds to wait before disabling motor when correct colour found.
+	public static final int COLOUR_WHEEL_ROTATION_TARGET = 3*8 + 2; // Counting in eights aiming for 3.25 full rotations.
+	public static final int COLOUR_WHEEL_DELAY = 15; // Time in miliseconds to wait before disabling motor when correct colour found.
 
 	/*
 	 * LED Strip
 	 */
-	public static final int LED_STRIP_PWM_PORT = 9;
+	public static final int LED_STRIP_PWM_PORT = 0;
 	public static final int LED_STRIP_NUMBER_OF_LEDS = 30;
 	public static final int LED_STRIP_COUNTDOWN = 15;
+
+	/*
+	 * Log Syncing
+	 */
+	public static final int RSYNC_PORT = 5802; // External port to forward to port 22 for transfering robot logs to pc over rsync.
+	public static final String RSYNC_HOSTNAME = "roborio-3132-FRC.local"; //Hostname of the robot.
 }
