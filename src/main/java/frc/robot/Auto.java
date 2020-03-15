@@ -175,7 +175,9 @@ public class Auto {
 	private void addTrenchAutoSequence() {
 		Sequence seq = new Sequence("Basic trench auto sequence");
 
-		seq.appendSequence(Sequences.spinUpShooter(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS)).deployIntake();
+		seq.appendSequence(Sequences.spinUpShooter(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		
+		seq.add().deployIntake();
 		
 		// Let shooter spin up a little before running every other motor 
 		// seq.add().setDelayDelta(0.5);		
