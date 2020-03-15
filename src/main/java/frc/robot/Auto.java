@@ -60,6 +60,7 @@ public class Auto {
 		addDriveTestSplineSequence();
 		addDriveTestUSequence();
 		addBasicShootIntakeDriveShootSequence();
+		addTrenchAutoSequence();
 	}
 	
 	private void addDriveTestSequence() {
@@ -169,6 +170,52 @@ public class Auto {
 		seq.appendSequence(Sequences.stopShooting());
 
 		autoProgram.addOption("Basic shoot intake drive shoot", seq); 
+	}
+
+	private void addTrenchAutoSequence() {
+		Sequence seq = new Sequence("Basic trench auto sequence");
+
+		seq.appendSequence(Sequences.spinUpShooter(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		// Let shooter spin up a little before running every other motor 
+		seq.add().setDelayDelta(0.5);		
+
+		// Start intaking
+		seq.appendSequence(Sequences.startIntaking());
+
+		// Drive backwards to pick up the two balls.
+		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
+		Pose2d secondBall = new Pose2d(-3.2, -0, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(start1, List.of(), secondBall, false);  // backwards
+
+		// Stop intaking
+		seq.appendSequence(Sequences.stopIntaking());
+
+		seq.add().doVisionAim();
+
+		// Start shooting
+		seq.appendSequence(Sequences.startShooting(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		seq.add().setDelayDelta(2);		
+
+		// Pick up the last 3 balls 
+		seq.appendSequence(Sequences.startIntaking());
+
+		Pose2d fifthBall = new Pose2d(-5.8, -0.1, new Rotation2d(Math.toRadians(0)));
+		seq.add().driveRelativeWaypoints(secondBall, List.of(), fifthBall, false);
+
+		// Drive forward and shoot
+		seq.add().driveRelativeWaypoints(fifthBall, List.of(), secondBall, true);
+
+		seq.appendSequence(Sequences.stopIntaking());
+
+		seq.add().doVisionAim();
+
+		// Shoot the balls.
+		seq.appendSequence(Sequences.startShooting(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		seq.add().setDelayDelta(2);	
+
+		seq.appendSequence(Sequences.stopShooting());
+
+		autoProgram.addOption("Basic trench auto sequence", seq); 
 	}
 
 	
