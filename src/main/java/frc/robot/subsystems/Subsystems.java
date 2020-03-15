@@ -384,7 +384,7 @@ public class Subsystems implements DashboardUpdater {
 		
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
 		// TODO: replace 0 with appropriate subsystem PIDF values
-		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, true, Constants.INTAKE_POSITION_P, Constants.INTAKE_POSITION_I, Constants.INTAKE_POSITION_D, Constants.INTAKE_POSITION_F, log);
+		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, true, Constants.INTAKE_P, Constants.INTAKE_I, Constants.INTAKE_D, Constants.INTAKE_F, log);
 		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
 
