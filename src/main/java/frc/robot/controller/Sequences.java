@@ -261,7 +261,7 @@ public class Sequences {
 	public static Sequence visionAim(){
 		Sequence seq = new Sequence("vision aim");
 		seq.add().doVisionAim(); 
-	
+		seq.add().doArcadeDrive();
 		return seq;
 	}
 

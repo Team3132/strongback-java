@@ -71,6 +71,7 @@ public class MotorFactory {
 	public static HardwareSparkMAX getIntakeMotor(int canID, boolean invert, double p, double i, double d, double f, Log log) {
 		HardwareSparkMAX motor = getSparkMAX(canID, invert, NeutralMode.Brake, log, p , i, d, f, new NetworkTablesHelper("intake"));
 		motor.setScale(Constants.SPARKMAX_ENCODER_TICKS, Constants.INTAKE_ENCODER_GEARBOX_RATIO);
+		motor.setClosedLoopRampRate(0.5);
 		return motor;
 	}
 
@@ -106,7 +107,7 @@ public class MotorFactory {
 		motor.setScale(Constants.S4T_ENCODER_TICKS, Constants.SHOOTER_GEARBOX_RATIO);
 		motor.selectProfileSlot(0, 0);
 		
-		motor.configClosedloopRamp(0.125, 10);
+		motor.configClosedloopRamp(1, 10);
 		motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
 
 		return motor;
