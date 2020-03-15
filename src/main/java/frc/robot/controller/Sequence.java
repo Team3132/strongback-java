@@ -51,7 +51,8 @@ public class Sequence implements Iterable<State> {
 	 * Add another sequence to the end of this one.
 	 * @param other the sequence to add.
 	 */
-	public void appendSequence(Sequence other) {
+	public State appendSequence(Sequence other) {
 		states.addAll(other.states);
+		return states.get(states.size() - 1);
 	}
 }
