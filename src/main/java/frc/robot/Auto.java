@@ -176,6 +176,7 @@ public class Auto {
 		Sequence seq = new Sequence("Basic trench auto sequence");
 
 		seq.appendSequence(Sequences.spinUpShooter(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		seq.add().deployIntake();
 		// Let shooter spin up a little before running every other motor 
 		seq.add().setDelayDelta(0.5);		
 
@@ -188,7 +189,9 @@ public class Auto {
 		seq.add().driveRelativeWaypoints(start1, List.of(), secondBall, false);  // backwards
 
 		// Stop intaking
-		seq.appendSequence(Sequences.stopIntaking());
+		seq.add().setIntakeRPS(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPS(0);
 
 		seq.add().doVisionAim();
 
@@ -205,7 +208,10 @@ public class Auto {
 		// Drive forward and shoot
 		seq.add().driveRelativeWaypoints(fifthBall, List.of(), secondBall, true);
 
-		seq.appendSequence(Sequences.stopIntaking());
+		// Stop intaking
+		seq.add().setIntakeRPS(0)
+			.setLoaderPassthroughMotorOutput(0)
+			.setLoaderSpinnerMotorRPS(0);
 
 		seq.add().doVisionAim();
 
