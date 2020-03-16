@@ -106,11 +106,11 @@ public class Constants {
 	 */
 	public static final int INTAKE_CAN_ID = 10;
 	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
-	public static final double INTAKE_TARGET_RPS = 10;
-	public static final double INTAKE_POSITION_F = 0.015;
-	public static final double INTAKE_POSITION_P = 0.001;
-	public static final double INTAKE_POSITION_I = 0;
-	public static final double INTAKE_POSITION_D = 0;
+	public static final double INTAKE_TARGET_RPS = 30;
+	public static final double INTAKE_F = 0.019;
+	public static final double INTAKE_P = 0.015;
+	public static final double INTAKE_I = 0;
+	public static final double INTAKE_D = 15.0;
 
 
 
@@ -172,11 +172,11 @@ public class Constants {
 	public static final int CAMERA_FRAMES_PER_SECOND = 60;
 	// Vision (all need tuning)
 	public static final double VISON_MAX_TARGET_AGE_SECS = 2;
-	public static final double VISION_MAX_VELOCITY_JERK = 40; // in/s/s
-	public static final double VISION_SPEED_SCALE = 2.4;
+	public static final double VISION_MAX_VELOCITY_JERK = 32; // m/s/s
+	public static final double VISION_SPEED_SCALE = 2.4 * INCHES_TO_METRES;
 	public static final double VISION_ASSIST_ANGLE_SCALE = 0.6;
-	public static final double VISION_AIM_ANGLE_SCALE = 0.4;
-	public static final double VISION_SPLINE_MIN_DISTANCE = 60; // inches
+	public static final double VISION_AIM_ANGLE_SCALE = 0.02;
+	public static final double VISION_SPLINE_MIN_DISTANCE = 60 * INCHES_TO_METRES;
 	public static final double VISION_WAYPOINT_DISTANCE_SCALE = 0.5; // percentage 0 to 1
 	public static final double VISION_STOP_DISTANCE = 6; // metres 
 	public static final double VISION_MAX_DRIVE_SPEED = 0.4; // metres per second

@@ -16,6 +16,8 @@ CAMERA_VERT_FOV = CAMERA_HORI_FOV * (3/4)
 
 CAMERA_ANGLE = 25 # degrees from horizontal
 
+
+
 def deg_to_rad(degrees):
     return degrees * (math.pi / 180)
 
@@ -138,15 +140,17 @@ class FirstPython:
         # S: 0 for unsaturated (whitish discolored object) to 255 for fully saturated (solid color)
         # V: 0 for dark to 255 for maximally bright
                
-        self.HSVmin = np.array([ 40,  20, 40], dtype=np.uint8)
+        self.HSVmin = np.array([ 40, 20, 40], dtype=np.uint8)
         self.HSVmax = np.array([ 100, 255, 255], dtype=np.uint8)
 
         # Other processing parameters:
         self.epsilon = 0.015               # Shape smoothing factor (higher for smoother)
         self.hullarea = ( 15*15, 300*300 ) # Range of object area (in pixels) to track 
         self.hullfill = 35                 # Max fill ratio of the convex hull (percent)
-        self.ethresh = 1500                 # Shape error threshold (lower is stricter for exact shape)
+        self.ethresh = 1500                # Shape error threshold (lower is stricter for exact shape)
         self.margin = 5                    # Margin from from frame borders (pixels)
+        self.img_rotate_angle = 0          #angle the outimg rotates in degrees, positive value is counter clockwise
+        self.scale =1.0                    #isotropic scale factor
     
         # Instantiate a JeVois Timer to measure our processing framerate:
         self.timer = jevois.Timer("FirstPython", 100, jevois.LOG_INFO)  
@@ -182,7 +186,7 @@ class FirstPython:
     # ###################################################################################################
     ## Load camera calibration from JeVois share directory
     def loadCameraCalibration(self, w, h):
-        cpf = "/jevois/share/camera/newcalibration{}x{}.yaml".format(w, h)
+        cpf = "/jevois/share/camera/calibration{}x{}.yaml".format(w, h)
         fs = cv2.FileStorage(cpf, cv2.FILE_STORAGE_READ)
         if (fs.isOpened()):
             self.camMatrix = fs.getNode("camera_matrix").mat()
@@ -405,16 +409,24 @@ class FirstPython:
         
         h, w, chans = imgbgr.shape
         if not hasattr(self, 'camMatrix'): self.loadCameraCalibration(w, h)
+        
+        #center of imgbgr
+        center = (w/2,h/2)
 
         #imgbgr = cv2.undistort(imgbgr, self.camMatrix, self.distCoeffs, dst=None, newCameraMatrix = None)
-        h, w, chans = imgbgr.shape
+        
         # Get pre-allocated but blank output image which we will send over USB:
+            
         outimg = outframe.get()
+    
         outimg.require("output", w * 2, h + 12, jevois.V4L2_PIX_FMT_YUYV)
-        jevois.convertCvBGRtoRawImage(imgbgr, inimg, 0)
+        M = cv2.getRotationMatrix2D(center, self.img_rotate_angle, self.scale)
+        imgbgr_rotate = cv2.warpAffine(imgbgr, M, (w, h))
+        jevois.convertCvBGRtoRawImage(imgbgr_rotate, inimg, 0)
         jevois.paste(inimg, outimg, 0, 0)
-        jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)
-
+        jevois.drawFilledRect(outimg, 0, h, outimg.width, outimg.height-h, jevois.YUYV.Black)    
+        
+        imgbgr = cv2.warpAffine(imgbgr, M, (w, h))
         imgbgr = self.thresholding(imgbgr)
    
         # Get a list of quadrilateral convex hulls for all good objects:
