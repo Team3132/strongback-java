@@ -17,7 +17,7 @@ public class LogFileWriter {
 	
 	private final String name; // eg chart
 	private final String extn; // eg "html" or "csv"
-	private final String basePath; // All logs are below this directory
+	private final String directory; // All logs are below this directory
 	private Path filePath = null;
 	private BufferedWriter writer = null;
 
@@ -27,28 +27,29 @@ public class LogFileWriter {
 	 * Creates
 	 * <pre>
 	 *    basePath/
-   	 *             Latest_name.extn -> data/name_filenum.extn
    	 *             data/name_000filenum.extn
-   	 *             date/timestamp_name.extn -> ../data/name_filenum.extn 
+   	 *             latest/Latest_name.extn -> data/name_filenum.extn
+	 *             date/timestamp_name.extn -> ../data/name_filenum.extn 
+	 *			   event/event_match_name.extn -> ../data/name_filenum.extn
 	 * </pre>
 	 *        
 	 * @param name  the type of data, eg "data", "chart"
 	 * @param filenum  the number of the file. Incremented every start of the code.
 	 * @param extn  the file extension
-	 * @param basePath  Where on the file system to put these files.
+	 * @param directory  Where on the file system to put these files.
 	 * @throws IOException 
 	 */
-	public LogFileWriter(String name, long filenum, String extn, String basePath, String dataDir) throws IOException {
+	public LogFileWriter(String name, long filenum, String extn, String directory, String dataDir) throws IOException {
 		this.name = name;
 		this.extn = extn;
-		this.basePath = basePath;
+		this.directory = directory;
 		// The absolute path to the data file so we can write to the file.
-		filePath = Paths.get(basePath, dataDir, String.format("%s_%05d.%s", name, filenum, extn));
+		filePath = Paths.get(directory, dataDir, String.format("%s_%05d.%s", name, filenum, extn));
 		// Ensure the parent directory exists.
 		Files.createDirectories(filePath.getParent());
 		// Create the file writer.
 		writer = Files.newBufferedWriter(filePath);
-		createSymbolicLink("Latest");
+		createSymbolicLink("latest/Latest");
 	}
 	
 	/**
@@ -58,13 +59,23 @@ public class LogFileWriter {
 	 * @param prefix as in <prefix>_chart.html
 	 */
 	public void createSymbolicLink(String prefix) {
-		Path symlinkPath = Paths.get(basePath, String.format("%s_%s.%s", prefix, name, extn));
-		Path relPath = createRelativePath(symlinkPath, filePath);
+		Path symlinkPath = Paths.get(directory, String.format("%s_%s.%s", prefix, name, extn));
+		createSymbolicLink(symlinkPath, filePath);
+	}
+
+	/**
+	 * Create symbolic links to the file. Used to create Latest_x and dated
+	 * symlinks. 
+	 * 
+	 * @param prefix as in <prefix>_chart.html
+	 */
+	public static void createSymbolicLink(Path from, Path to) {
+		Path relPath = createRelativePath(from, to);
 		try {
 			// Ensure the parent directory exists.
-			Files.createDirectories(symlinkPath.getParent());
-			Files.deleteIfExists(symlinkPath);
-			Files.createSymbolicLink(symlinkPath, relPath);
+			Files.createDirectories(from.getParent());
+			Files.deleteIfExists(from);
+			Files.createSymbolicLink(from, relPath);
 		} catch (Exception e) {
 			//e.printStackTrace();
 			System.err.printf("Failed to create symbolic link: Are we on windows? %s", e);

@@ -35,7 +35,8 @@ public class Constants {
 	/*
 	 * Location on the roborio of the configuration file.
 	 */
-	public static final String CONFIG_FILE_PATH= "/home/lvuser/config.txt";
+	public static final String HOME_DIRECTORY = System.getProperty("user.home");
+	public static final String CONFIG_FILE_PATH= Paths.get(HOME_DIRECTORY, "config.txt").toString();
 	public static final long EXECUTOR_CYCLE_INTERVAL_MSEC = 20;  // 50Hz
 	public static final double DASHBOARD_UPDATE_INTERVAL_SEC = 0.5;
 	
@@ -207,12 +208,14 @@ public class Constants {
 	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
 
 	// logging information constants
-	public static final String WEB_BASE_PATH = "/media/sda1";		// where web server's data lives
-	public static final String LOG_BASE_PATH = WEB_BASE_PATH;		// log files (has to be inside web server)
+	public static final String USB_FLASH_DRIVE = "/media/sda1/";
+	public static final String WEB_BASE_PATH = USB_FLASH_DRIVE;		// where web server's data lives
+	public static final String LOG_BASE_PATH = USB_FLASH_DRIVE;		// log files (has to be inside web server)
 	public static final String LOG_DATA_EXTENSION = "data";
 	public static final String LOG_DATE_EXTENSION = "date";
-	public static final Path LOG_NUMBER_FILE = Paths.get(System.getProperty("user.home"), "lognumber.txt");
-	public static final int	 WEB_PORT = 5800;			// first open port for graph/log web server
+	public static final String LOG_LATEST_EXTENSION = "latest";
+	public static final String LOG_EVENT_EXTENSION = "event";
+	public static final int	 WEB_PORT = 5800;// first open port for graph/log web server
 	public static final double LOG_GRAPH_PERIOD = 0.05;	// run the graph updater every 50ms
 	
 	// LocationHistory
