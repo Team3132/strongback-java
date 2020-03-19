@@ -68,11 +68,14 @@ public class LogDygraph implements Log, Executable {
 		}
 	}
 	
+	private final String robotName;
 	private final String basePath;  // Where the log files live.
-	private final Path logInstancePath;  // Counter for log number.
+	private final String logPath;
 	private long logFileNumber = 0;
 	private final String dateDir;
 	private final String dataDir;
+	private final String latestDir;
+	private final String eventDir;
 	// Log files.
 	private LogFileWriter csvWriter;
 	private LogFileWriter logWriter;
@@ -86,14 +89,16 @@ public class LogDygraph implements Log, Executable {
 	private boolean createdDateFiles;	
 	private Clock clock;
 	private boolean onlyLocal = false;	// only log locally defined elements.
-
 	public Double enableOffset = 0.0;
-
-	public LogDygraph(String basePath, String dataDir, String dateDir, Path logInstancePath, boolean onlyLocal, Clock clock) {
+	
+	public LogDygraph(String robotName, String basePath, String logPath, String dataDir, String dateDir, String latestDir, String eventDir, boolean onlyLocal, Clock clock) {
+		this.robotName = robotName;
 		this.basePath = basePath;
+		this.logPath = logPath;
 		this.dataDir = dataDir;
 		this.dateDir = dateDir;
-		this.logInstancePath = logInstancePath;
+		this.latestDir = latestDir;
+		this.eventDir = eventDir;
 		this.clock = clock;		
 		this.logGraphElements = new ArrayList<LogGraphElement>();
 		this.onlyLocal = onlyLocal;
@@ -126,15 +131,18 @@ public class LogDygraph implements Log, Executable {
 			// Ensure the directories exist.
 			Files.createDirectories(getDataPath());
 			Files.createDirectories(getDatePath());
+			Files.createDirectories(getLatestPath());
+			Files.createDirectories(getEventPath());
 			
 			logFileNumber = getNextLogFileNumber();  // Different number each start.
 			
 			// Open all files. Also creates Latest symlink.
-			csvWriter = new LogFileWriter("data", logFileNumber, "csv", basePath, dataDir);
-			logWriter = new LogFileWriter("log", logFileNumber, "txt", basePath, dataDir);
-			graphWriter = new LogFileWriter("graph", logFileNumber, "html", basePath, dataDir);
-			chartWriter = new LogFileWriter("chart", logFileNumber, "html", basePath, dataDir);
-			locationWriter = new LogFileWriter("location", logFileNumber, "html", basePath, dataDir);
+			var path = Paths.get(basePath, robotName).toString();
+			csvWriter = new LogFileWriter("data", logFileNumber, "csv", path, dataDir);
+			logWriter = new LogFileWriter("log", logFileNumber, "txt", path, dataDir);
+			graphWriter = new LogFileWriter("graph", logFileNumber, "html", path, dataDir);
+			chartWriter = new LogFileWriter("chart", logFileNumber, "html", path, dataDir);
+			locationWriter = new LogFileWriter("location", logFileNumber, "html", path, dataDir);
 			
 			// Everything was successfully created, we're good to go.
 			graphLogState = GraphLogState.CREATED;
@@ -153,7 +161,7 @@ public class LogDygraph implements Log, Executable {
 	 * @param timestamp The date to use.
 	 */
 	public void createDateFiles(Calendar timestamp) {
-		String timestampStr = new SimpleDateFormat("yyyyMMdd_HH:mm:ss.SSS").format(timestamp.getTime());
+		String timestampStr = new SimpleDateFormat("yyyyMMdd_HH-mm-ss.SSS").format(timestamp.getTime());
 		try {
 			// Create links based on the timestamp.
 			csvWriter.createSymbolicLink(dateDir, timestampStr);
@@ -164,11 +172,11 @@ public class LogDygraph implements Log, Executable {
 			// And on event name, match type, match number, replay number, alliance and position.
 			// These details should be available at the same time now that the drivers station is
 			// able to talk to the robot.
-			csvWriter.createSymbolicLink(dateDir, matchDescription);
-			logWriter.createSymbolicLink(dateDir, matchDescription);
-			graphWriter.createSymbolicLink(dateDir, matchDescription);
-			chartWriter.createSymbolicLink(dateDir, matchDescription);
-			locationWriter.createSymbolicLink(dateDir, matchDescription);
+			csvWriter.createSymbolicLink(eventDir, matchDescription);
+			logWriter.createSymbolicLink(eventDir, matchDescription);
+			graphWriter.createSymbolicLink(eventDir, matchDescription);
+			chartWriter.createSymbolicLink(eventDir, matchDescription);
+			locationWriter.createSymbolicLink(eventDir, matchDescription);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.printf("Error creating symlinks in %s\n", basePath);
@@ -185,7 +193,7 @@ public class LogDygraph implements Log, Executable {
 		writeMessageToFile(graphWriter, String.format(
 				"<html>\n" +
 				"<head><title>%1$s</title>\n" +
-				"<script type='text/javascript' src='/scripts/dygraph-combined.js'></script>\n" +
+				"<script type='text/javascript' src='../../scripts/dygraph-combined.js'></script>\n" +
 				"</head>\n" +
 				"<body onload='checkCookie()'>\n" +
 				"<div id='optionDiv' style='width:100%%;height:100%%;background-color:#f0f0f0;z-index:30;display:none;position:absolute'>\n" +
@@ -200,10 +208,10 @@ public class LogDygraph implements Log, Executable {
 				"</div>\n" +
 				"<div id='graphdiv' style='width:100%%;height:90%%;display:block'></div>\n" +
 				"<script>\n" +
-				"var fn = '/%4$s/%2$s.csv';\n" +
+				"var fn = '../%4$s/%2$s.csv';\n" +
 				"var baseLabelsStr = '%3$s';\n" +
 				"</script>\n" +
-				"<script type='text/javascript' src='/scripts/dygraph-exts.js'></script>\n" +
+				"<script type='text/javascript' src='../../scripts/dygraph-exts.js'></script>\n" +
 				"<button id='b4' onclick='button_select()'>Select Traces</button>\n" +
 				"<button id='b5' onclick='button_reload()'>Reload Traces</button>\n" +
 				"<button id='b6' onclick='button_remaining_visible()' disabled>All Traces Shown</button>\n" +
@@ -229,10 +237,10 @@ public class LogDygraph implements Log, Executable {
                 "</head>\n" + 
                 "<body>\n" + 
                 "<script>\n" + 
-				"var fn = '/%4$s/%2$s.csv';\n" +
+				"var fn = '../%4$s/%2$s.csv';\n" +
 				"var baseLabelsStr = '%3$s';\n" +
                 "</script>\n" + 
-                "<script src='/scripts/plotly.js'></script><script src='/scripts/plotly-ext.js'></script>\n" + 
+                "<script src='../../scripts/plotly.js'></script><script src='../../scripts/plotly-ext.js'></script>\n" + 
                 "<div id='chart1' style='width:100%%;height:90%%;'><!-- Plotly chart will be drawn inside this DIV --></div>\n" + 
                 "<script> loadPlotlyFromCSV('%1$s', fn, 0);\n" + 
                 "</script>\n\n" + 
@@ -272,10 +280,10 @@ public class LogDygraph implements Log, Executable {
 		String file = String.format("data_%05d", logFileNumber);
 		writeMessageToFile(locationWriter, String.format(
 				"<html><title>%1$s</title><head>\n" +
-				"<script src='/scripts/plotly.js'></script><script src='/scripts/plotLocation.js'></script>\n" +
+				"<script src='../../scripts/plotly.js'></script><script src='../../scripts/plotLocation.js'></script>\n" +
 				"<body><div id='myDiv' style='width: 480px; height: 400px;'>\n" +
 				"<!-- Plotly chart will be drawn inside this DIV --></div>\n" +
-				"<script> makeplot('/%3$s/%2$s.csv');\n" +
+				"<script> makeplot('../%3$s/%2$s.csv');\n" +
 				"</script>" +
                 "<p>\n" + 
                 "Trying to run this locally? Run the following in the directory containing this file:\n" + 
@@ -537,11 +545,24 @@ public class LogDygraph implements Log, Executable {
 	}
 
 	private Path getDataPath() {
-		return Paths.get(basePath, dataDir);
+		return Paths.get(basePath, robotName, dataDir);
 	}
 
 	private Path getDatePath() {
-		return Paths.get(basePath, dateDir);
+		return Paths.get(basePath, robotName, dateDir);
+	}
+
+	private Path getLatestPath() {
+		return Paths.get(logPath, robotName, latestDir);
+	}
+
+	private Path getEventPath() {
+		return Paths.get(basePath, robotName, eventDir);
+	}
+
+
+	private Path getLogNumberPath() {
+		return Paths.get(logPath, robotName, "lognumber.txt");
 	}
 
 	private synchronized long getNextLogFileNumber() {
@@ -552,7 +573,7 @@ public class LogDygraph implements Log, Executable {
 		 * out.
 		 */
 		long logFileNumber = 0;
-		
+		var logInstancePath = getLogNumberPath();
 		try {
 			BufferedReader br = Files.newBufferedReader(logInstancePath);
 			String s = br.readLine(); // read the line into the buffer.

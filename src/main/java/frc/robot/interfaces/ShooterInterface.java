@@ -13,11 +13,11 @@ public interface ShooterInterface extends SubsystemInterface, Executable, Dashbo
 	/**
 	 * setTargetSpeed() sets the speed on the shooter wheels.
 	 * 
-	 * @param rpm is the target speed in RPM that is being given to the shooter.
+	 * @param rps is the target speed that is being given to the shooter.
 	 */
-	public ShooterInterface setTargetRPM(double rpm);
+	public ShooterInterface setTargetRPS(double rps);
 
-	public double getTargetRPM();
+	public double getTargetRPS();
 
 	public boolean isAtTargetSpeed();
 

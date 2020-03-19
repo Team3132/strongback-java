@@ -137,7 +137,6 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		logSub("Applying requested state: %s", desiredState);
 		//logSub("Waiting subsystems to finish moving before applying state");
-		waitForIntake();
 
 		// Get the current state of the subsystems.
 		State currentState = new State(subsystems, clock);
@@ -158,14 +157,16 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
-		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
+		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
 
-		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
-		
+		subsystems.loader.setTargetSpinnerMotorRPS(desiredState.loaderSpinnerMotorRPS);
+		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
+		subsystems.loader.setPaddleBlocking(desiredState.loaderPaddleBlocking);
+
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
 
-		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
+		subsystems.shooter.setTargetRPS(desiredState.shooterRPS);
 		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
 
 		// Toggle buddy climb if needed
@@ -181,6 +182,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
+		waitForBlocker();
 		waitForShooterHood();
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
@@ -209,6 +211,13 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
+	 * Blocks waiting till the blocker is in position.
+	 */
+	private void waitForBlocker() {
+		waitUntil(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
+	}
+
+	/**
 	 * Blocks waiting till the shooter hood is in position.
 	 */
 	private void waitForShooterHood() {
@@ -228,7 +237,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while spinning up shooter, stopping shooter");
-			subsystems.shooter.setTargetRPM(0);
+			subsystems.shooter.setTargetRPS(0);
 		}
 	}
 	

@@ -97,16 +97,21 @@ public class HardwareTalonSRX implements Motor {
 
 	@Override
 	public void set(ControlMode mode, double demand) {
+		lastMode = mode;
+		lastDemand = demand;  // Pre-scaling.
 		if (scalable(mode)) {
 			demand *= scale;
 		}
-		lastMode = mode;
 		if (mode.equals(Motor.ControlMode.Voltage)) {
 			// TalonSRX doesn't support voltage as a control mode, so percent output is used instead.
 			mode = ControlMode.PercentOutput;
 			demand /= talon.getBusVoltage();
 		}
-		lastDemand = demand;
+		if (mode.equals(Motor.ControlMode.Velocity)) {
+			// In Velocity mode, the talon expects position change / 100ms.
+			// Convert ticks / sec to ticks / 100ms.
+			demand /= 10;
+		}
 		talon.set(mode.talonControlMode, demand);
 	}
 
@@ -115,6 +120,20 @@ public class HardwareTalonSRX implements Motor {
 		return lastDemand;
 	}
 
+	@Override
+	public double getSpeed() {
+		return sensorCollection.getQuadratureVelocity();
+	}
+
+	@Override
+    public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameter) {
+		scale = ticksPerTurn * gearRatio / wheelDiameter;
+		if (scale == 0) {
+			throw new RuntimeException("WARNING: HardwareSparkMAX::setScale() was passed zero, this isn't what you want!");
+		}
+		return this;
+	}
+	
 	public void neutralOutput() {
 		talon.neutralOutput();
 	}
@@ -131,9 +150,30 @@ public class HardwareTalonSRX implements Motor {
 
 	@Override
     public Motor setPosition(double position) {
-        sensorCollection.setQuadraturePosition(position, 10);
+		System.out.printf("Calling setPosition(%f)\n", position);
+		setSelectedSensorPosition(position, 0, 30);
         return this;        
-    }
+	}
+	
+	@Override
+	public double getPosition() {
+		return talon.getSelectedSensorPosition(0) / scale;
+	}
+
+	@Override
+	public double getVelocity() {
+		// TalonSRX::getSelectedSensorVelocity() returns ticks / 100ms.
+		// Convert from ticks / 100ms to ticks / second and then scale.
+		return 10 * talon.getSelectedSensorVelocity() / scale;
+	}
+
+	public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeoutMs) {
+		if (scalable(lastMode)) {
+			sensorPos = (int) (sensorPos * scale);
+		}
+		System.out.printf("Calling setSelectedSensorPosition(%f)\n", sensorPos);
+		return talon.setSelectedSensorPosition((int) sensorPos, pidIdx, timeoutMs);
+	}
 
 	@Override
 	public Motor setInverted(boolean invert) {
@@ -221,23 +261,6 @@ public class HardwareTalonSRX implements Motor {
 
 	public ErrorCode configSensorTerm(SensorTerm sensorTerm, FeedbackDevice feedbackDevice, int timeoutMs) {
 		return talon.configSensorTerm(sensorTerm, feedbackDevice, timeoutMs);
-	}
-
-	@Override
-	public double getPosition() {
-		return talon.getSelectedSensorPosition(0) / scale;
-	}
-
-	@Override
-	public double getVelocity() {
-		return talon.getSelectedSensorVelocity(0) / scale;
-	}
-
-	public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeoutMs) {
-		if (scalable(lastMode)) {
-			sensorPos = (int) (sensorPos * scale);
-		}
-		return talon.setSelectedSensorPosition((int) sensorPos, pidIdx, timeoutMs);
 	}
 
 	public ErrorCode setControlFramePeriod(ControlFrame frame, int periodMs) {
@@ -449,13 +472,6 @@ public class HardwareTalonSRX implements Motor {
 
 	public TalonSensorCollection getSensorCollection() {
 		return sensorCollection;
-	}
-
-	@Override
-	public Motor setScale(double scale) {
-		this.scale = scale;
-		sensorCollection.setScale(scale);
-		return this;
 	}
 
 	public HardwareTalonSRX follow(IMotorController master) {

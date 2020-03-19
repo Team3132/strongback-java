@@ -44,8 +44,8 @@ public class TestLoader {
 
     @Test
     public void testSpinnerMotor() {
-        loader.setTargetSpinnerMotorRPM(600);
-        assertEquals(600, loader.getTargetSpinnerMotorRPM(), 0.01);
+        loader.setTargetSpinnerMotorRPS(10);
+        assertEquals(10, loader.getTargetSpinnerMotorRPS(), 0.01);
     }
 
     @Test

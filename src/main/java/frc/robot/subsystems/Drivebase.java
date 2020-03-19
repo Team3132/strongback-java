@@ -167,6 +167,8 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	public void updateDashboard() {
 		dashboard.putNumber("Left drive motor", currentMotion.left);
 		dashboard.putNumber("Right drive motor", currentMotion.right);
+		dashboard.putNumber("Left drive pos", left.getPosition());
+		dashboard.putNumber("Right drive pos", right.getPosition());
 		dashboard.putString("Drive control", routine.getName());
 	}
 
