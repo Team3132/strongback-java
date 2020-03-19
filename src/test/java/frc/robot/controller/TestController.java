@@ -13,6 +13,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.WheelColour;
+import frc.robot.mock.MockColourWheel;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLocation;
@@ -59,6 +60,7 @@ public class TestController {
 		subsystems.loader = new MockLoader(log);
 		subsystems.shooter = new MockShooter(log);
 		subsystems.location = new MockLocation();
+		subsystems.colourWheel = new MockColourWheel(log);
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
 		
