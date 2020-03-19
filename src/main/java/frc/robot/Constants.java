@@ -232,7 +232,7 @@ public class Constants {
 	public static final int LOCATION_HISTORY_CYCLE_SPEED = 100; // in hz
 
 	// NavX (gyro)
-	public static final boolean NAVX_PRESENT_DEFAULT = true;  // Always leave on by default as no harm if not plugged in.
+	public static final boolean NAVX_PRESENT_DEFAULT = DRIVE_PRESENT_DEFAULT;
 	
 	/*
 	 * Command timings
