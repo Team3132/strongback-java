@@ -45,7 +45,7 @@ public class MockMotor implements Motor {
                 break;
             case PercentOutput:
                 this.mode = mode;
-                output = demand;
+                speed = output = demand;
                 break;
             case Position:
                 this.mode = mode;
