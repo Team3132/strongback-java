@@ -24,6 +24,7 @@ public class HardwareSparkMAX implements Motor {
 	private final com.revrobotics.CANSparkMax spark;
 	private final com.revrobotics.CANEncoder encoder;
 	private int slotID = 0;
+	private double setpoint = 0;
 	// There appears to be a bug where if the pid controller is created before
 	// any followers, then the followers won't follow. Hence the pid controller
 	// is created on demand in getPID() in case there have been followers added.
@@ -46,6 +47,7 @@ public class HardwareSparkMAX implements Motor {
 	public void set(ControlMode mode, double value) {
 		//spark.set(value);
 		getPID().setReference(value, mode.revControlType, slotID);
+		setpoint = value;
 	}
 
 	private CANPIDController getPID() {
@@ -59,7 +61,7 @@ public class HardwareSparkMAX implements Motor {
 
 	@Override
 	public double get() {
-		return spark.get();
+		return setpoint;
 	}
 
 	@Override

@@ -10,7 +10,6 @@ import org.strongback.mock.MockGyroscope;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
 import frc.robot.mock.MockLog;
-import frc.robot.subsystems.Location;
 
 /**
  * Test the Location class.

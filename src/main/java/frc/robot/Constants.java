@@ -51,6 +51,7 @@ public class Constants {
 	 * 
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
+	public static final boolean DRIVE_PRESENT_DEFAULT = false;
 	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {4,5};
 	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
 	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
@@ -105,6 +106,7 @@ public class Constants {
 	/*
 	 *  Intake constants 
 	 */
+	public static final boolean INTAKE_PRESENT_DEFAULT = false;
 	public static final int INTAKE_CAN_ID = 10;
 	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
 	public static final double INTAKE_TARGET_RPS = 30;
@@ -124,6 +126,7 @@ public class Constants {
 	/*
 	* Shooter constants
 	*/
+	public static final boolean SHOOTER_PRESENT_DEFAULT = false;
 	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
 	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
 	public static final double SHOOTER_SPEED_TOLERANCE_RPS = 3.33;
@@ -139,6 +142,7 @@ public class Constants {
 	/*
 	* Loader
 	*/
+	public static final boolean LOADER_PRESENT_DEFAULT = false;
 	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 12;
 	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 11;
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
@@ -156,12 +160,15 @@ public class Constants {
 	/*
 	 * Canifier 
 	 */
+	public static final boolean CANIFIER_PRESENT_DEFAULT = false;
 	public static final int LED_CANIFIER_CAN_ID = 21;
 
 	// Power distribution Panel (PDP)
+	public static final boolean PDP_PRESENT_DEFAULT = false;
 	public static final int PDP_CAN_ID = 62;
 	
 	// Pneumatic Control Modules (PCM)
+	public static final boolean PCM_PRESENT_DEFAULT = false;
 	public static final int PCM_CAN_ID = 61;
 
 	/*
@@ -172,6 +179,7 @@ public class Constants {
 	public static final int CAMERA_RESOULTION_HEIGHT = 252;
 	public static final int CAMERA_FRAMES_PER_SECOND = 60;
 	// Vision (all need tuning)
+	public static final boolean VISION_PRESENT_DEFAULT = false;
 	public static final double VISON_MAX_TARGET_AGE_SECS = 2;
 	public static final double VISION_MAX_VELOCITY_JERK = 32; // m/s/s
 	public static final double VISION_SPEED_SCALE = 2.4 * INCHES_TO_METRES;
@@ -205,6 +213,7 @@ public class Constants {
 	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
 	
 	// Buddy climb
+	public static final boolean BUDDYCLIMB_PRESENT_DEFAULT = false;
 	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
 
 	// logging information constants
@@ -221,6 +230,9 @@ public class Constants {
 	// LocationHistory
 	public static final int LOCATION_HISTORY_MEMORY_SECONDS = 5;
 	public static final int LOCATION_HISTORY_CYCLE_SPEED = 100; // in hz
+
+	// NavX (gyro)
+	public static final boolean NAVX_PRESENT_DEFAULT = DRIVE_PRESENT_DEFAULT;
 	
 	/*
 	 * Command timings
@@ -262,6 +274,7 @@ public class Constants {
 	/*
 	 * Colour Wheel
 	 */
+	public static final boolean COLOUR_WHEEL_PRESENT_DEFAULT = false;
 	public static final int COLOUR_WHEEL_CAN_ID = 7;
 	public static final int COLOUR_WHEEL_SOLENOID_PORT = 5;
 	// Values callibrated using vynl sticker for control panel.
@@ -281,6 +294,7 @@ public class Constants {
 	/*
 	 * LED Strip
 	 */
+	public static final boolean LED_STRIP_PRESENT_DEFAULT = false;
 	public static final int LED_STRIP_PWM_PORT = 0;
 	public static final int LED_STRIP_NUMBER_OF_LEDS = 30;
 	public static final int LED_STRIP_COUNTDOWN = 15;

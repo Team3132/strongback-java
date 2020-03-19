@@ -23,7 +23,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     final Counter outSensorCount;
     private int initBallCount = 0;
     final private LEDStripInterface led;
-    private double targetPassthroughMotorOutput;
+    private double targetPassthroughMotorOutput = 0;
 
     public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
             final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard,

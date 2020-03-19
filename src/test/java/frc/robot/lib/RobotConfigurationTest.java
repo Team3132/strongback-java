@@ -26,7 +26,7 @@ public class RobotConfigurationTest {
 		Path path = Paths.get(tempDir.toString(), "robot.config");
 		RobotConfiguration config = new RobotConfiguration(path.toString(), 3132, log);
 		
-		assertThat(config.drivebaseIsPresent, is(equalTo(true)));
+		assertThat(config.drivebaseIsPresent, is(equalTo(Constants.DRIVE_PRESENT_DEFAULT)));
 		//assertThat(config.liftIsPresent, is(equalTo(false)));
 		assertThat(config.drivebaseCanIdsLeftWithEncoders, is(equalTo(Constants.DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST)));
 	}
@@ -39,8 +39,7 @@ public class RobotConfigurationTest {
 		RobotConfiguration config = new RobotConfiguration(file.toString(), 3132, log);
 		assertThat(file.exists(), is(equalTo(true)));
 		
-		assertThat(config.drivebaseIsPresent, is(equalTo(true)));
-		//assertThat(config.liftIsPresent, is(equalTo(false)));
+		assertThat(config.drivebaseIsPresent, is(equalTo(Constants.DRIVE_PRESENT_DEFAULT)));
 		assertThat(config.drivebaseCanIdsLeftWithEncoders, is(equalTo(Constants.DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST)));
 		assertThat(exampleFile.toString().length(), greaterThan(20)); // make sure the example file isn't empty after first run of update
 		
@@ -50,8 +49,7 @@ public class RobotConfigurationTest {
 		String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
 		Files.write(path, content.getBytes(StandardCharsets.UTF_8));
 		config = new RobotConfiguration(exampleFile, 3132, log);
-		assertThat(config.drivebaseIsPresent, is(equalTo(true)));
-		//assertThat(config.liftIsPresent, is(equalTo(false)));
+		assertThat(config.drivebaseIsPresent, is(equalTo(Constants.DRIVE_PRESENT_DEFAULT)));
 		assertThat(config.drivebaseCanIdsLeftWithEncoders, is(equalTo(Constants.DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST)));
 	}
 
