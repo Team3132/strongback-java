@@ -142,8 +142,9 @@ public class Auto {
 	private void addBasicShootIntakeDriveShootSequence() {
 		Sequence seq = new Sequence("Basic shoot intake drive shoot");
 		// Start shooting
-		seq.appendSequence(Sequences.startShooting(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
-		seq.add().setDelayDelta(2);		
+		seq.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		seq.appendSequence(Sequences.startShooting());
+		seq.add().setDelayDelta(2).deployIntake();
 
 		// Start intaking
 		seq.appendSequence(Sequences.startIntaking());
@@ -164,7 +165,8 @@ public class Auto {
 
 		seq.add().doVisionAim();
 		// Shoot the balls.
-		seq.appendSequence(Sequences.startShooting(SHOOTER_FAR_TARGET_SPEED_RPS));
+		seq.appendSequence(Sequences.spinUpFarShot(SHOOTER_FAR_TARGET_SPEED_RPS));
+		seq.appendSequence(Sequences.startShooting());
 		seq.add().setDelayDelta(2);	
 
 		seq.appendSequence(Sequences.stopShooting());
@@ -175,7 +177,7 @@ public class Auto {
 	private void addTrenchAutoSequence() {
 		Sequence seq = new Sequence("Basic trench auto sequence");
 
-		seq.appendSequence(Sequences.spinUpShooter(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		seq.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
 		
 		seq.add().deployIntake();
 		
@@ -198,7 +200,7 @@ public class Auto {
 		seq.add().doVisionAim();
 
 		// Start shooting
-		seq.appendSequence(Sequences.startShooting(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		seq.appendSequence(Sequences.startShooting());
 		seq.add().setDelayDelta(2);		
 
 		// Pick up the last 3 balls 
@@ -218,7 +220,7 @@ public class Auto {
 		seq.add().doVisionAim();
 
 		// Shoot the balls.
-		seq.appendSequence(Sequences.startShooting(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		seq.appendSequence(Sequences.startShooting());
 		seq.add().setDelayDelta(2);	
 
 		seq.appendSequence(Sequences.stopShooting());

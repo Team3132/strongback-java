@@ -90,10 +90,7 @@ public class Sequences {
 
 	public static Sequence setDrivebaseToArcade() {
 		Sequence seq = new Sequence("Arcade");
-		seq.add().doArcadeDrive()
-			.setShooterRPS(0) // Turn off everything that may be on.
-			.retractShooterHood()
-			.setLoaderSpinnerMotorRPS(0);
+		seq.add().doArcadeDrive();
 		return seq;
 	}
 
@@ -118,6 +115,13 @@ public class Sequences {
 		seq.add().setIntakeRPS(0)
 			.setLoaderSpinnerMotorRPS(0)
 			.setLoaderPassthroughMotorOutput(0);*/
+		return seq;
+	}
+
+	public static Sequence reverseIntaking() {
+		Sequence seq = new Sequence("Reverse intake");
+		seq.add().setIntakeRPS(-INTAKE_TARGET_RPS)
+			.setLoaderPassthroughMotorOutput(-LOADER_MOTOR_INTAKING_RPS);
 		return seq;
 	}
 
@@ -187,36 +191,39 @@ public class Sequences {
 	}
 
 	/**
-	 * As the shooter takes time to spin up, enable spinning
-	 * it up in advance.
-	 * Use the button mapped for near/far shooting to halt.
+	 * Spin up the shooter and position the hood to get ready for a far shot.
+	 * To spin down use a button mapped to stopShooting()
 	 */
-	public static Sequence spinUpShooter(double speed) {
-		Sequence seq = new Sequence("spin up shooter " + speed);
-		seq.add().setShooterRPS(speed);
+	public static Sequence spinUpCloseShot(double speed) {
+		Sequence seq = new Sequence("spinUpCloseShot" + speed);
+		seq.add().setShooterRPS(speed)
+			.extendShooterHood();
 		return seq;
 	}
 
-	// This sequence is used for both auto and teleop 
-	public static Sequence startShooting(double speed) {
-		Sequence seq = new Sequence("start shooting" + speed);
-		// Only shoot straight up when we are shooting from target zone
-		// All other shots are at the faster speed
-		if (speed == SHOOTER_CLOSE_TARGET_SPEED_RPS) {
-			// Shooter wheel may already be up to speed.
-			seq.add().setShooterRPS(speed)
-			// Shooting from just below the goal straight up.
-					.extendShooterHood();
-		} else {
-			// Shooter wheel may already be up to speed.
-			seq.add().setShooterRPS(speed)
-			// Shooting from far from the goal at a flat angle.
-				.retractShooterHood();
-		}
+	/**
+	 * Spin up the shooter and position the hood to get ready for a far shot.
+	 * To spin down use a button mapped to stopShooting()
+	 */
+	public static Sequence spinUpFarShot(double speed) {
+		Sequence seq = new Sequence("spinUpFarShot" + speed);
+		seq.add().setShooterRPS(speed)
+			.retractShooterHood();
+		return seq;
+	}
+
+	/**
+	 * Shoot the balls using whatever hood position and shooter speed is currently set
+	 * 
+	 * WARNING: This sequence will never finish if the shooter speed is currently set to zero
+	 * 			It sets the LEDs to purple if this happens
+	 */
+	public static Sequence startShooting() {
+		Sequence seq = new Sequence("start shooting");
+		// Another sequence should have set the shooter speed and hood position already
+
 		// Wait for the shooter wheel to settle.
 		seq.add().waitForShooter();
-		// Briefly back off loader to prevent balls jamming against shooter blocker
-		// seq.add().setLoaderSpinnerMotorRPS(-LOADER_MOTOR_SHOOTING_RPS);
 		// Let the balls out of the loader and into the shooter.
 		seq.add().unblockShooter();
 		// Spin passthrough
@@ -336,7 +343,7 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		startShooting(SHOOTER_CLOSE_TARGET_SPEED_RPS),
+		startShooting(),
 		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),

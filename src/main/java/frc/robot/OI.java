@@ -101,9 +101,14 @@ public class OI implements OIInterface {
 
 		// Vision lineup
 		onTriggered(rightStick.getButton(2), Sequences.visionAim());
-		onUntriggered(rightStick.getButton(2), Sequences.setDrivebaseToArcade());	
 
-		//onTriggered(rightStick.getButton(4), Sequences.toggleBuddyClimb());
+		// Arcade
+		onTriggered(leftStick.getButton(4), Sequences.setDrivebaseToArcade());	
+
+		// Reverse intake
+		onTriggered(rightStick.getButton(3), Sequences.reverseIntaking());
+		onUntriggered(rightStick.getButton(3), Sequences.stopIntaking());
+
 	}
 
 	private void configureOperatorJoystick(InputDevice stick, String name) {
@@ -123,20 +128,23 @@ public class OI implements OIInterface {
 		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, -GamepadButtonsX.AXIS_THRESHOLD), Sequences.colourWheelAnticlockwise());
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
 
-		// Close shot
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.startShooting(Constants.SHOOTER_CLOSE_TARGET_SPEED_RPS));
-		onUntriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.stopShooting());
-		// Spin up shooter. Touch and release the close or far shot buttons to stop shooter wheel.
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpShooter(Constants.SHOOTER_CLOSE_TARGET_SPEED_RPS));
+		// Close/ender shot
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpCloseShot(Constants.SHOOTER_CLOSE_TARGET_SPEED_RPS));
+		// Auto line/front trench shot
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.spinUpFarShot(Constants.SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		// Colourwheel/back trench shot
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpFarShot(Constants.SHOOTER_FAR_TARGET_SPEED_RPS));
 
-		// Far shot
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.startShooting(Constants.SHOOTER_FAR_TARGET_SPEED_RPS));
-		onUntriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.stopShooting());
-		// Spin up shooter. Touch and release the close or far shot buttons to stop shooter wheel.
-		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpShooter(Constants.SHOOTER_FAR_TARGET_SPEED_RPS));
+		// Acutally shoot the balls
+		// YOU MUST use one of the spinUp buttons before pressing this
+		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting());
+		onUntriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
 
 		// Buddy climb toggle
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.toggleBuddyClimb());
+
+		// Stow the intake
+		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
 	}
 
 

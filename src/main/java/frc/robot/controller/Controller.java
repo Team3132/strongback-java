@@ -10,6 +10,7 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
@@ -184,6 +185,14 @@ public class Controller implements Runnable, DashboardUpdater {
 		waitForIntake();
 		waitForBlocker();
 		waitForShooterHood();
+
+		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
+		if (desiredState.shooterUpToSpeed != null && desiredState.shooterUpToSpeed && desiredState.shooterRPS == 0) {
+			subsystems.ledStrip.setColour(LEDColour.PURPLE);
+			logSub("Should never be waiting for the shooter to reach 0 RPS. Running the empty sequence");
+			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
+		}
+
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
 		// Wait for driving to finish if needed.
@@ -233,6 +242,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			// Don't wait.
 			return;
 		}
+		
 		try {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {

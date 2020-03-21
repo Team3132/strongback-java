@@ -148,14 +148,14 @@ public class Constants {
 	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
 	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
 	public static final int PADDLE_SOLENOID_PORT = 2; 
-	public static final double LOADER_MOTOR_INTAKING_RPS = 10;
+	public static final double LOADER_MOTOR_INTAKING_RPS = 18;
 	public static final double LOADER_MOTOR_SHOOTING_RPS = 8;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
 	public static final double LOADER_MAIN_MOTOR_GEARBOX_RATIO = 1; // Encoder is on output shaft.
-	public static final double LOADER_SPINNER_P = 0.4;
+	public static final double LOADER_SPINNER_P = 0.3;
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 30;
-	public static final double LOADER_SPINNER_F = 0.225;
+	public static final double LOADER_SPINNER_F = 0.1;
 	
 	/*
 	 * Canifier 
