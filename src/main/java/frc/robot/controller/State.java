@@ -41,9 +41,9 @@ public class State {
 	public Boolean shooterHoodExtended = null;
 
 	// Loader
-	public Double loaderPassthroughMotorOutput = null;
+	public Double loaderPassthroughDutyCycle = null;
 	public Boolean loaderPaddleBlocking = null;
-	public Double loaderSpinnerMotorRPS = null;
+	public Double loaderSpinnerRPS = null;
 	public Integer expectedNumberOfBalls = null;
 
 	// Vision
@@ -77,8 +77,8 @@ public class State {
 		buddyClimbToggle = false;  // Don't toggle unless requested.
 		driveClimbModeToggle = false;  // Don't toggle unless requested.
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
-		loaderSpinnerMotorRPS = subsystems.loader.getTargetSpinnerMotorRPS();
-		loaderPassthroughMotorOutput = subsystems.loader.getTargetPassthroughMotorOutput();
+		loaderSpinnerRPS = subsystems.loader.getTargetSpinnerRPS();
+		loaderPassthroughDutyCycle = subsystems.loader.getTargetPassthroughDutyCycle();
 		loaderPaddleBlocking = subsystems.loader.isPaddleBlocking();
 		shooterRPS = subsystems.shooter.getTargetRPS();
 		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
@@ -152,12 +152,12 @@ public class State {
 	}
 
 	// Loader
-	public State setLoaderSpinnerMotorRPS(double rps) {
-		loaderSpinnerMotorRPS = Double.valueOf(rps);
+	public State setSpinnerRPS(double rps) {
+		loaderSpinnerRPS = Double.valueOf(rps);
 		return this;
 	}
-	public State setLoaderPassthroughMotorOutput(double output) {
-		loaderPassthroughMotorOutput = Double.valueOf(output);
+	public State setPassthroughDutyCycle(double output) {
+		loaderPassthroughDutyCycle = Double.valueOf(output);
 		return this;
 	}
 	public State setPaddleBlocking(boolean blocking) {
@@ -393,8 +393,8 @@ public class State {
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);
 		maybeAdd("intakeRPS", intakeRPS, result);
-		maybeAdd("loaderPassthroughMotorOutput", loaderPassthroughMotorOutput, result);
-		maybeAdd("loaderSpinnerMotorRPS", loaderSpinnerMotorRPS, result);
+		maybeAdd("loaderPassthroughDutyCycle", loaderPassthroughDutyCycle, result);
+		maybeAdd("loaderSpinnerRPS", loaderSpinnerRPS, result);
 		maybeAdd("shooterHoodExtended", shooterHoodExtended, result);
 		maybeAdd("shooterRPS", shooterRPS, result);
 		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);

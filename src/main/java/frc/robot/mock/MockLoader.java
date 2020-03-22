@@ -28,7 +28,7 @@ public class MockLoader implements LoaderInterface {
     }
 
     @Override
-    public void setTargetSpinnerMotorRPS(double rps) {
+    public void setTargetSpinnerRPS(double rps) {
         spinnerRPS = rps;
     }
 
@@ -64,17 +64,17 @@ public class MockLoader implements LoaderInterface {
 
 
     @Override
-    public void setTargetPassthroughMotorOutput(double percent) {
+    public void setTargetPassthroughDutyCycle(double percent) {
     }
 
 
     @Override
-    public double getTargetSpinnerMotorRPS() {
+    public double getTargetSpinnerRPS() {
         return spinnerRPS;
        
     }
     @Override
-    public double getTargetPassthroughMotorOutput() {
+    public double getTargetPassthroughDutyCycle() {
         return 0;
     }
 // 

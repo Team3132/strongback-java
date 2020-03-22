@@ -44,14 +44,14 @@ public class TestLoader {
 
     @Test
     public void testSpinnerMotor() {
-        loader.setTargetSpinnerMotorRPS(10);
-        assertEquals(10, loader.getTargetSpinnerMotorRPS(), 0.01);
+        loader.setTargetSpinnerRPS(10);
+        assertEquals(10, loader.getTargetSpinnerRPS(), 0.01);
     }
 
     @Test
     public void testPassthroughMotor() {
-        loader.setTargetPassthroughMotorOutput(0.5);
-        assertEquals(0.5, loader.getTargetPassthroughMotorOutput(),0.01);
+        loader.setTargetPassthroughDutyCycle(0.5);
+        assertEquals(0.5, loader.getTargetPassthroughDutyCycle(),0.01);
     }
 
 

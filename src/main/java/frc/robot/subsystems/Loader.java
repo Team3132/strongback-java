@@ -23,7 +23,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     final Counter outSensorCount;
     private int initBallCount = 0;
     final private LEDStripInterface led;
-    private double targetPassthroughMotorOutput = 0;
+    private double targetPassthroughDutyCycle = 0;
 
     public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
             final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard,
@@ -39,7 +39,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
                 .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
                 .register(true, () -> getSpinnerMotorRPS(), "%s/spinner/rps", name)
-                .register(true, () -> getTargetSpinnerMotorRPS(), "%s/spinner/targetRPS", name)
+                .register(true, () -> getTargetSpinnerRPS(), "%s/spinner/targetRPS", name)
                 .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
                 .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
                 .register(true, () -> (double) getCurrentBallCount(), "%s/spinner/CurrentBallCount", name)
@@ -52,7 +52,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public void setTargetSpinnerMotorRPS(final double rps) {
+    public void setTargetSpinnerRPS(final double rps) {
 
         spinnerRPS = rps;
         log.sub("%s: Setting loader motor rps to: %f", name, rps);
@@ -66,7 +66,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public double getTargetSpinnerMotorRPS() {
+    public double getTargetSpinnerRPS() {
         return spinnerRPS;
     }
 
@@ -75,17 +75,17 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     @Override
-    public void setTargetPassthroughMotorOutput(double percent) {
+    public void setTargetPassthroughDutyCycle(double percent) {
         log.sub("%s: Setting loader in motor percent output to: %f", name, percent);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
-        targetPassthroughMotorOutput = percent;
+        targetPassthroughDutyCycle = percent;
         passthrough.set(ControlMode.PercentOutput, percent);
     }
 
     @Override
-    public double getTargetPassthroughMotorOutput() {
-        return targetPassthroughMotorOutput;
+    public double getTargetPassthroughDutyCycle() {
+        return targetPassthroughDutyCycle;
     }
     
     @Override
@@ -133,7 +133,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         dashboard.putString("Loader Paddle position",
                 isPaddleNotBlocking() ? "not blocking" : isPaddleBlocking() ? "blocking" : "moving");
         dashboard.putNumber("Loader spinner rps", getSpinnerMotorRPS());
-        dashboard.putNumber("Loader spinner target rps", getTargetSpinnerMotorRPS());
+        dashboard.putNumber("Loader spinner target rps", getTargetSpinnerRPS());
         dashboard.putNumber("Loader passthrough percent output", passthrough.getOutputPercent());
         dashboard.putNumber("Current number of balls", getCurrentBallCount());
         inSensorCount.updateDashboard();

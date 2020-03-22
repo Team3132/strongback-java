@@ -160,8 +160,8 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
 
-		subsystems.loader.setTargetSpinnerMotorRPS(desiredState.loaderSpinnerMotorRPS);
-		subsystems.loader.setTargetPassthroughMotorOutput(desiredState.loaderPassthroughMotorOutput);
+		subsystems.loader.setTargetSpinnerRPS(desiredState.loaderSpinnerRPS);
+		subsystems.loader.setTargetPassthroughDutyCycle(desiredState.loaderPassthroughDutyCycle);
 		subsystems.loader.setPaddleBlocking(desiredState.loaderPaddleBlocking);
 
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);

@@ -192,13 +192,13 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
 		// While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
-			() -> loaderIF.setTargetSpinnerMotorRPS(1.5*Constants.LOADER_MOTOR_INTAKING_RPS*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+			() -> loaderIF.setTargetSpinnerRPS(1.5*Constants.LOADER_MOTOR_INTAKING_RPS*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
-			() -> loaderIF.setTargetSpinnerMotorRPS(0));
+			() -> loaderIF.setTargetSpinnerRPS(0));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
-			() -> loaderIF.setTargetPassthroughMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+			() -> loaderIF.setTargetPassthroughDutyCycle(box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
-			() -> loaderIF.setTargetPassthroughMotorOutput(0));
+			() -> loaderIF.setTargetPassthroughDutyCycle(0));
 		
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING), 
 			() -> loaderIF.setPaddleBlocking(true));

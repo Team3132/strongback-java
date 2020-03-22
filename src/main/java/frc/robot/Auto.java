@@ -194,8 +194,8 @@ public class Auto {
 
 		// Stop intaking
 		seq.add().setIntakeRPS(0)
-			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPS(0);
+			.setPassthroughDutyCycle(0)
+			.setSpinnerRPS(0);
 
 		seq.add().doVisionAim();
 
@@ -214,8 +214,8 @@ public class Auto {
 
 		// Stop intaking
 		seq.add().setIntakeRPS(0)
-			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPS(0);
+			.setPassthroughDutyCycle(0)
+			.setSpinnerRPS(0);
 
 		seq.add().doVisionAim();
 
