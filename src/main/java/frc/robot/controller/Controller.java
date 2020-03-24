@@ -214,7 +214,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		try {
 			waitUntilOrAbort(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
 		} catch (SequenceChangedException e) {
-			logSub("Sequence changed while deploying/intaking, switching drivebase back to arcade");
+			logSub("Sequence changed while deploying/intaking");
 			subsystems.drivebase.setArcadeDrive();
 		}		
 	}
@@ -225,7 +225,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		try {
 			waitUntilOrAbort(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
 		} catch (SequenceChangedException e) {
-			logSub("Sequence changed for paddle, switching drivebase back to arcade");
+			logSub("Sequence changed while blocking/not blocking with paddle");
 			subsystems.drivebase.setArcadeDrive();
 		}		
 	}
@@ -237,7 +237,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			try {
 				waitUntilOrAbort(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
 		} catch (SequenceChangedException e) {
-			logSub("Sequence changed for paddle, switching drivebase back to arcade");
+			logSub("Sequence changed while Shooter Hood extends/retracts");
 			subsystems.drivebase.setArcadeDrive();
 		}		
 	}
