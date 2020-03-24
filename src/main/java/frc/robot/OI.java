@@ -368,4 +368,112 @@ public class OI implements OIInterface {
 			return this;
 		}
 	}
+
+	
+	/**
+	 * Create a toggle switch based on a single button.
+	 * Supports having other buttons change their behaviour based on the state of the toggle.
+	 * 
+	 * <pre>
+     * {@code
+	 * onToggle(rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
+	 *   .onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.startSlowDriveForward())
+	 *   .onUntriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.driveFast());
+     * }
+     * </pre>
+	 * 
+	 * @param swtch condition used to toggle the state. Normally a button press.
+	 * @param name used for logging when the toggle changes.
+	 * @param onSeq sequence to run when the toggle is triggered on.
+	 * @param offSeq sequence to run when the toggle is triggered off.
+	 * @return the ToggleSwitch for further chaining of more buttons based on the toggle state.
+	 */
+	private ToggleSwitch onToggle(Switch swtch, String name, Sequence onSeq, Sequence offSeq) {
+		return new ToggleSwitch(swtch, name, onSeq, offSeq);
+	}
+
+	/**
+	 * Maintains the state of a toggle switch based on a single button.
+	 * Supports having other buttons change their behaviour based on the state of the toggle.
+	 */
+	@SuppressWarnings("unused")
+	private class ToggleSwitch {
+		private boolean toggled = false;
+
+		/**
+		 * Creates a ToggleSwitch to track the state and run sequences on state change.
+		 * 
+		 * @param swtch  condition used to toggle the state. Normally a button press.
+		 * @param name   used for logging when the toggle changes.
+		 * @param onSeq  sequence to run when the toggle is triggered on.
+		 * @param offSeq sequence to run when the toggle is triggered off.
+		 * @return the ToggleSwitch for further chaining of more buttons based on the toggle state.
+		 */
+		public ToggleSwitch(Switch swtch, String name, Sequence onSeq, Sequence offSeq) {
+			Strongback.switchReactor().onTriggered(swtch, () -> {
+				if (!toggled) {
+					log.sub("Toggling on " + name);
+					exec.doSequence(onSeq);
+				} else {
+					log.sub("Toggling off " + name);
+					exec.doSequence(offSeq);
+				}
+				toggled = !toggled;
+			});
+		}
+
+		/**
+		 * Run different sequences depending on toggle state on button press.
+		 * @param swtch condition to trigger a sequence to run. Normally a button press.
+		 * @param ifOnSeq sequence to run if the toggle is on.
+		 * @param ifOffSeq sequence to run if the toggle is off.
+		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 */
+		public ToggleSwitch onTriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+			Strongback.switchReactor().onTriggered(swtch, () -> {
+				if (toggled) {
+					exec.doSequence(ifOnSeq);
+				} else {
+					exec.doSequence(ifOffSeq);
+				}
+			});
+			return this;
+		}
+
+		/**
+		 * Run different sequences depending on toggle state on button release.
+		 * @param swtch condition to trigger a sequence to run. Normally a button release.
+		 * @param ifOnSeq sequence to run if the toggle is on.
+		 * @param ifOffSeq sequence to run if the toggle is off.
+		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 */
+		public ToggleSwitch onUntriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+			Strongback.switchReactor().onUntriggered(swtch, () -> {
+				if (toggled) {
+					exec.doSequence(ifOnSeq);
+				} else {
+					exec.doSequence(ifOffSeq);
+				}
+			});
+			return this;
+		}
+
+		/**
+		 * Run different sequences depending on toggle state while a button is pressed.
+		 * @param swtch condition to trigger a sequence to run. Normally while a button is pressed.
+		 * @param ifOnSeq sequence to run if the toggle is on.
+		 * @param ifOffSeq sequence to run if the toggle is off.
+		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 */
+		public ToggleSwitch whileTriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+			Strongback.switchReactor().whileTriggered(swtch, () -> {
+				if (toggled) {
+					exec.doSequence(ifOnSeq);
+				} else {
+					exec.doSequence(ifOffSeq);
+				}
+			});
+			return this;
+		}
+	}
 }
