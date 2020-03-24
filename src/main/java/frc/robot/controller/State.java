@@ -31,6 +31,9 @@ public class State {
 	// Time
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
 
+
+	public String logString = null;
+
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
 	public Double intakeRPS = null; 
@@ -107,6 +110,15 @@ public class State {
 	 */
 	public State setDelayDelta(double seconds) {
 		timeAction = new TimeAction(TimeAction.Type.DELAY_DELTA, seconds);
+		return this;
+	}
+
+	/**  
+	*  Set Status Message
+    *  @param statusMessage to display to log.
+	*/
+	public State setStatusMessageToBruh(String bruhStatus) {
+		logString = bruhStatus;
 		return this;
 	}
 
