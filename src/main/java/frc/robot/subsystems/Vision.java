@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import java.io.IOException;
 
 import org.strongback.components.Clock;
+
+import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.JevoisInterface;
@@ -137,7 +139,7 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 			// change as the caller uses it.
 
 			newTarget.imageTimestamp = clock.currentTime() - Double.parseDouble(parts[1]);
-			newTarget.distance = Double.parseDouble(parts[3]);
+			newTarget.distance = Double.parseDouble(parts[3])*Constants.INCHES_TO_METRES;
 			newTarget.angle = -Double.parseDouble(parts[4]);
 			newTarget.skew = Double.parseDouble(parts[5]);
 

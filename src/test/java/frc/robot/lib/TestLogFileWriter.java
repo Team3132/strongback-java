@@ -61,11 +61,11 @@ public class TestLogFileWriter {
 			br.close();
 		}
 		
-		//Is Windows?
+		// Is this running on Windows which doesn't do symbolic links?
 		if(System.getProperty("os.name").startsWith("Windows") == false) {
 			// Check that the "Latest" symbolic link can be read.
 			{
-				Path expectedFile = Paths.get(tempDir.toString(), "Latest_name.extn");
+				Path expectedFile = Paths.get(tempDir.toString(), "latest/Latest_name.extn");
 				BufferedReader br = Files.newBufferedReader(expectedFile);
 				assertThat("Hello", is(equalTo(br.readLine())));
 				assertThat("world!", is(equalTo(br.readLine())));

@@ -95,10 +95,10 @@ public class Location extends Subsystem implements LocationInterface, Executable
     private Clock clock;            // Source of time.
     /**
      * current the current Position:
-     * x: current left/right offset from 0 at start point (inches). +x is forward.
-	 * y: current forward/backward offset from 0 at start point (inches). +y is left.
+     * x: current left/right offset from 0 at start point (metres). +x is forward.
+	 * y: current forward/backward offset from 0 at start point (metres). +y is left.
 	 * h: current heading from facing directly down the field (degrees). +ve is anticlockwise.
-	 * s: current speed (inches/sec)
+	 * s: current speed (metres/sec)
 	 * t: time of the last update. (seconds)
 	 */
 	private Position current;  // Where the robot actually is based on the encoders and gyro.
@@ -144,7 +144,7 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	 * where we are on the field, and then to inform the location subsystem of that fact.
 	 * 
 	 * @param name The name to be used in the logs
-	 * @param leftDistance The distance travelled by the left wheel (in inches)
+	 * @param leftDistance The distance travelled by the left wheel (in metres)
 	 * @param gyro The gyro to get angles
 	 * @param log The log to store debug and other logging messages
 	 */
@@ -277,10 +277,10 @@ public class Location extends Subsystem implements LocationInterface, Executable
 		if (!enabled) return;			// The location subsystem should never be disabled.
 
 		// odometry expects degrees and metres
-		odometry.update(Rotation2d.fromDegrees(gyro.getAngle()), leftDistance.getAsDouble() * Constants.INCHES_TO_METRES,
-				rightDistance.getAsDouble() * Constants.INCHES_TO_METRES);
+		odometry.update(Rotation2d.fromDegrees(gyro.getAngle()), leftDistance.getAsDouble(),
+				rightDistance.getAsDouble());
 
-		double newLeft = leftDistanceDelta.getAsDouble();  // The change in inches since last call.
+		double newLeft = leftDistanceDelta.getAsDouble();  // The change in metres since last call.
 		double newRight = rightDistanceDelta.getAsDouble();
 		double newHeading = gyro.getAngle();
 		double newTime = clock.currentTime();  // Time of last update

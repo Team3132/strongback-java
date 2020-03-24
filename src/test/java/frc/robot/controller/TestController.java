@@ -13,6 +13,7 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.WheelColour;
+import frc.robot.mock.MockColourWheel;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLocation;
@@ -59,6 +60,7 @@ public class TestController {
 		subsystems.loader = new MockLoader(log);
 		subsystems.shooter = new MockShooter(log);
 		subsystems.location = new MockLocation();
+		subsystems.colourWheel = new MockColourWheel(log);
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
 		
@@ -172,21 +174,21 @@ public class TestController {
 	 * @param power to set/expect to/from the motor.
 	 * @return a setter or asserter object to pass to the TestHelper.
 	 */
-	private StateSetterOrAsserter intakeMotorPower(double power) {
+	private StateSetterOrAsserter intakeMotorRPM(double rpm) {
 		return new StateSetterOrAsserter() {
 			@Override
 			public String name() {
-				return String.format("IntakeMotorPower(%.1f)", power);
+				return String.format("IntakeMotorPower(%.1f)", rpm);
 			}
 			@Override
 			public void setState() {
-				subsystems.intake.setMotorOutput(power);
+				subsystems.intake.setTargetRPS(rpm);
 			}
 			@Override
 			public void assertState() throws AssertionError {
-				if (Math.abs(subsystems.intake.getMotorOutput() - power) > 0.1) {
-					throw new AssertionError("Expected intake motor to have power " + power + " but it is "
-							+ subsystems.intake.getMotorOutput());
+				if (Math.abs(subsystems.intake.getTargetRPS() - rpm) > 0.1) {
+					throw new AssertionError("Expected intake motor to have rpm " + rpm + " but it is "
+							+ subsystems.intake.getTargetRPS());
 				}
 			}
 		};

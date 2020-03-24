@@ -10,6 +10,7 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
@@ -137,7 +138,6 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		logSub("Applying requested state: %s", desiredState);
 		//logSub("Waiting subsystems to finish moving before applying state");
-		waitForIntake();
 
 		// Get the current state of the subsystems.
 		State currentState = new State(subsystems, clock);
@@ -158,14 +158,16 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
-		subsystems.intake.setMotorOutput(desiredState.intakeMotorOutput);
+		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
 
-		subsystems.loader.setTargetSpinnerMotorRPM(desiredState.loaderSpinnerMotorRPM);
-		
+		subsystems.loader.setTargetSpinnerRPS(desiredState.loaderSpinnerRPS);
+		subsystems.loader.setTargetPassthroughDutyCycle(desiredState.loaderPassthroughDutyCycle);
+		subsystems.loader.setPaddleBlocking(desiredState.loaderPaddleBlocking);
+
 		subsystems.colourWheel.setArmExtended(desiredState.extendColourWheel);
 		subsystems.colourWheel.setDesiredAction(desiredState.colourAction);
 
-		subsystems.shooter.setTargetRPM(desiredState.shooterRPM);
+		subsystems.shooter.setTargetRPS(desiredState.shooterRPS);
 		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
 
 		// Toggle buddy climb if needed
@@ -181,7 +183,16 @@ public class Controller implements Runnable, DashboardUpdater {
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
 		waitForIntake();
+		waitForBlocker();
 		waitForShooterHood();
+
+		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
+		if (desiredState.shooterUpToSpeed != null && desiredState.shooterUpToSpeed && desiredState.shooterRPS == 0) {
+			subsystems.ledStrip.setColour(LEDColour.PURPLE);
+			logSub("Should never be waiting for the shooter to reach 0 RPS. Running the empty sequence");
+			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
+		}
+
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
 		// Wait for driving to finish if needed.
@@ -209,6 +220,13 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 
 	/**
+	 * Blocks waiting till the blocker is in position.
+	 */
+	private void waitForBlocker() {
+		waitUntil(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
+	}
+
+	/**
 	 * Blocks waiting till the shooter hood is in position.
 	 */
 	private void waitForShooterHood() {
@@ -224,11 +242,12 @@ public class Controller implements Runnable, DashboardUpdater {
 			// Don't wait.
 			return;
 		}
+		
 		try {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while spinning up shooter, stopping shooter");
-			subsystems.shooter.setTargetRPM(0);
+			subsystems.shooter.setTargetRPS(0);
 		}
 	}
 	

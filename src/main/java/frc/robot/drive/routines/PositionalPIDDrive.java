@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import org.strongback.components.Clock;
 import frc.robot.interfaces.Log;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.Constants;
 import frc.robot.drive.util.LowPassFilter;
 import frc.robot.drive.util.PositionPID;
 
@@ -71,9 +72,9 @@ public class PositionalPIDDrive implements DriveRoutine {
 	private PositionPID createPID(String name, DoubleSupplier targetSpeed, double maxJerk,
 		 DoubleSupplier distance, DoubleSupplier speed, Clock clock, Log log) {
 		PositionPID pid = new PositionPID(name, targetSpeed, maxJerk, distance, speed, clock, log);
-		double kV = 0.018;
-		double kA = 0, kI = 0, kD = 1.05;
-		double kP = 0.1;
+		double kV = 0.3;
+		double kA = 0, kI = 0, kD = 0;//0.5;
+		double kP = 0.64;
 		// double kA = 0, kP = 0.03, kI = 0, kD = 0; // from offseason 
 		pid.setVAPID(kV, kA, kP, kI, kD);
 		return pid;
@@ -118,7 +119,8 @@ public class PositionalPIDDrive implements DriveRoutine {
 
 	@Override
 	public boolean hasFinished() {
-		return clock.currentTime() - timestamp > 1;  // Always ready for the next state.
+		// Check that aiming has stayed within tolerance before next state
+		return clock.currentTime() - timestamp > Constants.VISION_AIM_TIME_COMPLETE;  
 	}
 
 }

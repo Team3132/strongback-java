@@ -90,10 +90,7 @@ public class Sequences {
 
 	public static Sequence setDrivebaseToArcade() {
 		Sequence seq = new Sequence("Arcade");
-		seq.add().doArcadeDrive()
-			.setShooterRPM(0) // Turn off everything that may be on.
-			.retractShooterHood()
-			.setLoaderSpinnerMotorRPM(0);
+		seq.add().doArcadeDrive();
 		return seq;
 	}
 
@@ -105,31 +102,36 @@ public class Sequences {
 	public static Sequence startIntaking() {
 		Sequence seq = new Sequence("Start intake");
 		// Wait for the intake to extend before turning motor
-		seq.add().deployIntake();
-		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT)
-			.setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM)
-			.setLoaderPassthroughMotorOutput(PASSTHROUGH_MOTOR_CURRENT)
-			.setPaddleNotBlocking(false);
-		seq.add().waitForBalls(5);
+		seq.add().deployIntake()
+			.blockShooter();
+		seq.add().setIntakeRPS(INTAKE_TARGET_RPS)
+			.setSpinnerRPS(LOADER_MOTOR_INTAKING_RPS)
+			.setPassthroughDutyCycle(PASSTHROUGH_MOTOR_CURRENT);
+		//seq.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT) 
-				.setLoaderSpinnerMotorRPM(0);
-		seq.add().setDelayDelta(0.5);
-		seq.add().setIntakeMotorOutput(0)
-			.setLoaderPassthroughMotorOutput(0);
+		/*seq.add().setIntakeRPS(-INTAKE_TARGET_RPS);
+		seq.add().setDelayDelta(1);
+		seq.add().setIntakeRPS(0)
+			.setLoaderSpinnerMotorRPS(0)
+			.setLoaderPassthroughMotorOutput(0);*/
+		return seq;
+	}
+
+	public static Sequence reverseIntaking() {
+		Sequence seq = new Sequence("Reverse intake");
+		seq.add().setIntakeRPS(-INTAKE_TARGET_RPS)
+			.setPassthroughDutyCycle(-LOADER_MOTOR_INTAKING_RPS);
 		return seq;
 	}
 
 	public static Sequence stopIntaking() {
 		Sequence seq = new Sequence("Stop intake");
 
-		// Reverse to eject excess > 5 balls to avoid penalty
-		seq.add().setIntakeMotorOutput(-INTAKE_MOTOR_CURRENT);
+		seq.add().setIntakeRPS(0);
+		// Let passthrough run for 0.25s longer to get all balls through
 		seq.add().setDelayDelta(0.25);
-		seq.add().setIntakeMotorOutput(0);
-		seq.add().setDelayDelta(0.25);
-		seq.add().setLoaderPassthroughMotorOutput(0);
-		seq.add().setLoaderSpinnerMotorRPM(0);
+		seq.add().setPassthroughDutyCycle(0);
+		seq.add().setSpinnerRPS(0);
 		return seq;
 	}
 
@@ -145,16 +147,16 @@ public class Sequences {
 	 */
 	public static Sequence startLoaderTest() {
 		Sequence seq = new Sequence("Start Loader Test Sequence");
-		seq.add().setLoaderPassthroughMotorOutput(0.5);
-		seq.add().setLoaderSpinnerMotorRPM(0.3);
+		seq.add().setPassthroughDutyCycle(0.5);
+		seq.add().setSpinnerRPS(0.3);
 		seq.add().setDelayDelta(10);
-		seq.add().setLoaderPassthroughMotorOutput(0);
-		seq.add().setLoaderSpinnerMotorRPM(0);
+		seq.add().setPassthroughDutyCycle(0);
+		seq.add().setSpinnerRPS(0);
 		seq.add().setDelayDelta(5);
 		//Switch/Extend Occurs here
-		seq.add().setLoaderSpinnerMotorRPM(0.2);
+		seq.add().setSpinnerRPS(0.2);
 		seq.add().setDelayDelta(5);
-		seq.add().setLoaderSpinnerMotorRPM(0);
+		seq.add().setSpinnerRPS(0);
 
 		return seq;
 	}
@@ -163,13 +165,13 @@ public class Sequences {
 	public static Sequence startIntakingOnly() {
 		Sequence seq = new Sequence("start intaking");
 		seq.add().deployIntake();
-		seq.add().setIntakeMotorOutput(INTAKE_MOTOR_CURRENT).deployIntake();
+		seq.add().setIntakeRPS(INTAKE_TARGET_RPS).deployIntake();
 		return seq;
 	}
 
 	public static Sequence stopIntakingOnly() {
 		Sequence seq = new Sequence("stop intaking");
-		seq.add().setIntakeMotorOutput(0.0);
+		seq.add().setIntakeRPS(0);
 		seq.add().stowIntake();
 		return seq;
 	}
@@ -177,60 +179,74 @@ public class Sequences {
 	// This is to test the Loader system
 	public static Sequence startLoader() {
 		Sequence seq = new Sequence("start loader");
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		seq.add().setSpinnerRPS(LOADER_MOTOR_INTAKING_RPS);
 		return seq;
 	}
 
 	public static Sequence stopLoader() {
 		Sequence seq = new Sequence("stop loader");
-		seq.add().setLoaderSpinnerMotorRPM(0.0);
+		seq.add().setSpinnerRPS(0.0);
 		return seq;
 	}
 
 	/**
-	 * As the shooter takes time to spin up, enable spinning
-	 * it up in advance.
-	 * Use the button mapped for near/far shooting to halt.
+	 * Spin up the shooter and position the hood to get ready for a far shot.
+	 * To spin down use a button mapped to stopShooting()
 	 */
-	public static Sequence spinUpShooter() {
-		Sequence seq = new Sequence("spin up shooter");
-		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
+	public static Sequence spinUpCloseShot(double speed) {
+		Sequence seq = new Sequence("spinUpCloseShot" + speed);
+		seq.add().setShooterRPS(speed)
+			.extendShooterHood();
 		return seq;
 	}
 
-	public static Sequence startShooting(boolean closeToGoal) {
+	/**
+	 * Spin up the shooter and position the hood to get ready for a far shot.
+	 * To spin down use a button mapped to stopShooting()
+	 */
+	public static Sequence spinUpFarShot(double speed) {
+		Sequence seq = new Sequence("spinUpFarShot" + speed);
+		seq.add().setShooterRPS(speed)
+			.retractShooterHood();
+		return seq;
+	}
+
+	/**
+	 * Shoot the balls using whatever hood position and shooter speed is currently set
+	 * 
+	 * WARNING: This sequence will never finish if the shooter speed is currently set to zero
+	 * 			It sets the LEDs to purple if this happens
+	 */
+	public static Sequence startShooting() {
 		Sequence seq = new Sequence("start shooting");
-		// Shooter wheel may already be up to speed.
-		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
-		if (closeToGoal) {
-			// Shooting from just below the goal straight up.
-			seq.add().retractShooterHood();
-		} else {
-			// Shooting from far from the goal at a flat angle.
-			seq.add().extendShooterHood();
-		}
-		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
+		// Another sequence should have set the shooter speed and hood position already
+
 		// Wait for the shooter wheel to settle.
 		seq.add().waitForShooter();
 		// Let the balls out of the loader and into the shooter.
 		seq.add().unblockShooter();
+		// Spin passthrough
+		seq.add().setPassthroughDutyCycle(PASSTHROUGH_MOTOR_CURRENT)
+		// Start the loader to push the balls.
+				.setSpinnerRPS(LOADER_MOTOR_SHOOTING_RPS);
+		/*
 		// Wait for all of the balls to leave.
 		seq.add().waitForBalls(0);
 		// Turn off everything.
-		seq.add().setShooterRPM(0)
+		seq.add().setShooterRPS(0)
 			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPM(0)
+			.setLoaderSpinnerMotorRPS(0)
 			.blockShooter();
+		*/
 		return seq;
 	}
 
 	public static Sequence stopShooting() {
 		Sequence seq = new Sequence("stop shooting");
 		// Turn off everything.
-		seq.add().setShooterRPM(0)
-			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPM(0)
+		seq.add().setShooterRPS(0)
+			.setPassthroughDutyCycle(0)
+			.setSpinnerRPS(0)
 			.blockShooter();
 		return seq;
 	}
@@ -250,26 +266,8 @@ public class Sequences {
 
 	public static Sequence visionAim(){
 		Sequence seq = new Sequence("vision aim");
-		seq.add().setShooterRPM(SHOOTER_TARGET_SPEED_RPM);
-		// Start the loader to push the balls.
-		seq.add().setLoaderSpinnerMotorRPM(LOADER_MOTOR_RPM);
-		seq.add().extendShooterHood();
-		// Allow the robot to move to aim to the vision target while
-		// the shooter wheel spins up.
 		seq.add().doVisionAim(); 
-		// Wait for the shooter wheel to settle if it hasn't already.
-		seq.add().waitForShooter();
-		// Back to normal driving so it can be adjusted while shooting.
 		seq.add().doArcadeDrive();
-		// Let the balls out of the loader and into the shooter.
-		seq.add().unblockShooter();
-		// Wait for all of the balls to leave.
-		seq.add().waitForBalls(0);
-		// Turn off everything.
-		seq.add().setShooterRPM(0)
-			.setLoaderPassthroughMotorOutput(0)
-			.setLoaderSpinnerMotorRPM(0)
-			.blockShooter();
 		return seq;
 	}
 
@@ -344,7 +342,7 @@ public class Sequences {
 		getResetSequence(),
 		startIntaking(),
 		stopIntaking(),
-		startShooting(true),
+		startShooting(),
 		stopShooting(),
 		startIntakingOnly(),
 		stopIntakingOnly(),

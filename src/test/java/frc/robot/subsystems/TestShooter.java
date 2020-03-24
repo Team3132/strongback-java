@@ -19,7 +19,7 @@ public class TestShooter {
     MockSolenoid shooterSolenoid;
     ShooterInterface shooter;
 
-	public static final int SHOOTER_TARGET_SPEED_RPM = 6500;
+	public static final int SHOOTER_TARGET_SPEED_RPS = 100;
 
     @Before
     public void setUp() {
@@ -42,12 +42,12 @@ public class TestShooter {
 
     @Test
     public void testShooterSetTargetSpeed() {
-        shooter.setTargetRPM(SHOOTER_TARGET_SPEED_RPM);
-        assertEquals(SHOOTER_TARGET_SPEED_RPM, shooterMotor.getSpeed(), 0.1);
+        shooter.setTargetRPS(SHOOTER_TARGET_SPEED_RPS);
+        assertEquals(SHOOTER_TARGET_SPEED_RPS, shooterMotor.getSpeed(), 0.1);
     }
     @Test
     public void testShooterSetTargetSpeedAndDisable() {
-        shooter.setTargetRPM(SHOOTER_TARGET_SPEED_RPM);
+        shooter.setTargetRPS(SHOOTER_TARGET_SPEED_RPS);
         shooter.disable();
         assertEquals(0, shooterMotor.getSpeed(), 0.01);
     }

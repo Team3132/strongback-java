@@ -4,32 +4,32 @@ import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.Log;
 
 public class MockLoader implements LoaderInterface {
-    private double spinnerRPM = 0;
+    private double spinnerRPS = 0;
 
     public MockLoader(Log log) {
     }
     // Paddle
-    private boolean isPaddleNotBlocking = false;
+    private boolean isPaddleBlocking = false;
 
     @Override
-	public LoaderInterface setPaddleNotBlocking(boolean notBlocking) {
-		isPaddleNotBlocking = notBlocking;
+	public LoaderInterface setPaddleBlocking(boolean blocking) {
+		isPaddleBlocking = blocking;
 		return this;
 	}
 
 	@Override
 	public boolean isPaddleNotBlocking() {
-		return isPaddleNotBlocking;
+		return !isPaddleBlocking;
 	}
 
 	@Override
 	public boolean isPaddleBlocking() {
-		return !isPaddleNotBlocking;
+		return !isPaddleBlocking;
     }
 
     @Override
-    public void setTargetSpinnerMotorRPM(double rpm) {
-        spinnerRPM = rpm;
+    public void setTargetSpinnerRPS(double rps) {
+        spinnerRPS = rps;
     }
 
     @Override
@@ -64,17 +64,17 @@ public class MockLoader implements LoaderInterface {
 
 
     @Override
-    public void setTargetPassthroughMotorOutput(double percent) {
+    public void setTargetPassthroughDutyCycle(double percent) {
     }
 
 
     @Override
-    public double getTargetSpinnerMotorRPM() {
-        return spinnerRPM;
+    public double getTargetSpinnerRPS() {
+        return spinnerRPS;
        
     }
     @Override
-    public double getTargetPassthroughMotorOutput() {
+    public double getTargetPassthroughDutyCycle() {
         return 0;
     }
 // 

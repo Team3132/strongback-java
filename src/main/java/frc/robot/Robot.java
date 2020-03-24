@@ -1,6 +1,8 @@
 package frc.robot;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 import org.jibble.simplewebserver.SimpleWebServer;
@@ -13,23 +15,27 @@ import org.strongback.components.ui.FlightStick;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.hardware.Hardware;
 import org.strongback.hardware.HardwareDriverStation;
-import frc.robot.controller.Controller;
-import frc.robot.controller.Sequences;
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.OIInterface;
-import frc.robot.lib.LogDygraph;
-import frc.robot.lib.Position;
-import frc.robot.lib.PowerMonitor;
-import frc.robot.lib.RedundantTalonSRX;
-import frc.robot.lib.RobotConfiguration;
-import frc.robot.lib.WheelColour;
-import frc.robot.subsystems.Subsystems;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpiutil.net.PortForwarder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpiutil.net.PortForwarder;
+import frc.robot.controller.Controller;
+import frc.robot.controller.Sequences;
+import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.OIInterface;
+import frc.robot.lib.LEDColour;
+import frc.robot.lib.LogDygraph;
+import frc.robot.lib.Position;
+import frc.robot.lib.PowerMonitor;
+import frc.robot.lib.RedundantTalonSRX;
+import frc.robot.lib.RobotConfiguration;
+import frc.robot.lib.RobotName;
+import frc.robot.lib.WheelColour;
+import frc.robot.subsystems.Subsystems;
 
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
@@ -49,8 +55,6 @@ public class Robot extends IterativeRobot implements Executable {
 	private Subsystems subsystems;
 	private PowerMonitor pdp;
 	private Auto auto;
-	
-	
 
 	/*
 	 * We wish to delay our full setup until; the driver's station has connected. At
@@ -63,7 +67,9 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void robotInit() {
 		clock = Strongback.timeSystem();
-		log = new LogDygraph(Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION, Constants.LOG_DATE_EXTENSION, Constants.LOG_NUMBER_FILE, false, clock);
+		var robotName = RobotName.get(Constants.HOME_DIRECTORY);
+		log = new LogDygraph(robotName, Constants.WEB_BASE_PATH, Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION,
+				Constants.LOG_DATE_EXTENSION, Constants.LOG_LATEST_EXTENSION, Constants.LOG_EVENT_EXTENSION, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
 		startWebServer();
 		log.info("Waiting for driver's station to connect before setting up UI");
@@ -110,7 +116,7 @@ public class Robot extends IterativeRobot implements Executable {
 		createCameraServers();
 
 		// Create the brains of the robot. This runs the sequences.
-		controller = new Controller(subsystems, getFMSColour());
+		controller = new Controller(subsystems, getFMSColourSupplier());
 
 		// Setup the interface to the user, mapping buttons to sequences for the controller.
 		setupUserInterface();
@@ -141,6 +147,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledInit() {
+		PortForwarder.add(Constants.RSYNC_PORT, Constants.RSYNC_HOSTNAME, 22); // Start forwarding to port 22 (ssh port) for pulling logs using rsync.
 		maybeInit();  // Called before robotPeriodic().
 		log.info("disabledInit");
 		// Log any failures again on disable.
@@ -164,6 +171,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
+		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
 		log.restartLogs();
 		log.info("auto has started");
 		subsystems.enable();
@@ -191,10 +199,12 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
+		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
 		log.restartLogs();
 		log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
+		subsystems.setLEDColour(allianceLEDColour());
 	}
 
 	/**
@@ -206,7 +216,9 @@ public class Robot extends IterativeRobot implements Executable {
 
 	@Override
 	public void teleopPeriodic() {
-	
+		if (0 <= driverStation.getMatchTime() && driverStation.getMatchTime() <= Constants.LED_STRIP_COUNTDOWN) { // While in teleop out of a match, the match time is -1.
+			subsystems.setLEDFinalCountdown(driverStation.getMatchTime());
+		}
 	}
 
 	/**
@@ -348,10 +360,34 @@ public class Robot extends IterativeRobot implements Executable {
 		if (now < lastDashboardUpdateSec + Constants.DASHBOARD_UPDATE_INTERVAL_SEC)
 			return;
 		lastDashboardUpdateSec = now;
-
+		subsystems.dashboard.putString("FMS Colour: ", getFMSColour().toString());
 		subsystems.updateDashboard();
 		//pdp.updateDashboard();
 		controller.updateDashboard();
+	}
+
+	private String lastColour = "";
+	public WheelColour getFMSColour() {
+		String fmsColour = driverStation.getGameSpecificMessage();
+		if (!fmsColour.equals(lastColour)) {
+			log.info("FMS Colour: %s", fmsColour);
+			lastColour = fmsColour;
+		}
+		if (fmsColour.length() == 0) {
+			return WheelColour.UNKNOWN;
+		}
+		switch (fmsColour.charAt(0)) {
+		case 'B':
+			return WheelColour.RED;
+		case 'G':
+			return WheelColour.YELLOW;
+		case 'R':
+			return WheelColour.BLUE;
+		case 'Y':
+			return WheelColour.GREEN;
+		default:
+			return WheelColour.UNKNOWN;
+		}
 	}
 
 	/**
@@ -360,27 +396,23 @@ public class Robot extends IterativeRobot implements Executable {
 	 * Colours are flipped around so that the sensor on the robot will look for the colour perpendicular to the field sensor.
 	 * @return The colour the robots sensor should look for.
 	 */
-	private Supplier<WheelColour> getFMSColour() {
+	private Supplier<WheelColour> getFMSColourSupplier() {
 		return new Supplier<WheelColour>() {
 			@Override
 			public WheelColour get() {
-				String fmsColour = edu.wpi.first.wpilibj.DriverStation.getInstance().getGameSpecificMessage();
-				if (fmsColour.length() == 0) {
-					return WheelColour.UNKNOWN;
-				}
-				switch (fmsColour.charAt(0)) {
-				case 'B':
-					return WheelColour.RED;
-				case 'G':
-					return WheelColour.YELLOW;
-				case 'R':
-					return WheelColour.BLUE;
-				case 'Y':
-					return WheelColour.GREEN;
-				default:
-					return WheelColour.UNKNOWN;
-				}
+				return getFMSColour();
 			}
 		};
+	}
+
+	private LEDColour allianceLEDColour() {
+		switch (driverStation.getAlliance()) {
+		case Red:
+			return LEDColour.RED;
+		case Blue:
+			return LEDColour.BLUE;
+		default:
+			return LEDColour.WHITE;
+		}
 	}
 }

@@ -7,20 +7,20 @@ import org.strongback.Executable;
  */
 public interface LoaderInterface extends SubsystemInterface, Executable, DashboardUpdater {
 
-    public double getTargetSpinnerMotorRPM();
-	public double getTargetPassthroughMotorOutput();
+    public double getTargetSpinnerRPS();
+	public double getTargetPassthroughDutyCycle();
 	
 	public int getCurrentBallCount();
 	public void setInitBallCount(int initBallCount); 
 
-    public void setTargetSpinnerMotorRPM(double current);
-	public void setTargetPassthroughMotorOutput(double percentoutput);
+    public void setTargetSpinnerRPS(double current);
+	public void setTargetPassthroughDutyCycle(double percentoutput);
 
 	/**
 	 * @return the state of the loader solenoid. 
 	 * */
 
-    public LoaderInterface setPaddleNotBlocking(boolean blocking);
+    public LoaderInterface setPaddleBlocking(boolean blocking);
 
 	/**
 	 * @return the state of the loader paddle solenoid. 

@@ -89,8 +89,8 @@ public class OI implements OIInterface {
 		onUntriggered(rightStick.getButton(1), Sequences.stopIntaking());
 		
 		// Slow drive
-		onTriggered(leftStick.getButton(1), Sequences.startSlowDriveForward());
-		onUntriggered(leftStick.getButton(1), Sequences.setDrivebaseToArcade());
+		/*onTriggered(leftStick.getButton(1), Sequences.startSlowDriveForward());
+		onUntriggered(leftStick.getButton(1), Sequences.setDrivebaseToArcade());*/
 
 		// Release/enable ratchets (empty sequence)
 		onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake());
@@ -105,9 +105,14 @@ public class OI implements OIInterface {
 
 		// Vision lineup
 		onTriggered(rightStick.getButton(2), Sequences.visionAim());
-		onUntriggered(rightStick.getButton(2), Sequences.setDrivebaseToArcade());	
 
-		//onTriggered(rightStick.getButton(4), Sequences.toggleBuddyClimb());
+		// Arcade
+		onTriggered(leftStick.getButton(4), Sequences.setDrivebaseToArcade());	
+
+		// Reverse intake
+		onTriggered(rightStick.getButton(3), Sequences.reverseIntaking());
+		onUntriggered(rightStick.getButton(3), Sequences.stopIntaking());
+
 	}
 
 	private void configureOperatorJoystick(InputDevice stick, String name) {
@@ -127,19 +132,23 @@ public class OI implements OIInterface {
 		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, -GamepadButtonsX.AXIS_THRESHOLD), Sequences.colourWheelAnticlockwise());
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
 
-		// Close shot
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/true));
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
+		// Close/ender shot
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpCloseShot(Constants.SHOOTER_CLOSE_TARGET_SPEED_RPS));
+		// Auto line/front trench shot
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.spinUpFarShot(Constants.SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		// Colourwheel/back trench shot
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpFarShot(Constants.SHOOTER_FAR_TARGET_SPEED_RPS));
 
-		// Far shot
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting(/*close=*/false));
-		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
-
-		// Spin up shooter. Touch and release the close or far shot buttons to stop shooter wheel.
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpShooter());
+		// Acutally shoot the balls
+		// YOU MUST use one of the spinUp buttons before pressing this
+		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting());
+		onUntriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
 
 		// Buddy climb toggle
 		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.toggleBuddyClimb());
+
+		// Stow the intake
+		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
 	}
 
 
@@ -153,11 +162,16 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.SHOOTER_DISABLE, OperatorBoxButtons.SHOOTER_MANUAL, shooterOverride);
 		// While the shooter speed button is pressed, set the target speed. Does not
 		// turn off.
+		onTriggered(box.getButton(OperatorBoxButtons.SHOOTER_HOOD_UP), 
+			() -> shooterIF.setHoodExtended(true));
+		onTriggered(box.getButton(OperatorBoxButtons.SHOOTER_HOOD_DOWN), 
+			() -> shooterIF.setHoodExtended(false));
 		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), () -> {
-			shooterIF.setTargetRPM(
-					1.5 * Constants.SHOOTER_TARGET_SPEED_RPM * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
-			log.sub("Shooter speed button pressed %f", box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
+			shooterIF.setTargetRPS(
+					1.5 * Constants.SHOOTER_CLOSE_TARGET_SPEED_RPS * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
 		});
+		onUntriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), 
+			() -> shooterIF.setTargetRPS(0));
 
 		// Intake overrides.
 		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
@@ -167,7 +181,9 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.INTAKE_DISABLE, OperatorBoxButtons.INTAKE_MANUAL, intakeOverride);
 	    // While the intake speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
-			() -> intakeIF.setMotorOutput(box.getAxis(OperatorBoxButtons.INTAKE_POT).read()));
+			() -> intakeIF.setTargetRPS(box.getAxis(OperatorBoxButtons.INTAKE_POT).read() * Constants.INTAKE_TARGET_RPS));
+		onUntriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
+			() -> intakeIF.setTargetRPS(0));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_DEPLOY), 
 			() -> intakeIF.setExtended(true));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_STOW), 
@@ -180,18 +196,18 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
 		// While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
-			() -> loaderIF.setTargetSpinnerMotorRPM(10*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+			() -> loaderIF.setTargetSpinnerRPS(1.5*Constants.LOADER_MOTOR_INTAKING_RPS*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
-			() -> loaderIF.setTargetSpinnerMotorRPM(0));
+			() -> loaderIF.setTargetSpinnerRPS(0));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 
-			() -> loaderIF.setTargetPassthroughMotorOutput(box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
+			() -> loaderIF.setTargetPassthroughDutyCycle(box.getAxis(OperatorBoxButtons.LOADER_PASSTHROUGH_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR),
-			() -> loaderIF.setTargetPassthroughMotorOutput(0));
+			() -> loaderIF.setTargetPassthroughDutyCycle(0));
 		
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_BLOCKING), 
-			() -> loaderIF.setPaddleNotBlocking(false));
+			() -> loaderIF.setPaddleBlocking(true));
 		onTriggered(box.getButton(OperatorBoxButtons.LOADER_PADDLE_NOTBLOCKING), 
-			() -> loaderIF.setPaddleNotBlocking(true));
+			() -> loaderIF.setPaddleBlocking(false));
 	}
 
 

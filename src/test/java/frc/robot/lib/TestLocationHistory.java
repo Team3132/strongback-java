@@ -18,8 +18,8 @@ public class TestLocationHistory {
 	// Check that a pose matches expected values.
 	public void assertPosition(double x, double y, double h, double timeSec, Position actual) {
 		Position expected = new Position(x, y, h, 0, timeSec);
-		System.out.printf("Checking expected position(%s)\n", expected);
-		System.out.printf("   against actual position(%s)\n", actual);
+		//System.out.printf("Checking expected position(%s)\n", expected);
+		//System.out.printf("   against actual position(%s)\n", actual);
 		assertEquals(x, actual.x, 0.01);
 		assertEquals(y, actual.y, 0.01);
 		assertEquals(h, actual.heading, 0.01);

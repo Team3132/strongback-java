@@ -41,7 +41,8 @@ public class MockJevois implements JevoisInterface {
 
     @Override
     public String issueCommand(String command) throws IOException {
-        throw new IOException("mock");
+        //throw new IOException("mock");
+        return "mock";
     }
 
     /**

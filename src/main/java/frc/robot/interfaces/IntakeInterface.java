@@ -15,7 +15,8 @@ public interface IntakeInterface extends SubsystemInterface, Executable, Dashboa
 	public boolean isExtended();
 	public boolean isRetracted();
 
-	// Current control.
-	public void setMotorOutput(double current);
-	public double getMotorOutput();
+	//Set intake speed
+	public IntakeInterface setTargetRPS(double rps);
+
+	public double getTargetRPS();
 }

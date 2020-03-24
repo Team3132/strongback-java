@@ -47,6 +47,7 @@ import frc.robot.interfaces.VisionInterface;
 import frc.robot.interfaces.VisionInterface.TargetDetails;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.Jevois;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.MotorFactory;
 import frc.robot.lib.NavXGyroscope;
@@ -80,11 +81,14 @@ public class Subsystems implements DashboardUpdater {
 	public LocationInterface location;
 	public DrivebaseInterface drivebase;
 	public IntakeInterface intake;
+	public IntakeInterface hwIntake;
 	public BuddyClimbInterface buddyClimb;
 	public OverridableSubsystem<IntakeInterface> intakeOverride;
 	public LoaderInterface loader;
+	public LoaderInterface hwLoader; // Keep track of the real hardware for dashboard update
 	public OverridableSubsystem<LoaderInterface> loaderOverride;
 	public ShooterInterface shooter;
+	public ShooterInterface hwShooter;
 	public OverridableSubsystem<ShooterInterface> shooterOverride;
 	public ColourWheelInterface colourWheel;
 	public PneumaticsModule compressor;
@@ -133,18 +137,18 @@ public class Subsystems implements DashboardUpdater {
 	@Override
 	public void updateDashboard() {
 		drivebase.updateDashboard();
-		intake.updateDashboard();
+		hwIntake.updateDashboard();
 		location.updateDashboard();
-		loader.updateDashboard();
-		shooter.updateDashboard();
+		hwLoader.updateDashboard();
+		hwShooter.updateDashboard();
 		vision.updateDashboard();
 		colourWheel.updateDashboard();
 	}
 
 	/**
-	 * Create the drivebase and location subsystems.
-	 * Creates the motors and gyro as needed by both.
-	 * Registers all of the available drive routines that can be requested by the controller.
+	 * Create the drivebase and location subsystems. Creates the motors and gyro as
+	 * needed by both. Registers all of the available drive routines that can be
+	 * requested by the controller.
 	 */
 	public void createDrivebaseLocation(InputDevice leftStick, InputDevice rightStick) {
 		if (!config.drivebaseIsPresent) {
@@ -156,16 +160,20 @@ public class Subsystems implements DashboardUpdater {
 		}
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
-		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsLeftWithEncoders,
-				!config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,config.drivebaseRampRate, config.drivebaseCurrentLimiting,
-				config.drivebaseContCurrent, config.drivebasePeakCurrent,config.drivebaseP, config.drivebaseI, config.drivebaseD,
-				config.drivebaseF, clock, log);
-		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType, config.drivebaseCanIdsRightWithEncoders,
-				config.drivebaseSwapLeftRight, config.drivebaseSensorPhase, config.drivebaseRampRate, config.drivebaseCurrentLimiting, 
-				config.drivebaseContCurrent, config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI,
-				 config.drivebaseD, config.drivebaseF, clock, log);
-		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT, 0.1, 0.1);
-		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
+		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
+				config.drivebaseCanIdsLeftWithEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
+				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
+				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
+				clock, log);
+		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
+				config.drivebaseCanIdsRightWithEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
+				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
+				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
+				clock, log);
+		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT,
+				0.1, 0.1);
+		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId,
+				Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
 
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
@@ -174,6 +182,11 @@ public class Subsystems implements DashboardUpdater {
 
 		leftMotor.setPosition(0);
 		rightMotor.setPosition(0);
+		try {
+			// Let the encoders get the message and have time to send it back to us.
+			Thread.sleep(100);
+		} catch (InterruptedException e) {}
+		log.error("Reset drive encoders to zero, currently are: %f, %f", leftMotor.getPosition(), rightMotor.getPosition());
 
 		// Save PID values into Network Tables
 		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
@@ -187,7 +200,7 @@ public class Subsystems implements DashboardUpdater {
 		gyro.zero();
 		location = new Location(() -> {	leftMotor.setPosition(0);
 			rightMotor.setPosition(0); },
-			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return inches.
+			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return metres.
 		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, driveHelper ,dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
@@ -247,7 +260,7 @@ public class Subsystems implements DashboardUpdater {
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
 				new PositionalPIDDrive("visionAim",
-				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_RANGE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_RANGE), 
+				() -> (Math.abs(getVisionTurnAdjustment())<Constants.VISION_AIM_ANGLE_TOLERANCE) && (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_TOLERANCE), 
 				() -> MathUtil.clamp(getVisionDistance()*Constants.VISION_AIM_DISTANCE_SCALE, -Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED),
 				() -> getVisionTurnAdjustment(),
 				Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
@@ -312,7 +325,9 @@ public class Subsystems implements DashboardUpdater {
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
-		return distance; 
+		// returning zero for now so visionAim just aims the robot (doesn't drive to a distance)
+		// TODO: reincorporate the distance measurment into how we shoot
+		return 0; //distance; 
 	}
 	
 	public Position getVisionWaypoint() {
@@ -367,10 +382,10 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		
-		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.1, 0.1);
+		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.2, 0.2);
 		// TODO: replace 0 with appropriate subsystem PIDF values
-		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, false, 0, 0, 0, 0, log);
-		intake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
+		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, true, Constants.INTAKE_P, Constants.INTAKE_I, Constants.INTAKE_D, Constants.INTAKE_F, log);
+		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
 
 	public void createIntakeOverride() {
@@ -380,6 +395,7 @@ public class Subsystems implements DashboardUpdater {
 		intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, intake, simulator, mock, log);
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
+		Strongback.executor().register(simulator, Priority.HIGH);
 	}
 
 	public void createBuddyClimb() {
@@ -444,6 +460,14 @@ public class Subsystems implements DashboardUpdater {
 		ledStrip.setIdle();
 	}
 
+	public void setLEDColour(LEDColour c) {
+		ledStrip.setColour(c);
+	}
+
+	public void setLEDFinalCountdown(double time) {
+		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time/Constants.LED_STRIP_COUNTDOWN);
+	}
+
 	public void createLoader() {
 		if (!config.loaderIsPresent) {
 			loader = new MockLoader(log);
@@ -452,15 +476,14 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderSpinnerCanID, false, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log);
-		// TODO: replace with appropriate subsystem PIDF values.
-		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, false, 0, 0, 0, 0, log); 
+		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, true, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log); 
 		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
 		// The ball sensors are connected to the DIO ports on the rio.
 		DigitalInput inBallSensor = new DigitalInput(Constants.IN_BALL_DETECTOR_DIO_PORT);
 		DigitalInput outBallSensor = new DigitalInput(Constants.OUT_BALL_DETECTOR_DIO_PORT);
-		BooleanSupplier loaderInSensor = () -> inBallSensor.get();
-		BooleanSupplier loaderOutSensor = () -> outBallSensor.get(); 
-		loader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
+		BooleanSupplier loaderInSensor = () -> !inBallSensor.get();
+		BooleanSupplier loaderOutSensor = () -> !outBallSensor.get(); 
+		loader = hwLoader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor, loaderOutSensor, ledStrip, dashboard, log);
 		Strongback.executor().register(loader, Priority.LOW);
 
 	}
@@ -482,10 +505,10 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1);
-		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, false, config.shooterP, config.shooterI,
+		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, true, config.shooterP, config.shooterI,
 				config.shooterD, config.shooterF, clock, log);
 
-		shooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
+		shooter = hwShooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
 	}
 
 	public void createShooterOverride() {
