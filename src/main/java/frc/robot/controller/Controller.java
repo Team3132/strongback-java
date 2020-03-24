@@ -181,10 +181,10 @@ public class Controller implements Runnable, DashboardUpdater {
 		}
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
-		maybewaitForBalls(desiredState.expectedNumberOfBalls);
-		maybewaitForIntake();
-		maybewaitForBlocker();
-		maybewaitForShooterHood();
+		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
+		maybeWaitForIntake();
+		maybeWaitForBlocker();
+		maybeWaitForShooterHood();
 
 		
 
@@ -210,18 +210,18 @@ public class Controller implements Runnable, DashboardUpdater {
 	/**
 	 * Blocks waiting till the intake is in position.
 	 */
-	private void maybewaitForIntake() {
+	private void maybeWaitForIntake() {
 		try {
 			waitUntilOrAbort(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
 		} catch (SequenceChangedException e) {
-			logSub("Sequence changed while intaking, switching drivebase back to arcade");
+			logSub("Sequence changed while deploying/intaking, switching drivebase back to arcade");
 			subsystems.drivebase.setArcadeDrive();
 		}		
 	}
 	/**
 	 * Blocks waiting till the blocker is in position.
 	 */
-	private void maybewaitForBlocker() {
+	private void maybeWaitForBlocker() {
 		try {
 			waitUntilOrAbort(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
 		} catch (SequenceChangedException e) {
@@ -233,7 +233,7 @@ public class Controller implements Runnable, DashboardUpdater {
 	/**
 	 * Blocks waiting till the shooter hood is in position.
 	 */
-	private void maybewaitForShooterHood() {
+	private void maybeWaitForShooterHood() {
 			try {
 				waitUntilOrAbort(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
 		} catch (SequenceChangedException e) {
@@ -280,7 +280,7 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Waits until loader has specific number of balls, or sequence is aborted.
 	 * @param expectBalls the number of balls to wait for. If null, it won't wait.
 	 */
-	private void maybewaitForBalls(Integer expectBalls) {
+	private void maybeWaitForBalls(Integer expectBalls) {
 		if (expectBalls == null) {
 			// This state doesn't specify the number of balls to wait for.
 			return;
@@ -360,7 +360,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		blockedBy = "";
 		if (clock.currentTime() - nextLogTimeSec > 1) {
 			// Print a final message.
-			logSub("Controller done waiting on %s", name,  clock.currentTime() - startTimeSec);
+			logSub("Controller done waiting on %s, has waited %fs so far", name,  clock.currentTime() - startTimeSec);
 		}
 	}
 
