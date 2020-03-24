@@ -182,16 +182,11 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
-		waitForIntake();
-		waitForBlocker();
-		waitForShooterHood();
+		maybeWaitForIntake();
+		maybeWaitForBlocker();
+		maybeWaitForShooterHood();
 
-		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
-		if (desiredState.shooterUpToSpeed != null && desiredState.shooterUpToSpeed && desiredState.shooterRPS == 0) {
-			subsystems.ledStrip.setColour(LEDColour.PURPLE);
-			logSub("Should never be waiting for the shooter to reach 0 RPS. Running the empty sequence");
-			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
-		}
+		
 
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
@@ -215,34 +210,53 @@ public class Controller implements Runnable, DashboardUpdater {
 	/**
 	 * Blocks waiting till the intake is in position.
 	 */
-	private void waitForIntake() {
-		waitUntil(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
+	private void maybeWaitForIntake() {
+		try {
+			waitUntilOrAbort(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while deploying/intaking");
+			subsystems.drivebase.setArcadeDrive();
+		}		
 	}
-
 	/**
 	 * Blocks waiting till the blocker is in position.
 	 */
-	private void waitForBlocker() {
-		waitUntil(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
+	private void maybeWaitForBlocker() {
+		try {
+			waitUntilOrAbort(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while blocking/not blocking with paddle");
+			subsystems.drivebase.setArcadeDrive();
+		}		
 	}
 
 	/**
 	 * Blocks waiting till the shooter hood is in position.
 	 */
-	private void waitForShooterHood() {
-		waitUntil(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
+	private void maybeWaitForShooterHood() {
+			try {
+				waitUntilOrAbort(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while Shooter Hood extends/retracts");
+			subsystems.drivebase.setArcadeDrive();
+		}		
 	}
-
 	/**
 	 * Maybe wait for the shooter to get up to the target speed.
 	 * @param shooterUpToSpeed if not null, blocks waiting for shooter to achieve target speed.
 	 */
 	private void maybeWaitForShooter(Boolean shooterUpToSpeed) {
+		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
+		if (shooterUpToSpeed && subsystems.shooter.getTargetRPS() == 0) {
+			subsystems.ledStrip.setColour(LEDColour.PURPLE);
+			logSub("Should never be waiting for the shooter to reach 0 RPS. Running the empty sequence");
+			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
+		}
+
 		if (shooterUpToSpeed == null) {
 			// Don't wait.
 			return;
 		}
-		
 		try {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
@@ -330,7 +344,7 @@ public class Controller implements Runnable, DashboardUpdater {
 	 */
 	private void waitUntil(BooleanSupplier func, String name) {
 		double startTimeSec = clock.currentTime();
-		double waitDurationSec = 1;
+		double waitDurationSec = 0.25;
 		double nextLogTimeSec = startTimeSec + waitDurationSec;
 		// Keep waiting until func returns true
 		while (!func.getAsBoolean()) {
@@ -346,7 +360,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		blockedBy = "";
 		if (clock.currentTime() - nextLogTimeSec > 1) {
 			// Print a final message.
-			logSub("Controller done waiting on %s", name);
+			logSub("Controller done waiting on %s, has waited %fs so far", name,  clock.currentTime() - startTimeSec);
 		}
 	}
 
