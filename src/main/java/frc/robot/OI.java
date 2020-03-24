@@ -98,7 +98,7 @@ public class OI implements OIInterface {
 
 		// Toggle drive / climb mode
 		// Silly example, don't take it seriously.
-		onToggle(rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
+		onMode(rightStick.getButton(5), rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
 		  .onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.startSlowDriveForward())
 		  .onUntriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.driveReallyFast());
    
@@ -255,25 +255,26 @@ public class OI implements OIInterface {
 	}
 
 	/**
-	 * Create a toggle switch based on a single button.
-	 * Supports having other buttons change their behaviour based on the state of the toggle.
+	 * Create a mode switch based on two buttons.
+	 * Supports having other buttons change their behaviour based on the mode.
 	 * 
 	 * <pre>
      * {@code
-	 * onToggle(rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
+	 * onMode(rightStick.getButton(5), rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
 	 *   .onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.startSlowDriveForward())
 	 *   .onUntriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.driveFast());
      * }
      * </pre>
 	 * 
-	 * @param swtch condition used to toggle the state. Normally a button press.
-	 * @param name used for logging when the toggle changes.
-	 * @param onSeq sequence to run when the toggle is triggered on.
-	 * @param offSeq sequence to run when the toggle is triggered off.
-	 * @return the ToggleSwitch for further chaining of more buttons based on the toggle state.
+	 * @param switchOn condition used to enable the mode. Normally a button press.
+	 * @param switchOff condition used to disable the mode. Normally a button press.
+	 * @param name used for logging when the mode changes.
+	 * @param activateSeq sequence to run when the mode is actived.
+	 * @param deactiveSeq sequence to run when the mode is deactived.
+	 * @return the ModeSwitch for further chaining of more buttons based on the mode.
 	 */
-	private ToggleSwitch onToggle(Switch swtch, String name, Sequence onSeq, Sequence offSeq) {
-		return new ToggleSwitch(swtch, name, onSeq, offSeq);
+	private ModeSwitch onMode(Switch switchOn, Switch switchOff, String name, Sequence activateSeq, Sequence deactiveSeq) {
+		return new ModeSwitch(switchOn, switchOff, name, activateSeq, deactiveSeq);
 	}
 
 	/**
@@ -281,80 +282,87 @@ public class OI implements OIInterface {
 	 * Supports having other buttons change their behaviour based on the state of the toggle.
 	 */
 	@SuppressWarnings("unused")
-	private class ToggleSwitch {
-		private boolean toggled = false;
+	private class ModeSwitch {
+		private boolean active = false;
 
 		/**
 		 * Creates a ToggleSwitch to track the state and run sequences on state change.
 		 * 
-		 * @param swtch  condition used to toggle the state. Normally a button press.
-		 * @param name   used for logging when the toggle changes.
-		 * @param onSeq  sequence to run when the toggle is triggered on.
-		 * @param offSeq sequence to run when the toggle is triggered off.
-		 * @return the ToggleSwitch for further chaining of more buttons based on the toggle state.
+		 * @param switchOn condition used to enable the mode. Normally a button press.
+		 * @param switchOff condition used to disable the mode. Normally a button press.
+		 * @param name   used for logging when the mode changes.
+		 * @param activatedSeq sequence to run when the mode is actived.
+		 * @param deactivedSeq sequence to run when the mode is deactived.
+		 * @return the ModeSwitch for chaining of more buttons based on the mode.
 		 */
-		public ToggleSwitch(Switch swtch, String name, Sequence onSeq, Sequence offSeq) {
-			Strongback.switchReactor().onTriggered(swtch, () -> {
-				if (!toggled) {
-					log.sub("Toggling on " + name);
-					exec.doSequence(onSeq);
-				} else {
-					log.sub("Toggling off " + name);
-					exec.doSequence(offSeq);
+		public ModeSwitch(Switch switchOn, Switch switchOff, String name, Sequence activatedSeq, Sequence deactivedSeq) {
+			Strongback.switchReactor().onTriggered(switchOn, () -> {
+				if (active) {
+					return;
 				}
-				toggled = !toggled;
+				log.sub("Activating " + name);
+				exec.doSequence(activatedSeq);
+				active = true;
+			});
+			Strongback.switchReactor().onTriggered(switchOff, () -> {
+				if (!active) {
+					return;
+				}
+				log.sub("Deactivating " + name);
+				exec.doSequence(deactivedSeq);
+				active = false;
 			});
 		}
 
 		/**
-		 * Run different sequences depending on toggle state on button press.
+		 * Run different sequences depending on the mode on button press.
 		 * @param swtch condition to trigger a sequence to run. Normally a button press.
-		 * @param ifOnSeq sequence to run if the toggle is on.
-		 * @param ifOffSeq sequence to run if the toggle is off.
-		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 * @param activeSeq sequence to run if the mode is active.
+		 * @param inactiveSeq sequence to run if the mode is inactive.
+		 * @return the ModeSwitch for further chaining of more buttons based on the mode.
 		 */
-		public ToggleSwitch onTriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+		public ModeSwitch onTriggered(Switch swtch, Sequence activeSeq, Sequence inactiveSeq) {
 			Strongback.switchReactor().onTriggered(swtch, () -> {
-				if (toggled) {
-					exec.doSequence(ifOnSeq);
+				if (active) {
+					exec.doSequence(activeSeq);
 				} else {
-					exec.doSequence(ifOffSeq);
+					exec.doSequence(inactiveSeq);
 				}
 			});
 			return this;
 		}
 
 		/**
-		 * Run different sequences depending on toggle state on button release.
+		 * Run different sequences depending on the mode on button release.
 		 * @param swtch condition to trigger a sequence to run. Normally a button release.
-		 * @param ifOnSeq sequence to run if the toggle is on.
-		 * @param ifOffSeq sequence to run if the toggle is off.
-		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 * @param activeSeq sequence to run if the mode is active.
+		 * @param inactiveSeq sequence to run if the mode is inactive.
+		 * @return the ModeSwitch for further chaining of more buttons based on the mode.
 		 */
-		public ToggleSwitch onUntriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+		public ModeSwitch onUntriggered(Switch swtch, Sequence activeSeq, Sequence inactiveSeq) {
 			Strongback.switchReactor().onUntriggered(swtch, () -> {
-				if (toggled) {
-					exec.doSequence(ifOnSeq);
+				if (active) {
+					exec.doSequence(activeSeq);
 				} else {
-					exec.doSequence(ifOffSeq);
+					exec.doSequence(inactiveSeq);
 				}
 			});
 			return this;
 		}
 
 		/**
-		 * Run different sequences depending on toggle state while a button is pressed.
+		 * Run different sequences depending on the mode while a button is pressed.
 		 * @param swtch condition to trigger a sequence to run. Normally while a button is pressed.
-		 * @param ifOnSeq sequence to run if the toggle is on.
-		 * @param ifOffSeq sequence to run if the toggle is off.
-		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 * @param activeSeq sequence to run if the mode is active.
+		 * @param inactiveSeq sequence to run if the mode is inactive.
+		 * @return the ModeSwitch for further chaining of more buttons based on the mode.
 		 */
-		public ToggleSwitch whileTriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+		public ModeSwitch whileTriggered(Switch swtch, Sequence activeSeq, Sequence inactiveSeq) {
 			Strongback.switchReactor().whileTriggered(swtch, () -> {
-				if (toggled) {
-					exec.doSequence(ifOnSeq);
+				if (active) {
+					exec.doSequence(activeSeq);
 				} else {
-					exec.doSequence(ifOffSeq);
+					exec.doSequence(inactiveSeq);
 				}
 			});
 			return this;
