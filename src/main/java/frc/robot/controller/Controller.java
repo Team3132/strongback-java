@@ -181,6 +181,8 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.shooter.setTargetRPS(desiredState.shooterRPS);
 		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
 
+		subsystems.ledStrip.setColour(desiredState.ledColour);
+
 		// Toggle buddy climb if needed
 		if (desiredState.buddyClimbToggle) {
 			subsystems.buddyClimb.setExtended(!subsystems.buddyClimb.isExtended());
