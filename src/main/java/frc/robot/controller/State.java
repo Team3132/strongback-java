@@ -368,6 +368,27 @@ public class State {
 		}
 		return updatedState;
 	}
+
+	/**
+	 * Auto fill the endState to be applied when a sequence is interrupted
+	 */
+	public void fillInterrupt(State newState) {
+		intakeRPS = fillParam(intakeRPS, newState.intakeRPS);
+		loaderPassthroughDutyCycle = fillParam(loaderPassthroughDutyCycle, newState.loaderPassthroughDutyCycle);
+		loaderSpinnerRPS = fillParam(loaderSpinnerRPS, newState.loaderSpinnerRPS);
+		shooterRPS = fillParam(shooterRPS, newState.shooterRPS);
+		intakeExtended = fillParam(intakeExtended, newState.intakeExtended);
+	}
+
+	/**
+	 * Set value to newValue if newValue is non null
+	 */
+	private static <T> T fillParam(T value, T newValue){
+		if (newValue != null)
+			return newValue;
+		else 
+			return value;
+	}
 	
 	/**
 	 * Append the description and value for this parameter if value is non null.

@@ -14,6 +14,9 @@ import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
+import frc.robot.controller.Sequence.SequenceBuilder;
+
+
 /**
  * The controller of State Sequences while ensuring the robot is safe at every
  * step.
@@ -38,12 +41,14 @@ public class Controller implements Runnable, DashboardUpdater {
 	private final Clock clock;
 	private final DashboardInterface dashboard;
 	private final Log log;
-	private Sequence sequence = new Sequence("idle"); // Current sequence we are working through.
+	private Sequence sequence = new SequenceBuilder("idle",false).build(); // Current sequence we are working through.
 	private boolean sequenceHasChanged = true;
-	private boolean sequenceHasFinished = false;
+	private boolean sequenceHasFinished = true;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
 	private Supplier<WheelColour> fmsColour;
+	private State endState = new State();
+
 
 	public Controller(Subsystems subsystems, Supplier<WheelColour> fmsColour) {
 		this.subsystems = subsystems;
@@ -62,6 +67,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			if (!sequenceHasFinished)
 				return;
 		}
+		endState = this.sequence.getEndState();
 		this.sequence = sequence;
 		sequenceHasChanged = true;
 		logSub("Sequence has changed to %s sequence", sequence.getName());
@@ -77,15 +83,20 @@ public class Controller implements Runnable, DashboardUpdater {
 	public void run() {
 		try {
 			Iterator<State> iterator = null;
+
 			while (true) {
 				State desiredState = null;
 				synchronized (this) {
+					if (!sequenceHasFinished && sequenceHasChanged) {
+						logSub("Sequence interrupted, applying end state.");
+						applyState(endState);
+					}	
 					if (sequenceHasChanged || iterator == null) {
 						logSub("State sequence has changed, now executing %s sequence", sequence.getName());
 						iterator = sequence.iterator();
 						sequenceHasChanged = false;
 						sequenceHasFinished = false;
-					}
+					}				
 					if (!iterator.hasNext()) {
 						logSub("Sequence %s is complete", sequence.getName());
 						sequenceHasFinished = true;
