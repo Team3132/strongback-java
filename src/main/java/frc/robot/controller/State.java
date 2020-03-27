@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.WheelColour;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.TimeAction;
 import frc.robot.subsystems.Subsystems;
 
@@ -61,6 +62,9 @@ public class State {
 	public ColourAction colourAction = null;
 	public Boolean extendColourWheel = null;
 
+	//LED strip
+	public LEDColour ledColour = null;
+	
 	/**
 	 * Create a blank state
 	 */
@@ -87,6 +91,7 @@ public class State {
 		colourAction = subsystems.colourWheel.getDesiredAction();
 		extendColourWheel = subsystems.colourWheel.isArmExtended();
 		expectedNumberOfBalls = null;  // Leave as null so it can be ignored downstream.
+		ledColour = null;
 	}
 
 	// Time
@@ -258,7 +263,14 @@ public class State {
 		return this;
 	}
 
-	// Drive base
+	//LED strip
+	
+	public State setColour(LEDColour c) {
+		ledColour = c;
+		return this;
+	}
+
+	// Drive base	
 	/**
 	 * Set the power levels on the drive base.
 	 * Used to drive the robot forward or backwards in a
@@ -360,7 +372,7 @@ public class State {
 			// if (!field.canAccess(current)) continue;
 			try {
 				if (field.get(desiredState) == null) {
-					// In some cases this field in currentState can also be null.
+					// In some cases this field in currentState can also be null.				
 					field.set(updatedState, field.get(currentState));
 				} else {
 					field.set(updatedState, field.get(desiredState));
@@ -373,6 +385,27 @@ public class State {
 			}
 		}
 		return updatedState;
+	}
+
+	/**
+	 * Auto fill the endState to be applied when a sequence is interrupted
+	 */
+	public void fillInterrupt(State newState) {
+		intakeRPS = fillParam(intakeRPS, newState.intakeRPS);
+		loaderPassthroughDutyCycle = fillParam(loaderPassthroughDutyCycle, newState.loaderPassthroughDutyCycle);
+		loaderSpinnerRPS = fillParam(loaderSpinnerRPS, newState.loaderSpinnerRPS);
+		shooterRPS = fillParam(shooterRPS, newState.shooterRPS);
+		intakeExtended = fillParam(intakeExtended, newState.intakeExtended);
+	}
+
+	/**
+	 * Set value to newValue if newValue is non null
+	 */
+	private static <T> T fillParam(T value, T newValue){
+		if (newValue != null)
+			return newValue;
+		else 
+			return value;
 	}
 	
 	/**

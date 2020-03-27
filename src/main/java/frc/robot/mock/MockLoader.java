@@ -5,6 +5,7 @@ import frc.robot.interfaces.Log;
 
 public class MockLoader implements LoaderInterface {
     private double spinnerRPS = 0;
+    private double passthroughPower = 0;
 
     public MockLoader(Log log) {
     }
@@ -24,7 +25,7 @@ public class MockLoader implements LoaderInterface {
 
 	@Override
 	public boolean isPaddleBlocking() {
-		return !isPaddleBlocking;
+		return isPaddleBlocking;
     }
 
     @Override
@@ -65,6 +66,7 @@ public class MockLoader implements LoaderInterface {
 
     @Override
     public void setTargetPassthroughDutyCycle(double percent) {
+        passthroughPower = percent;
     }
 
 
@@ -75,9 +77,8 @@ public class MockLoader implements LoaderInterface {
     }
     @Override
     public double getTargetPassthroughDutyCycle() {
-        return 0;
-    }
-// 
+        return passthroughPower;
+    } 
 
     @Override
     public int getCurrentBallCount() {

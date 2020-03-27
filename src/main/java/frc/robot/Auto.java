@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.controller.Controller;
 import frc.robot.controller.Sequence;
+import frc.robot.controller.Sequence.SequenceBuilder;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.Log;
 import static frc.robot.Constants.*;
@@ -64,168 +65,170 @@ public class Auto {
 	}
 	
 	private void addDriveTestSequence() {
-		Sequence seq = new Sequence("Drive backwards 2m then forwards 2m"); 
+		SequenceBuilder builder = new SequenceBuilder("Drive backwards 2m then forwards 2m", false);
 		// Go backwards 2m
 		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d end1 = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
+		builder.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
 		// Go forwards 2m
 		Pose2d start = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
-		autoProgram.addOption("Drive test 2m", seq); 
+		builder.add().driveRelativeWaypoints(start, List.of(), end, true);
+		autoProgram.addOption("Drive test 2m", builder.build()); 
 	}
 
 	private void addDriveTestSplineSequence() {
-		Sequence seq = new Sequence("Drive backwards 2mx1m then forward 2mx-1m"); 
+		SequenceBuilder builder = new SequenceBuilder("Drive backwards 2mx1m then forward 2mx-1m", false);
 		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d end1 = new Pose2d(-2, -1, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
+		builder.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
 		// Go backwards 2m
 		Pose2d start = new Pose2d(-2, -1, new Rotation2d(Math.toRadians(0)));
 		Pose2d end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
-		autoProgram.addOption("Drive test spline 2mx1m", seq); 
+		builder.add().driveRelativeWaypoints(start, List.of(), end, true);
+		autoProgram.addOption("Drive test spline 2mx1m", builder.build()); 
 	}
 
 	private void addDriveTestUSequence() {
-		Sequence seq = new Sequence("Drive u-turn 2m"); 
-
+		SequenceBuilder builder = new SequenceBuilder("Drive u-turn 2m", false);
 		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d end1 = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start1, List.of(), end1, false);
+		builder.add().setDelayDelta(1);
 		Pose2d start = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
 		Pose2d end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);  // backwards.
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start, List.of(), end, true);  // backwards.
+		builder.add().setDelayDelta(1);
 
 		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		end1 = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
+		builder.add().setDelayDelta(1);
 		start = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
 		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start, List.of(), end, true);
+		builder.add().setDelayDelta(1);
 		
 		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		end1 = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
+		builder.add().setDelayDelta(1);
 		start = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
 		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start, List.of(), end, true);
+		builder.add().setDelayDelta(1);
 		
 		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		end1 = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
+		builder.add().setDelayDelta(1);
 		start = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
 		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start, List.of(), end, true);
+		builder.add().setDelayDelta(1);
 
 		start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		end1 = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
-		seq.add().setDelayDelta(1);
+		builder.add().driveRelativeWaypoints(start1, List.of(), end1, false);  // backwards.
+		builder.add().setDelayDelta(1);
 		start = new Pose2d(0, -2, new Rotation2d(Math.toRadians(180)));
 		end = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start, List.of(), end, true);
-		seq.add().setDelayDelta(1);
-		autoProgram.addOption("Drive u-turn 2m", seq); 
+		builder.add().driveRelativeWaypoints(start, List.of(), end, true);
+		builder.add().setDelayDelta(1);
+		autoProgram.addOption("Drive u-turn 2m", builder.build()); 
 	}
 
 
 	private void addBasicShootIntakeDriveShootSequence() {
-		Sequence seq = new Sequence("Basic shoot intake drive shoot");
+		SequenceBuilder builder = new SequenceBuilder("Basic shoot intake drive shoot", false);
 		// Start shooting
-		seq.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
-		seq.appendSequence(Sequences.startShooting());
-		seq.add().setDelayDelta(2).deployIntake();
+		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.startShooting());
+		builder.add().setDelayDelta(2);		
 
 		// Start intaking
-		seq.appendSequence(Sequences.startIntaking());
+		builder.appendSequence(Sequences.startIntaking());
 		
 		// Drive backwards to pick up the three balls.
 		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d thirdBall = new Pose2d(-4, -1.5, new Rotation2d(Math.toRadians(0)));
 		// Drive to first ball 
 		// Translation2d firstBall = new Translation2d(-2,-1.25);
-		seq.add().driveRelativeWaypoints(start1, List.of(), thirdBall, false);  // backwards.
+		builder.add().driveRelativeWaypoints(start1, List.of(), thirdBall, false);  // backwards.
 
 		// Stop intaking
-		seq.appendSequence(Sequences.stopIntaking());
+		builder.appendSequence(Sequences.stopIntaking());
 
 		// Go forwards 2m to shoot.
 		Pose2d end = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(thirdBall, List.of(), end, true);
+		builder.add().driveRelativeWaypoints(thirdBall, List.of(), end, true);
 
-		seq.add().doVisionAim();
+		builder.add().doVisionAim();
 		// Shoot the balls.
-		seq.appendSequence(Sequences.spinUpFarShot(SHOOTER_FAR_TARGET_SPEED_RPS));
-		seq.appendSequence(Sequences.startShooting());
-		seq.add().setDelayDelta(2);	
+		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_FAR_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.startShooting());
+		builder.add().setDelayDelta(2);	
 
-		seq.appendSequence(Sequences.stopShooting());
+		builder.appendSequence(Sequences.stopShooting());
 
-		autoProgram.addOption("Basic shoot intake drive shoot", seq); 
+		autoProgram.addOption("Basic shoot intake drive shoot", builder.build()); 
 	}
 
 	private void addTrenchAutoSequence() {
-		Sequence seq = new Sequence("Basic trench auto sequence");
-
-		seq.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
 		
-		seq.add().deployIntake();
+		SequenceBuilder builder = new SequenceBuilder("Basic trench routine", false);
+
+		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.startShooting());		
+		builder.add().deployIntake();
 		
 		// Let shooter spin up a little before running every other motor 
-		// seq.add().setDelayDelta(0.5);		
+		// builder.add().setDelayDelta(0.5);		
 
 		// Start intaking
-		seq.appendSequence(Sequences.startIntaking());
+		builder.appendSequence(Sequences.startIntaking());
 
 		// Drive backwards to pick up the two balls.
 		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d secondBall = new Pose2d(-3.2, -0, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(start1, List.of(), secondBall, false);  // backwards
+		builder.add().driveRelativeWaypoints(start1, List.of(), secondBall, false);  // backwards
 
 		// Stop intaking
-		seq.add().setIntakeRPS(0)
+		builder.add().setIntakeRPS(0)
 			.setPassthroughDutyCycle(0)
 			.setSpinnerRPS(0);
 
-		seq.add().doVisionAim();
+		builder.add().doVisionAim();
 
 		// Start shooting
-		seq.appendSequence(Sequences.startShooting());
-		seq.add().setDelayDelta(2);		
+		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.startShooting());
+		builder.add().setDelayDelta(2);		
 
 		// Pick up the last 3 balls 
-		seq.appendSequence(Sequences.startIntaking());
+		builder.appendSequence(Sequences.startIntaking());
 
 		Pose2d fifthBall = new Pose2d(-5.8, -0.1, new Rotation2d(Math.toRadians(0)));
-		seq.add().driveRelativeWaypoints(secondBall, List.of(), fifthBall, false);
+		builder.add().driveRelativeWaypoints(secondBall, List.of(), fifthBall, false);
 
 		// Drive forward and shoot
-		seq.add().driveRelativeWaypoints(fifthBall, List.of(), secondBall, true);
+		builder.add().driveRelativeWaypoints(fifthBall, List.of(), secondBall, true);
 
 		// Stop intaking
-		seq.add().setIntakeRPS(0)
+		builder.add().setIntakeRPS(0)
 			.setPassthroughDutyCycle(0)
 			.setSpinnerRPS(0);
 
-		seq.add().doVisionAim();
+		builder.add().doVisionAim();
 
 		// Shoot the balls.
-		seq.appendSequence(Sequences.startShooting());
-		seq.add().setDelayDelta(2);	
+		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.startShooting());
+		builder.add().setDelayDelta(2);	
 
-		seq.appendSequence(Sequences.stopShooting());
+		builder.appendSequence(Sequences.stopShooting());
 
-		autoProgram.addOption("Basic trench auto sequence", seq); 
+		autoProgram.addOption("Basic trench auto sequence", builder.build()); 
 	}
 
 	
