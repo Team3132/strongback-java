@@ -74,7 +74,7 @@ public class Sequence implements Iterable<State> {
 		 * Adds a new state at the end of the sequence.
 		 * @return new state
 		 */
-		public State add() {
+		public State then() {
 			states.add(new State());
 			return states.get(states.size() - 1);
 		}

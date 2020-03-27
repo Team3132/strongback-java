@@ -52,7 +52,7 @@ public class Sequences {
 	public static Sequence getResetSequence() {
 		if (resetSeq == null) {
 			SequenceBuilder builder = new SequenceBuilder("empty");
-			builder.add().doArcadeDrive(); 
+			builder.then().doArcadeDrive(); 
 			resetSeq = builder.build();
 		}
 		return resetSeq;
@@ -65,7 +65,7 @@ public class Sequences {
 	public static Sequence turnToWall() {
 		if (driveTestSeq == null) {
 			SequenceBuilder builder = new SequenceBuilder("turn to wall");
-			builder.add().doTurnToHeading(180);
+			builder.then().doTurnToHeading(180);
 			// builder.add().doArcadeDrive();
 			driveTestSeq = builder.build();
 		}
@@ -81,7 +81,7 @@ public class Sequences {
 		Pose2d start = new Pose2d();
 		Pose2d end = new Pose2d(x, y, new Rotation2d(Math.toRadians(angle)));
 		SequenceBuilder builder = new SequenceBuilder(String.format("drive to %s", end));
-		builder.add().driveRelativeWaypoints(start, List.of(), end, true);
+		builder.then().driveRelativeWaypoints(start, List.of(), end, true);
 		driveToWaypointSeq = builder.build();
 		return driveToWaypointSeq;
 	}	
@@ -89,13 +89,13 @@ public class Sequences {
 
 	public static Sequence startSlowDriveForward() {
 		SequenceBuilder builder = new SequenceBuilder("Slow drive forward");
-		builder.add().setDrivebasePower(DRIVE_OFF_LEVEL_TWO_POWER);
+		builder.then().setDrivebasePower(DRIVE_OFF_LEVEL_TWO_POWER);
 		return builder.build();
 	}
 
 	public static Sequence setDrivebaseToArcade() {
 		SequenceBuilder builder = new SequenceBuilder("Arcade");
-		builder.add().doArcadeDrive();
+		builder.then().doArcadeDrive();
 		return builder.build();
 	}
 
@@ -107,10 +107,10 @@ public class Sequences {
 	public static Sequence startIntaking() {
 		SequenceBuilder builder = new SequenceBuilder("Start intaking");
 		// Wait for the intake to extend before turning motor
-		builder.add().deployIntake()
+		builder.then().deployIntake()
 			.blockShooter();
 		//builder.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
-		builder.add().setIntakeRPS(INTAKE_TARGET_RPS)
+		builder.then().setIntakeRPS(INTAKE_TARGET_RPS)
 			.setSpinnerRPS(LOADER_MOTOR_INTAKING_RPS)
 			.setPassthroughDutyCycle(PASSTHROUGH_MOTOR_CURRENT);
 		//builder.add().waitForBalls(5);
@@ -125,25 +125,25 @@ public class Sequences {
 
 	public static Sequence reverseIntaking() {
 		SequenceBuilder builder = new SequenceBuilder("Reverse intaking");
-		builder.add().setIntakeRPS(-INTAKE_TARGET_RPS)
+		builder.then().setIntakeRPS(-INTAKE_TARGET_RPS)
 			.setPassthroughDutyCycle(-LOADER_MOTOR_INTAKING_RPS);
 		return builder.build();
 	}
 
 	public static Sequence stopIntaking() {
 		SequenceBuilder builder = new SequenceBuilder("Stop intaking", true);
-		builder.add().setIntakeRPS(0);
+		builder.then().setIntakeRPS(0);
 		// Let passthrough run for 0.25s longer to get all balls through
-		builder.add().setDelayDelta(0.25);
-		builder.add().setPassthroughDutyCycle(0);
-		builder.add().setSpinnerRPS(0);
+		builder.then().setDelayDelta(0.25);
+		builder.then().setPassthroughDutyCycle(0);
+		builder.then().setSpinnerRPS(0);
 
 		return builder.build();
 	}
 
 	public static Sequence raiseIntake() {
 		SequenceBuilder builder = new SequenceBuilder("Raise intake");
-		builder.add().stowIntake();
+		builder.then().stowIntake();
 		return builder.build();
 	}
 
@@ -153,16 +153,16 @@ public class Sequences {
 	 */
 	public static Sequence startLoaderTest() {
 		SequenceBuilder builder = new SequenceBuilder("Start Loader Test");
-		builder.add().setPassthroughDutyCycle(0.5);
-		builder.add().setSpinnerRPS(0.3);
-		builder.add().setDelayDelta(10);
-		builder.add().setPassthroughDutyCycle(0);
-		builder.add().setSpinnerRPS(0);
-		builder.add().setDelayDelta(5);
+		builder.then().setPassthroughDutyCycle(0.5);
+		builder.then().setSpinnerRPS(0.3);
+		builder.then().setDelayDelta(10);
+		builder.then().setPassthroughDutyCycle(0);
+		builder.then().setSpinnerRPS(0);
+		builder.then().setDelayDelta(5);
 		//Switch/Extend Occurs here
-		builder.add().setSpinnerRPS(0.2);
-		builder.add().setDelayDelta(5);
-		builder.add().setSpinnerRPS(0);
+		builder.then().setSpinnerRPS(0.2);
+		builder.then().setDelayDelta(5);
+		builder.then().setSpinnerRPS(0);
 
 		return builder.build();
 	}
@@ -170,28 +170,28 @@ public class Sequences {
 	// Testing methods
 	public static Sequence startIntakingOnly() {
 		SequenceBuilder builder = new SequenceBuilder("Start Intaking only");
-		builder.add().deployIntake();
-		builder.add().setIntakeRPS(INTAKE_TARGET_RPS).deployIntake();
+		builder.then().deployIntake();
+		builder.then().setIntakeRPS(INTAKE_TARGET_RPS).deployIntake();
 		return builder.build();
 	}
 
 	public static Sequence stopIntakingOnly() {
 		SequenceBuilder builder = new SequenceBuilder("Stop intaking only");
-		builder.add().setIntakeRPS(0);
-		builder.add().stowIntake();
+		builder.then().setIntakeRPS(0);
+		builder.then().stowIntake();
 		return builder.build();
 	}
 
 	// This is to test the Loader system
 	public static Sequence startLoader() {
 		SequenceBuilder builder = new SequenceBuilder("Start loader");
-		builder.add().setSpinnerRPS(LOADER_MOTOR_INTAKING_RPS);
+		builder.then().setSpinnerRPS(LOADER_MOTOR_INTAKING_RPS);
 		return builder.build();
 	}
 
 	public static Sequence stopLoader() {
 		SequenceBuilder builder = new SequenceBuilder("Stop loader");
-		builder.add().setSpinnerRPS(0.0);
+		builder.then().setSpinnerRPS(0.0);
 		return builder.build();
 	}
 
@@ -201,7 +201,7 @@ public class Sequences {
 	 */
 	public static Sequence spinUpCloseShot(double speed) {
 		SequenceBuilder builder = new SequenceBuilder("spinUpCloseShot" + speed);
-		builder.add().setShooterRPS(speed)
+		builder.then().setShooterRPS(speed)
 			.extendShooterHood();
 		return builder.build();
 	}
@@ -212,7 +212,7 @@ public class Sequences {
 	 */
 	public static Sequence spinUpFarShot(double speed) {
 		SequenceBuilder builder = new SequenceBuilder("spinUpFarShot" + speed);
-		builder.add().setShooterRPS(speed)
+		builder.then().setShooterRPS(speed)
 			.retractShooterHood();
 		return builder.build();
 	}
@@ -228,11 +228,11 @@ public class Sequences {
 		// Another sequence should have set the shooter speed and hood position already
 
 		// Wait for the shooter wheel to settle.
-		builder.add().waitForShooter();
+		builder.then().waitForShooter();
 		// Let the balls out of the loader and into the shooter.
-		builder.add().unblockShooter();
+		builder.then().unblockShooter();
 		// Spin passthrough
-		builder.add().setPassthroughDutyCycle(PASSTHROUGH_MOTOR_CURRENT)
+		builder.then().setPassthroughDutyCycle(PASSTHROUGH_MOTOR_CURRENT)
 		// Start the loader to push the balls.
 				.setSpinnerRPS(LOADER_MOTOR_SHOOTING_RPS);
 		/*
@@ -250,7 +250,7 @@ public class Sequences {
 	public static Sequence stopShooting() {
 		SequenceBuilder builder = new SequenceBuilder("Stop shooting");
 		// Turn off everything.
-		builder.add().setShooterRPS(0)
+		builder.then().setShooterRPS(0)
 			.setPassthroughDutyCycle(0)
 			.setSpinnerRPS(0)
 			.blockShooter();
@@ -259,94 +259,94 @@ public class Sequences {
 
 	public static Sequence startDriveByVision() {
 		SequenceBuilder builder = new SequenceBuilder("Start drive by vision");
-		builder.add().doVisionAssistDrive();
+		builder.then().doVisionAssistDrive();
 		return builder.build();
 	}
 
 	public static Sequence stopDriveByVision() {
 		SequenceBuilder builder = new SequenceBuilder("Stop drive by vision");
-		builder.add().doArcadeDrive();
+		builder.then().doArcadeDrive();
 		return builder.build();
 	}
 	
 
 	public static Sequence visionAim(){
 		SequenceBuilder builder = new SequenceBuilder("Vision aim");
-		builder.add().doVisionAim(); 
-		builder.add().doArcadeDrive();
+		builder.then().doVisionAim(); 
+		builder.then().doArcadeDrive();
 		return builder.build();
 	}
 
 	public static Sequence startColourWheelRotational() {
 		SequenceBuilder builder = new SequenceBuilder("Start rotational control");
-		builder.add().extendedColourWheel();
-		builder.add().colourWheelRotational();
-		builder.add().retractColourWheel();
+		builder.then().extendedColourWheel();
+		builder.then().colourWheelRotational();
+		builder.then().retractColourWheel();
 		return builder.build();
 	}
 	
 	public static Sequence startColourWheelPositional(WheelColour colour) {
 		SequenceBuilder builder = new SequenceBuilder("Start positional control");
-		builder.add().extendedColourWheel();
-		builder.add().startColourWheelPositional(colour);
-		builder.add().retractColourWheel();
+		builder.then().extendedColourWheel();
+		builder.then().startColourWheelPositional(colour);
+		builder.then().retractColourWheel();
 		return builder.build();
 	}
 
 	public static Sequence stopColourWheel() {
 		SequenceBuilder builder = new SequenceBuilder("Stop colour wheel spinner");
-		builder.add().stopColourWheel();
-		builder.add().retractColourWheel();
+		builder.then().stopColourWheel();
+		builder.then().retractColourWheel();
 		return builder.build();
 	}
 
 	public static Sequence colourWheelAnticlockwise() {
 		SequenceBuilder builder = new SequenceBuilder("Moving colour wheel anticlockwise");
-		builder.add().extendedColourWheel();
-		builder.add().colourWheelAnticlockwise();
+		builder.then().extendedColourWheel();
+		builder.then().colourWheelAnticlockwise();
 		return builder.build();
 	}
 
 	public static Sequence colourWheelClockwise() {
 		SequenceBuilder builder = new SequenceBuilder("Moving colour wheel clockwise");
-		builder.add().extendedColourWheel();
-		builder.add().colourWheelClockwise();
+		builder.then().extendedColourWheel();
+		builder.then().colourWheelClockwise();
 		return builder.build();
 	}
 
 	public static Sequence enableClimbMode() {
 		SequenceBuilder builder = new SequenceBuilder("enable climb mode");
-		builder.add().enableClimbMode();
+		builder.then().enableClimbMode();
 		return builder.build();
 	}
 
 	public static Sequence enableDriveMode() {
 		SequenceBuilder builder = new SequenceBuilder("enable drive mode");
-		builder.add().enableDriveMode();
+		builder.then().enableDriveMode();
 		return builder.build();
 	}
 
 	public static Sequence applyClimberBrake() {
 		SequenceBuilder builder = new SequenceBuilder("Apply climber brake");
-		builder.add().applyClimberBrake();
+		builder.then().applyClimberBrake();
 		return builder.build();
 	}
 
 	public static Sequence releaseClimberBrake() {
 		SequenceBuilder builder = new SequenceBuilder("Release climber brake");
-		builder.add().releaseClimberBrake();
+		builder.then().releaseClimberBrake();
 		return builder.build();	
 	}
 
 	public static Sequence deployBuddyClimb() {
 		SequenceBuilder builder = new SequenceBuilder("deploy buddy climb attachment");
-		builder.add().deployBuddyClimb();
+		builder.then().deployBuddyClimb();
 		return builder.build();
 	}
 
 	public static Sequence stowBuddyClimb() {
 		SequenceBuilder builder = new SequenceBuilder("stow buddy climb attachment");
-		builder.add().stowBuddyClimb();
+		builder.then().stowBuddyClimb();
 		return builder.build();
 	}
 
