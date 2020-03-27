@@ -75,7 +75,7 @@ public class State {
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPS = subsystems.intake.getTargetRPS();
 		buddyClimbDeployed = subsystems.buddyClimb.isExtended();
-		climbMode = false;  // Don't know if this is right?
+		climbMode = subsystems.drivebase.isClimbModeEnabled();
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerRPS = subsystems.loader.getTargetSpinnerRPS();
 		loaderPassthroughDutyCycle = subsystems.loader.getTargetPassthroughDutyCycle();

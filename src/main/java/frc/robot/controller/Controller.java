@@ -5,11 +5,12 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
+
+import frc.robot.interfaces.ColourWheelInterface.ColourAction;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
@@ -176,6 +177,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
+		maybeWaitForBuddyClimb();
 		waitForIntake();
 		waitForBlocker();
 		waitForShooterHood();
@@ -253,6 +255,14 @@ public class Controller implements Runnable, DashboardUpdater {
 			// The sequence has changed, setting action to null.
 			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
 			subsystems.colourWheel.setArmExtended(false);
+		}
+	}
+
+	private void maybeWaitForBuddyClimb() {
+		try {
+			waitUntilOrAbort(() -> subsystems.buddyClimb.isExtended() || subsystems.buddyClimb.isRetracted(), "buddy climb to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while moving buddy climb");
 		}
 	}
 
