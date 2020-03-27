@@ -327,10 +327,15 @@ public class Sequences {
 		return seq;	
 	}
 
-	// Toggle buddy climb (deploy / retract)
-	public static Sequence toggleBuddyClimb() {
-		Sequence seq = new Sequence("toggle buddy climb attatchment");
-		seq.add().toggleBuddyClimb();
+	public static Sequence deployBuddyClimb() {
+		Sequence seq = new Sequence("deploy buddy climb attachment");
+		seq.add().deployBuddyClimb();
+		return seq;
+	}
+
+	public static Sequence stowBuddyClimb() {
+		Sequence seq = new Sequence("stow buddy climb attachment");
+		seq.add().stowBuddyClimb();
 		return seq;
 	}
 
@@ -349,7 +354,8 @@ public class Sequences {
 		getDriveToWaypointSequence(0, 12, 0),
 		startLoader(),
 		stopLoader(),
-		toggleBuddyClimb(),
+		deployBuddyClimb(),
+		stowBuddyClimb(),
 		toggleDriveClimbModes(),
 		visionAim(),
 	};	

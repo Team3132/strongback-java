@@ -170,10 +170,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.shooter.setTargetRPS(desiredState.shooterRPS);
 		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
 
-		// Toggle buddy climb if needed
-		if (desiredState.buddyClimbToggle) {
-			subsystems.buddyClimb.setExtended(!subsystems.buddyClimb.isExtended());
-		}
+		subsystems.buddyClimb.setExtended(desiredState.buddyClimbDeployed);
 
 		// Toggle between drive and climb modes if needed
 		if (desiredState.driveClimbModeToggle) {

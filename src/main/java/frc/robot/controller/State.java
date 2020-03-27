@@ -55,8 +55,7 @@ public class State {
 	public Boolean climberBrakeApplied = null;
 
 	// Buddy Climb
-	//public Boolean buddyClimbToggle = null;
-	public Boolean buddyClimbExtended = null;
+	public Boolean buddyClimbDeployed = null;
 
 	//Colour Wheel
 	public ColourAction colourAction = null;
@@ -75,7 +74,7 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPS = subsystems.intake.getTargetRPS();
-		buddyClimbExtended = false;
+		buddyClimbDeployed = subsystems.buddyClimb.isExtended();
 		driveClimbModeToggle = false;  // Don't toggle unless requested.
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerRPS = subsystems.loader.getTargetSpinnerRPS();
@@ -208,22 +207,13 @@ public class State {
 		return this;
 	}
 
-	/**
-	 * Calling this will retract the buddy climb if it was deployed
-	 * and deploy it if it was retracted.
-	 */
-	/*public State toggleBuddyClimb() {
-		buddyClimbToggle = true;
-		return this;
-	}*/
-
-	public State extendBuddyClimb() {
-		buddyClimbExtended = true;
+	public State deployBuddyClimb() {
+		buddyClimbDeployed = true;
 		return this;
 	}
 
-	public State retractBuddyClimb() {
-		buddyClimbExtended = false;
+	public State stowBuddyClimb() {
+		buddyClimbDeployed = false;
 		return this;
 	}
 	
@@ -394,7 +384,7 @@ public class State {
 	@Override
 	public String toString() {
 		ArrayList<String> result = new ArrayList<String>();
-		maybeAdd("buddyClimbExtended", buddyClimbExtended, result);
+		maybeAdd("buddyClimbDeployed", buddyClimbDeployed, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourWheelExtended", extendColourWheel, result);
 		maybeAdd("colourwheelMode", colourAction, result);
