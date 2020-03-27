@@ -145,7 +145,7 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
 
 		// Buddy climb
-		onMode(stick.getButton(GamepadButtonsX.B_BUTTON), stick.getButton(GamepadButtonsX.X_BUTTON), "deploybuddyclimb/stowbuddyclimb", Sequences.deployBuddyClimb(), Sequences.stowBuddyClimb());
+		onToggle(stick.getButton(GamepadButtonsX.B_BUTTON), "deploybuddyclimb/stowbuddyclimb", Sequences.deployBuddyClimb(), Sequences.stowBuddyClimb());
 
 		// Stow the intake
 		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
