@@ -316,13 +316,13 @@ public class Sequences {
 
 	public static Sequence enableClimbMode() {
 		SequenceBuilder builder = new SequenceBuilder("enable climb mode");
-		builder.add().climbModeTrue();
+		builder.add().enableClimbMode();
 		return builder.build();
 	}
 
 	public static Sequence enableDriveMode() {
 		SequenceBuilder builder = new SequenceBuilder("enable drive mode");
-		builder.add().climbModeFalse();
+		builder.add().enableDriveMode();
 		return builder.build();
 	}
 

@@ -197,12 +197,12 @@ public class State {
 
 	
 	// Toggle between drive and climb modes
-	public State climbModeTrue() {
+	public State enableClimbMode() {
 		climbMode = true;
 		return this;
 	}
 
-	public State climbModeFalse() {
+	public State enableDriveMode() {
 		climbMode = false;
 		return this;
 	}
