@@ -94,10 +94,7 @@ public class OI implements OIInterface {
 
 		// Release/enable ratchets (empty sequence)
 		onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake());
-		onUntriggered(rightStick.getButton(5), Sequences.applyClimberBrake());		
-
-		// Toggle drive / climb mode
-		onTriggered(rightStick.getButton(6), Sequences.toggleDriveClimbModes());
+		onUntriggered(rightStick.getButton(5), Sequences.applyClimberBrake());
 
 		// Vision lineup
 		onTriggered(rightStick.getButton(2), Sequences.visionAim());
@@ -108,6 +105,8 @@ public class OI implements OIInterface {
 		// Reverse intake
 		onTriggered(rightStick.getButton(3), Sequences.reverseIntaking());
 		onUntriggered(rightStick.getButton(3), Sequences.stopIntaking());
+
+		onToggle(rightStick.getButton(6), "climb/drive", Sequences.enableClimbMode(), Sequences.enableDriveMode());
 
 	}
 
@@ -140,8 +139,8 @@ public class OI implements OIInterface {
 		onTriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.startShooting());
 		onUntriggered(stick.getAxis(GamepadButtonsX.RIGHT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.stopShooting());
 
-		// Buddy climb toggle
-		onTriggered(stick.getButton(GamepadButtonsX.B_BUTTON), Sequences.toggleBuddyClimb());
+		// Buddy climb
+		onToggle(stick.getButton(GamepadButtonsX.B_BUTTON), "deploybuddyclimb/stowbuddyclimb", Sequences.deployBuddyClimb(), Sequences.stowBuddyClimb());
 
 		// Stow the intake
 		onTriggered(stick.getButton(GamepadButtonsX.BACK_BUTTON), Sequences.raiseIntake());
@@ -250,19 +249,242 @@ public class OI implements OIInterface {
 	private void onUntriggered(Switch swtch, Supplier<Sequence> func) {
 		reactor.onUntriggered(swtch, () -> exec.doSequence(func.get()));
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void whileTriggered(Switch swtch, Runnable func) {
 		reactor.whileTriggered(swtch, func);
-  }
-	
+	}
+
 	@SuppressWarnings("unused")
 	private void whileTriggered(Switch swtch, Sequence seq) {
 		reactor.whileTriggered(swtch, () -> exec.doSequence(seq));
-  }
+	}
+
+	@SuppressWarnings("unused")
+	private void whileTriggered(Switch swtch, Supplier<Sequence> func) {
+		reactor.whileTriggered(swtch, () -> exec.doSequence(func.get()));
+	}
+
+	/**
+	 * Create a mode switch based on two buttons.
+	 * Supports having other buttons change their behaviour based on the mode.
+	 * 
+	 * <pre>
+     * {@code
+	 * onMode(rightStick.getButton(5), rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
+	 *   .onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.startSlowDriveForward())
+	 *   .onUntriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.driveFast());
+     * }
+     * </pre>
+	 * 
+	 * @param switchOn condition used to enable the mode. Normally a button press.
+	 * @param switchOff condition used to disable the mode. Normally a button press.
+	 * @param name used for logging when the mode changes.
+	 * @param activateSeq sequence to run when the mode is actived.
+	 * @param deactiveSeq sequence to run when the mode is deactived.
+	 * @return the ModeSwitch for further chaining of more buttons based on the mode.
+	 */
+	private ModeSwitch onMode(Switch switchOn, Switch switchOff, String name, Sequence activateSeq, Sequence deactiveSeq) {
+		return new ModeSwitch(switchOn, switchOff, name, activateSeq, deactiveSeq);
+	}
+
+	/**
+	 * Maintains the state of a toggle switch based on a single button.
+	 * Supports having other buttons change their behaviour based on the state of the toggle.
+	 */
+	@SuppressWarnings("unused")
+	private class ModeSwitch {
+		private boolean active = false;
+
+		/**
+		 * Creates a ToggleSwitch to track the state and run sequences on state change.
+		 * 
+		 * @param switchOn condition used to enable the mode. Normally a button press.
+		 * @param switchOff condition used to disable the mode. Normally a button press.
+		 * @param name   used for logging when the mode changes.
+		 * @param activatedSeq sequence to run when the mode is actived.
+		 * @param deactivedSeq sequence to run when the mode is deactived.
+		 * @return the ModeSwitch for chaining of more buttons based on the mode.
+		 */
+		public ModeSwitch(Switch switchOn, Switch switchOff, String name, Sequence activatedSeq, Sequence deactivedSeq) {
+			Strongback.switchReactor().onTriggered(switchOn, () -> {
+				if (active) {
+					return;
+				}
+				log.sub("Activating " + name);
+				exec.doSequence(activatedSeq);
+				active = true;
+			});
+			Strongback.switchReactor().onTriggered(switchOff, () -> {
+				if (!active) {
+					return;
+				}
+				log.sub("Deactivating " + name);
+				exec.doSequence(deactivedSeq);
+				active = false;
+			});
+		}
+
+		/**
+		 * Run different sequences depending on the mode on button press.
+		 * @param swtch condition to trigger a sequence to run. Normally a button press.
+		 * @param activeSeq sequence to run if the mode is active.
+		 * @param inactiveSeq sequence to run if the mode is inactive.
+		 * @return the ModeSwitch for further chaining of more buttons based on the mode.
+		 */
+		public ModeSwitch onTriggered(Switch swtch, Sequence activeSeq, Sequence inactiveSeq) {
+			Strongback.switchReactor().onTriggered(swtch, () -> {
+				if (active) {
+					exec.doSequence(activeSeq);
+				} else {
+					exec.doSequence(inactiveSeq);
+				}
+			});
+			return this;
+		}
+
+		/**
+		 * Run different sequences depending on the mode on button release.
+		 * @param swtch condition to trigger a sequence to run. Normally a button release.
+		 * @param activeSeq sequence to run if the mode is active.
+		 * @param inactiveSeq sequence to run if the mode is inactive.
+		 * @return the ModeSwitch for further chaining of more buttons based on the mode.
+		 */
+		public ModeSwitch onUntriggered(Switch swtch, Sequence activeSeq, Sequence inactiveSeq) {
+			Strongback.switchReactor().onUntriggered(swtch, () -> {
+				if (active) {
+					exec.doSequence(activeSeq);
+				} else {
+					exec.doSequence(inactiveSeq);
+				}
+			});
+			return this;
+		}
+
+		/**
+		 * Run different sequences depending on the mode while a button is pressed.
+		 * @param swtch condition to trigger a sequence to run. Normally while a button is pressed.
+		 * @param activeSeq sequence to run if the mode is active.
+		 * @param inactiveSeq sequence to run if the mode is inactive.
+		 * @return the ModeSwitch for further chaining of more buttons based on the mode.
+		 */
+		public ModeSwitch whileTriggered(Switch swtch, Sequence activeSeq, Sequence inactiveSeq) {
+			Strongback.switchReactor().whileTriggered(swtch, () -> {
+				if (active) {
+					exec.doSequence(activeSeq);
+				} else {
+					exec.doSequence(inactiveSeq);
+				}
+			});
+			return this;
+		}
+	}
+
 	
-  @SuppressWarnings("unused")
-  private void whileTriggered(Switch swtch, Supplier<Sequence> func) {
-	  reactor.whileTriggered(swtch, () -> exec.doSequence(func.get()));
-  }
+	/**
+	 * Create a toggle switch based on a single button.
+	 * Supports having other buttons change their behaviour based on the state of the toggle.
+	 * 
+	 * <pre>
+     * {@code
+	 * onToggle(rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
+	 *   .onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.startSlowDriveForward())
+	 *   .onUntriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.driveFast());
+     * }
+     * </pre>
+	 * 
+	 * @param swtch condition used to toggle the state. Normally a button press.
+	 * @param name used for logging when the toggle changes.
+	 * @param onSeq sequence to run when the toggle is triggered on.
+	 * @param offSeq sequence to run when the toggle is triggered off.
+	 * @return the ToggleSwitch for further chaining of more buttons based on the toggle state.
+	 */
+	private ToggleSwitch onToggle(Switch swtch, String name, Sequence onSeq, Sequence offSeq) {
+		return new ToggleSwitch(swtch, name, onSeq, offSeq);
+	}
+
+	/**
+	 * Maintains the state of a toggle switch based on a single button.
+	 * Supports having other buttons change their behaviour based on the state of the toggle.
+	 */
+	@SuppressWarnings("unused")
+	private class ToggleSwitch {
+		private boolean toggled = false;
+
+		/**
+		 * Creates a ToggleSwitch to track the state and run sequences on state change.
+		 * 
+		 * @param swtch  condition used to toggle the state. Normally a button press.
+		 * @param name   used for logging when the toggle changes.
+		 * @param onSeq  sequence to run when the toggle is triggered on.
+		 * @param offSeq sequence to run when the toggle is triggered off.
+		 * @return the ToggleSwitch for further chaining of more buttons based on the toggle state.
+		 */
+		public ToggleSwitch(Switch swtch, String name, Sequence onSeq, Sequence offSeq) {
+			Strongback.switchReactor().onTriggered(swtch, () -> {
+				if (!toggled) {
+					log.sub("Toggling on " + name);
+					exec.doSequence(onSeq);
+				} else {
+					log.sub("Toggling off " + name);
+					exec.doSequence(offSeq);
+				}
+				toggled = !toggled;
+			});
+		}
+
+		/**
+		 * Run different sequences depending on toggle state on button press.
+		 * @param swtch condition to trigger a sequence to run. Normally a button press.
+		 * @param ifOnSeq sequence to run if the toggle is on.
+		 * @param ifOffSeq sequence to run if the toggle is off.
+		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 */
+		public ToggleSwitch onTriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+			Strongback.switchReactor().onTriggered(swtch, () -> {
+				if (toggled) {
+					exec.doSequence(ifOnSeq);
+				} else {
+					exec.doSequence(ifOffSeq);
+				}
+			});
+			return this;
+		}
+
+		/**
+		 * Run different sequences depending on toggle state on button release.
+		 * @param swtch condition to trigger a sequence to run. Normally a button release.
+		 * @param ifOnSeq sequence to run if the toggle is on.
+		 * @param ifOffSeq sequence to run if the toggle is off.
+		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 */
+		public ToggleSwitch onUntriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+			Strongback.switchReactor().onUntriggered(swtch, () -> {
+				if (toggled) {
+					exec.doSequence(ifOnSeq);
+				} else {
+					exec.doSequence(ifOffSeq);
+				}
+			});
+			return this;
+		}
+
+		/**
+		 * Run different sequences depending on toggle state while a button is pressed.
+		 * @param swtch condition to trigger a sequence to run. Normally while a button is pressed.
+		 * @param ifOnSeq sequence to run if the toggle is on.
+		 * @param ifOffSeq sequence to run if the toggle is off.
+		 * @return the ToggleSwitch for further chaining of more button based on the toggle state.
+		 */
+		public ToggleSwitch whileTriggered(Switch swtch, Sequence ifOnSeq, Sequence ifOffSeq) {
+			Strongback.switchReactor().whileTriggered(swtch, () -> {
+				if (toggled) {
+					exec.doSequence(ifOnSeq);
+				} else {
+					exec.doSequence(ifOffSeq);
+				}
+			});
+			return this;
+		}
+	}
 }

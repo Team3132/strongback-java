@@ -52,11 +52,11 @@ public class State {
 
 	// Driving / Climbing
 	public DriveRoutineParameters drive = null;
-	public Boolean driveClimbModeToggle = null;
+	public Boolean climbMode = null; //false means drive mode, true means climb mode
 	public Boolean climberBrakeApplied = null;
 
 	// Buddy Climb
-	public Boolean buddyClimbToggle = null;
+	public Boolean buddyClimbDeployed = null;
 
 	//Colour Wheel
 	public ColourAction colourAction = null;
@@ -78,8 +78,8 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPS = subsystems.intake.getTargetRPS();
-		buddyClimbToggle = false;  // Don't toggle unless requested.
-		driveClimbModeToggle = false;  // Don't toggle unless requested.
+		buddyClimbDeployed = subsystems.buddyClimb.isExtended();
+		climbMode = subsystems.drivebase.isClimbModeEnabled();
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerRPS = subsystems.loader.getTargetSpinnerRPS();
 		loaderPassthroughDutyCycle = subsystems.loader.getTargetPassthroughDutyCycle();
@@ -197,8 +197,13 @@ public class State {
 
 	
 	// Toggle between drive and climb modes
-	public State toggleDriveClimbMode() {
-		driveClimbModeToggle = true;
+	public State enableClimbMode() {
+		climbMode = true;
+		return this;
+	}
+
+	public State enableDriveMode() {
+		climbMode = false;
 		return this;
 	}
 
@@ -212,12 +217,13 @@ public class State {
 		return this;
 	}
 
-	/**
-	 * Calling this will retract the buddy climb if it was deployed
-	 * and deploy it if it was retracted.
-	 */
-	public State toggleBuddyClimb() {
-		buddyClimbToggle = true;
+	public State deployBuddyClimb() {
+		buddyClimbDeployed = true;
+		return this;
+	}
+
+	public State stowBuddyClimb() {
+		buddyClimbDeployed = false;
 		return this;
 	}
 	
@@ -416,12 +422,12 @@ public class State {
 	@Override
 	public String toString() {
 		ArrayList<String> result = new ArrayList<String>();
-		maybeAdd("buddyClimbToggle", buddyClimbToggle, result);
+		maybeAdd("buddyClimbDeployed", buddyClimbDeployed, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourWheelExtended", extendColourWheel, result);
 		maybeAdd("colourwheelMode", colourAction, result);
 		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
-		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
+		maybeAdd("climbMode", climbMode, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);
