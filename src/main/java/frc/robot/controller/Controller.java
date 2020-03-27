@@ -172,10 +172,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		subsystems.buddyClimb.setExtended(desiredState.buddyClimbDeployed);
 
-		// Toggle between drive and climb modes if needed
-		if (desiredState.driveClimbModeToggle) {
-			subsystems.drivebase.activateClimbMode(!subsystems.drivebase.isClimbModeEnabled());
-		}
+		subsystems.drivebase.activateClimbMode(desiredState.climbMode);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);

@@ -94,14 +94,7 @@ public class OI implements OIInterface {
 
 		// Release/enable ratchets (empty sequence)
 		onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake());
-		onUntriggered(rightStick.getButton(5), Sequences.applyClimberBrake());		
-
-		// Toggle drive / climb mode
-		// Silly example, don't take it seriously.
-		onMode(rightStick.getButton(5), rightStick.getButton(6), "drive/climb", Sequences.enableClimbMode(), Sequences.enableDriveMode())
-		  .onTriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.startSlowDriveForward())
-		  .onUntriggered(rightStick.getButton(5), Sequences.releaseClimberBrake(), Sequences.driveReallyFast());
-   
+		onUntriggered(rightStick.getButton(5), Sequences.applyClimberBrake());
 
 		// Vision lineup
 		onTriggered(rightStick.getButton(2), Sequences.visionAim());
@@ -112,6 +105,8 @@ public class OI implements OIInterface {
 		// Reverse intake
 		onTriggered(rightStick.getButton(3), Sequences.reverseIntaking());
 		onUntriggered(rightStick.getButton(3), Sequences.stopIntaking());
+
+		onToggle(rightStick.getButton(6), "climb/drive", Sequences.enableClimbMode(), Sequences.enableDriveMode());
 
 	}
 

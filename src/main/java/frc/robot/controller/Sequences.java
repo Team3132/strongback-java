@@ -308,10 +308,15 @@ public class Sequences {
 		return seq;
 	}
 
-	// Drive / climb mode.
-	public static Sequence toggleDriveClimbModes() {
-		Sequence seq = new Sequence("toggle drive / climb modes");
-		seq.add().toggleDriveClimbMode();
+	public static Sequence enableClimbMode() {
+		Sequence seq = new Sequence("enable climb mode");
+		seq.add().climbModeTrue();
+		return seq;
+	}
+
+	public static Sequence enableDriveMode() {
+		Sequence seq = new Sequence("enable drive mode");
+		seq.add().climbModeFalse();
 		return seq;
 	}
 
@@ -356,7 +361,8 @@ public class Sequences {
 		stopLoader(),
 		deployBuddyClimb(),
 		stowBuddyClimb(),
-		toggleDriveClimbModes(),
+		enableClimbMode(),
+		enableDriveMode(),
 		visionAim(),
 	};	
 }  

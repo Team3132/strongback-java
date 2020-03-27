@@ -51,7 +51,7 @@ public class State {
 
 	// Driving / Climbing
 	public DriveRoutineParameters drive = null;
-	public Boolean driveClimbModeToggle = null;
+	public Boolean climbMode = null; //false means drive mode, true means climb mode
 	public Boolean climberBrakeApplied = null;
 
 	// Buddy Climb
@@ -75,7 +75,7 @@ public class State {
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPS = subsystems.intake.getTargetRPS();
 		buddyClimbDeployed = subsystems.buddyClimb.isExtended();
-		driveClimbModeToggle = false;  // Don't toggle unless requested.
+		climbMode = false;  // Don't know if this is right?
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerRPS = subsystems.loader.getTargetSpinnerRPS();
 		loaderPassthroughDutyCycle = subsystems.loader.getTargetPassthroughDutyCycle();
@@ -192,8 +192,13 @@ public class State {
 
 	
 	// Toggle between drive and climb modes
-	public State toggleDriveClimbMode() {
-		driveClimbModeToggle = true;
+	public State climbModeTrue() {
+		climbMode = true;
+		return this;
+	}
+
+	public State climbModeFalse() {
+		climbMode = false;
 		return this;
 	}
 
@@ -389,7 +394,7 @@ public class State {
 		maybeAdd("colourWheelExtended", extendColourWheel, result);
 		maybeAdd("colourwheelMode", colourAction, result);
 		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
-		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
+		maybeAdd("climbMode", climbMode, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);
