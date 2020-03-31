@@ -12,7 +12,7 @@ import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
-import frc.robot.lib.LogDygraph;
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.TimeAction;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
@@ -54,16 +54,19 @@ public class State {
 
 	// Driving / Climbing
 	public DriveRoutineParameters drive = null;
-	public Boolean driveClimbModeToggle = null;
+	public Boolean climbMode = null; //false means drive mode, true means climb mode
 	public Boolean climberBrakeApplied = null;
 
 	// Buddy Climb
-	public Boolean buddyClimbToggle = null;
+	public Boolean buddyClimbDeployed = null;
 
 	//Colour Wheel
 	public ColourAction colourAction = null;
 	public Boolean extendColourWheel = null;
 
+	//LED strip
+	public LEDColour ledColour = null;
+	
 	/**
 	 * Create a blank state
 	 */
@@ -77,8 +80,8 @@ public class State {
 		setDelayUntilTime(clock.currentTime());
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPS = subsystems.intake.getTargetRPS();
-		buddyClimbToggle = false;  // Don't toggle unless requested.
-		driveClimbModeToggle = false;  // Don't toggle unless requested.
+		buddyClimbDeployed = subsystems.buddyClimb.isExtended();
+		climbMode = subsystems.drivebase.isClimbModeEnabled();
 		climberBrakeApplied = subsystems.drivebase.isBrakeApplied();
 		loaderSpinnerRPS = subsystems.loader.getTargetSpinnerRPS();
 		loaderPassthroughDutyCycle = subsystems.loader.getTargetPassthroughDutyCycle();
@@ -90,6 +93,7 @@ public class State {
 		colourAction = subsystems.colourWheel.getDesiredAction();
 		extendColourWheel = subsystems.colourWheel.isArmExtended();
 		expectedNumberOfBalls = null;  // Leave as null so it can be ignored downstream.
+		ledColour = null;
 	}
 
 	// Time
@@ -200,8 +204,13 @@ public class State {
 
 	
 	// Toggle between drive and climb modes
-	public State toggleDriveClimbMode() {
-		driveClimbModeToggle = true;
+	public State enableClimbMode() {
+		climbMode = true;
+		return this;
+	}
+
+	public State enableDriveMode() {
+		climbMode = false;
 		return this;
 	}
 
@@ -215,12 +224,13 @@ public class State {
 		return this;
 	}
 
-	/**
-	 * Calling this will retract the buddy climb if it was deployed
-	 * and deploy it if it was retracted.
-	 */
-	public State toggleBuddyClimb() {
-		buddyClimbToggle = true;
+	public State deployBuddyClimb() {
+		buddyClimbDeployed = true;
+		return this;
+	}
+
+	public State stowBuddyClimb() {
+		buddyClimbDeployed = false;
 		return this;
 	}
 	
@@ -260,7 +270,14 @@ public class State {
 		return this;
 	}
 
-	// Drive base
+	//LED strip
+	
+	public State setColour(LEDColour c) {
+		ledColour = c;
+		return this;
+	}
+
+	// Drive base	
 	/**
 	 * Set the power levels on the drive base.
 	 * Used to drive the robot forward or backwards in a
@@ -362,7 +379,7 @@ public class State {
 			// if (!field.canAccess(current)) continue;
 			try {
 				if (field.get(desiredState) == null) {
-					// In some cases this field in currentState can also be null.
+					// In some cases this field in currentState can also be null.				
 					field.set(updatedState, field.get(currentState));
 				} else {
 					field.set(updatedState, field.get(desiredState));
@@ -375,6 +392,27 @@ public class State {
 			}
 		}
 		return updatedState;
+	}
+
+	/**
+	 * Auto fill the endState to be applied when a sequence is interrupted
+	 */
+	public void fillInterrupt(State newState) {
+		intakeRPS = fillParam(intakeRPS, newState.intakeRPS);
+		loaderPassthroughDutyCycle = fillParam(loaderPassthroughDutyCycle, newState.loaderPassthroughDutyCycle);
+		loaderSpinnerRPS = fillParam(loaderSpinnerRPS, newState.loaderSpinnerRPS);
+		shooterRPS = fillParam(shooterRPS, newState.shooterRPS);
+		intakeExtended = fillParam(intakeExtended, newState.intakeExtended);
+	}
+
+	/**
+	 * Set value to newValue if newValue is non null
+	 */
+	private static <T> T fillParam(T value, T newValue){
+		if (newValue != null)
+			return newValue;
+		else 
+			return value;
 	}
 	
 	/**
@@ -391,12 +429,12 @@ public class State {
 	@Override
 	public String toString() {
 		ArrayList<String> result = new ArrayList<String>();
-		maybeAdd("buddyClimbToggle", buddyClimbToggle, result);
+		maybeAdd("buddyClimbDeployed", buddyClimbDeployed, result);
 		maybeAdd("cameraMode", cameraMode, result);
 		maybeAdd("colourWheelExtended", extendColourWheel, result);
 		maybeAdd("colourwheelMode", colourAction, result);
 		maybeAdd("climberBrakeApplied", climberBrakeApplied, result);
-		maybeAdd("driveClimbToggle", driveClimbModeToggle, result);
+		maybeAdd("climbMode", climbMode, result);
 		maybeAdd("drive", drive, result);
 		maybeAdd("intakeExtended", intakeExtended, result);
 		maybeAdd("loaderPaddleBlocking", loaderPaddleBlocking, result);

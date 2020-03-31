@@ -5,14 +5,18 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
+
+import frc.robot.interfaces.ColourWheelInterface.ColourAction;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
+
+import frc.robot.controller.Sequence.SequenceBuilder;
+
 
 /**
  * The controller of State Sequences while ensuring the robot is safe at every
@@ -38,12 +42,14 @@ public class Controller implements Runnable, DashboardUpdater {
 	private final Clock clock;
 	private final DashboardInterface dashboard;
 	private final Log log;
-	private Sequence sequence = new Sequence("idle"); // Current sequence we are working through.
+	private Sequence sequence = new SequenceBuilder("idle",false).build(); // Current sequence we are working through.
 	private boolean sequenceHasChanged = true;
-	private boolean sequenceHasFinished = false;
+	private boolean sequenceHasFinished = true;
 	private String blockedBy = "";
 	private boolean isAlive = true; // For unit tests
 	private Supplier<WheelColour> fmsColour;
+	private State endState = new State();
+
 
 	public Controller(Subsystems subsystems, Supplier<WheelColour> fmsColour) {
 		this.subsystems = subsystems;
@@ -62,6 +68,7 @@ public class Controller implements Runnable, DashboardUpdater {
 			if (!sequenceHasFinished)
 				return;
 		}
+		endState = this.sequence.getEndState();
 		this.sequence = sequence;
 		sequenceHasChanged = true;
 		logSub("Sequence has changed to %s sequence", sequence.getName());
@@ -77,15 +84,20 @@ public class Controller implements Runnable, DashboardUpdater {
 	public void run() {
 		try {
 			Iterator<State> iterator = null;
+
 			while (true) {
 				State desiredState = null;
 				synchronized (this) {
+					if (!sequenceHasFinished && sequenceHasChanged) {
+						logSub("Sequence interrupted, applying end state.");
+						applyState(endState);
+					}	
 					if (sequenceHasChanged || iterator == null) {
 						logSub("State sequence has changed, now executing %s sequence", sequence.getName());
 						iterator = sequence.iterator();
 						sequenceHasChanged = false;
 						sequenceHasFinished = false;
-					}
+					}				
 					if (!iterator.hasNext()) {
 						logSub("Sequence %s is complete", sequence.getName());
 						sequenceHasFinished = true;
@@ -170,28 +182,19 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.shooter.setTargetRPS(desiredState.shooterRPS);
 		subsystems.shooter.setHoodExtended(desiredState.shooterHoodExtended);
 
-		// Toggle buddy climb if needed
-		if (desiredState.buddyClimbToggle) {
-			subsystems.buddyClimb.setExtended(!subsystems.buddyClimb.isExtended());
-		}
+		subsystems.ledStrip.setColour(desiredState.ledColour);
 
-		// Toggle between drive and climb modes if needed
-		if (desiredState.driveClimbModeToggle) {
-			subsystems.drivebase.activateClimbMode(!subsystems.drivebase.isClimbModeEnabled());
-		}
+		subsystems.buddyClimb.setExtended(desiredState.buddyClimbDeployed);
+
+		subsystems.drivebase.activateClimbMode(desiredState.climbMode);
 
 		//subsystems.jevois.setCameraMode(desiredState.cameraMode);
 		maybeWaitForBalls(desiredState.expectedNumberOfBalls);
-		waitForIntake();
-		waitForBlocker();
-		waitForShooterHood();
-
-		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
-		if (desiredState.shooterUpToSpeed != null && desiredState.shooterUpToSpeed && desiredState.shooterRPS == 0) {
-			subsystems.ledStrip.setColour(LEDColour.PURPLE);
-			logSub("Should never be waiting for the shooter to reach 0 RPS. Running the empty sequence");
-			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
-		}
+		
+		maybeWaitForBuddyClimb();
+		maybeWaitForIntake();
+		maybeWaitForBlocker();
+		maybeWaitForShooterHood();
 
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
@@ -215,34 +218,50 @@ public class Controller implements Runnable, DashboardUpdater {
 	/**
 	 * Blocks waiting till the intake is in position.
 	 */
-	private void waitForIntake() {
-		waitUntil(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
+	private void maybeWaitForIntake() {
+		try {
+			waitUntilOrAbort(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while deploying/intaking");
+		}		
 	}
-
 	/**
 	 * Blocks waiting till the blocker is in position.
 	 */
-	private void waitForBlocker() {
-		waitUntil(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
+	private void maybeWaitForBlocker() {
+		try {
+			waitUntilOrAbort(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while blocking/not blocking with paddle");
+		}		
 	}
 
 	/**
 	 * Blocks waiting till the shooter hood is in position.
 	 */
-	private void waitForShooterHood() {
-		waitUntil(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
+	private void maybeWaitForShooterHood() {
+			try {
+				waitUntilOrAbort(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while Shooter Hood extends/retracts");
+		}		
 	}
-
 	/**
 	 * Maybe wait for the shooter to get up to the target speed.
 	 * @param shooterUpToSpeed if not null, blocks waiting for shooter to achieve target speed.
 	 */
 	private void maybeWaitForShooter(Boolean shooterUpToSpeed) {
+		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
+		if (shooterUpToSpeed && subsystems.shooter.getTargetRPS() == 0) {
+			subsystems.ledStrip.setColour(LEDColour.PURPLE);
+			logSub("Should never be waiting for the shooter to reach 0 RPS. Running the empty sequence");
+			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
+		}
+
 		if (shooterUpToSpeed == null) {
 			// Don't wait.
 			return;
 		}
-		
 		try {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {
@@ -259,6 +278,14 @@ public class Controller implements Runnable, DashboardUpdater {
 			// The sequence has changed, setting action to null.
 			subsystems.colourWheel.setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
 			subsystems.colourWheel.setArmExtended(false);
+		}
+	}
+
+	private void maybeWaitForBuddyClimb() {
+		try {
+			waitUntilOrAbort(() -> subsystems.buddyClimb.isExtended() || subsystems.buddyClimb.isRetracted(), "buddy climb to finish moving");
+		} catch (SequenceChangedException e) {
+			logSub("Sequence changed while moving buddy climb");
 		}
 	}
 
@@ -330,7 +357,7 @@ public class Controller implements Runnable, DashboardUpdater {
 	 */
 	private void waitUntil(BooleanSupplier func, String name) {
 		double startTimeSec = clock.currentTime();
-		double waitDurationSec = 1;
+		double waitDurationSec = 0.25;
 		double nextLogTimeSec = startTimeSec + waitDurationSec;
 		// Keep waiting until func returns true
 		while (!func.getAsBoolean()) {
@@ -346,7 +373,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		blockedBy = "";
 		if (clock.currentTime() - nextLogTimeSec > 1) {
 			// Print a final message.
-			logSub("Controller done waiting on %s", name);
+			logSub("Controller done waiting on %s, has waited %fs so far", name,  clock.currentTime() - startTimeSec);
 		}
 	}
 
