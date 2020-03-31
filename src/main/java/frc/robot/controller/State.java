@@ -4,18 +4,17 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
-
 import org.strongback.components.Clock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
+import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
-import frc.robot.lib.WheelColour;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.TimeAction;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -31,6 +30,9 @@ public class State {
 	// be changed and the current state be preserved.
 	// Time
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
+
+
+	public String LogString = null;
 
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
@@ -112,6 +114,15 @@ public class State {
 	 */
 	public State setDelayDelta(double seconds) {
 		timeAction = new TimeAction(TimeAction.Type.DELAY_DELTA, seconds);
+		return this;
+	}
+
+	/**  
+	*  Set Status Message
+	*  @param Status to get as a string.
+	*/
+	public State setLogMessage(String message) {
+		LogString = message;
 		return this;
 	}
 
@@ -439,6 +450,7 @@ public class State {
 		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("waitForBalls", expectedNumberOfBalls, result);
+		maybeAdd("logString", LogString, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }
