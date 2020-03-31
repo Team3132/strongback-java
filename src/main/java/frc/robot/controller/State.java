@@ -4,17 +4,17 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
-
 import org.strongback.components.Clock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
+import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
-import frc.robot.lib.WheelColour;
+import frc.robot.lib.LogDygraph;
 import frc.robot.lib.TimeAction;
+import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
 
 /**
@@ -32,7 +32,7 @@ public class State {
 	public TimeAction timeAction = null; // How we should/shouldn't delay at the end of this state
 
 
-	public String logString = null;
+	public String LogString = null;
 
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
@@ -115,12 +115,8 @@ public class State {
 
 	/**  
 	*  Set Status Message
-    *  @param statusMessage to display to log.
+	*  @param Status to get as a string.
 	*/
-	public State setStatusMessageToBruh(String bruhStatus) {
-		logString = bruhStatus;
-		return this;
-	}
 
 	// Intake
 	public State deployIntake() {
@@ -412,6 +408,7 @@ public class State {
 		maybeAdd("shooterUpToSpeed", shooterUpToSpeed, result);
 		maybeAdd("timeAction", timeAction, result);
 		maybeAdd("waitForBalls", expectedNumberOfBalls, result);
+		maybeAdd("logString", LogString, result);
 		return "[" + String.join(",", result) + "]";
 	}
 }
