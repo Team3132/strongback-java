@@ -121,6 +121,10 @@ public class State {
 	*  Set Status Message
 	*  @param Status to get as a string.
 	*/
+	public State setLogMessage(String message) {
+		LogString = message;
+		return this;
+	}
 
 	// Intake
 	public State deployIntake() {
