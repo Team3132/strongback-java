@@ -251,6 +251,10 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * @param shooterUpToSpeed if not null, blocks waiting for shooter to achieve target speed.
 	 */
 	private void maybeWaitForShooter(Boolean shooterUpToSpeed) {
+		if (shooterUpToSpeed == null) {
+			// Don't wait.
+			return;
+		}
 		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
 		if (shooterUpToSpeed && subsystems.shooter.getTargetRPS() == 0) {
 			subsystems.ledStrip.setColour(LEDColour.PURPLE);
@@ -258,10 +262,6 @@ public class Controller implements Runnable, DashboardUpdater {
 			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
 		}
 
-		if (shooterUpToSpeed == null) {
-			// Don't wait.
-			return;
-		}
 		try {
 			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
 		} catch (SequenceChangedException e) {

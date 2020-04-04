@@ -20,6 +20,8 @@ import org.strongback.annotation.ThreadSafe;
 import org.strongback.command.Requirable;
 import org.strongback.drive.TankDrive;
 
+import frc.robot.lib.PIDF;
+
 /**
  * A motor is a device that can be set to operate at a speed.
  *
@@ -188,7 +190,7 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     /**
      * Set PID parameters for motor controllers that support it.
      */
-    public default Motor setPIDF(int slotIdx, double p, double i, double d, double f) {
+    public default Motor setPIDF(int slotIdx, PIDF pidf) {
         // Not implmented by default.
         return this;
     }

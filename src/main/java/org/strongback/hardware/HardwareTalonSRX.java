@@ -3,6 +3,8 @@ package org.strongback.hardware;
 import org.strongback.components.Motor;
 import org.strongback.components.TalonSensorCollection;
 
+import frc.robot.lib.PIDF;
+
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motion.MotionProfileStatus;
@@ -310,12 +312,12 @@ public class HardwareTalonSRX implements Motor {
 	}
 
 	@Override
-	public Motor setPIDF(int slotIdx, double p, double i, double d, double f) {
+	public Motor setPIDF(int slotIdx, PIDF pidf) {
 		// Ignore return values.
-		talon.config_kP(slotIdx, p, 10);
-		talon.config_kI(slotIdx, i, 10);
-		talon.config_kD(slotIdx, d, 10);
-		talon.config_kF(slotIdx, f, 10);
+		talon.config_kP(slotIdx, pidf.p, 10);
+		talon.config_kI(slotIdx, pidf.i, 10);
+		talon.config_kD(slotIdx, pidf.d, 10);
+		talon.config_kF(slotIdx, pidf.f, 10);
 		return this;
 	}
 

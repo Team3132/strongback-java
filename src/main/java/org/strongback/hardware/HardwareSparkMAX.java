@@ -10,6 +10,8 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 
 import org.strongback.components.Motor;
 
+import frc.robot.lib.PIDF;
+
 /*
  * Package to wrap a Spark MAX controller driving a Neo.
  * 
@@ -88,11 +90,11 @@ public class HardwareSparkMAX implements Motor {
 	}
 
 	@Override
-	public Motor setPIDF(int slotIdx, double p, double i, double d, double f) {
-		getPID().setP(p, slotIdx);
-		getPID().setI(i, slotIdx);
-		getPID().setD(d, slotIdx);
-		getPID().setFF(f, slotIdx);
+	public Motor setPIDF(int slotIdx, PIDF pidf) {
+		getPID().setP(pidf.p, slotIdx);
+		getPID().setI(pidf.i, slotIdx);
+		getPID().setD(pidf.d, slotIdx);
+		getPID().setFF(pidf.f, slotIdx);
 		return this;
 	}
 

@@ -19,6 +19,7 @@ import frc.robot.mock.MockBuddyClimb;
 import frc.robot.mock.MockColourWheel;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
+import frc.robot.mock.MockLEDStrip;
 import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLog;
 import frc.robot.mock.MockLoader;
@@ -67,6 +68,7 @@ public class TestController {
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
 		subsystems.buddyClimb = new MockBuddyClimb(log);
+		subsystems.ledStrip = new MockLEDStrip();
 		
 		exec = new Controller(subsystems, getFMSColour());
 

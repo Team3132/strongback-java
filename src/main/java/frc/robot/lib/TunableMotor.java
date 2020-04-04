@@ -19,18 +19,17 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
 	private final Motor motor;
 	private final NetworkTableHelperInterface networkTable;
 	private double lastUpdateSec = 0;
+	private final PIDF pidf;
 
-	public static void tuneMotor(Motor  motor, int id, double p, double i , double d , double f, NetworkTablesHelper networkTable) {
-		var tunable = new TunableMotor(motor, id, p, i, d, f, networkTable);
-		networkTable.set("p", p);
-		networkTable.set("i", i);
-		networkTable.set("d", d);
-		networkTable.set("f", f);
+	public static void tuneMotor(Motor  motor, PIDF pidf, NetworkTablesHelper networkTable) {
+		var tunable = new TunableMotor(motor, pidf, networkTable);
+		pidf.saveTo(networkTable);
 		Strongback.executor().register(tunable, Priority.LOW);
 	}
 
-	public TunableMotor(Motor motor, int id, double p, double i, double d, double f, NetworkTablesHelper networkTable) {
+	public TunableMotor(Motor motor, PIDF pidf, NetworkTablesHelper networkTable) {
 		this.motor = motor;
+		this.pidf = pidf;
 		this.networkTable = networkTable;
 	}
 	
@@ -45,10 +44,7 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
 	}
 
 	private void update() {
-		double p = networkTable.get("p", Constants.DRIVE_P);
-		double i = networkTable.get("i", Constants.DRIVE_I);
-		double d = networkTable.get("d", Constants.DRIVE_D);
-		double f = networkTable.get("f", Constants.DRIVE_F);
-		motor.setPIDF(0, p, i, d, f);
+		pidf.readFrom(networkTable);
+		motor.setPIDF(0, pidf);
 	}
 }

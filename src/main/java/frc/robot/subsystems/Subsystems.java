@@ -51,7 +51,6 @@ import frc.robot.lib.LEDColour;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.MotorFactory;
 import frc.robot.lib.NavXGyroscope;
-import frc.robot.lib.NetworkTablesHelper;
 import frc.robot.lib.Position;
 import frc.robot.lib.RobotConfiguration;
 import frc.robot.lib.WheelColour;
@@ -160,16 +159,8 @@ public class Subsystems implements DashboardUpdater {
 		}
 		// Redundant drive motors - automatic failover if the talon or the encoders
 		// fail.
-		Motor leftMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
-				config.drivebaseCanIdsLeftWithEncoders, !config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
-				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
-				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
-				clock, log);
-		Motor rightMotor = MotorFactory.getDriveMotor(config.drivebaseMotorControllerType,
-				config.drivebaseCanIdsRightWithEncoders, config.drivebaseSwapLeftRight, config.drivebaseSensorPhase,
-				config.drivebaseRampRate, config.drivebaseCurrentLimiting, config.drivebaseContCurrent,
-				config.drivebasePeakCurrent, config.drivebaseP, config.drivebaseI, config.drivebaseD, config.drivebaseF,
-				clock, log);
+		Motor leftMotor = MotorFactory.getDriveMotor(true, config, clock, log);
+		Motor rightMotor = MotorFactory.getDriveMotor(false, config,clock, log);
 		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT,
 				0.1, 0.1);
 		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId,
@@ -188,20 +179,12 @@ public class Subsystems implements DashboardUpdater {
 		} catch (InterruptedException e) {}
 		log.error("Reset drive encoders to zero, currently are: %f, %f", leftMotor.getPosition(), rightMotor.getPosition());
 
-		// Save PID values into Network Tables
-		NetworkTablesHelper driveHelper = new NetworkTablesHelper("drive");
-		driveHelper.set("p", config.drivebaseP);
-		driveHelper.set("i", config.drivebaseI);
-		driveHelper.set("d", config.drivebaseD);
-		driveHelper.set("f", config.drivebaseF);
-
-
 		Gyroscope gyro = new NavXGyroscope("NavX", config.navxIsPresent, log);
 		gyro.zero();
 		location = new Location(() -> {	leftMotor.setPosition(0);
 			rightMotor.setPosition(0); },
 			leftDriveDistance, rightDriveDistance, gyro, clock, dashboard, log); // Encoders must return metres.
-		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, driveHelper ,dashboard, log);
+		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, dashboard, log);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -384,7 +367,7 @@ public class Subsystems implements DashboardUpdater {
 		
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.2, 0.2);
 		// TODO: replace 0 with appropriate subsystem PIDF values
-		Motor intakeMotor = MotorFactory.getIntakeMotor(config.intakeCanID, true, Constants.INTAKE_P, Constants.INTAKE_I, Constants.INTAKE_D, Constants.INTAKE_F, log);
+		Motor intakeMotor = MotorFactory.getIntakeMotor(config, log);
 		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
 
@@ -416,7 +399,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		 // TODO: replace 0 with appropriate subsystem PIDF values
-		Motor motor = MotorFactory.getColourWheelMotor(config.colourWheelCanID, true, 0, 0, 0, 0, log);
+		Motor motor = MotorFactory.getColourWheelMotor(config, log);
 		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
@@ -475,8 +458,8 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config.loaderSpinnerCanID, false, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log);
-		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config.loaderPassthroughCanID, true, Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F, log); 
+		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config, log);
+		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config, log); 
 		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
 		// The ball sensors are connected to the DIO ports on the rio.
 		DigitalInput inBallSensor = new DigitalInput(Constants.IN_BALL_DETECTOR_DIO_PORT);
@@ -505,8 +488,7 @@ public class Subsystems implements DashboardUpdater {
 		}
 
 		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1);
-		Motor shooterMotor = MotorFactory.getShooterMotor(config.shooterCanIds, true, config.shooterP, config.shooterI,
-				config.shooterD, config.shooterF, clock, log);
+		Motor shooterMotor = MotorFactory.getShooterMotor(config, clock, log);
 
 		shooter = hwShooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);
 	}

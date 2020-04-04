@@ -3,20 +3,16 @@ package frc.robot.subsystems;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Solenoid;
 
-import frc.robot.Constants;
 import frc.robot.drive.routines.ConstantDrive;
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.drive.routines.DriveRoutine.DriveMotion;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.Subsystem;
 
 /**
@@ -28,7 +24,7 @@ import frc.robot.lib.Subsystem;
  * It periodically queries the joysticks (or the auto routine) for the
  * speed/power for each side of the drivebase.
  */
-public class Drivebase extends Subsystem implements DrivebaseInterface, Executable, DashboardUpdater {
+public class Drivebase extends Subsystem implements DrivebaseInterface {
 	private DriveRoutineParameters parameters = DriveRoutineParameters.getConstantPower(0);
 	private DriveRoutine routine = null;
 	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
@@ -40,8 +36,8 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 	private DriveMotion currentMotion;
 
 	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, 
-			NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
-		super("Drive", networkTable, dashboard, log);
+			DashboardInterface dashboard, Log log) {
+		super("Drive", dashboard, log);
 		this.left = left;
 		this.right = right;
 		this.ptoSolenoid = ptoSolenoid;
@@ -139,20 +135,11 @@ public class Drivebase extends Subsystem implements DrivebaseInterface, Executab
 
 	@Override
 	public void enable() {
-			double p = networkTable.get("p", Constants.DRIVE_P);
-			double i = networkTable.get("i", Constants.DRIVE_I);
-			double d = networkTable.get("d", Constants.DRIVE_D);
-			double f = networkTable.get("f", Constants.DRIVE_F);
-			left.setPIDF(0, p, i, d, f);
-					
-			super.enable();
-	
-			log.info("Drivebase  PID values: %f %f %f %f", p, i, d, f);
-	
+
+		super.enable();
+
 		if (routine != null) routine.enable();
 	}
-
-
 
 	public void disable() {
 		super.disable();

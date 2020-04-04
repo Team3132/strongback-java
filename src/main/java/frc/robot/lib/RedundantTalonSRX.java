@@ -367,8 +367,8 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements Motor, TalonS
 	}
 
 	@Override
-    public Motor setPIDF(int slotIdx, double p, double i, double d, double f) {
-		return leader.setPIDF(slotIdx, p, i, d, f);
+    public Motor setPIDF(int slotIdx, PIDF pidf) {
+		return leader.setPIDF(slotIdx, pidf);
 	}
 
 	@Override

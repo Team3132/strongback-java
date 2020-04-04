@@ -43,8 +43,8 @@ public class Constants {
 	/*
 	 * Current limits.
 	 */
-	public static final int DEFAULT_TALON_CONTINUOUS_CURRENT_LIMIT = 30;
-	public static final int DEFAULT_TALON_PEAK_CURRENT_LIMIT = 40;
+	public static final int DEFAULT_CONTINUOUS_CURRENT_LIMIT = 30;
+	public static final int DEFAULT_PEAK_CURRENT_LIMIT = 40;
 
 	/*
 	 * Drivebase Constants

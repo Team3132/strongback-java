@@ -61,10 +61,7 @@ public class RobotConfiguration {
 	public int drivebaseContCurrent = Constants.DRIVE_CONT_CURRENT;
 	public int drivebasePeakCurrent = Constants.DRIVE_PEAK_CURRENT;
 	public double drivebaseRampRate = Constants.DRIVE_RAMP_RATE;
-	public double drivebaseP = Constants.DRIVE_P;
-	public double drivebaseI = Constants.DRIVE_I;
-	public double drivebaseD = Constants.DRIVE_D;
-	public double drivebaseF = Constants.DRIVE_F;
+	public PIDF drivebasePIDF = new PIDF(Constants.DRIVE_P, Constants.DRIVE_I, Constants.DRIVE_D, Constants.DRIVE_F);
 	public String drivebaseMode = Constants.DRIVE_DEFAULT_MODE;
 	public double drivebaseMaxSpeed = Constants.DRIVE_MAX_SPEED;
 
@@ -78,21 +75,21 @@ public class RobotConfiguration {
 	
 	public boolean intakeIsPresent = Constants.INTAKE_PRESENT_DEFAULT;
 	public int intakeCanID = Constants.INTAKE_CAN_ID;
+	public PIDF intakePIDF = new PIDF(Constants.INTAKE_P, Constants.INTAKE_I, Constants.INTAKE_D, Constants.INTAKE_F);
 
 	public boolean colourWheelIsPresent = Constants.COLOUR_WHEEL_PRESENT_DEFAULT;
 	public int colourWheelCanID = Constants.COLOUR_WHEEL_CAN_ID;
+	public PIDF colourWheelPIDF = new PIDF(0, 0, 0, 0);
 
 	public boolean loaderIsPresent = Constants.LOADER_PRESENT_DEFAULT;
 	public int loaderSpinnerCanID = Constants.LOADER_SPINNER_MOTOR_CAN_ID;
+	public PIDF loaderSpinnderPIDF = new PIDF(Constants.LOADER_SPINNER_P, Constants.LOADER_SPINNER_I, Constants.LOADER_SPINNER_D, Constants.LOADER_SPINNER_F);
 	public int loaderPassthroughCanID = Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID;
+	public PIDF loaderPassthroughPIDF = new PIDF(0, 0, 0, 0);
 
 	public boolean shooterIsPresent = Constants.SHOOTER_PRESENT_DEFAULT;
 	public int[] shooterCanIds = Constants.SHOOTER_TALON_CAN_ID_LIST;
-
-	public double shooterP = Constants.SHOOTER_P;
-	public double shooterI = Constants.SHOOTER_I;
-	public double shooterD = Constants.SHOOTER_D;
-	public double shooterF = Constants.SHOOTER_F;
+	public PIDF shooterPIDF = new PIDF(Constants.SHOOTER_P, Constants.SHOOTER_I, Constants.SHOOTER_D, Constants.SHOOTER_F);
 
 	public boolean pdpIsPresent = Constants.PDP_PRESENT_DEFAULT;
 	public int pdpCanId = Constants.PDP_CAN_ID;
@@ -196,35 +193,31 @@ public class RobotConfiguration {
 		drivebaseContCurrent = getAsInt("drivebase/maxCurrent", drivebaseContCurrent);
 		drivebasePeakCurrent = getAsInt("drivebase/peakCurrent", drivebasePeakCurrent);
 		drivebaseRampRate = getAsDouble("drivebase/rampRate", drivebaseRampRate);
-		drivebaseP = getAsDouble("drivebase/p", drivebaseP);
-		drivebaseI = getAsDouble("drivebase/i", drivebaseI);
-		drivebaseD = getAsDouble("drivebase/d", drivebaseD);
-		drivebaseF = getAsDouble("drivebase/f", drivebaseF);
+		drivebasePIDF = getAsPIDF("drivebase", drivebasePIDF);
 		drivebaseMode = getAsString("drivebase/mode", drivebaseMode);
 		drivebaseMaxSpeed = getAsDouble("drivebase/maxSpeed", drivebaseMaxSpeed);
 		drivebaseSwapLeftRight = getAsBoolean("drivebase/swapLeftRight", drivebaseSwapLeftRight);
 		drivebaseSensorPhase = getAsBoolean("drivebase/sensor/phase", drivebaseSensorPhase);
 		drivebaseCount = getAsDouble("drivebase/count100ms", drivebaseCount);
-
 		
 	
 		intakeIsPresent = getAsBoolean("intake/present", intakeIsPresent);
 		intakeCanID = getAsInt("intake/canID", Constants.INTAKE_CAN_ID);
+		intakePIDF = getAsPIDF("intake", intakePIDF);
 
 		colourWheelIsPresent = getAsBoolean("colourWheel/present", colourWheelIsPresent);
 		colourWheelCanID = getAsInt("colourWheel/canID", Constants.COLOUR_WHEEL_CAN_ID);
+		colourWheelPIDF = getAsPIDF("colourWheel", colourWheelPIDF);
 
 		loaderIsPresent = getAsBoolean("loader/present", loaderIsPresent);
 		loaderSpinnerCanID = getAsInt("loader/spinner/canID", Constants.LOADER_SPINNER_MOTOR_CAN_ID);
+		loaderSpinnderPIDF = getAsPIDF("loader/spinner/", loaderSpinnderPIDF);
 		loaderPassthroughCanID = getAsInt("loader/passthrough/canID", Constants.LOADER_PASSTHROUGH_MOTOR_CAN_ID);
+		loaderPassthroughPIDF = getAsPIDF("loader/passthrough/", loaderPassthroughPIDF);
 
 		shooterIsPresent = getAsBoolean("shooter/present", shooterIsPresent);
 		shooterCanIds = getAsIntArray("shooter/shooterCanIDs", Constants.SHOOTER_TALON_CAN_ID_LIST);
-		
-		shooterP = getAsDouble("shooter/p", shooterP);
-		shooterI = getAsDouble("drivebase/i", shooterI);
-		shooterD = getAsDouble("drivebase/d", shooterD);
-		shooterF = getAsDouble("drivebase/f", shooterF);
+		shooterPIDF = getAsPIDF("shooter/", shooterPIDF);
 		
 		pdpIsPresent = getAsBoolean("pdp/present", pdpIsPresent);
 		pdpCanId = getAsInt("pdp/canID", Constants.PDP_CAN_ID);
@@ -327,6 +320,14 @@ public class RobotConfiguration {
 			log.exception("Error reading key: " + key + " using default", e);
 		}
 		return defaultValue;
+	}
+
+	private PIDF getAsPIDF(String prefix, PIDF pidf) {
+		pidf.p = getAsDouble(prefix+"/p", pidf.p);
+		pidf.i = getAsDouble(prefix+"/i", pidf.i);
+		pidf.d = getAsDouble(prefix+"/d", pidf.d);
+		pidf.f = getAsDouble(prefix+"/f", pidf.f);
+		return pidf;
 	}
 	
 	private boolean getAsBoolean(String key, boolean defaultValue) {
