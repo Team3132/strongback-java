@@ -176,6 +176,6 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	 */
 	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine, ControlMode controlMode);
 	public default void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine) {
-		registerDriveRoutine(mode, routine, ControlMode.PercentOutput);
+		registerDriveRoutine(mode, routine, ControlMode.DutyCycle);
 	};
 }

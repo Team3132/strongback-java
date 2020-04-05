@@ -19,8 +19,8 @@ import frc.robot.lib.PIDF;
  * 
  * This currently only supports the built in hall effect encoder.
  * 
- * We have a scale factor. This is useful in position and velocity close loop feedback modes.
- * 	For reading it we divide by the scale factor, when writing values we multiply by the scale factor.
+ * We have a scale factor. This is useful in position and velocity/speed closed loop feedback modes.
+ * For reading it we divide by the scale factor, when writing values we multiply by the scale factor.
  */
 public class HardwareSparkMAX implements Motor {
 	private final com.revrobotics.CANSparkMax spark;
@@ -115,9 +115,15 @@ public class HardwareSparkMAX implements Motor {
 		return this;
 	}
 
+	/**
+	 * Returns the speed as measured by the encoders and scaled by setScale()
+	 * 
+	 * @return Depending on what setScale() was called with, this will return either
+	 *         RPS or meters/second.
+	 */
 	@Override
-	public double getVelocity() {
-		// CANEncoder returns RPM by default. This has been scaled to divide by 60.
+	public double getSpeed() {
+		// CANEncoder returns RPM by default. This has been scaled to be RPS by dividing by 60.
 		return encoder.getVelocity();
 	}
 
@@ -125,7 +131,7 @@ public class HardwareSparkMAX implements Motor {
      * Scale the values to/from the motors into more intuitive values.
      * 
      * getPosition() returns the number of metres.
-     * getVelocity() returns metres/second.
+     * getSpeed() returns metres/second.
      * 
      * Also consider setScale(double ticksPerTurn, double gearRatio).
      * 

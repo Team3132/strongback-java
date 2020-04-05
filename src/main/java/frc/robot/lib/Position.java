@@ -1,7 +1,6 @@
 package frc.robot.lib;
 
 import frc.robot.Constants;
-import frc.robot.lib.MathUtil;
 
 /*
  * The position class defines a position on the field.

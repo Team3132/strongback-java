@@ -1,12 +1,10 @@
 package frc.robot.subsystems;
 
-import org.strongback.Executable;
 import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
 import org.strongback.components.Motor.ControlMode;
 
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.IntakeInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
@@ -38,12 +36,12 @@ public class Intake extends Subsystem implements IntakeInterface
 
     @Override
     public void enable() {
-        motor.set(ControlMode.PercentOutput, 0);
+        motor.set(ControlMode.DutyCycle, 0);
     }
 
     @Override
     public void disable() {
-        motor.set(ControlMode.PercentOutput, 0);
+        motor.set(ControlMode.DutyCycle, 0);
     }
 
     @Override
@@ -100,9 +98,9 @@ public class Intake extends Subsystem implements IntakeInterface
             // unnecessary load on the battery and motor.
             if (rps == 0) { 
                 log.sub("Turning intake wheel off.");
-                motor.set(ControlMode.PercentOutput, 0); 
+                motor.set(ControlMode.DutyCycle, 0); 
             } else {
-                motor.set(ControlMode.Velocity, rps);
+                motor.set(ControlMode.Speed, rps);
             }
             log.sub("Setting intake target speed to %f", targetRPS);
         }
@@ -112,7 +110,7 @@ public class Intake extends Subsystem implements IntakeInterface
         }
 
         public double getRPS() {
-            return motor.getVelocity();
+            return motor.getSpeed();
         }
     }
     

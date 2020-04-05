@@ -20,6 +20,7 @@ import org.strongback.command.Command;
 import org.strongback.command.Requirable;
 import org.strongback.components.Motor;
 import org.strongback.components.Relay;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Relay.State;
 import org.strongback.function.DoubleToDoubleFunction;
 import org.strongback.util.Values;
@@ -177,8 +178,8 @@ public class TankDrive implements Requirable {
             }
         }
 
-        left.setSpeed(leftMotorSpeed);
-        right.setSpeed(rightMotorSpeed);
+        left.set(ControlMode.Speed, leftMotorSpeed);
+        right.set(ControlMode.Speed, rightMotorSpeed);
     }
 
     /**
@@ -205,8 +206,8 @@ public class TankDrive implements Requirable {
                 rightSpeed = -(rightSpeed * rightSpeed);
             }
         }
-        left.setSpeed(leftSpeed);
-        right.setSpeed(rightSpeed);
+        left.set(ControlMode.Speed, leftSpeed);
+        right.set(ControlMode.Speed, rightSpeed);
     }
 
     /**
@@ -219,8 +220,8 @@ public class TankDrive implements Requirable {
     public void tank(double leftSpeed, double rightSpeed) {
         leftSpeed = speedLimiter.applyAsDouble(leftSpeed);
         rightSpeed = speedLimiter.applyAsDouble(rightSpeed);
-        left.setSpeed(leftSpeed);
-        right.setSpeed(rightSpeed);
+        left.set(ControlMode.Speed, leftSpeed);
+        right.set(ControlMode.Speed, rightSpeed);
     }
 
     /**
@@ -409,8 +410,8 @@ public class TankDrive implements Requirable {
             leftPwm += overPower * (-1.0 - rightPwm);
             rightPwm = -1.0;
         }
-        left.setSpeed(leftPwm);
-        right.setSpeed(rightPwm);
+        left.set(ControlMode.DutyCycle, leftPwm);
+        right.set(ControlMode.DutyCycle, rightPwm);
     }
 
     /**
@@ -470,8 +471,8 @@ public class TankDrive implements Requirable {
             leftPwm += overPower * (-1.0 - rightPwm);
             rightPwm = -1.0;
         }
-        left.setSpeed(leftPwm);
-        right.setSpeed(rightPwm);
+        left.set(ControlMode.DutyCycle, leftPwm);
+        right.set(ControlMode.DutyCycle, rightPwm);
     }
 
 }

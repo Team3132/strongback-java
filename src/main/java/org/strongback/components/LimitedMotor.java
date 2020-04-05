@@ -38,7 +38,7 @@ import org.strongback.util.Values;
 public interface LimitedMotor extends Motor {
 
     @Override
-    public LimitedMotor setSpeed(double speed);
+    public void set(ControlMode mode, double demand);
 
     /**
      * Get the switch that signals when this motor reaches its limit in the forward direction.
@@ -84,7 +84,7 @@ public interface LimitedMotor extends Motor {
     default public boolean forward(double speed) {
         // Motor protection
         if (!isAtForwardLimit()) {
-            setSpeed(Math.abs(speed));
+            set(ControlMode.Speed, Math.abs(speed));
         } else {
             stop();
         }
@@ -101,7 +101,7 @@ public interface LimitedMotor extends Motor {
     default public boolean reverse(double speed) {
         // Motor protection
         if (!isAtReverseLimit()) {
-            setSpeed(-Math.abs(speed));
+            set(ControlMode.Speed, -Math.abs(speed));
         } else {
             stop();
         }
@@ -124,26 +124,26 @@ public interface LimitedMotor extends Motor {
         Switch fwdSwitch = forwardSwitch != null ? forwardSwitch : Switch.neverTriggered();
         Switch revSwitch = reverseSwitch != null ? reverseSwitch : Switch.neverTriggered();
         return new LimitedMotor() {
-            @Override
-            public double getSpeed() {
-                double speed = motor.getSpeed();
-                int direction = Values.fuzzyCompare(speed, 0.0);
-                if (direction > 0 && fwdSwitch.isTriggered()) return 0.0;
-                if (direction < 0 && revSwitch.isTriggered()) return 0.0;
-                return speed;
-            }
 
             @Override
-            public LimitedMotor setSpeed(double speed) {
-                int direction = Values.fuzzyCompare(speed, 0.0);
+            public void set(ControlMode mode, double demand) {
+                int direction = Values.fuzzyCompare(demand, 0.0);
                 if (direction > 0 && !fwdSwitch.isTriggered()) {
-                    motor.setSpeed(speed);
+                    motor.set(mode, demand);
                 } else if (direction < 0 && !revSwitch.isTriggered()) {
-                    motor.setSpeed(speed);
+                    motor.set(mode, demand);
                 } else {
                     motor.stop();
                 }
-                return this;
+            }
+
+            @Override
+            public double get() {
+                double demand = motor.get();
+                int direction = Values.fuzzyCompare(demand, 0.0);
+                if (direction > 0 && fwdSwitch.isTriggered()) return 0.0;
+                if (direction < 0 && revSwitch.isTriggered()) return 0.0;
+                return demand;
             }
 
             @Override

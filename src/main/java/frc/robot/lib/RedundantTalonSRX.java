@@ -25,7 +25,7 @@ import frc.robot.interfaces.Log;
  * Most of this file is plumbing the TalonSRX methods through to one or more
  * of the underlying talons.
  */
-public class RedundantTalonSRX extends HardwareTalonSRX implements Motor, TalonSensorCollection, Executable {
+public class RedundantTalonSRX extends HardwareTalonSRX implements TalonSensorCollection, Executable {
 
 	private ArrayList<HardwareTalonSRX> potentialLeaders;  // All leaders.
 	private ArrayList<HardwareTalonSRX> followers;
@@ -55,7 +55,7 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements Motor, TalonS
 	
 	// Remember the last values from set(...) so that when the leadership is changed
 	// the new leader can be told what to do until set() is called again.
-	ControlMode lastMode = ControlMode.Velocity;
+	ControlMode lastMode = ControlMode.Speed;
 	double lastDemand0 = 0;
 	
 	public RedundantTalonSRX(ArrayList<HardwareTalonSRX> potentialLeaders, ArrayList<HardwareTalonSRX> followers, Clock clock, Log log) {
@@ -166,7 +166,7 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements Motor, TalonS
 		double sum = 0;
 		int count = 0;
 		for (HardwareTalonSRX talon : potentialLeaders) {
-			double speed = Math.abs(talon.getVelocity());
+			double speed = Math.abs(talon.getSpeed());
 			speedHash.put(talon, speed);
 			sum += speed;
 			count++;
@@ -362,8 +362,8 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements Motor, TalonS
 	}
 
 	@Override
-	public double getVelocity() {
-		return leader.getVelocity();
+	public double getSpeed() {
+		return leader.getSpeed();
 	}
 
 	@Override

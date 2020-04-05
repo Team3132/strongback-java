@@ -1,8 +1,6 @@
 package frc.robot;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 import org.jibble.simplewebserver.SimpleWebServer;
@@ -20,7 +18,6 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpiutil.net.PortForwarder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpiutil.net.PortForwarder;
 import frc.robot.controller.Controller;
@@ -279,7 +276,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void createPowerMonitor() {
 		// Do not monitor if not present, or we have been asked not to monitor
-		boolean enabled = config.pdpIsPresent || config.pdpMonitor;
+		//boolean enabled = config.pdpIsPresent || config.pdpMonitor;
 		//pdp = new PowerMonitor(new PowerDistributionPanel(config.pdpCanId), config.pdpChannelsToMonitor, enabled, log);
 	}
 

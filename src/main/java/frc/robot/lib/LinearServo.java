@@ -2,8 +2,6 @@
 package frc.robot.lib;
 
 
-import frc.robot.lib.MathUtil;
-
 import edu.wpi.first.wpilibj.Servo;
 
 public class LinearServo {

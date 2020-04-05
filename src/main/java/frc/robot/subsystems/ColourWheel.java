@@ -4,19 +4,18 @@ import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
 import org.strongback.components.Motor;
-import org.strongback.components.Solenoid;
 import org.strongback.components.Motor.ControlMode;
+import org.strongback.components.Solenoid;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.interfaces.ColourWheelInterface;
+import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.lib.WheelColour;
 import frc.robot.lib.LEDColour;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.WheelColour;
 
 /**
  * This subsystem is made to spin the Colour Wheel on the control panel in the
@@ -102,7 +101,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       break;
     }
     if (newSpeed != speed) {
-      motor.set(ControlMode.PercentOutput, newSpeed);
+      motor.set(ControlMode.DutyCycle, newSpeed);
       speed = newSpeed;
     }
   }
@@ -257,7 +256,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
 
   @Override
   public void disable() {
-    motor.set(ControlMode.PercentOutput, 0);
+    motor.set(ControlMode.DutyCycle, 0);
     action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
   }
 

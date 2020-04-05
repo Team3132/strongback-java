@@ -168,8 +168,8 @@ public class Subsystems implements DashboardUpdater {
 
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
-		leftDriveSpeed = () -> leftMotor.getVelocity();
-		rightDriveSpeed = () -> rightMotor.getVelocity();
+		leftDriveSpeed = () -> leftMotor.getSpeed();
+		rightDriveSpeed = () -> rightMotor.getSpeed();
 
 		leftMotor.setPosition(0);
 		rightMotor.setPosition(0);
@@ -189,8 +189,8 @@ public class Subsystems implements DashboardUpdater {
 		Strongback.executor().register(location, Priority.HIGH);
 
 		// Add the supported drive routines
-		drivebase.registerDriveRoutine(DriveRoutineType.CONSTANT_POWER, new ConstantDrive(), ControlMode.PercentOutput);
-		drivebase.registerDriveRoutine(DriveRoutineType.CONSTANT_SPEED, new ConstantDrive(), ControlMode.Velocity);
+		drivebase.registerDriveRoutine(DriveRoutineType.CONSTANT_POWER, new ConstantDrive(), ControlMode.DutyCycle);
+		drivebase.registerDriveRoutine(DriveRoutineType.CONSTANT_SPEED, new ConstantDrive(), ControlMode.Speed);
 		// The old favourite arcade drive with throttling if a button is pressed.
 		drivebase.registerDriveRoutine(DriveRoutineType.ARCADE, new ArcadeDrive("Arcade", 1.0, () -> { // Throttle.
 			double scale = 1;
@@ -221,7 +221,7 @@ public class Subsystems implements DashboardUpdater {
 			}
 			return -rightStick.getAxis(0).read() * scale; // Turn power.
 		},
-		true, log), ControlMode.Velocity);
+		true, log), ControlMode.Speed);
 		// Cheesy drive.
 		drivebase.registerDriveRoutine(DriveRoutineType.CHEESY, new CheesyDpadDrive(leftStick.getDPad(0), // DPad
 				leftStick.getAxis(GamepadButtonsX.LEFT_Y_AXIS), // Throttle
@@ -301,6 +301,9 @@ public class Subsystems implements DashboardUpdater {
 	}
 
 	public double getVisionDistance(){
+		// returning zero for now so visionAim just aims the robot (doesn't drive to a distance)
+		// TODO: reincorporate the distance measurment into how we shoot
+		/*
 		if (vision == null || !vision.isConnected()) return 0;
 		TargetDetails details = vision.getTargetDetails();
 		if (!details.isValid(clock.currentTime())) return 0;
@@ -308,9 +311,9 @@ public class Subsystems implements DashboardUpdater {
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
 		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
-		// returning zero for now so visionAim just aims the robot (doesn't drive to a distance)
-		// TODO: reincorporate the distance measurment into how we shoot
-		return 0; //distance; 
+		return distance; 
+		*/
+		return 0;
 	}
 	
 	public Position getVisionWaypoint() {
@@ -366,7 +369,6 @@ public class Subsystems implements DashboardUpdater {
 		}
 		
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.2, 0.2);
-		// TODO: replace 0 with appropriate subsystem PIDF values
 		Motor intakeMotor = MotorFactory.getIntakeMotor(config, log);
 		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
@@ -398,7 +400,6 @@ public class Subsystems implements DashboardUpdater {
 			log.sub("Colour Sensor not present, using a mock colour sensor instead");
 			return;
 		}
-		 // TODO: replace 0 with appropriate subsystem PIDF values
 		Motor motor = MotorFactory.getColourWheelMotor(config, log);
 		Solenoid colourWheelSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.COLOUR_WHEEL_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 

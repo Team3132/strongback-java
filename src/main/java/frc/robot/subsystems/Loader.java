@@ -59,9 +59,9 @@ public class Loader extends Subsystem implements LoaderInterface {
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
         if (rps == 0) {
-            spinner.set(ControlMode.PercentOutput, 0);
+            spinner.set(ControlMode.DutyCycle, 0);
         } else {
-            spinner.set(ControlMode.Velocity, rps);
+            spinner.set(ControlMode.Speed, rps);
         }
     }
 
@@ -71,7 +71,7 @@ public class Loader extends Subsystem implements LoaderInterface {
     }
 
     public double getSpinnerMotorRPS() {
-        return spinner.getVelocity();
+        return spinner.getSpeed();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
         targetPassthroughDutyCycle = percent;
-        passthrough.set(ControlMode.PercentOutput, percent);
+        passthrough.set(ControlMode.DutyCycle, percent);
     }
 
     @Override
@@ -142,14 +142,14 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     @Override
     public void enable() {
-        spinner.set(ControlMode.PercentOutput, 0);
-        passthrough.set(ControlMode.PercentOutput, 0);
+        spinner.set(ControlMode.DutyCycle, 0);
+        passthrough.set(ControlMode.DutyCycle, 0);
     }
 
     @Override
     public void disable() {
-        spinner.set(ControlMode.PercentOutput, 0);
-        passthrough.set(ControlMode.PercentOutput, 0);
+        spinner.set(ControlMode.DutyCycle, 0);
+        passthrough.set(ControlMode.DutyCycle, 0);
     }
 
     @Override

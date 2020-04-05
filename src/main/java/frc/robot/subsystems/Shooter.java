@@ -97,9 +97,9 @@ public class Shooter extends Subsystem implements ShooterInterface {
             // unnecessary load on the battery and motor.
             if (rps == 0) { 
                 log.sub("Turning shooter wheel off.");
-                motor.set(ControlMode.PercentOutput, 0); 
+                motor.set(ControlMode.DutyCycle, 0); 
             } else {
-                motor.set(ControlMode.Velocity, rps);
+                motor.set(ControlMode.Speed, rps);
             }
             log.sub("Setting shooter target speed to %f", targetRPS);
         }
@@ -109,7 +109,7 @@ public class Shooter extends Subsystem implements ShooterInterface {
         }
 
         public double getRPS() {
-            return motor.getVelocity();
+            return motor.getSpeed();
         }
     }
 

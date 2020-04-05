@@ -22,6 +22,7 @@ import org.strongback.command.Requirable;
 import org.strongback.components.AngleSensor;
 import org.strongback.components.Motor;
 import org.strongback.components.Stoppable;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.function.DoubleToDoubleFunction;
 import org.strongback.util.Values;
 
@@ -199,10 +200,10 @@ public class MecanumDrive implements Stoppable, Requirable {
 
         normalize(wheelSpeeds);
         scale(wheelSpeeds, OUTPUT_SCALE_FACTOR);
-        leftFront.setSpeed(wheelSpeeds[LEFT_FRONT]);
-        leftRear.setSpeed(wheelSpeeds[LEFT_REAR]);
-        rightFront.setSpeed(wheelSpeeds[RIGHT_FRONT]);
-        rightRear.setSpeed(wheelSpeeds[RIGHT_REAR]);
+        leftFront.set(ControlMode.Speed, wheelSpeeds[LEFT_FRONT]);
+        leftRear.set(ControlMode.Speed, wheelSpeeds[LEFT_REAR]);
+        rightFront.set(ControlMode.Speed, wheelSpeeds[RIGHT_FRONT]);
+        rightRear.set(ControlMode.Speed, wheelSpeeds[RIGHT_REAR]);
     }
 
     /**
@@ -231,10 +232,10 @@ public class MecanumDrive implements Stoppable, Requirable {
 
         normalize(wheelSpeeds);
         scale(wheelSpeeds, OUTPUT_SCALE_FACTOR);
-        leftFront.setSpeed(wheelSpeeds[LEFT_FRONT]);
-        leftRear.setSpeed(wheelSpeeds[LEFT_REAR]);
-        rightFront.setSpeed(wheelSpeeds[RIGHT_FRONT]);
-        rightRear.setSpeed(wheelSpeeds[RIGHT_REAR]);
+        leftFront.set(ControlMode.Speed, wheelSpeeds[LEFT_FRONT]);
+        leftRear.set(ControlMode.Speed, wheelSpeeds[LEFT_REAR]);
+        rightFront.set(ControlMode.Speed, wheelSpeeds[RIGHT_FRONT]);
+        rightRear.set(ControlMode.Speed, wheelSpeeds[RIGHT_REAR]);
     }
 
     /**

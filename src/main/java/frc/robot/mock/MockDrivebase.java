@@ -1,7 +1,6 @@
 package frc.robot.mock;
 
 import org.strongback.components.Motor.ControlMode;
-import org.strongback.mock.MockSolenoid;
 
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.DrivebaseInterface;

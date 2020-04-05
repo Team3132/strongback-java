@@ -10,11 +10,8 @@ import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.JevoisInterface;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.interfaces.VisionInterface;
-import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
-import frc.robot.lib.PrintStack;
 import frc.robot.lib.Subsystem;
 
 public class Vision extends Subsystem implements VisionInterface, DashboardUpdater, Runnable {
@@ -161,7 +158,6 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 
 	@Override
 	public void updateDashboard() {
-		boolean targetFound = lastSeenTarget.targetFound;
 		double lockAgeSec = (clock.currentTime() - lastSeenTarget.imageTimestamp);
 		double angle = 0, distance = 0;
 		if (lastSeenTarget.isValid(clock.currentTime())) {

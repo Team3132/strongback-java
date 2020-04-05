@@ -27,7 +27,7 @@ import frc.robot.lib.Subsystem;
 public class Drivebase extends Subsystem implements DrivebaseInterface {
 	private DriveRoutineParameters parameters = DriveRoutineParameters.getConstantPower(0);
 	private DriveRoutine routine = null;
-	private ControlMode controlMode = ControlMode.PercentOutput;  // The mode the talon should be in.
+	private ControlMode controlMode = ControlMode.DutyCycle;  // The mode the talon should be in.
 	private final Motor left;
 	private final Motor right;
 	private Solenoid ptoSolenoid;
@@ -47,12 +47,12 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 		currentMotion = new DriveMotion(0, 0);
 		routine = new ConstantDrive();
 		disable(); // disable until we are ready to use it.
-		log.register(true, () -> currentMotion.left, "%s/setpoint/Left", name) // talons work in units/100ms
-				.register(true, () -> currentMotion.right, "%s/setpoint/Right", name) // talons work in units/100ms
+		log.register(true, () -> currentMotion.left, "%s/setpoint/Left", name)
+				.register(true, () -> currentMotion.right, "%s/setpoint/Right", name)
 				.register(false, () -> left.getPosition(), "%s/position/Left", name)
 				.register(false, () -> right.getPosition(), "%s/position/Right", name)
-				.register(false, () -> left.getVelocity(), "%s/speed/Left", name) // talons work in units/100ms
-				.register(false, () -> right.getVelocity(), "%s/speed/Right", name) // talons work in units/100ms
+				.register(false, () -> left.getSpeed(), "%s/speed/Left", name)
+				.register(false, () -> right.getSpeed(), "%s/speed/Right", name)
 				.register(false, () -> left.getOutputVoltage(), "%s/outputVoltage/Left", name)
 				.register(false, () -> right.getOutputVoltage(), "%s/outputVoltage/Right", name)
 				.register(false, () -> left.getOutputPercent(), "%s/outputPercentage/Left", name)
@@ -120,8 +120,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 		// Query the drive routine for the desired wheel speed/power.
 		if (routine == null) return;  // No drive routine set yet.
 		// Ask for the power to supply to each side. Pass in the current wheel speeds.
-		// TODO: Ensure that this is in meters/sec (not inches/100ms). See comment above.
-		DriveMotion motion = routine.getMotion(left.getVelocity(), right.getVelocity());
+		DriveMotion motion = routine.getMotion(left.getSpeed(), right.getSpeed());
 		//log.debug("drive subsystem motion = %.1f, %.1f", motion.left, motion.right);
 		if (motion.equals(currentMotion)) {
 			return; // No change.
@@ -144,16 +143,16 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 	public void disable() {
 		super.disable();
 		if (routine != null) routine.disable();
-		left.set(ControlMode.PercentOutput, 0.0);
-		right.set(ControlMode.PercentOutput, 0.0);
+		left.set(ControlMode.DutyCycle, 0.0);
+		right.set(ControlMode.DutyCycle, 0.0);
 		currentMotion.left = 0;
 		currentMotion.right = 0;
 	}
 
 	@Override
 	public void updateDashboard() {
-		dashboard.putNumber("Left drive motor", currentMotion.left);
-		dashboard.putNumber("Right drive motor", currentMotion.right);
+		dashboard.putNumber("Left drive motor duty cycle", currentMotion.left);
+		dashboard.putNumber("Right drive motor duty cycle", currentMotion.right);
 		dashboard.putNumber("Left drive pos", left.getPosition());
 		dashboard.putNumber("Right drive pos", right.getPosition());
 		dashboard.putString("Drive control", routine.getName());

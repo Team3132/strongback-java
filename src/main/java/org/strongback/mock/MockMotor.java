@@ -19,68 +19,58 @@ package org.strongback.mock;
 import org.strongback.components.Motor;
 
 /**
- * A {@link Motor} implementation useful for testing. This motor does nothing but maintain a record of the current speed.
+ * A {@link Motor} implementation useful for testing. This motor does nothing but maintain a record of the current demand.
+ * 
+ * Because there are multiple modes (duty cycle, speed, position etc), the get{Speed|Position}() will only return the
+ * last set demand if set() was set with that mode last time.
  *
  * @author Randall Hauch
  *
  */
 public class MockMotor implements Motor {
 
-    private volatile double speed = 0;
-    private volatile double position = 0;
-    private volatile double output = 0;
-    private volatile ControlMode mode = ControlMode.PercentOutput;
+    private volatile double demand = 0;
+    private volatile ControlMode mode = ControlMode.DutyCycle;
 
-    MockMotor(double speed) {
-        this.speed = speed;
+    MockMotor(double dutyCycle) {
+        mode = ControlMode.DutyCycle;
+        this.demand = dutyCycle;
     }
-
 
     @Override
     public void set(ControlMode mode, double demand) {
-        // Default implementation. Either set() or setSpeed() needs to be implemented.
-        switch (mode) {
-            case Velocity:
-                setSpeed(demand);
-                break;
-            case PercentOutput:
-                this.mode = mode;
-                speed = output = demand;
-                break;
-            case Position:
-                this.mode = mode;
-                position = demand;
-                break;
-            default:
-                break;
-        }
+        this.mode = mode;
+        this.demand = demand;
     }
 
     @Override
     public double getSpeed() {
-        return speed;
+        if (mode == ControlMode.Speed) return demand;
+        // Wasn't told a speed last time, return 0.
+        return 0;
     }
 
     @Override
-    public MockMotor setSpeed(double speed) {
-        mode = ControlMode.Velocity;
-        this.speed = speed;
-        return this;
+    public double get() {
+        return demand;
     }
 
     @Override
     public String toString() {
-        return Double.toString(getSpeed());
+        return String.format("mode: %s, demand %f", mode, demand);
     }
 
     @Override
     public double getPosition() {
-        return position;
+        if (mode == ControlMode.Position) return demand;
+        // Wasn't told a position last time, return 0.
+        return 0;
     }
 
     @Override
     public double getOutputPercent() {
-        // Not implmented by default.
-        return output;
+        if (mode == ControlMode.DutyCycle) return demand;
+        // Wasn't told a duty cycle last time, return 0.
+        return 0;
     }
 }

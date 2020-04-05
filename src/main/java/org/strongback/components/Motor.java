@@ -29,21 +29,24 @@ import frc.robot.lib.PIDF;
  *
  */
 @ThreadSafe
-public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirable {
+public interface Motor extends SpeedSensor, Stoppable, Requirable {
 
     public enum ControlMode {
         /**
-         * Percent output [-1,1]
+         * Set the faction of time that the motor is being powered [-1,1].
+         * Same as percent output.
          */
-        PercentOutput(0, com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput, com.revrobotics.ControlType.kDutyCycle),
+        DutyCycle(0, com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput, com.revrobotics.ControlType.kDutyCycle),
         /**
          * Position closed loop
          */
         Position(1, com.ctre.phoenix.motorcontrol.ControlMode.Position, com.revrobotics.ControlType.kPosition),
         /**
-         * Velocity closed loop
+         * Speed closed loop
+         * This is what both the Talon and the Spark MAX call velocity, but there is no direction component
+         * so we call it speed.
          */
-        Velocity(2, com.ctre.phoenix.motorcontrol.ControlMode.Velocity, com.revrobotics.ControlType.kVelocity),
+        Speed(2, com.ctre.phoenix.motorcontrol.ControlMode.Velocity, com.revrobotics.ControlType.kVelocity),
         /**
          * Input current closed loop
          */
@@ -100,26 +103,18 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     /**
      * Tell the motor what control mode and how fast/far.
      * Some motor controllers don't support some modes.
-     * Normally for Velocity mode, this is in rps, not ticks / 100ms.
+     * Normally for Speed mode, this is in rps, not ticks / 100ms.
      * 
      * @param mode percent output, position, velocity etc.
      * @param demand for percent [-1,1].
      */
-    public default void set(final ControlMode mode, double demand) {
-        // Default implementation. Either set() or setSpeed() needs to be implemented.
-        if (mode != ControlMode.PercentOutput) {
-            System.err.printf("ERROR: Unsupported motor control mode %s\n", mode);
-            demand = 0;
-        }
-        setSpeed(demand);
-    }
+    public void set(final ControlMode mode, double demand);
 
     /**
      * Ask for the last set demand.
+     * Not normally useful without the control mode used.
      */
-    public default double get() {
-        return getSpeed();
-    }
+    public double get();
 
     /**
      * Returns the velocity after scaling.
@@ -127,7 +122,7 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
      * 
      * Not supported by all motor controllers.
      */
-    public default double getVelocity() {
+    public default double getSpeed() {
         // Not implmented by default.
         return 0;
     }
@@ -298,41 +293,17 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     }
 
     /**
-     * Gets the current duty cycle as set by setSpeed().
-     * This is a value from -1...1 not a speed.
-     * 
-     * TODO: Fix this by removing it and renaming getVelocity() to getSpeed().
-     * 
-     * @return the speed, will be between -1.0 and 1.0 inclusive
-     */
-    @Override
-    public default double getSpeed() {
-        return get();
-    }
-
-    /**
-     * Sets the speed of this {@link Motor}.
-     *
-     * @param speed the new speed as a double, clamped to -1.0 to 1.0 inclusive
-     * @return this object to allow chaining of methods; never null
-     */
-    @Override
-    public default Motor setSpeed(double speed) {
-        set(ControlMode.PercentOutput, speed);
-        return this;
-    }
-
-    /**
-     * Stops this {@link Motor}. Same as calling {@code setSpeed(0.0)}.
+     * Stops this {@link Motor}.
      */
     @Override
     public default void stop() {
-        setSpeed(0.0);
+        set(ControlMode.DutyCycle, 0);
     }
 
     /**
      * Create a new {@link Motor} instance that is actually composed of two other motors that will be controlled identically.
      * This is useful when multiple motors are controlled in the same way, such as on one side of a {@link TankDrive}.
+     * TalonSRX and Spark MAX controllers support following, so use that instead.
      *
      * @param motor1 the first motor, and the motor from which the speed is read; may not be null
      * @param motor2 the second motor; may not be null
@@ -341,15 +312,19 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     static Motor compose(final Motor motor1, final Motor motor2) {
         return new Motor() {
             @Override
-            public double getSpeed() {
-                return motor1.getSpeed();
+            public void set(final ControlMode mode, double demand) {
+                motor1.set(mode, demand);
+                motor2.set(mode, demand);
             }
 
             @Override
-            public Motor setSpeed(final double speed) {
-                motor1.setSpeed(speed);
-                motor2.setSpeed(speed);
-                return this;
+            public double get() {
+                return motor1.get();
+            }
+
+            @Override
+            public double getSpeed() {
+                return motor1.getSpeed();
             }
         };
     }
@@ -366,16 +341,20 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
     static Motor compose(final Motor motor1, final Motor motor2, final Motor motor3) {
         return new Motor() {
             @Override
-            public double getSpeed() {
-                return motor1.getSpeed();
+            public void set(final ControlMode mode, double demand) {
+                motor1.set(mode, demand);
+                motor2.set(mode, demand);
+                motor3.set(mode, demand);
             }
 
             @Override
-            public Motor setSpeed(final double speed) {
-                motor1.setSpeed(speed);
-                motor2.setSpeed(speed);
-                motor3.setSpeed(speed);
-                return this;
+            public double get() {
+                return motor1.get();
+            }
+
+            @Override
+            public double getSpeed() {
+                return motor1.getSpeed();
             }
         };
     }

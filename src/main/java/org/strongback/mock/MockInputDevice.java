@@ -4,7 +4,6 @@ import org.strongback.components.Switch;
 import org.strongback.components.ui.ContinuousRange;
 import org.strongback.components.ui.DirectionalAxis;
 import org.strongback.components.ui.InputDevice;
-import org.strongback.mock.MockSwitchImplementation;
 
 public class MockInputDevice implements InputDevice {
 	private final int numAxes;
