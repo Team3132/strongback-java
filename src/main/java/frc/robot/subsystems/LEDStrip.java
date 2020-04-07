@@ -38,6 +38,18 @@ public class LEDStrip implements LEDStripInterface {
     }
 
     @Override
+    public void setAlternatingColour(LEDColour c1, LEDColour c2) { 
+        int alternateNum = numberOfLEDs / 10; // alternate colours every 10% of the strip
+        for (int i = 0; i < numberOfLEDs; i++) {
+            if ((i / alternateNum) % 2 == 0) {
+                setLEDColour(i, c1); 
+            } else {
+                setLEDColour(i, c2); 
+            }
+        }  
+    }
+
+    @Override
     public void setProgressColour(LEDColour c1, LEDColour c2, double percent) {
         percent = MathUtil.clamp(percent, 0, 1);
         int leds = (int) (percent * numberOfLEDs);

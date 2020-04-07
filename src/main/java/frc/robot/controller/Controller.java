@@ -198,17 +198,23 @@ public class Controller implements Runnable, DashboardUpdater {
 
 		maybeWaitForShooter(desiredState.shooterUpToSpeed);
 		maybeWaitForColourWheel();
-		// Wait for driving to finish if needed.
-		// If the sequence is interrupted it drops back to arcade.
+	
 		maybeWaitForAutoDriving();
 
 		// Last thing: wait for the delay time if it's set.
 		waitForTime(endTime);
 	}
 
+	// All maybeWaits alternate purple and another colour
+
+	/**
+	 * Wait for driving to finish if needed.
+	 * If the sequence is interrupted it drops back to arcade.
+	 */
 	private void maybeWaitForAutoDriving() {
+
 		try {
-			waitUntilOrAbort(() -> subsystems.drivebase.hasFinished(), "auto driving");
+			waitUntilOrAbort(() -> subsystems.drivebase.hasFinished(), "auto driving", LEDColour.RED);
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while driving, switching drivebase back to arcade");
 			subsystems.drivebase.setArcadeDrive();
@@ -219,8 +225,9 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Blocks waiting till the intake is in position.
 	 */
 	private void maybeWaitForIntake() {
+
 		try {
-			waitUntilOrAbort(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving");
+			waitUntilOrAbort(() -> subsystems.intake.isRetracted() || subsystems.intake.isExtended(), "intake to finish moving", LEDColour.YELLOW);
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while deploying/intaking");
 		}		
@@ -229,8 +236,9 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Blocks waiting till the blocker is in position.
 	 */
 	private void maybeWaitForBlocker() {
+
 		try {
-			waitUntilOrAbort(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving");
+			waitUntilOrAbort(() -> subsystems.loader.isPaddleBlocking() || subsystems.loader.isPaddleNotBlocking(), "blocking to finish moving", LEDColour.BLUE);
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while blocking/not blocking with paddle");
 		}		
@@ -240,8 +248,9 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Blocks waiting till the shooter hood is in position.
 	 */
 	private void maybeWaitForShooterHood() {
-			try {
-				waitUntilOrAbort(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving");
+
+		try {
+			waitUntilOrAbort(() -> subsystems.shooter.isHoodExtended() || subsystems.shooter.isHoodRetracted(), "hood to finish moving", LEDColour.GREEN);
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while Shooter Hood extends/retracts");
 		}		
@@ -263,7 +272,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		}
 
 		try {
-			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter");
+			waitUntilOrAbort(() -> subsystems.shooter.isAtTargetSpeed(), "shooter", LEDColour.CYAN);
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while spinning up shooter, stopping shooter");
 			subsystems.shooter.setTargetRPS(0);
@@ -271,8 +280,9 @@ public class Controller implements Runnable, DashboardUpdater {
 	}
 	
 	private void maybeWaitForColourWheel() {
+		
 		try {
-			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished");
+			waitUntilOrAbort(() -> subsystems.colourWheel.isFinished(), "colour wheel finished", LEDColour.ORANGE);
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while moving colour wheel");
 			// The sequence has changed, setting action to null.
@@ -283,7 +293,7 @@ public class Controller implements Runnable, DashboardUpdater {
 
 	private void maybeWaitForBuddyClimb() {
 		try {
-			waitUntilOrAbort(() -> subsystems.buddyClimb.isExtended() || subsystems.buddyClimb.isRetracted(), "buddy climb to finish moving");
+			waitUntilOrAbort(() -> subsystems.buddyClimb.isExtended() || subsystems.buddyClimb.isRetracted(), "buddy climb to finish moving", LEDColour.BROWN);
 		} catch (SequenceChangedException e) {
 			logSub("Sequence changed while moving buddy climb");
 		}
@@ -298,10 +308,12 @@ public class Controller implements Runnable, DashboardUpdater {
 			// This state doesn't specify the number of balls to wait for.
 			return;
 		}
+		
 		if (subsystems.loader.getCurrentBallCount() == expectBalls) return;
+		
 		logSub("Waiting for balls");
 		try {
-			waitUntilOrAbort(() -> subsystems.loader.getCurrentBallCount() == expectBalls, "numBalls");
+			waitUntilOrAbort(() -> subsystems.loader.getCurrentBallCount() == expectBalls, "numBalls", LEDColour.MAGENTA);
 		} catch (SequenceChangedException e) {
 			// Desired state has changed underneath us, give up waiting
 			//and return.
@@ -316,7 +328,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		if (clock.currentTime() < endTimeSec) {
 			//logSub("Waiting for %.1f seconds", endTimeSec - clock.currentTime());
 		}
-		waitUntil(() -> clock.currentTime() > endTimeSec, "time");
+		waitUntil(() -> clock.currentTime() > endTimeSec, "time", LEDColour.WHITE);
 	}
 
 	/**
@@ -324,10 +336,13 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * @param func returns when this function returns true.
 	 * @throws SequenceChangedException if the sequence has changed.
 	 */
-	private void waitUntilOrAbort(BooleanSupplier func, String name) throws SequenceChangedException {
+	private void waitUntilOrAbort(BooleanSupplier func, String name, LEDColour debugColour) throws SequenceChangedException {
 		double startTimeSec = clock.currentTime();
 		double waitDurationSec = 1;
 		double nextLogTimeSec = startTimeSec + waitDurationSec;
+		if (!func.getAsBoolean()) {
+			subsystems.ledStrip.setAlternatingColour(LEDColour.PURPLE, debugColour);
+		}
 		// Wait until func returns true or the desired state changed.
 		while (!func.getAsBoolean()) {
 			synchronized (this) {
@@ -347,7 +362,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		blockedBy = "";
 		if (clock.currentTime() - nextLogTimeSec > 1) {
 			// Print a final message.
-			logSub("Controller done waiting on %s", name);
+			logSub("Controller done waiting on %s, after %fs", name, clock.currentTime() - startTimeSec);
 		}
 	}
 	
@@ -355,10 +370,13 @@ public class Controller implements Runnable, DashboardUpdater {
 	 * Waits for func to return true.
 	 * @param func returns when this function returns true.
 	 */
-	private void waitUntil(BooleanSupplier func, String name) {
+	private void waitUntil(BooleanSupplier func, String name, LEDColour debugColour) {
 		double startTimeSec = clock.currentTime();
 		double waitDurationSec = 0.25;
 		double nextLogTimeSec = startTimeSec + waitDurationSec;
+		if (!func.getAsBoolean()) {
+			subsystems.ledStrip.setAlternatingColour(LEDColour.PURPLE, debugColour);
+		}
 		// Keep waiting until func returns true
 		while (!func.getAsBoolean()) {
 			double now = clock.currentTime();
@@ -373,7 +391,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		blockedBy = "";
 		if (clock.currentTime() - nextLogTimeSec > 1) {
 			// Print a final message.
-			logSub("Controller done waiting on %s, has waited %fs so far", name,  clock.currentTime() - startTimeSec);
+			logSub("Controller done waiting on %s, after %fs", name,  clock.currentTime() - startTimeSec);
 		}
 	}
 
