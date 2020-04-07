@@ -124,12 +124,15 @@ public class Constants {
 	public static final Position AUTO_LINE_OPPOSING_TRENCH = new Position(AUTO_LINE_XPOS - ROBOT_LENGTH, OPPOSING_TRENCH_BALLS_YPOS, 0, 0); 
 
 	/*
-	 * LED channels for the canifier 
+	 * LED constants
 	 */
+	// channels for the canifier 
 	public static final CANifier.LEDChannel RED_LED_STRIP_CHANNEL = LEDChannel.LEDChannelB;
 	public static final CANifier.LEDChannel GREEN_LED_STRIP_CHANNEL = LEDChannel.LEDChannelA;
 	public static final CANifier.LEDChannel BLUE_LED_STRIP_CHANNEL = LEDChannel.LEDChannelC;
-	
+	// brightness
+	public static final double LED_PERCENTAGE = 0.2;
+
 	/*
 	 *  Intake constants 
 	 */
