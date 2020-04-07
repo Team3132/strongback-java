@@ -151,18 +151,17 @@ public class Auto {
 		builder.appendSequence(Sequences.startIntaking());
 		
 		// Drive backwards to pick up the three balls.
-		Pose2d start1 = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
-		Pose2d thirdBall = new Pose2d(-4, -1.5, new Rotation2d(Math.toRadians(0)));
+		Pose2d start1 = new Pose2d(Constants.AUTO_LINE_GOAL.x, Constants.AUTO_LINE_GOAL.y, new Rotation2d(Math.toRadians(Constants.AUTO_LINE_GOAL.heading)));
 		// Drive to first ball 
 		// Translation2d firstBall = new Translation2d(-2,-1.25);
-		builder.then().driveRelativeWaypoints(start1, List.of(), thirdBall, false);  // backwards.
+		builder.then().driveRelativeWaypoints(start1, List.of(), Constants.ALLIANCE_TRENCH_THIRD_BALL, false);  // backwards.
 
 		// Stop intaking
 		builder.appendSequence(Sequences.stopIntaking());
 
 		// Go forwards 2m to shoot.
-		Pose2d end = new Pose2d(-2, 0, new Rotation2d(Math.toRadians(0)));
-		builder.then().driveRelativeWaypoints(thirdBall, List.of(), end, true);
+		Pose2d end = new Pose2d(Constants.AUTO_LINE_GOAL.x + 2, Constants.AUTO_LINE_GOAL.y, new Rotation2d(Math.toRadians(Constants.AUTO_LINE_GOAL.heading)));
+		builder.then().driveRelativeWaypoints(Constants.ALLIANCE_TRENCH_THIRD_BALL, List.of(), end, true);
 
 		builder.then().doVisionAim();
 		// Shoot the balls.
@@ -193,14 +192,13 @@ public class Auto {
 
 		// Drive backwards to pick up the two balls, starting with front bumpers on auto line
 		Pose2d start = new Pose2d(Constants.AUTO_LINE_ALLIANCE_TRENCH.x, Constants.AUTO_LINE_ALLIANCE_TRENCH.y, new Rotation2d(Math.toRadians(Constants.AUTO_LINE_ALLIANCE_TRENCH.heading)));
-		Pose2d secondBall = new Pose2d(Constants.ALLIANCE_TRENCH_SECOND_BALL.x, Constants.ALLIANCE_TRENCH_SECOND_BALL.y, new Rotation2d(Math.toRadians(0)));
 		
 		/*
 		Pose2d start = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d secondBall = new Pose2d(-3.2, -0, new Rotation2d(Math.toRadians(0)));
 		*/
 
-		builder.then().driveRelativeWaypoints(start, List.of(), secondBall, false); // backwards
+		builder.then().driveRelativeWaypoints(start, List.of(), Constants.ALLIANCE_TRENCH_SECOND_BALL, false); // backwards
 
 		// Stop intaking
 		builder.then().setIntakeRPS(0)
@@ -217,13 +215,12 @@ public class Auto {
 		// Pick up the last 3 balls 
 		builder.appendSequence(Sequences.startIntaking());
 
-		Pose2d fifthBall = new Pose2d(Constants.ALLIANCE_TRENCH_FIFTH_BALL.x, Constants.ALLIANCE_TRENCH_FIFTH_BALL.y, new Rotation2d(Math.toRadians(0)));
 		//Pose2d fifthBall = new Pose2d(-5.8, -0.1, new Rotation2d(Math.toRadians(0)));
 	
-		builder.then().driveRelativeWaypoints(secondBall, List.of(), fifthBall, false);
+		builder.then().driveRelativeWaypoints(Constants.ALLIANCE_TRENCH_SECOND_BALL, List.of(), Constants.ALLIANCE_TRENCH_FIFTH_BALL, false);
 
 		// Drive forward and shoot
-		builder.then().driveRelativeWaypoints(fifthBall, List.of(), secondBall, true);
+		builder.then().driveRelativeWaypoints(Constants.ALLIANCE_TRENCH_FIFTH_BALL, List.of(), Constants.ALLIANCE_TRENCH_SECOND_BALL, true);
 
 		// Stop intaking
 		builder.then().setIntakeRPS(0)
