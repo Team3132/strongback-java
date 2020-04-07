@@ -13,6 +13,7 @@ import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.LEDColour;
+import frc.robot.lib.Position;
 import frc.robot.lib.TimeAction;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
@@ -33,6 +34,9 @@ public class State {
 
 
 	public String LogString = null;
+
+	// Location
+	public Position currentPosition = null;
 
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
@@ -78,6 +82,7 @@ public class State {
 	 */
 	public State(Subsystems subsystems, Clock clock) {
 		setDelayUntilTime(clock.currentTime());
+		currentPosition = subsystems.location.getCurrentLocation();
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPS = subsystems.intake.getTargetRPS();
 		buddyClimbDeployed = subsystems.buddyClimb.isExtended();
@@ -123,6 +128,12 @@ public class State {
 	*/
 	public State setLogMessage(String message) {
 		LogString = message;
+		return this;
+	}
+
+	// Location
+	public State setCurrentPostion(Position position) {
+		currentPosition = position;
 		return this;
 	}
 
