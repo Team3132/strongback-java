@@ -8,6 +8,7 @@ import com.revrobotics.ColorMatch;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.lib.Position;
 
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
@@ -94,7 +95,34 @@ public class Constants {
 	public static final int DRIVE_PEAK_CURRENT = 80;	// the current exceeds this value for 100ms
 	public static final int DRIVE_SCALE_FACTOR = 128;
 	public static final double DRIVE_OFF_LEVEL_TWO_POWER = 0.3;
+
 	
+	/**
+	 * Field / Auto, see location.java for more info on the coordinate system. 
+	 */
+	public static final double FIELD_LENGTH = 629.25 * INCHES_TO_METRES;
+	public static final double HALF_FIELD_LENGTH = FIELD_LENGTH / 2;
+	public static final double FIELD_WIDTH = 323.25 * INCHES_TO_METRES;
+	public static final double TRENCH_DIST_BETWEEN_BALLS = 36 * INCHES_TO_METRES;
+	public static final double TRENCH_BALL_DIST_TO_WALL = 27.75 * INCHES_TO_METRES;
+	public static final double GOAL_DIST_TO_WALL = 94.66 * INCHES_TO_METRES;
+	public static final double ROBOT_LENGTH = 30 * INCHES_TO_METRES;
+
+	public static final double AUTO_LINE_XPOS = 508.875 * INCHES_TO_METRES;
+	public static final double ALLIANCE_TRENCH_BALLS_YPOS = - (FIELD_WIDTH - TRENCH_BALL_DIST_TO_WALL);
+	public static final double OPPOSING_TRENCH_BALLS_YPOS = - TRENCH_BALL_DIST_TO_WALL;
+
+	// Field Positions
+	public static final Position ALLIANCE_TRENCH_FIRST_BALL = new Position(HALF_FIELD_LENGTH + TRENCH_DIST_BETWEEN_BALLS * 2, ALLIANCE_TRENCH_BALLS_YPOS);
+	public static final Position ALLIANCE_TRENCH_SECOND_BALL = new Position(HALF_FIELD_LENGTH + TRENCH_DIST_BETWEEN_BALLS, ALLIANCE_TRENCH_BALLS_YPOS);
+	public static final Position ALLIANCE_TRENCH_THIRD_BALL = new Position(HALF_FIELD_LENGTH, ALLIANCE_TRENCH_BALLS_YPOS);
+	public static final Position ALLIANCE_TRENCH_FIFTH_BALL = new Position(HALF_FIELD_LENGTH - 65.53 * INCHES_TO_METRES, ALLIANCE_TRENCH_BALLS_YPOS);
+	
+	// Auto Starting Positions
+	public static final Position AUTO_LINE_ALLIANCE_TRENCH = new Position(AUTO_LINE_XPOS - ROBOT_LENGTH, ALLIANCE_TRENCH_BALLS_YPOS, 0, 0); 
+	public static final Position AUTO_LINE_GOAL = new Position(AUTO_LINE_XPOS - ROBOT_LENGTH, - (FIELD_WIDTH - GOAL_DIST_TO_WALL), 0, 0); 
+	public static final Position AUTO_LINE_OPPOSING_TRENCH = new Position(AUTO_LINE_XPOS - ROBOT_LENGTH, OPPOSING_TRENCH_BALLS_YPOS, 0, 0); 
+
 	/*
 	 * LED channels for the canifier 
 	 */
