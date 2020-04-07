@@ -44,32 +44,32 @@ import frc.robot.lib.Subsystem;
  * opposite alliance's end from the driver's station.
  *  
  * X is along the "horizontal line", and Y is the "vertical" line with 
- * (0,0) at the bottom left of the diagram below.
+ * (0,0) at the bottom right of the diagram below.
  * DANGER: This is changing to having X away from the drivers' stations.
  *
- *          ^ X +ve 
- *          |
- *          | Other alliance driver stations
- *          +*******|*******|********
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          +************************
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- * Y +ve <--0-------|-------|-------+---> Y -ve
- *          | Our drivers' stations
- *          |
- *          v X -ve
+ *          						^ X +ve 
+ *          						|
+ *   Other alliance driver stations |
+ *          ********|*******|*******|
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          ************************|
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ *          *                       |
+ * Y +ve <----------|-------|-------0---> Y -ve
+ *            Our drivers' stations |
+ *          						|
+ *          						v X -ve
  * 
  * Heading angles:
  *                        ^  0 degrees 
