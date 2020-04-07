@@ -151,16 +151,14 @@ public class Auto {
 		builder.appendSequence(Sequences.startIntaking());
 		
 		// Drive backwards to pick up the three balls.
-		Pose2d start1 = new Pose2d(Constants.AUTO_LINE_GOAL.x, Constants.AUTO_LINE_GOAL.y, new Rotation2d(Math.toRadians(Constants.AUTO_LINE_GOAL.heading)));
 		// Drive to first ball 
-		// Translation2d firstBall = new Translation2d(-2,-1.25);
-		builder.then().driveRelativeWaypoints(start1, List.of(), Constants.ALLIANCE_TRENCH_THIRD_BALL, false);  // backwards.
+		builder.then().driveRelativeWaypoints(Constants.AUTO_LINE_GOAL, List.of(), Constants.ALLIANCE_TRENCH_THIRD_BALL, false);  // backwards.
 
 		// Stop intaking
 		builder.appendSequence(Sequences.stopIntaking());
 
 		// Go forwards 2m to shoot.
-		Pose2d end = new Pose2d(Constants.AUTO_LINE_GOAL.x + 2, Constants.AUTO_LINE_GOAL.y, new Rotation2d(Math.toRadians(Constants.AUTO_LINE_GOAL.heading)));
+		Pose2d end = new Pose2d(Constants.AUTO_LINE_GOAL.getTranslation().getX() + 2, Constants.AUTO_LINE_GOAL.getTranslation().getY(), Constants.AUTO_LINE_GOAL.getRotation());
 		builder.then().driveRelativeWaypoints(Constants.ALLIANCE_TRENCH_THIRD_BALL, List.of(), end, true);
 
 		builder.then().doVisionAim();
@@ -191,14 +189,13 @@ public class Auto {
 		builder.appendSequence(Sequences.startIntaking());
 
 		// Drive backwards to pick up the two balls, starting with front bumpers on auto line
-		Pose2d start = new Pose2d(Constants.AUTO_LINE_ALLIANCE_TRENCH.x, Constants.AUTO_LINE_ALLIANCE_TRENCH.y, new Rotation2d(Math.toRadians(Constants.AUTO_LINE_ALLIANCE_TRENCH.heading)));
 		
 		/*
 		Pose2d start = new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)));
 		Pose2d secondBall = new Pose2d(-3.2, -0, new Rotation2d(Math.toRadians(0)));
 		*/
 
-		builder.then().driveRelativeWaypoints(start, List.of(), Constants.ALLIANCE_TRENCH_SECOND_BALL, false); // backwards
+		builder.then().driveRelativeWaypoints(Constants.AUTO_LINE_ALLIANCE_TRENCH, List.of(), Constants.ALLIANCE_TRENCH_SECOND_BALL, false); // backwards
 
 		// Stop intaking
 		builder.then().setIntakeRPS(0)

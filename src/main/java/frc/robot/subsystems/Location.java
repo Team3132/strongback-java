@@ -70,6 +70,7 @@ import frc.robot.lib.Subsystem;
  *            Our drivers' stations |
  *          						|
  *          						v X -ve
+ * //TODO: change origin to be center of the field
  * 
  * Heading angles:
  *                        ^  0 degrees 
@@ -192,6 +193,22 @@ public class Location extends Subsystem implements LocationInterface, Executable
 		history.setInitial(current);
 		resetEncoders.run();
 		odometry.resetPosition(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)), Rotation2d.fromDegrees(0));
+	}
+
+	/**
+     * Set the current location. This allows a subsystem to override the location and force the location to a particular point.
+     * In particular the start location should be set as accurately as possible, so the robot knows where it starts on the field
+     * @param pose The current location.
+     */
+    @Override
+    public void setCurrentLocation(Pose2d pose) {
+		log.sub("%s: resetting to: %s", name, pose.toString());
+    	((NavXGyroscope) gyro).setAngle(pose.getRotation().getDegrees());
+    	current.speed = 0;
+    	current.timeSec = clock.currentTime();  // time of last update
+		history.setInitial(current);
+		resetEncoders.run();
+		odometry.resetPosition(pose, Rotation2d.fromDegrees(0));
 	}
 	
 	/**

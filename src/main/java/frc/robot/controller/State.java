@@ -36,7 +36,7 @@ public class State {
 	public String LogString = null;
 
 	// Location
-	public Position currentPosition = null;
+	public Pose2d currentPose = null;
 
 	// Intake
 	public Boolean intakeExtended = null; // Intake is either extended or retracted.
@@ -82,7 +82,6 @@ public class State {
 	 */
 	public State(Subsystems subsystems, Clock clock) {
 		setDelayUntilTime(clock.currentTime());
-		currentPosition = subsystems.location.getCurrentLocation();
 		intakeExtended = subsystems.intake.isExtended();
 		intakeRPS = subsystems.intake.getTargetRPS();
 		buddyClimbDeployed = subsystems.buddyClimb.isExtended();
@@ -132,8 +131,8 @@ public class State {
 	}
 
 	// Location
-	public State setCurrentPostion(Position position) {
-		currentPosition = position;
+	public State setCurrentPostion(Pose2d pose) {
+		currentPose = pose;
 		return this;
 	}
 

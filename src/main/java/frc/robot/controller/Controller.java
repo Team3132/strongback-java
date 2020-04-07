@@ -169,7 +169,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
 
-		subsystems.location.setCurrentLocation(desiredState.currentPosition);
+		subsystems.location.setCurrentLocation(desiredState.currentPose);
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
