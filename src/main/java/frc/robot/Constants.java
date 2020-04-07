@@ -102,25 +102,27 @@ public class Constants {
 	/**
 	 * Field / Auto, see location.java for more info on the coordinate system. 
 	 */
-	//TODO: change origin to be center of the field
+
+	public static final double ROBOT_LENGTH = 37.311 * INCHES_TO_METRES;
+	public static final double HALF_ROBOT_LENGTH = ROBOT_LENGTH / 2;
 
 	public static final double FIELD_LENGTH = 629.25 * INCHES_TO_METRES;
 	public static final double HALF_FIELD_LENGTH = FIELD_LENGTH / 2;
 	public static final double FIELD_WIDTH = 323.25 * INCHES_TO_METRES;
-	public static final double TRENCH_DIST_BETWEEN_BALLS = 36 * INCHES_TO_METRES;
-	public static final double ROBOT_LENGTH = 37.311 * INCHES_TO_METRES;
-	public static final double HALF_ROBOT_LENGTH = ROBOT_LENGTH / 2;
+	public static final double HALF_FIELD_WIDTH = FIELD_WIDTH / 2;
 
-	public static final double GOAL_YPOS = 94.66 * INCHES_TO_METRES;
-	public static final double AUTO_LINE_XPOS = 508.875 * INCHES_TO_METRES;
-	public static final double ALLIANCE_TRENCH_BALLS_YPOS = 27.75 * INCHES_TO_METRES;;
-	public static final double OPPOSING_TRENCH_BALLS_YPOS = FIELD_WIDTH - ALLIANCE_TRENCH_BALLS_YPOS;
+	public static final double TRENCH_DIST_BETWEEN_BALLS = 36 * INCHES_TO_METRES;
+
+	public static final double GOAL_YPOS = -HALF_FIELD_WIDTH + 94.66 * INCHES_TO_METRES;
+	public static final double AUTO_LINE_XPOS = -HALF_FIELD_LENGTH + 508.875 * INCHES_TO_METRES;
+	public static final double ALLIANCE_TRENCH_BALLS_YPOS = - HALF_FIELD_WIDTH + 27.75 * INCHES_TO_METRES;
+	public static final double OPPOSING_TRENCH_BALLS_YPOS = -ALLIANCE_TRENCH_BALLS_YPOS;
 
 	// Field Positions // TODO: do something with translation 2d and take away half the robot length when using these
-	public static final Pose2d ALLIANCE_TRENCH_FIRST_BALL = new Pose2d(HALF_FIELD_LENGTH + TRENCH_DIST_BETWEEN_BALLS * 2, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
-	public static final Pose2d ALLIANCE_TRENCH_SECOND_BALL = new Pose2d(HALF_FIELD_LENGTH + TRENCH_DIST_BETWEEN_BALLS, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
-	public static final Pose2d ALLIANCE_TRENCH_THIRD_BALL = new Pose2d(HALF_FIELD_LENGTH, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
-	public static final Pose2d ALLIANCE_TRENCH_FIFTH_BALL = new Pose2d(HALF_FIELD_LENGTH - 65.53 * INCHES_TO_METRES, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
+	public static final Pose2d ALLIANCE_TRENCH_FIRST_BALL = new Pose2d(TRENCH_DIST_BETWEEN_BALLS * 2, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
+	public static final Pose2d ALLIANCE_TRENCH_SECOND_BALL = new Pose2d(TRENCH_DIST_BETWEEN_BALLS, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
+	public static final Pose2d ALLIANCE_TRENCH_THIRD_BALL = new Pose2d(0 , ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
+	public static final Pose2d ALLIANCE_TRENCH_FIFTH_BALL = new Pose2d(-65.53 * INCHES_TO_METRES, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
 	
 	// Auto Starting Positions
 	public static final Pose2d AUTO_LINE_ALLIANCE_TRENCH = new Pose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0))); 
