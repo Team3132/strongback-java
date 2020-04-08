@@ -47,7 +47,7 @@ import frc.robot.interfaces.Log;
  * and provide a variety of methods to append to that log file.
  */
 
-public class LogDygraph implements Log, Executable {
+public class LogGraph implements Log, Executable {
 	
 	private enum GraphLogState {
 		INVALID,				// File has not yet been created
@@ -79,7 +79,6 @@ public class LogDygraph implements Log, Executable {
 	// Log files.
 	private LogFileWriter csvWriter;
 	private LogFileWriter logWriter;
-	private LogFileWriter graphWriter;
 	private LogFileWriter chartWriter;
 	private LogFileWriter locationWriter;
 	// Internal state.
@@ -91,7 +90,7 @@ public class LogDygraph implements Log, Executable {
 	private boolean onlyLocal = false;	// only log locally defined elements.
 	public Double enableOffset = 0.0;
 	
-	public LogDygraph(String robotName, String basePath, String logPath, String dataDir, String dateDir, String latestDir, String eventDir, boolean onlyLocal, Clock clock) {
+	public LogGraph(String robotName, String basePath, String logPath, String dataDir, String dateDir, String latestDir, String eventDir, boolean onlyLocal, Clock clock) {
 		this.robotName = robotName;
 		this.basePath = basePath;
 		this.logPath = logPath;
@@ -140,7 +139,6 @@ public class LogDygraph implements Log, Executable {
 			var path = Paths.get(basePath, robotName).toString();
 			csvWriter = new LogFileWriter("data", logFileNumber, "csv", path, dataDir);
 			logWriter = new LogFileWriter("log", logFileNumber, "txt", path, dataDir);
-			graphWriter = new LogFileWriter("graph", logFileNumber, "html", path, dataDir);
 			chartWriter = new LogFileWriter("chart", logFileNumber, "html", path, dataDir);
 			locationWriter = new LogFileWriter("location", logFileNumber, "html", path, dataDir);
 			
@@ -166,7 +164,6 @@ public class LogDygraph implements Log, Executable {
 			// Create links based on the timestamp.
 			csvWriter.createSymbolicLink(dateDir, timestampStr);
 			logWriter.createSymbolicLink(dateDir, timestampStr);
-			graphWriter.createSymbolicLink(dateDir, timestampStr);
 			chartWriter.createSymbolicLink(dateDir, timestampStr);
 			locationWriter.createSymbolicLink(dateDir, timestampStr);
 			// And on event name, match type, match number, replay number, alliance and position.
@@ -174,54 +171,11 @@ public class LogDygraph implements Log, Executable {
 			// able to talk to the robot.
 			csvWriter.createSymbolicLink(eventDir, matchDescription);
 			logWriter.createSymbolicLink(eventDir, matchDescription);
-			graphWriter.createSymbolicLink(eventDir, matchDescription);
 			chartWriter.createSymbolicLink(eventDir, matchDescription);
 			locationWriter.createSymbolicLink(eventDir, matchDescription);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.printf("Error creating symlinks in %s\n", basePath);
-		}
-	}
-	
-	private void initGraphFile(String csvColumns) {
-		/*
-		 * Create the html file for dygraph.
-		 * We can only do this once the logging classes have all been instantiated.
-		 */
-		String title = "Instance " + logFileNumber;
-		String file = String.format("data_%05d", logFileNumber);
-		writeMessageToFile(graphWriter, String.format(
-				"<html>\n" +
-				"<head><title>%1$s</title>\n" +
-				"<script type='text/javascript' src='../../scripts/dygraph-combined.js'></script>\n" +
-				"</head>\n" +
-				"<body onload='checkCookie()'>\n" +
-				"<div id='optionDiv' style='width:100%%;height:100%%;background-color:#f0f0f0;z-index:30;display:none;position:absolute'>\n" +
-				"<div id='optionHTML'>\n" +
-				"</div>\n" +
-				"<button id='b1' onclick='button_set_all()'>Set All</button>\n" +
-				"<button id='b2' onclick='button_clear_all()'>Clear All</button>\n" +
-				"<button id='b3' onclick='button_set_visible()'>Done</button>\n" +
-				"<p>\n" +
-				"<button id='b7' onclick='doShowAllCascade()'>Open All</button>\n" +
-				"<button id='b8' onclick='doHideAllCascade()'>Collapse All</button>\n" +
-				"</div>\n" +
-				"<div id='graphdiv' style='width:100%%;height:90%%;display:block'></div>\n" +
-				"<script>\n" +
-				"var fn = '../%4$s/%2$s.csv';\n" +
-				"var baseLabelsStr = '%3$s';\n" +
-				"</script>\n" +
-				"<script type='text/javascript' src='../../scripts/dygraph-exts.js'></script>\n" +
-				"<button id='b4' onclick='button_select()'>Select Traces</button>\n" +
-				"<button id='b5' onclick='button_reload()'>Reload Traces</button>\n" +
-				"<button id='b6' onclick='button_remaining_visible()' disabled>All Traces Shown</button>\n" +
-				"</body>\n", title, file, csvColumns, dataDir));
-		try {
-			if (graphWriter != null) {
-				graphWriter.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -538,8 +492,6 @@ public class LogDygraph implements Log, Executable {
 		/*
 		 * Create the timestamp for this message. We use the robot time, so each
 		 * log entry is time stamped for when it happened during the match.
-		 * Question: Should we document dygraphs limits here on the limit(3?) of
-		 * the number of decimal places in the timestamp?
 		 */
 		return String.format("%.3f", time);
 	}
@@ -623,7 +575,6 @@ public class LogDygraph implements Log, Executable {
 	public void execute(long timeInMillis) {
 		if (graphLogState == GraphLogState.CONFIGURED) {
 			String csvColumns = getGraphHeaders();
-			initGraphFile(csvColumns);
 			initChartFile(csvColumns);
 			initCSVFile(csvColumns);
 			initLocationPlotFile();
@@ -650,7 +601,6 @@ public class LogDygraph implements Log, Executable {
 	public Log flush() {
 		csvWriter.flush();
 		logWriter.flush();
-		graphWriter.flush();
 		chartWriter.flush();
 		locationWriter.flush();
 		return this;

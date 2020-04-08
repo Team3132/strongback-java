@@ -25,7 +25,7 @@ import frc.robot.controller.Sequences;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.OIInterface;
 import frc.robot.lib.LEDColour;
-import frc.robot.lib.LogDygraph;
+import frc.robot.lib.LogGraph;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
@@ -37,7 +37,7 @@ import frc.robot.subsystems.Subsystems;
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
 	private RobotConfiguration config;
-	private LogDygraph log;
+	private LogGraph log;
 
 	// User interface.
 	private DriverStation driverStation;
@@ -65,7 +65,7 @@ public class Robot extends IterativeRobot implements Executable {
 	public void robotInit() {
 		clock = Strongback.timeSystem();
 		var robotName = RobotName.get(Constants.HOME_DIRECTORY);
-		log = new LogDygraph(robotName, Constants.WEB_BASE_PATH, Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION,
+		log = new LogGraph(robotName, Constants.WEB_BASE_PATH, Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION,
 				Constants.LOG_DATE_EXTENSION, Constants.LOG_LATEST_EXTENSION, Constants.LOG_EVENT_EXTENSION, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
 		startWebServer();
