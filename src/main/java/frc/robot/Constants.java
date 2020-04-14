@@ -2,8 +2,6 @@ package frc.robot;
 
 import java.nio.file.Paths;
 
-import com.ctre.phoenix.CANifier;
-import com.ctre.phoenix.CANifier.LEDChannel;
 import com.revrobotics.ColorMatch;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -131,10 +129,6 @@ public class Constants {
 	/*
 	 * LED constants
 	 */
-	// channels for the canifier 
-	public static final CANifier.LEDChannel RED_LED_STRIP_CHANNEL = LEDChannel.LEDChannelB;
-	public static final CANifier.LEDChannel GREEN_LED_STRIP_CHANNEL = LEDChannel.LEDChannelA;
-	public static final CANifier.LEDChannel BLUE_LED_STRIP_CHANNEL = LEDChannel.LEDChannelC;
 	// brightness
 	public static final double LED_PERCENTAGE = 0.2;
 
@@ -191,12 +185,6 @@ public class Constants {
 	public static final double LOADER_SPINNER_I = 0;
 	public static final double LOADER_SPINNER_D = 30;
 	public static final double LOADER_SPINNER_F = 0.1;
-	
-	/*
-	 * Canifier 
-	 */
-	public static final boolean CANIFIER_PRESENT_DEFAULT = false;
-	public static final int LED_CANIFIER_CAN_ID = 21;
 
 	// Power distribution Panel (PDP)
 	public static final boolean PDP_PRESENT_DEFAULT = false;

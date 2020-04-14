@@ -184,13 +184,7 @@ public class Location extends Subsystem implements LocationInterface, Executable
      */
     @Override
     public void setCurrentLocation(Position location) {
-		log.sub("%s: resetting to: %s", name, location.toString());
-    	((NavXGyroscope) gyro).setAngle(location.heading);
-    	current.speed = 0;
-    	current.timeSec = clock.currentTime();  // time of last update
-		history.setInitial(current);
-		resetEncoders.run();
-		odometry.resetPosition(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)), Rotation2d.fromDegrees(0));
+		setCurrentLocation(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)));
 	}
 
 	/**

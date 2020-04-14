@@ -15,7 +15,7 @@ public class PoseHelper {
 	 * @param dist distance away from pose
 	 * @param bearing the bearing we approach pose from
 	 */
-	public static Pose2d addVector(Pose2d pose, double dist, double bearing) {
+	public static Pose2d approachPose(Pose2d pose, double dist, double bearing) {
 		double x = dist * MathUtil.cos(bearing);
 		double y = dist * MathUtil.sin(bearing);
 		
@@ -32,6 +32,6 @@ public class PoseHelper {
 	 * @param bearing the bearing we approach pose from
 	 */
 	public static Pose2d intakeAt(Pose2d pose, double bearing) {		
-		return addVector(pose, HALF_ROBOT_LENGTH, bearing);
+		return approachPose(pose, HALF_ROBOT_LENGTH, bearing);
 	}
 }

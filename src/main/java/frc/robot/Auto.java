@@ -153,14 +153,14 @@ public class Auto {
 		builder.appendSequence(Sequences.startIntaking());
 		
 		// Drive backwards to pick up the three balls.
-		// Drive to first ball
-		builder.then().driveRelativeWaypoints(AUTO_LINE_GOAL, List.of(), intakeAt(ALLIANCE_TRENCH_THIRD_BALL, 0), false);  // backwards.
+		// Drive to third ball via the first ball
+		builder.then().driveRelativeWaypoints(AUTO_LINE_GOAL, List.of(ALLIANCE_TRENCH_FIRST_BALL.getTranslation()), intakeAt(ALLIANCE_TRENCH_THIRD_BALL, 0), false);  // backwards.
 
 		// Stop intaking
 		builder.appendSequence(Sequences.stopIntaking());
 
 		// Go forwards 2m to shoot.
-		Pose2d end = addVector(ALLIANCE_TRENCH_THIRD_BALL, 2, 0);
+		Pose2d end = approachPose(ALLIANCE_TRENCH_THIRD_BALL, 2, 0);
 
 		builder.then().driveRelativeWaypoints(intakeAt(ALLIANCE_TRENCH_THIRD_BALL, 0), List.of(), end, true);
 

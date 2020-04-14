@@ -98,9 +98,6 @@ public class RobotConfiguration {
 
 	public boolean pcmIsPresent = Constants.PCM_PRESENT_DEFAULT;
 	public int pcmCanId = Constants.PCM_CAN_ID;
-	
-	public boolean canifierIsPresent = Constants.CANIFIER_PRESENT_DEFAULT;
-	public int canifierCanId;
 
 	public boolean navxIsPresent = Constants.NAVX_PRESENT_DEFAULT;
 
@@ -246,9 +243,6 @@ public class RobotConfiguration {
 		// These are the safest defaults.
 		doLogging = getAsBoolean("logging/enabled", true);
 		onlyLocal = getAsBoolean("logging/onlyLocal", true);
-
-		canifierIsPresent = getAsBoolean("canifier/present", canifierIsPresent);
-		canifierCanId = getAsInt("canifier/canID", Constants.LED_CANIFIER_CAN_ID);
 
 		ledStripIsPresent = getAsBoolean("ledStrip/present", ledStripIsPresent);
 
