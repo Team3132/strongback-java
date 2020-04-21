@@ -2,16 +2,14 @@ package frc.robot.lib;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Transform2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 import static frc.robot.Constants.*;
 
 public class PoseHelper {
     /**
-	 * Adds a vector to a pose
+	 * Stops at a distance as we approach a pose
 	 * 
-	 * @param pose the pose to add a vector to
+	 * @param pose the pose to approach
 	 * @param dist distance away from pose
 	 * @param bearing the bearing we approach pose from
 	 */
@@ -19,10 +17,7 @@ public class PoseHelper {
 		double x = dist * MathUtil.cos(bearing);
 		double y = dist * MathUtil.sin(bearing);
 		
-		Translation2d translation = new Translation2d(x, y);
-        Transform2d transform = new Transform2d(translation, new Rotation2d(0));
-		
-		return pose.plus(transform);
+		return new Pose2d(pose.getTranslation().getX() + x, pose.getTranslation().getY() + y, new Rotation2d(MathUtil.degreesToRadians(bearing)));
 	}
 
 	/**
