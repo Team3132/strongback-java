@@ -2,8 +2,8 @@ package frc.robot.interfaces;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.strongback.Executable;
 import org.strongback.components.Motor.ControlMode;
@@ -76,18 +76,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			
 			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.TRAJECTORY);
 			
-			int hash = Objects.hash(start, interiorWaypoints, end, forward);
-			String trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
-			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-
-			try {
-				p.trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-			} catch (IOException e) {
-				e.printStackTrace();
-
-				p.trajectory = generateTrajectory(start, interiorWaypoints, end, forward, relative, trajectoryPath);
-			}
-
+			p.trajectory = generateTrajectory(start, interiorWaypoints, end, forward, relative);
 			p.relative = relative;
 			return p;
 		}
@@ -102,15 +91,32 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			return new DriveRoutineParameters(DriveRoutineType.POSITION_PID_ARCADE);
 		}
 
+		/**
+		 * Returns a trajectory by first checking for any cached trajectories in the deploy directory. 
+		 * If it doesn't already exist, generate a trajectory then export it. 
+		 */
 		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
-				Pose2d end, boolean forward, boolean relative, Path trajectoryPath)  {
+				Pose2d end, boolean forward, boolean relative)  {
+			
+			int hash = createHash(start, interiorWaypoints, end, forward);
+			String trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
+			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+
+			Trajectory trajectory;
+			try {
+				trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+				return trajectory;
+			} catch (IOException e) {
+				e.printStackTrace();				
+			} 
+
 			// Build the trajectory on start so that it's ready when needed.
 			// Create a voltage constraint to ensure we don't accelerate too fast
 			var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-					new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
-							Constants.DriveConstants.kvVoltSecondsPerMeter,
-							Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
-					Constants.DriveConstants.kDriveKinematics, 10);
+				new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
+						Constants.DriveConstants.kvVoltSecondsPerMeter,
+						Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+				Constants.DriveConstants.kDriveKinematics, 10);
 
 			// Create config for trajectory
 			TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
@@ -123,16 +129,31 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 			// An example trajectory to follow. All units in meters.
 			long t = System.currentTimeMillis();
-			Trajectory newTrajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
+			trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
 			System.out.printf("Trajectory Generator: took %d milliseconds to generate this spline\n", System.currentTimeMillis() - t);
 
 			try {
-				TrajectoryUtil.toPathweaverJson(newTrajectory, trajectoryPath);
+				TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 
-			return newTrajectory;
+			return trajectory;
+		}
+
+		public static int createHash(Pose2d start, List<Translation2d> interiorWaypoints,
+		Pose2d end, boolean forward) {
+			ArrayList<Object> arr = new ArrayList<Object>();
+			
+			arr.add(start);
+			for(Translation2d waypoint : interiorWaypoints) {
+				arr.add(waypoint);
+			}
+			arr.add(end);
+			arr.add(forward);
+
+			int hash = arr.hashCode();
+			return hash;
 		}
 
 		public DriveRoutineType type = DriveRoutineType.ARCADE;
