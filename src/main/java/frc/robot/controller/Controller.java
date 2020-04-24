@@ -168,6 +168,10 @@ public class Controller implements Runnable, DashboardUpdater {
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
+		
+		if (desiredState.currentPose != null) {
+			subsystems.location.setCurrentLocation(desiredState.currentPose);
+		}
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
