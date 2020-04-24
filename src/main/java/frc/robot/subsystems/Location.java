@@ -46,9 +46,9 @@ import frc.robot.lib.Subsystem;
  * X is along the "horizontal line", and Y is the "vertical" line with 
  * (0,0) at the center of the diagram below.
  *
- *          			^ X +ve 
- *          			|
- *   					|	Other alliance driver stations 
+ *                      ^ X +ve 
+ *                      |
+ *   		            |	Other alliance driver stations 
  *          ********|***|***|********
  *          *           |           *
  *          *           |           *
@@ -66,9 +66,9 @@ import frc.robot.lib.Subsystem;
  *          *           |			*
  *          *           |			*
  *          ********|***|***|********
- *            			|	Our drivers' stations
- *          			|
- *          			v X -ve
+ *                      |	Our drivers' stations
+ *                      |
+ *                      v X -ve
  * 
  * Heading angles:
  *                        ^  0 degrees 
