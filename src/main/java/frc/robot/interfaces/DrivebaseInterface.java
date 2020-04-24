@@ -1,16 +1,21 @@
 package frc.robot.interfaces;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.strongback.Executable;
 import org.strongback.components.Motor.ControlMode;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import frc.robot.Constants;
 import frc.robot.drive.routines.DriveRoutine;
@@ -68,7 +73,37 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 		public static DriveRoutineParameters getDriveWaypoints(Pose2d start, List<Translation2d> interiorWaypoints,
 				Pose2d end, boolean forward, boolean relative) {
+			
 			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.TRAJECTORY);
+			
+			int hash = Objects.hash(start, interiorWaypoints, end, forward);
+			String trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
+			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+
+			try {
+				p.trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+			} catch (IOException e) {
+				e.printStackTrace();
+
+				p.trajectory = generateTrajectory(start, interiorWaypoints, end, forward, relative, trajectoryPath);
+			}
+
+			p.relative = relative;
+			return p;
+		}
+
+		public static DriveRoutineParameters turnToAngle(double angle) {
+			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.TURN_TO_ANGLE);
+			p.value = angle;
+			return p;
+		}
+
+		public static DriveRoutineParameters positionPIDArcade() {
+			return new DriveRoutineParameters(DriveRoutineType.POSITION_PID_ARCADE);
+		}
+
+		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
+				Pose2d end, boolean forward, boolean relative, Path trajectoryPath)  {
 			// Build the trajectory on start so that it's ready when needed.
 			// Create a voltage constraint to ensure we don't accelerate too fast
 			var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
@@ -88,21 +123,16 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 			// An example trajectory to follow. All units in meters.
 			long t = System.currentTimeMillis();
-			p.trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
+			Trajectory newTrajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
 			System.out.printf("Trajectory Generator: took %d milliseconds to generate this spline\n", System.currentTimeMillis() - t);
 
-			p.relative = relative;
-			return p;
-		}
+			try {
+				TrajectoryUtil.toPathweaverJson(newTrajectory, trajectoryPath);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 
-		public static DriveRoutineParameters turnToAngle(double angle) {
-			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.TURN_TO_ANGLE);
-			p.value = angle;
-			return p;
-		}
-
-		public static DriveRoutineParameters positionPIDArcade() {
-			return new DriveRoutineParameters(DriveRoutineType.POSITION_PID_ARCADE);
+			return newTrajectory;
 		}
 
 		public DriveRoutineType type = DriveRoutineType.ARCADE;
