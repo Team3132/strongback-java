@@ -7,6 +7,7 @@ package frc.robot.controller;
 
 import static frc.robot.Constants.*;
 
+import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
 
 import java.util.List;
@@ -347,6 +348,12 @@ public class Sequences {
 	public static Sequence stowBuddyClimb() {
 		SequenceBuilder builder = new SequenceBuilder("stow buddy climb attachment");
 		builder.then().stowBuddyClimb();
+		return builder.build();
+	}
+
+	public static Sequence setLEDColour(LEDColour c) {
+		SequenceBuilder builder = new SequenceBuilder("set LEDS to " + c);
+		builder.then().setColour(c);
 		return builder.build();
 	}
 

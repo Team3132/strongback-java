@@ -1,15 +1,13 @@
 package frc.robot.subsystems;
 
-import org.strongback.Executable;
 import org.strongback.components.Solenoid;
 
 import frc.robot.interfaces.BuddyClimbInterface;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
 
-public class BuddyClimb extends Subsystem implements BuddyClimbInterface, Executable, DashboardUpdater {
+public class BuddyClimb extends Subsystem implements BuddyClimbInterface {
    private Solenoid solenoid;
 
    public BuddyClimb(Solenoid solenoid, DashboardInterface dashboard, Log log) {

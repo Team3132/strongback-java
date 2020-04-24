@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
-import org.strongback.Executable;
 import org.strongback.components.Clock;
 import org.strongback.components.Gyroscope;
 
@@ -11,7 +10,6 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.LocationHistory;
@@ -88,7 +86,7 @@ import frc.robot.lib.Subsystem;
  * A bearing is the relative angle from the initial angle. In nautical terms it is the absolute bearing.
  * A bearing is constrained to the range -180 to 180 degrees.
  */
-public class Location extends Subsystem implements LocationInterface, Executable, DashboardUpdater {
+public class Location extends Subsystem implements LocationInterface {
     private Gyroscope gyro;
     private DoubleDelta leftDistanceDelta, rightDistanceDelta;
     private Clock clock;            // Source of time.
@@ -279,7 +277,6 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	 * 
 	 * One problem is that very fast sampling means we will have zero movements for some samples.
 	 * This causes problems with the current speed value.
-	 * TODO: Add a low pass filter.
 	 */
 	@Override
 	public void update() {

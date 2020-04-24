@@ -61,7 +61,8 @@ public class OverridableSubsystem<SubIF> {
 
 	private OverrideMode mode = OverrideMode.AUTOMATIC;
 
-	public OverridableSubsystem(String name, Class clazz, SubIF real, SubIF simulator, SubIF mock, Log log) {
+	@SuppressWarnings("unchecked")
+	public OverridableSubsystem(String name, Class<?> clazz, SubIF real, SubIF simulator, SubIF mock, Log log) {
 		this.name = name;
 		this.log = log;
 		log.register(true, () -> (double)mode.value, "%s/overrideMode", name);

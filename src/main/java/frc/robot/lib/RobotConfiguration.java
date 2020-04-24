@@ -29,9 +29,6 @@ import frc.robot.interfaces.Log;
  * drivebase/rampRate = 0.13125
  * drivebase/right/canIDs/withEncoders = 7,6
  * drivebase/right/canIDs/withoutEncoders = 5
- * 
- * TODO: Add support for comments and freeform parameters.
- * @author carlin
  */
 public class RobotConfiguration {
 	private String name = "RobotConfig";

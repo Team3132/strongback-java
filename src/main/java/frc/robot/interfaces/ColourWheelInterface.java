@@ -42,7 +42,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
 
         @Override
         public String toString() {
-            if (type.equals(type.NONE)) {
+            if (type.equals(ColourWheelType.NONE)) {
                 return String.format("%s", type.toString().toLowerCase());
             }
             return String.format("%s: %s", type.toString().toLowerCase(), colour);

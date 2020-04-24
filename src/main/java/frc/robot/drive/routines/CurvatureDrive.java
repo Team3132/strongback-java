@@ -13,7 +13,8 @@ public class CurvatureDrive implements DriveRoutine {
 	private double quickStopAccumulator = 0.0;
 	private ContinuousRange throttleCR;
 	private ContinuousRange wheelCR;
-	private Switch isQuickTurn;
+    private Switch isQuickTurn;
+    @SuppressWarnings("unused")
 	private Log log;            
 
     public static final double DEFAULT_MINIMUM_SPEED = 0.02;

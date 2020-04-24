@@ -26,6 +26,7 @@ import frc.robot.interfaces.Log;
     // Coefficients on how the velocity and acceleration affect the motor power.
     private double kV = 0, kA = 0;
     // Position PID values.
+    @SuppressWarnings("unused")
     private double kP = 0, kI = 0, kD = 0;
     private boolean enabled = true;
 

@@ -105,10 +105,12 @@ public class Jevois implements JevoisInterface {
             this.autowb.value = autowb;
         }
 
+        @SuppressWarnings("unused")
         public void setRedbal(int redbal) {
             this.redbal.value = limit(redbal, 0, 255);
         }
 
+        @SuppressWarnings("unused")
         public void setBluebal(int bluebal) {
             this.bluebal.value = limit(bluebal, 0, 255);
         }
@@ -121,10 +123,12 @@ public class Jevois implements JevoisInterface {
             this.gain.value = limit(gain, 16, 1023);
         }
 
+        @SuppressWarnings("unused")
         public void setHflip(boolean hflip) {
             this.hflip.value = hflip;
         }
 
+        @SuppressWarnings("unused")
         public void setVflip(boolean vflip) {
             this.vflip.value = vflip;
         }
@@ -133,6 +137,7 @@ public class Jevois implements JevoisInterface {
             this.sharpness.value = limit(sharpness, 0, 32);
         }
 
+        @SuppressWarnings("unused")
         public void setAbsexp(int absexp) {
             this.absexp.value = limit(absexp, 1, 1000);
         }

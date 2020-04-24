@@ -26,7 +26,7 @@ import org.strongback.components.AngleSensor;
  * @author Randall Hauch
  */
 @ThreadSafe
-public class MockEncoder extends MockAngleSensor implements AngleSensor {
+public class MockEncoder extends MockAngleSensor {
 
     @Override
     public MockEncoder zero() {

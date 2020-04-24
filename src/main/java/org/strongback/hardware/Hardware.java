@@ -81,6 +81,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  * @author Zach Anderson
  * @author Randall Hauch
  */
+@SuppressWarnings("resource")
 public class Hardware {
 
     /**
