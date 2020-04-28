@@ -2,7 +2,7 @@ package frc.robot.interfaces;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.strongback.Executable;
@@ -98,7 +98,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
 				Pose2d end, boolean forward, boolean relative)  {
 			
-			int hash = createHash(start, interiorWaypoints, end, forward);
+			int hash = Arrays.deepHashCode(new Object[] {start, interiorWaypoints, end, forward});
 			String trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
 			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
 
@@ -139,21 +139,6 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			}
 
 			return trajectory;
-		}
-
-		public static int createHash(Pose2d start, List<Translation2d> interiorWaypoints,
-		Pose2d end, boolean forward) {
-			ArrayList<Object> arr = new ArrayList<Object>();
-			
-			arr.add(start);
-			for(Translation2d waypoint : interiorWaypoints) {
-				arr.add(waypoint);
-			}
-			arr.add(end);
-			arr.add(forward);
-
-			int hash = arr.hashCode();
-			return hash;
 		}
 
 		public DriveRoutineType type = DriveRoutineType.ARCADE;
