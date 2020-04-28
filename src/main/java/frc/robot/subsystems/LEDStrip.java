@@ -13,6 +13,7 @@ public class LEDStrip implements LEDStripInterface {
     public AddressableLED ledStrip;
     public AddressableLEDBuffer ledStripBuffer;
     private final int numberOfLEDs;
+    @SuppressWarnings("unused")
     private final Log log;
 
     public LEDStrip(int PWM_Port, int numberOfLEDs, Log log) {   

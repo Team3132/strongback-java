@@ -21,6 +21,11 @@ public class MockLocation implements LocationInterface {
 	}
 
 	@Override
+	public void setCurrentLocation(Pose2d pose) {
+		here = new Position(pose.getTranslation().getX(), pose.getTranslation().getY(), pose.getRotation().getDegrees());
+	}
+
+	@Override
 	public Position getCurrentLocation() {
 		return here;
 	}
@@ -80,4 +85,6 @@ public class MockLocation implements LocationInterface {
 	public void setHeading(double heading) {
 		this.heading = heading;
 	}
+
+	
 }

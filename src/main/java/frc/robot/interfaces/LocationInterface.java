@@ -34,9 +34,16 @@ public abstract interface LocationInterface extends Executable, DashboardUpdater
     /**
      * Set the current location. This allows a subsystem to override the location and force the location to a particular point.
      * In particular the start location should be set as accurately as possible, so the robot knows where it starts on the field
-     * @param current The current location.
+     * @param location The current location.
      */
-    public void setCurrentLocation(Position location);
+	public void setCurrentLocation(Position location);
+	
+	/**
+     * Set the current location. This allows a subsystem to override the location and force the location to a particular point.
+     * In particular the start location should be set as accurately as possible, so the robot knows where it starts on the field
+     * @param pose The current location.
+     */
+    public void setCurrentLocation(Pose2d pose);
     
     /**
      * Return the location on the field at the current time.

@@ -207,7 +207,7 @@ public class OI implements OIInterface {
 
 
 
-	private void mapOverrideSwitch(InputDevice box, int disableButton, int manualButton, OverridableSubsystem overrideableSubsystem) {
+	private void mapOverrideSwitch(InputDevice box, int disableButton, int manualButton, OverridableSubsystem<?> overrideableSubsystem) {
 		onTriggered(box.getButton(disableButton), () -> overrideableSubsystem.turnOff());
 		onTriggered(box.getButton(manualButton), () -> overrideableSubsystem.setManualMode());
 		onUntriggered(
@@ -284,6 +284,7 @@ public class OI implements OIInterface {
 	 * @param deactiveSeq sequence to run when the mode is deactived.
 	 * @return the ModeSwitch for further chaining of more buttons based on the mode.
 	 */
+	@SuppressWarnings("unused")
 	private ModeSwitch onMode(Switch switchOn, Switch switchOff, String name, Sequence activateSeq, Sequence deactiveSeq) {
 		return new ModeSwitch(switchOn, switchOff, name, activateSeq, deactiveSeq);
 	}

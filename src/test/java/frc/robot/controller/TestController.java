@@ -13,7 +13,6 @@ import org.strongback.mock.MockPneumaticsModule;
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.Log;
-import frc.robot.interfaces.NetworkTableHelperInterface;
 import frc.robot.lib.WheelColour;
 import frc.robot.mock.MockBuddyClimb;
 import frc.robot.mock.MockColourWheel;
@@ -43,11 +42,11 @@ public class TestController {
 	private Subsystems subsystems;
 	// Store direct access to the simulators so the simulator-only
 	// methods can be called.
+	@SuppressWarnings("unused")
 	private IntakeSimulator intake;
 	private TestHelper test;
 	// The bit that is being tested under test.
 	private Controller exec;
-	private NetworkTableHelperInterface networkTable;
 		
 	/**
 	 * Setup fields used by this test.

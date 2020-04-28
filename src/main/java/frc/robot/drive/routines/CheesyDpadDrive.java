@@ -16,6 +16,7 @@ public class CheesyDpadDrive implements DriveRoutine {
 	private ContinuousRange throttleCR;
 	private ContinuousRange wheelCR;
 	private Switch isQuickTurn;
+	@SuppressWarnings("unused")
 	private Log log;
 	private double lastTime;
 	private static final double timeThreashold = 3; // milliseconds 

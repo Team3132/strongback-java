@@ -367,7 +367,8 @@ public class HardwareTalonSRX implements Motor {
 	}
 
 	public double getActiveTrajectoryHeading() {
-		return talon.getActiveTrajectoryHeading();
+		// return talon.getActiveTrajectoryHeading();
+		return talon.getActiveTrajectoryPosition(1);
 	}
 
 	public ErrorCode configMotionCruiseVelocity(int sensorUnitsPer100ms, int timeoutMs) {

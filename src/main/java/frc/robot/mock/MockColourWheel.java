@@ -7,6 +7,7 @@ import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 
 public class MockColourWheel implements ColourWheelInterface {
     private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
+    private boolean extended = false;
 
     public MockColourWheel(Log log) {
     }
@@ -59,19 +60,17 @@ public class MockColourWheel implements ColourWheelInterface {
 
     @Override
     public boolean isArmExtended() {
-        // TODO Auto-generated method stub
-        return false;
+        return extended;
     }
 
     @Override
     public boolean isArmRetracted() {
-        // TODO Auto-generated method stub
-        return false;
+        return extended == false;
     }
 
     @Override
     public void setArmExtended(boolean extended) {
-        // TODO Auto-generated method stub
+        this.extended = extended;
     }
 
 }

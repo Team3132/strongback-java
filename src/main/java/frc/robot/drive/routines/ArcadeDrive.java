@@ -6,6 +6,7 @@ import frc.robot.interfaces.Log;
 public class ArcadeDrive implements DriveRoutine {
 	private String name = "ArcadeDrive";
 	private double scale = 1;
+	@SuppressWarnings("unused")
 	private Log log;
 	
 	private ContinuousRange move;

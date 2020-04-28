@@ -162,9 +162,9 @@ public class Subsystems implements DashboardUpdater {
 		Motor leftMotor = MotorFactory.getDriveMotor(true, config, clock, log);
 		Motor rightMotor = MotorFactory.getDriveMotor(false, config,clock, log);
 		Solenoid ptoSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.CLIMBER_PTO_SOLENOID_PORT,
-				0.1, 0.1);
+				0.1, 0.1); // TODO: Test and work out correct timings.
 		Solenoid brakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId,
-				Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1);
+				Constants.CLIMBER_BRAKE_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 
 		leftDriveDistance = () -> leftMotor.getPosition();
 		rightDriveDistance = () -> rightMotor.getPosition();
@@ -368,7 +368,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 		
-		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.2, 0.2);
+		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.INTAKE_SOLENOID_PORT, 0.2, 0.2); // TODO: Test and work out correct timings.
 		Motor intakeMotor = MotorFactory.getIntakeMotor(config, log);
 		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard, log); 
 	}
@@ -390,7 +390,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		Solenoid buddyClimbSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.BUDDYCLIMB_SOLENOID_PORT, 0.1, 0.1);
+		Solenoid buddyClimbSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.BUDDYCLIMB_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 		buddyClimb = new BuddyClimb(buddyClimbSolenoid, dashboard, log);
 	}
 
@@ -452,6 +452,7 @@ public class Subsystems implements DashboardUpdater {
 		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time/Constants.LED_STRIP_COUNTDOWN);
 	}
 
+	@SuppressWarnings("resource")
 	public void createLoader() {
 		if (!config.loaderIsPresent) {
 			loader = new MockLoader(log);
@@ -461,7 +462,7 @@ public class Subsystems implements DashboardUpdater {
 
 		Motor spinnerMotor = MotorFactory.getLoaderSpinnerMotor(config, log);
 		Motor loaderPassthroughMotor = MotorFactory.getLoaderPassthroughMotor(config, log); 
-		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1);
+		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.PADDLE_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 		// The ball sensors are connected to the DIO ports on the rio.
 		DigitalInput inBallSensor = new DigitalInput(Constants.IN_BALL_DETECTOR_DIO_PORT);
 		DigitalInput outBallSensor = new DigitalInput(Constants.OUT_BALL_DETECTOR_DIO_PORT);
@@ -488,7 +489,7 @@ public class Subsystems implements DashboardUpdater {
 			return;
 		}
 
-		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1);
+		Solenoid hoodSolenoid = Hardware.Solenoids.singleSolenoid(config.pcmCanId, Constants.SHOOTER_HOOD_SOLENOID_PORT, 0.1, 0.1); // TODO: Test and work out correct timings.
 		Motor shooterMotor = MotorFactory.getShooterMotor(config, clock, log);
 
 		shooter = hwShooter = new Shooter(shooterMotor, hoodSolenoid, dashboard, log);

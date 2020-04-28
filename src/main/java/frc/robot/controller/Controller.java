@@ -168,6 +168,10 @@ public class Controller implements Runnable, DashboardUpdater {
 		// Start driving if necessary.
 		subsystems.drivebase.setDriveRoutine(desiredState.drive);
 		subsystems.drivebase.applyBrake(desiredState.climberBrakeApplied);
+		
+		if (desiredState.currentPose != null) {
+			subsystems.location.setCurrentLocation(desiredState.currentPose);
+		}
 	
 		subsystems.intake.setExtended(desiredState.intakeExtended);
 		subsystems.intake.setTargetRPS(desiredState.intakeRPS);
@@ -266,9 +270,8 @@ public class Controller implements Runnable, DashboardUpdater {
 		}
 		// set the LEDs to purple if we are trying to wait for the shooter to reach 0 rps
 		if (shooterUpToSpeed && subsystems.shooter.getTargetRPS() == 0) {
-			subsystems.ledStrip.setColour(LEDColour.PURPLE);
 			logSub("Should never be waiting for the shooter to reach 0 RPS. Running the empty sequence");
-			doSequence(Sequences.getEmptySequence()); // TODO: replace this with a set leds to X colour sequence (remeber to update the logSub when this happens)
+			doSequence(Sequences.setLEDColour(LEDColour.PURPLE));
 		}
 
 		try {
@@ -407,6 +410,7 @@ public class Controller implements Runnable, DashboardUpdater {
 		log.sub(time_str + message, args);
 	}
 
+	@SuppressWarnings("unused")
 	private void logErr(String message, Object... args) {
 		String time_str = String.format("%.3f controller: ", clock.currentTime());
 		log.error(time_str + message, args);

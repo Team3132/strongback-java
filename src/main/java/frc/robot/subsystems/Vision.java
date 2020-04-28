@@ -6,7 +6,6 @@ import org.strongback.components.Clock;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.JevoisInterface;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
@@ -14,7 +13,7 @@ import frc.robot.interfaces.VisionInterface;
 import frc.robot.lib.Position;
 import frc.robot.lib.Subsystem;
 
-public class Vision extends Subsystem implements VisionInterface, DashboardUpdater, Runnable {
+public class Vision extends Subsystem implements VisionInterface, Runnable {
 	private JevoisInterface jevois;
 	private LocationInterface location;
 	private Clock clock;
@@ -22,8 +21,6 @@ public class Vision extends Subsystem implements VisionInterface, DashboardUpdat
 	private double visionHMax, visionSMax, visionVMax;
 	private TargetDetails lastSeenTarget = new TargetDetails();
 	private boolean connected = false;
-
-	private double prevSkew = 0;
 
 	public Vision(JevoisInterface jevois, LocationInterface location, DashboardInterface dashboard, Clock clock,
 			double visionHMin, double visionSMin, double visionVMin, double visionHMax, double visionSMax,

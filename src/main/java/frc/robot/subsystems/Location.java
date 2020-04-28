@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
-import org.strongback.Executable;
 import org.strongback.components.Clock;
 import org.strongback.components.Gyroscope;
 
@@ -11,7 +10,6 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
 import frc.robot.lib.LocationHistory;
@@ -44,32 +42,31 @@ import frc.robot.lib.Subsystem;
  * opposite alliance's end from the driver's station.
  *  
  * X is along the "horizontal line", and Y is the "vertical" line with 
- * (0,0) at the bottom left of the diagram below.
- * DANGER: This is changing to having X away from the drivers' stations.
+ * (0,0) at the center of the diagram below.
  *
- *          ^ X +ve 
- *          |
- *          | Other alliance driver stations
- *          +*******|*******|********
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          +************************
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- *          |                       *
- * Y +ve <--0-------|-------|-------+---> Y -ve
- *          | Our drivers' stations
- *          |
- *          v X -ve
+ *                      ^ X +ve 
+ *                      |
+ *   		            |	Other alliance driver stations 
+ *          ********|***|***|********
+ *          *           |           *
+ *          *           |           *
+ *          *           |           *
+ *          *           |			*
+ *          *           |			*
+ *          *           |			*
+ *          *           |			*
+ * Y +ve <--------------|-----------0---> Y -ve
+ *          *           |           *
+ *          *           |           *
+ *          *           |           *
+ *          *           |			*
+ *          *           |			*
+ *          *           |			*
+ *          *           |			*
+ *          ********|***|***|********
+ *                      |	Our drivers' stations
+ *                      |
+ *                      v X -ve
  * 
  * Heading angles:
  *                        ^  0 degrees 
@@ -89,7 +86,7 @@ import frc.robot.lib.Subsystem;
  * A bearing is the relative angle from the initial angle. In nautical terms it is the absolute bearing.
  * A bearing is constrained to the range -180 to 180 degrees.
  */
-public class Location extends Subsystem implements LocationInterface, Executable, DashboardUpdater {
+public class Location extends Subsystem implements LocationInterface {
     private Gyroscope gyro;
     private DoubleDelta leftDistanceDelta, rightDistanceDelta;
     private Clock clock;            // Source of time.
@@ -185,13 +182,23 @@ public class Location extends Subsystem implements LocationInterface, Executable
      */
     @Override
     public void setCurrentLocation(Position location) {
-		log.sub("%s: resetting to: %s", name, location.toString());
-    	((NavXGyroscope) gyro).setAngle(location.heading);
+		setCurrentLocation(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)));
+	}
+
+	/**
+     * Set the current location. This allows a subsystem to override the location and force the location to a particular point.
+     * In particular the start location should be set as accurately as possible, so the robot knows where it starts on the field
+     * @param pose The current location.
+     */
+    @Override
+    public void setCurrentLocation(Pose2d pose) {
+		log.sub("%s: resetting to: %s", name, pose.toString());
+    	((NavXGyroscope) gyro).setAngle(pose.getRotation().getDegrees());
     	current.speed = 0;
     	current.timeSec = clock.currentTime();  // time of last update
 		history.setInitial(current);
 		resetEncoders.run();
-		odometry.resetPosition(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)), Rotation2d.fromDegrees(0));
+		odometry.resetPosition(pose, Rotation2d.fromDegrees(0));
 	}
 	
 	/**
@@ -270,7 +277,6 @@ public class Location extends Subsystem implements LocationInterface, Executable
 	 * 
 	 * One problem is that very fast sampling means we will have zero movements for some samples.
 	 * This causes problems with the current speed value.
-	 * TODO: Add a low pass filter.
 	 */
 	@Override
 	public void update() {

@@ -18,6 +18,7 @@ import frc.robot.interfaces.Log;
     private double targetSpeed;
     private double maxJerk;
     private Clock clock;
+    @SuppressWarnings("unused")
     private Log log;
     private double lastTime;
 

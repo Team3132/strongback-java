@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.function.DoubleSupplier;
 
-import org.strongback.Executable;
 import org.strongback.components.Clock;
 import frc.robot.interfaces.Log;
 
@@ -47,7 +46,7 @@ import frc.robot.interfaces.Log;
  * and provide a variety of methods to append to that log file.
  */
 
-public class LogGraph implements Log, Executable {
+public class LogGraph implements Log {
 	
 	private enum GraphLogState {
 		INVALID,				// File has not yet been created
