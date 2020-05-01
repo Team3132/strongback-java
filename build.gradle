@@ -62,6 +62,9 @@ dependencies {
     // For talking to the JeVois over the USB connection.
     compile 'com.fazecast:jSerialComm:[2.5.3]'
 
+    // For encoding and decoding html text as part of config server.
+    compile 'org.apache.commons:commons-text:[1.7]'
+
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')

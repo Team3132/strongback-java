@@ -249,6 +249,10 @@ public class Constants {
 	public static final String LOG_EVENT_EXTENSION = "event";
 	public static final int	 WEB_PORT = 5800;// first open port for graph/log web server
 	public static final double LOG_GRAPH_PERIOD = 0.05;	// run the graph updater every 50ms
+
+	// Config WebServer
+	public static final String CONFIG_WEB_ROOT = "/home/lvuser/www";
+	public static final int CONFIG_WEB_PORT = 5801;
 	
 	// LocationHistory
 	public static final int LOCATION_HISTORY_MEMORY_SECONDS = 5;
