@@ -1,5 +1,6 @@
 package frc.robot.drive.util;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -18,9 +19,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 
 import frc.robot.Constants;
 
@@ -43,8 +42,16 @@ public class TestTrajectoryCaching {
     private void testTrajectory(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward, boolean relative) {
         // Ensure there is no existing trajectory file
         clearPath(start, interiorWaypoints, end, forward);
+
+        // Double check that file does not exist
+        assertFalse(Files.exists(getPath(start, interiorWaypoints, end, forward)));
+
         // Creating trajectory file (and saving it to deploy/paths/test)
-        Trajectory trajectoryA = generateTrajectory(start, interiorWaypoints, end, forward, relative);      
+        Trajectory trajectoryA = generateTrajectory(start, interiorWaypoints, end, forward, relative);
+
+        // Double check that file has been created
+        assertTrue(Files.exists(getPath(start, interiorWaypoints, end, forward)));      
+
         // Compare created trajectory to TrajectoryGenerator's trajectory
         Trajectory expectedTrajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, createConfig(forward));
         assertTrue(trajectoryA.getStates().equals(expectedTrajectory.getStates()));
@@ -111,18 +118,23 @@ public class TestTrajectoryCaching {
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
-    
     /**
-     * Removes trajectory file
+     * returns path for trajectory file
      */
-    private void clearPath(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward) {
+    private Path getPath(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward) {
         int hash = Arrays.deepHashCode(new Object[] { start, interiorWaypoints, end, forward });
         // System.out.println(hash);
         String trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
         Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-        
+        return trajectoryPath;
+    }
+
+    /**
+     * Removes trajectory file
+     */
+    private void clearPath(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward) {
         try {
-            Files.deleteIfExists(trajectoryPath);
+            Files.deleteIfExists(getPath(start, interiorWaypoints, end, forward));
         } catch (IOException e) {
             e.printStackTrace();
         }
