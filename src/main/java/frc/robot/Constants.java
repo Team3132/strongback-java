@@ -4,9 +4,12 @@ import java.nio.file.Paths;
 
 import com.revrobotics.ColorMatch;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 import edu.wpi.first.wpilibj.util.Color;
 
 /**
@@ -293,6 +296,16 @@ public class Constants {
 		// seconds
 		public static final double kRamseteB = 2;
 		public static final double kRamseteZeta = 0.7;
+
+		public static final double kMaxVoltage = 10;
+
+		// Create a voltage constraint to ensure we don't accelerate too fast
+		public static final TrajectoryConstraint kAutoVoltageConstraint = new DifferentialDriveVoltageConstraint(
+			new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
+					Constants.DriveConstants.kvVoltSecondsPerMeter,
+					Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+			Constants.DriveConstants.kDriveKinematics, 
+			Constants.DriveConstants.kMaxVoltage);
 	}
 	/*
 	 * Colour Wheel

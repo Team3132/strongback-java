@@ -41,15 +41,17 @@ public class TestTrajectoryCaching {
      * Check that cached trajectories return the same trajectory as TrajectoryGenerator
      */
     private void testTrajectory(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward, boolean relative) {
-        
+        // Ensure there is no existing trajectory file
         clearPath(start, interiorWaypoints, end, forward);
-        // -1262101741, creating file
+        // Creating trajectory file (and saving it to deploy/paths/test)
         Trajectory trajectoryA = generateTrajectory(start, interiorWaypoints, end, forward, relative);      
+        // Compare created trajectory to TrajectoryGenerator's trajectory
         Trajectory expectedTrajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, createConfig(forward));
         assertTrue(trajectoryA.getStates().equals(expectedTrajectory.getStates()));
 
-        // -1262101741, existing file
-        Trajectory trajectoryB = generateTrajectory(start, interiorWaypoints, end, forward, relative);      
+        // Creating trajectory from existing file we created earlier
+        Trajectory trajectoryB = generateTrajectory(start, interiorWaypoints, end, forward, relative);    
+        // Compare trajectory to TrajectoryGenerator's trajectory
         assertTrue(trajectoryB.getStates().equals(expectedTrajectory.getStates()));
     }
 
@@ -126,23 +128,16 @@ public class TestTrajectoryCaching {
         }
     }
 
-
+    /**
+     * Create config for trajectory
+     */
     private TrajectoryConfig createConfig (boolean forward) {
-        // Build the trajectory on start so that it's ready when needed.
-        // Create a voltage constraint to ensure we don't accelerate too fast
-        var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-            new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
-                    Constants.DriveConstants.kvVoltSecondsPerMeter,
-                    Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
-            Constants.DriveConstants.kDriveKinematics, 10);
-
-        // Create config for trajectory
         TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
                 Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared)
                         // Add kinematics to ensure max speed is actually obeyed
                         .setKinematics(Constants.DriveConstants.kDriveKinematics)
                         // Apply the voltage constraint
-                        .addConstraint(autoVoltageConstraint)
+                        .addConstraint(Constants.DriveConstants.kAutoVoltageConstraint)
                         .setReversed(!forward);
         return config;
     }

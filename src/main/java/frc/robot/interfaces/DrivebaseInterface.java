@@ -106,13 +106,11 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			} else { 
 				trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
 			}
-			
+
 			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
 
-			Trajectory trajectory;
 			try {
-				trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-				return trajectory;
+				return TrajectoryUtil.fromPathweaverJson(trajectoryPath);
 			} catch (FileNotFoundException e) {
 				System.out.println("Trajectory file not found: Starting to generate and caching spline.");		
 			} catch (IOException e1) {
@@ -120,25 +118,18 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			}
 
 			// Build the trajectory on start so that it's ready when needed.
-			// Create a voltage constraint to ensure we don't accelerate too fast
-			var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-				new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
-						Constants.DriveConstants.kvVoltSecondsPerMeter,
-						Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
-				Constants.DriveConstants.kDriveKinematics, 10);
-
 			// Create config for trajectory
 			TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
 					Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared)
 							// Add kinematics to ensure max speed is actually obeyed
 							.setKinematics(Constants.DriveConstants.kDriveKinematics)
 							// Apply the voltage constraint
-							.addConstraint(autoVoltageConstraint)
+							.addConstraint(Constants.DriveConstants.kAutoVoltageConstraint)
 							.setReversed(!forward);
 
 			// An example trajectory to follow. All units in meters.
 			long t = System.currentTimeMillis();
-			trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
+			Trajectory trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
 
 			try {
 				TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
