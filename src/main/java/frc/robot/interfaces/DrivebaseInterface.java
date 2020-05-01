@@ -1,5 +1,6 @@
 package frc.robot.interfaces;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -99,16 +100,24 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 				Pose2d end, boolean forward, boolean relative)  {
 			
 			int hash = Arrays.deepHashCode(new Object[] {start, interiorWaypoints, end, forward});
-			String trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
+			String trajectoryJSON;
+			if (System.getProperty("user.name") == "lvuser") { 
+				trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
+			} else { 
+				trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
+			}
+			
 			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
 
 			Trajectory trajectory;
 			try {
 				trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
 				return trajectory;
-			} catch (IOException e) {
-				e.printStackTrace();				
-			} 
+			} catch (FileNotFoundException e) {
+				System.out.println("Trajectory file not found: Starting to generate and caching spline.");		
+			} catch (IOException e1) {
+				System.out.println(e1);
+			}
 
 			// Build the trajectory on start so that it's ready when needed.
 			// Create a voltage constraint to ensure we don't accelerate too fast
@@ -130,12 +139,12 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			// An example trajectory to follow. All units in meters.
 			long t = System.currentTimeMillis();
 			trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
-			System.out.printf("Trajectory Generator: took %d milliseconds to generate this spline\n", System.currentTimeMillis() - t);
 
 			try {
 				TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
-			} catch (IOException e1) {
-				e1.printStackTrace();
+				System.out.printf("Trajectory Generator: took %d milliseconds to generate and write this spline to file\n", System.currentTimeMillis() - t);
+			} catch (IOException e) {
+				System.out.println(e);
 			}
 
 			return trajectory;

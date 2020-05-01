@@ -157,5 +157,7 @@ gradle-app.setting
 bin/
 imgui.ini
 
+# Ignore splines generated from tests
+src/main/deploy/paths/test
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode

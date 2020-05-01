@@ -1,4 +1,4 @@
-package frc.robot.interfaces;
+package frc.robot.drive.util;
 
 import static org.junit.Assert.assertTrue;
 
@@ -27,9 +27,9 @@ import frc.robot.Constants;
 /**
  * Tests trajectory generation and caching 
  * 
- * To run the tests: ./gradlew test --tests "frc.robot.interfaces.TestDrivebaseInterface"
+ * To run the tests: ./gradlew test --tests "frc.robot.drive.util.TestTrajectoryCaching"
  */
-public class TestDrivebaseInterface {
+public class TestTrajectoryCaching {
 
     Pose2d start = new Pose2d(0, 0, new Rotation2d(0));
     List<Translation2d> interiorWaypoints = List.of();
@@ -116,7 +116,7 @@ public class TestDrivebaseInterface {
     private void clearPath(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward) {
         int hash = Arrays.deepHashCode(new Object[] { start, interiorWaypoints, end, forward });
         // System.out.println(hash);
-        String trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
+        String trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
         Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
         
         try {
