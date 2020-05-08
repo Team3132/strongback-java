@@ -228,6 +228,9 @@ public class Constants {
 	public static final double VISION_V_MIN = 40;
 	public static final double VISION_V_MAX = 255;
 
+	// Vision low pass filter (needs tuning)
+	public static final double GOAL_LOWPASS_ALPHA = 0.2;
+
 	// Turn to angle (all need tuning)
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
