@@ -2,6 +2,7 @@ package frc.robot.drive.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 
 import frc.robot.Constants;
+import junit.framework.TestFailure;
 
 /**
  * Tests trajectory generation and caching 
@@ -90,10 +92,10 @@ public class TestTrajectoryCaching {
         try {
             trajectoryA = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
         } catch (FileNotFoundException e) {
-            System.out.println("Trajectory file not found.");	
-            return;	
+            fail("Trajectory file not found.");
+            return;
         } catch (IOException e1) {
-            System.out.println(e1);
+            fail(e1.toString());
             return;
         }
 
