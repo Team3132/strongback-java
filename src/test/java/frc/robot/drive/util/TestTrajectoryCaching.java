@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 
 import frc.robot.Constants;
-import junit.framework.TestFailure;
 
 /**
  * Tests trajectory generation and caching 
@@ -107,7 +106,7 @@ public class TestTrajectoryCaching {
         //     System.out.println(e);
         // }
 
-        
+
 
         String testTrajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
         Path testTrajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(testTrajectoryJSON);
