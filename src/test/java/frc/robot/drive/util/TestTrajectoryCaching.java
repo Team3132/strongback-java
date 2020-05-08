@@ -67,7 +67,7 @@ public class TestTrajectoryCaching {
     }
 
     /**
-     * Test that we are actually reading from a cached file
+     * Test that we are actually reading from a cached file (src/main/deploy/paths/test/1532419827.wpilib.json)
      */
 
     @Test
@@ -80,17 +80,41 @@ public class TestTrajectoryCaching {
         Pose2d testEnd = new Pose2d(53,31, new Rotation2d(-70));
         boolean testForward = true;
 
-        // Hash : 1532419827
+        // If the above values are changed, uncomment the below code to generate a new file. Make sure to record the new hash in the line above 
+        // and update gitignore accordingly.
 
-        // int hash = Arrays.deepHashCode(new Object[] { testStart, testInteriorWaypoints, testEnd, testForward });
+        int hash = 1532419827;
+        
+        // String trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
+        // Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+            
+        // try {
+        //     Files.deleteIfExists(trajectoryPath);
+        // } catch (IOException e) {
+        //     System.out.println(e);
+        // }
+        
+        // hash = Arrays.deepHashCode(new Object[] {testStart, testInteriorWaypoints, testEnd, testForward});
         // System.out.println(hash);
+        // trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
+        // trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+        
+        // Trajectory trajectory = TrajectoryGenerator.generateTrajectory(testStart, testInteriorWaypoints, testEnd, createConfig(testForward));
 
-        String trajectoryJSON = "paths/test/1532419827.wpilib.json";
-        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+        // try {
+        //     TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
+        // } catch (IOException e) {
+        //     System.out.println(e);
+        // }
+
+        
+
+        String testTrajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
+        Path testTrajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(testTrajectoryJSON);
 
         Trajectory trajectoryA;
         try {
-            trajectoryA = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+            trajectoryA = TrajectoryUtil.fromPathweaverJson(testTrajectoryPath);
         } catch (FileNotFoundException e) {
             fail("Trajectory file not found.");
             return;

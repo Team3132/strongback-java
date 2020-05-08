@@ -158,6 +158,7 @@ bin/
 imgui.ini
 
 # Ignore splines generated from tests
-src/main/deploy/paths/test
+src/main/deploy/paths/test/*
+!src/main/deploy/paths/test/1532419827.wpilib.json
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
