@@ -3,7 +3,6 @@ package frc.robot.interfaces;
 import java.util.List;
 
 import org.strongback.Executable;
-import org.strongback.components.Motor.ControlMode;
 
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -27,7 +26,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	public enum DriveRoutineType {
 		CONSTANT_POWER,  // Set a constant power to drive wheels.
 		CONSTANT_SPEED,  // Set a constant speed to drive wheels.
-		ARCADE,  // Normal arcade drive.
+		ARCADE_DUTY_CYCLE,  // Normal arcade drive.
 		CHEESY,  // Cheesy drive using the drivers joysticks.
 		TRAJECTORY,  // Drive through waypoints.
 		VISION_ASSIST,  // Driver has speed control and vision has turn control.
@@ -41,6 +40,40 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 	public DrivebaseInterface activateClimbMode(boolean enabled);
 	public DrivebaseInterface applyBrake(boolean enabled);
+
+
+	/**
+	 * The values to give to the motors on each side of the robot.
+	 */
+	public class DriveMotion {
+		public double left;
+		public double right;
+		
+		public DriveMotion(double left, double right) {
+			this.left = left;
+			this.right = right;
+		}
+
+		@Override
+		public String toString() {
+			return "Left: " + left + ", Right: " + right;
+		}
+		
+		public boolean equals(Object o) {
+			if (o == this) {
+				return true;
+			}
+			if (!(o instanceof DriveMotion)) {
+				return false;
+			}
+			DriveMotion m = (DriveMotion) o;
+			return m.left == left && m.right == right;
+		}
+
+		public int hashCode() {
+			return (int) (1000 * left + right);
+		}
+	}
 
 	
 
@@ -62,7 +95,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		}
 
 		public static DriveRoutineParameters getArcade() {
-			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.ARCADE);
+			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.ARCADE_DUTY_CYCLE);
 			return p;
 		}
 
@@ -105,7 +138,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			return new DriveRoutineParameters(DriveRoutineType.POSITION_PID_ARCADE);
 		}
 
-		public DriveRoutineType type = DriveRoutineType.ARCADE;
+		public DriveRoutineType type = DriveRoutineType.ARCADE_DUTY_CYCLE;
 
 		// Waypoint parameters.
 		public Trajectory trajectory;
@@ -156,7 +189,7 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	 * Get the action that was requested of the drivebase.
 	 * @return
 	 */
-	public DriveRoutineParameters getDriveRoutine();
+	public DriveRoutineParameters getDriveRoutineParameters();
 
 	/**
 	 * Returns false if the drivebase has more to do.
@@ -174,8 +207,5 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 	/**
 	 * Register with the drivebase a way to drive the requested mode by using the supplied routine.
 	 */
-	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine, ControlMode controlMode);
-	public default void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine) {
-		registerDriveRoutine(mode, routine, ControlMode.DutyCycle);
-	};
+	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine);
 }

@@ -3,12 +3,14 @@ package frc.robot.subsystems;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.mock.Mock;
 import org.strongback.mock.MockMotor;
 import org.strongback.mock.MockSolenoid;
 
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.DrivebaseInterface;
+import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.mock.MockDashboard;
@@ -16,13 +18,14 @@ import frc.robot.mock.MockLog;
 
 public class TestDrivebase {
 
-    class MockDriveRoutine implements DriveRoutine {
+    class MockDriveRoutine extends DriveRoutine {
         public String name;
         public int callCount = 0;
         public double leftPower = 0;
         public double rightPower = 0;
 
         public MockDriveRoutine(String name) {
+            super(name, ControlMode.DutyCycle, new MockLog());
             this.name = name;
         }
 
@@ -61,9 +64,9 @@ public class TestDrivebase {
         DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid,
                 new MockDashboard(), new MockLog(true));
         // Register this drive routine so it can be used.
-        drive.registerDriveRoutine(DriveRoutineType.ARCADE, arcade);
+        drive.registerDriveRoutine(DriveRoutineType.ARCADE_DUTY_CYCLE, arcade);
         // Tell the drive subsystem to use it.
-        drive.setDriveRoutine(new DriveRoutineParameters(DriveRoutineType.ARCADE));
+        drive.setDriveRoutine(new DriveRoutineParameters(DriveRoutineType.ARCADE_DUTY_CYCLE));
         int expectedCallCount = 0;
 
         // Subsystems should start disabled, so shouldn't be calling the
