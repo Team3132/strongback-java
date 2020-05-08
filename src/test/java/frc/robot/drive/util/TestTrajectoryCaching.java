@@ -3,6 +3,7 @@ package frc.robot.drive.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 
 import frc.robot.Constants;
@@ -62,6 +64,45 @@ public class TestTrajectoryCaching {
         assertTrue(trajectoryB.getStates().equals(expectedTrajectory.getStates()));
     }
 
+    /**
+     * Test that we are actually reading from a cached file
+     */
+
+    @Test
+    public void testReadingFromFile() {
+        
+        Pose2d testStart = new Pose2d(-31, 32, new Rotation2d(10));
+        Translation2d testTranslation1 = new Translation2d(1,1);
+        Translation2d testTranslation2 = new Translation2d(-2,-2);
+        List<Translation2d> testInteriorWaypoints = List.of(testTranslation1, testTranslation2);
+        Pose2d testEnd = new Pose2d(53,31, new Rotation2d(-70));
+        boolean testForward = true;
+
+        // Hash : 1532419827
+
+        // int hash = Arrays.deepHashCode(new Object[] { testStart, testInteriorWaypoints, testEnd, testForward });
+        // System.out.println(hash);
+
+        String trajectoryJSON = "paths/test/1532419827.wpilib.json";
+        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+
+        Trajectory trajectoryA;
+        try {
+            trajectoryA = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+        } catch (FileNotFoundException e) {
+            System.out.println("Trajectory file not found.");	
+            return;	
+        } catch (IOException e1) {
+            System.out.println(e1);
+            return;
+        }
+
+        Trajectory expectedTrajectory = TrajectoryGenerator.generateTrajectory(testStart, testInteriorWaypoints, testEnd, createConfig(testForward));
+        assertTrue(trajectoryA.getStates().equals(expectedTrajectory.getStates()));
+    }
+
+
+    
     @Test
     public void testInitial() {
         testTrajectory(start, interiorWaypoints, end, forward, relative);
@@ -118,6 +159,7 @@ public class TestTrajectoryCaching {
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
+
     /**
      * returns path for trajectory file
      */
