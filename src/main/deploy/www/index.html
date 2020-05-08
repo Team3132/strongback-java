@@ -10,11 +10,11 @@
   </head>
   <p>Edit the config here and press save to update it on the robot.</p>
   <form method="post">
-    <textarea name="config" rows=30 cols=60>${CONFIG}</textarea>
-    <div>
-      <input type="checkbox" id="restart" name="restart" value="restart">
-      <label for="restart"> Restart robot code after saving config</label><br>
-      <input type="submit" value="Save Config" onClick="alert('Config saved.')">
-    </div>
+    <textarea name="config" rows=30 cols=60>${CONFIG}</textarea><br>
+    <label for="name">Robot Name: </label>
+    <textarea name="name" id="name">${ROBOT_NAME}</textarea><br>
+    <input type="checkbox" id="restart" name="restart" value="restart">
+    <label for="restart"> Restart robot code after saving config</label><br>
+    <input type="submit" value="Save Config" onClick="alert('Config saved.')">
   </form>
 </html>

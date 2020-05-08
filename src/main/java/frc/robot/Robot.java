@@ -67,7 +67,7 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void robotInit() {
 		clock = Strongback.timeSystem();
-		var robotName = RobotName.get(Constants.HOME_DIRECTORY);
+		var robotName = RobotName.get(Constants.ROBOT_NAME_FILE_PATH);
 		log = new LogGraph(robotName, Constants.WEB_BASE_PATH, Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION,
 				Constants.LOG_DATE_EXTENSION, Constants.LOG_LATEST_EXTENSION, Constants.LOG_EVENT_EXTENSION, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
@@ -307,7 +307,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void startConfigServer() {
 		try {
-			new ConfigServer(Constants.CONFIG_WEB_ROOT, Constants.CONFIG_FILE_PATH, Constants.CONFIG_WEB_PORT);
+			new ConfigServer(Constants.CONFIG_WEB_ROOT, Constants.CONFIG_FILE_PATH, Constants.ROBOT_NAME_FILE_PATH, Constants.CONFIG_WEB_PORT);
 			log.sub("Config webserver started at port: " + Constants.WEB_PORT);
 		} catch (Exception e) {
 			log.sub("Failed to start config webserver.");

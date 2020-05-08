@@ -22,13 +22,15 @@ import org.apache.commons.text.StringEscapeUtils;
 public class ConfigServer extends Thread {
 
     private String webRoot;
-    private String configFilename;
+	private String configFilename;
+	private String robotFilename;
     // Port to listen connection
     private int port;
 
-    public ConfigServer(String webRoot, String configFilename, int port) {
+    public ConfigServer(String webRoot, String configFilename, String robotFilename, int port) {
         this.webRoot = webRoot;
-        this.configFilename = configFilename;
+		this.configFilename = configFilename;
+		this.robotFilename = robotFilename;
         this.port = port;
         start();
     }
@@ -136,8 +138,11 @@ public class ConfigServer extends Thread {
 		for (int i = 0; i < inputs.length; i++) {
 			String[] param = inputs[i].split("=");
 			System.out.println("Seen param: " + param[0]);
+			// Add a new case to this if statement to check for more parameters.
 			if (param[0].toString().equals("config")) {
-				saveConfig(URLDecoder.decode(param[1], "UTF-8"));
+				saveToFile(URLDecoder.decode(param[1], "UTF-8"),configFilename);
+			} else if(param[0].toString().equals("name")) {
+				saveToFile(URLDecoder.decode(param[1], "UTF-8"),robotFilename);
 			} else if(param[0].toString().equals("restart")) {
 				System.exit(0);
 			} else {
@@ -150,9 +155,9 @@ public class ConfigServer extends Thread {
 	 * Method that takes a string to save to the robot's config file.
 	 * @param config Value to save to the config file.
 	 */
-	private void saveConfig(String config) {
+	private void saveToFile(String config, String filename) {
 		System.out.println("Save config: " + config);
-		File file = new File(configFilename);
+		File file = new File(filename);
 		FileWriter writer = null;
 		try {
 			writer = new FileWriter(file);
@@ -164,9 +169,10 @@ public class ConfigServer extends Thread {
 	}
 
 	private void handleGet(PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-		String config = StringEscapeUtils.escapeHtml4(readFile(configFilename));
 		String html = readFile(Paths.get(webRoot, "index.html").toString());
-		byte[] fileData = html.replace("${CONFIG}", config).getBytes();
+		html = replaceParameter(html, "CONFIG", configFilename);
+		html = replaceParameter(html, "ROBOT_NAME", robotFilename);
+		byte[] fileData = html.getBytes();
 		// Send HTTP Headers
 		out.println("HTTP/1.1 200 OK");
 		out.println("Content-type: text/html");
@@ -175,6 +181,11 @@ public class ConfigServer extends Thread {
 		out.flush(); // Flush character output stream buffer
 		dataOut.write(fileData, 0, fileData.length);
 		dataOut.flush();
+	}
+
+	private String replaceParameter(String htmlString, String param, String filename) {
+		String fileString = StringEscapeUtils.escapeHtml4(readFile(filename));
+		return htmlString.replace("${"+param+"}", fileString);
 	}
 
 	/**

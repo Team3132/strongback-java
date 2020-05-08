@@ -35,7 +35,8 @@ public class Constants {
 	 * Location on the roborio of the configuration file.
 	 */
 	public static final String HOME_DIRECTORY = System.getProperty("user.home");
-	public static final String CONFIG_FILE_PATH= Paths.get(HOME_DIRECTORY, "config.txt").toString();
+	public static final String CONFIG_FILE_PATH = Paths.get(HOME_DIRECTORY, "config.txt").toString();
+	public static final String ROBOT_NAME_FILE_PATH = Paths.get(HOME_DIRECTORY, "robotname.txt").toString();
 	public static final long EXECUTOR_CYCLE_INTERVAL_MSEC = 20;  // 50Hz
 	public static final double DASHBOARD_UPDATE_INTERVAL_SEC = 0.5;
 	

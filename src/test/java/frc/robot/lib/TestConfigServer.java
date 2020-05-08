@@ -39,6 +39,8 @@ public class TestConfigServer {
 "qfewg#Y#r3fG$H^^$WGH34wgd\n" +
 "end.";
 
+    private String robotNameContent = "Test";
+
     /**
      * Method to start the config server at localhost:5801 for manual testing.
     */
@@ -46,9 +48,11 @@ public class TestConfigServer {
     public void testConfigServer() throws InterruptedException, IOException {
         Path tempDir = Files.createTempDirectory("robot");
         File config = new File(tempDir.toString(), "config.txt");
+        File robotName = new File(tempDir.toString(), "robotname.txt");
         String webRoot = Paths.get("src","main", "deploy", "www").toString();
         write(config, configContent);
-        new ConfigServer(webRoot, config.getAbsolutePath(), Constants.CONFIG_WEB_PORT);
+        write(robotName, robotNameContent);
+        new ConfigServer(webRoot, config.getAbsolutePath(), robotName.getAbsolutePath(), Constants.CONFIG_WEB_PORT);
         //This line makes the test wait 100 seconds, only use when testing the webserver.
         //Thread.sleep(100000);
 	}
