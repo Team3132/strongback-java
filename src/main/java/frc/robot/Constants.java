@@ -38,7 +38,8 @@ public class Constants {
 	 * Location on the roborio of the configuration file.
 	 */
 	public static final String HOME_DIRECTORY = System.getProperty("user.home");
-	public static final String CONFIG_FILE_PATH= Paths.get(HOME_DIRECTORY, "config.txt").toString();
+	public static final String CONFIG_FILE_PATH = Paths.get(HOME_DIRECTORY, "config.txt").toString();
+	public static final String ROBOT_NAME_FILE_PATH = Paths.get(HOME_DIRECTORY, "robotname.txt").toString();
 	public static final long EXECUTOR_CYCLE_INTERVAL_MSEC = 20;  // 50Hz
 	public static final double DASHBOARD_UPDATE_INTERVAL_SEC = 0.5;
 	
@@ -230,6 +231,9 @@ public class Constants {
 	public static final double VISION_V_MIN = 40;
 	public static final double VISION_V_MAX = 255;
 
+	// Vision low pass filter (needs tuning)
+	public static final double GOAL_LOWPASS_ALPHA = 0.2;
+
 	// Turn to angle (all need tuning)
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
@@ -252,6 +256,10 @@ public class Constants {
 	public static final String LOG_EVENT_EXTENSION = "event";
 	public static final int	 WEB_PORT = 5800;// first open port for graph/log web server
 	public static final double LOG_GRAPH_PERIOD = 0.05;	// run the graph updater every 50ms
+
+	// Config WebServer
+	public static final String CONFIG_WEB_ROOT = "/home/lvuser/www";
+	public static final int CONFIG_WEB_PORT = 5801;
 	
 	// LocationHistory
 	public static final int LOCATION_HISTORY_MEMORY_SECONDS = 5;

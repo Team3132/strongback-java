@@ -1,45 +1,46 @@
 package frc.robot.drive.routines;
 
 import org.strongback.components.Switch;
+import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.ContinuousRange;
 import frc.robot.interfaces.Log;
+import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.lib.MathUtil;
 
 /*
  * Curvature drive, or an implementation of Cheesy Drive from 2016
  */
-public class CurvatureDrive implements DriveRoutine {
-	private String name = "Curvature";
-	private double quickStopAccumulator = 0.0;
-	private ContinuousRange throttleCR;
-	private ContinuousRange wheelCR;
+public class CurvatureDrive extends DriveRoutine {
+    private double quickStopAccumulator = 0.0;
+    private ContinuousRange throttleCR;
+    private ContinuousRange wheelCR;
     private Switch isQuickTurn;
-    @SuppressWarnings("unused")
-	private Log log;            
 
     public static final double DEFAULT_MINIMUM_SPEED = 0.02;
     public static final double DEFAULT_MAXIMUM_SPEED = 1.0;
     private static final double SENSITIVITY_TURN = 1.0;
-	
-	public CurvatureDrive(ContinuousRange throttle, ContinuousRange wheel, Switch isQuickTurn, Log log) {
-		this.throttleCR = throttle;
-		this.wheelCR = wheel;
-		this.isQuickTurn = isQuickTurn;
-		this.log = log;
-	}
 
-	@Override
-	public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
+    public CurvatureDrive(ContinuousRange throttle, ControlMode mode, ContinuousRange wheel, Switch isQuickTurn,
+            Log log) {
+        super("Curvature", mode, log);
+        this.throttleCR = throttle;
+        this.wheelCR = wheel;
+        this.isQuickTurn = isQuickTurn;
+    }
+
+    @Override
+    public DriveMotion getMotion(double leftSpeed, double rightSpeed) {
         double wheel = limit(this.wheelCR.read());
         double throttle = limit(this.throttleCR.read());
 
         double overPower;
         double angularPower;
 
-        if (isQuickTurn.isTriggered()) {		// do we do quick turn this time through?
+        if (isQuickTurn.isTriggered()) { // do we do quick turn this time through?
             if (Math.abs(throttle) < DEFAULT_MINIMUM_SPEED) {
                 double alpha = 0.1;
-                quickStopAccumulator = (1 - alpha) * quickStopAccumulator + alpha * MathUtil.clamp(wheel, -1.0, 1.0) * 2;
+                quickStopAccumulator = (1 - alpha) * quickStopAccumulator
+                        + alpha * MathUtil.clamp(wheel, -1.0, 1.0) * 2;
             }
             overPower = 1.0;
             angularPower = wheel;
@@ -70,17 +71,6 @@ public class CurvatureDrive implements DriveRoutine {
             leftPwm += overPower * (-1.0 - rightPwm);
             rightPwm = -1.0;
         }
-		return new DriveMotion(leftPwm, rightPwm);
-	}
-	
-	@Override
-	public String getName() {
-		return name;
+        return new DriveMotion(leftPwm, rightPwm);
     }
-    
-
-	@Override
-	public boolean hasFinished() {
-		return true;  // Always ready for the next state.
-	}
 }

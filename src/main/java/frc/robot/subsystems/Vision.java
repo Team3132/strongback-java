@@ -145,10 +145,21 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 			// log.sub("Location set.");
 			// newTarget.location.heading += newTarget.angle
 
+
+			// Low pass filter 
+			// We reject the last seen target if it is older than <timeOffset> seconds
+			double alpha = Constants.GOAL_LOWPASS_ALPHA; 
+			if (lastSeenTarget.isValid(clock.currentTime())) {
+				newTarget.location.x = alpha * newTarget.location.x + (1-alpha) * lastSeenTarget.location.x;
+				newTarget.location.y = alpha * newTarget.location.y + (1-alpha) * lastSeenTarget.location.y;
+				newTarget.location.heading = alpha * newTarget.location.heading + (1-alpha) * lastSeenTarget.location.heading;
+			}
+
 			synchronized (this) {
 				lastSeenTarget = newTarget;
 			}
 			// log.sub("Vision: Updated target %s", lastSeenTarget);
+
 		}
 
 	}

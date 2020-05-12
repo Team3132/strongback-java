@@ -25,6 +25,7 @@ import frc.robot.controller.Controller;
 import frc.robot.controller.Sequences;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.OIInterface;
+import frc.robot.lib.ConfigServer;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.LogGraph;
 import frc.robot.lib.Position;
@@ -66,11 +67,12 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void robotInit() {
 		clock = Strongback.timeSystem();
-		var robotName = RobotName.get(Constants.HOME_DIRECTORY);
+		var robotName = RobotName.get(Constants.ROBOT_NAME_FILE_PATH);
 		log = new LogGraph(robotName, Constants.WEB_BASE_PATH, Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION,
 				Constants.LOG_DATE_EXTENSION, Constants.LOG_LATEST_EXTENSION, Constants.LOG_EVENT_EXTENSION, false, clock);
 		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
 		startWebServer();
+		startConfigServer();
 		log.info("Waiting for driver's station to connect before setting up UI");
 		// Do the reset of the initialization in init().
 	}
@@ -296,6 +298,19 @@ public class Robot extends IterativeRobot implements Executable {
 		} catch (Exception e) {
 			log.sub("Failed to start webserver on directory " + fileDir.getAbsolutePath());
 
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Creates the web server for allowing easy modification of the robot's config file using port 5801.
+	 */
+	private void startConfigServer() {
+		try {
+			new ConfigServer(Constants.CONFIG_WEB_ROOT, Constants.CONFIG_FILE_PATH, Constants.ROBOT_NAME_FILE_PATH, Constants.CONFIG_WEB_PORT);
+			log.sub("Config webserver started at port: " + Constants.WEB_PORT);
+		} catch (Exception e) {
+			log.sub("Failed to start config webserver.");
 			e.printStackTrace();
 		}
 	}

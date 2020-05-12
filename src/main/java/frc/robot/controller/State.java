@@ -13,7 +13,6 @@ import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
 import frc.robot.interfaces.JevoisInterface.CameraMode;
 import frc.robot.lib.LEDColour;
-import frc.robot.lib.Position;
 import frc.robot.lib.TimeAction;
 import frc.robot.lib.WheelColour;
 import frc.robot.subsystems.Subsystems;
@@ -93,7 +92,7 @@ public class State {
 		shooterRPS = subsystems.shooter.getTargetRPS();
 		shooterUpToSpeed = null;  // Leave as null so it can be ignored downstream.
 		shooterHoodExtended = subsystems.shooter.isHoodExtended();
-		drive = subsystems.drivebase.getDriveRoutine();
+		drive = subsystems.drivebase.getDriveRoutineParameters();
 		colourAction = subsystems.colourWheel.getDesiredAction();
 		extendColourWheel = subsystems.colourWheel.isArmExtended();
 		expectedNumberOfBalls = null;  // Leave as null so it can be ignored downstream.
@@ -332,7 +331,7 @@ public class State {
 	 * Put the drive base in arcade drive mode for the driver.
 	 */
 	public State doArcadeDrive() {
-		drive = new DriveRoutineParameters(DriveRoutineType.ARCADE);
+		drive = new DriveRoutineParameters(DriveRoutineType.ARCADE_DUTY_CYCLE);
 		return this;
 	}
 

@@ -65,7 +65,21 @@ public interface ContinuousRange {
     }
 
     /**
-     * Create a new range that maps the values of this instance using the supplied function.
+     * Create a new range that reads zero if the absolute value of this instance is less than the theshold
+     *
+     * @param threshold The minimum absolute value which can be read from the new range
+     * @return the new deadbanded range; never null
+     */
+    default public ContinuousRange deadband(double threshold) {
+        return () -> {
+            double value = this.read();
+            return Math.abs(value) >= Math.abs(threshold) ? value : 0.0;
+        };
+    }
+
+    /**
+     * Create a new range that maps the values of this instance using the supplied
+     * function.
      *
      * @param mapFunction the function that maps the current value to another
      * @return the new mapped range; never null
@@ -75,12 +89,13 @@ public interface ContinuousRange {
     }
 
     /**
-     * Create a new {@link IntSupplier} that scales the values of this instance and rounds to an integer.
+     * Create a new {@link IntSupplier} that scales the values of this instance and
+     * rounds to an integer.
      *
      * @param scale the scaling factor
      * @return the new scaled IntSupplier; never null
      */
     default public IntSupplier scaleAsInt(double scale) {
-        return () -> (int)(this.read() * scale);
+        return () -> (int) (this.read() * scale);
     }
 }

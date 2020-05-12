@@ -9,7 +9,6 @@ import org.strongback.components.Solenoid;
 
 import frc.robot.drive.routines.ConstantDrive;
 import frc.robot.drive.routines.DriveRoutine;
-import frc.robot.drive.routines.DriveRoutine.DriveMotion;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
@@ -45,7 +44,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 		this.log = log;
 
 		currentMotion = new DriveMotion(0, 0);
-		routine = new ConstantDrive();
+		routine = new ConstantDrive("Constant Drive", ControlMode.DutyCycle, log);
 		disable(); // disable until we are ready to use it.
 		log.register(true, () -> currentMotion.left, "%s/setpoint/Left", name)
 				.register(true, () -> currentMotion.right, "%s/setpoint/Right", name)
@@ -96,22 +95,22 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 		// Drive routine has changed.
 		this.parameters = parameters;  // Remember it for next time.
 		// Find a routine to handle it
-		DriveMode mode = driveModes.getOrDefault(parameters.type, null);
-		if (mode == null) {
+		DriveRoutine newRoutine = driveModes.getOrDefault(parameters.type, null);
+		if (newRoutine == null) {
 			log.error("%s: Bad drive mode %s", name, parameters.type);
 			return;
 		}
 		// Tell the drive routine to change what it is doing.
-		mode.routine.reset(parameters);
-		log.sub("%s: Switching to %s drive routine using ControlMode %s", name, mode.routine.getName(), mode.controlMode);
-		if (routine != null) routine.disable();
-		mode.routine.enable();
-		routine = mode.routine;
-		this.controlMode = mode.controlMode;
+		newRoutine.reset(parameters);
+		log.sub("%s: Switching to %s drive routine using ControlMode %s", name, newRoutine.getName(), newRoutine.getControlMode());
+		if (newRoutine != null) newRoutine.disable();
+		newRoutine.enable();
+		routine = newRoutine;
+		controlMode = newRoutine.getControlMode();
 	}
 
 	@Override
-	public DriveRoutineParameters getDriveRoutine() {
+	public DriveRoutineParameters getDriveRoutineParameters() {
 		return parameters;
 	}
 
@@ -167,23 +166,12 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 		return routine.hasFinished();
 	}
 
-	/**
-	 * Stores the routine and the control mode for each DriveRoutineType
-	 */
-	private class DriveMode {
-		public DriveMode(DriveRoutine routine, ControlMode controlMode) {
-			this.routine = routine;
-			this.controlMode = controlMode;
-		}
-		DriveRoutine routine;
-		ControlMode controlMode;
-	}
-	private Map<DriveRoutineType, DriveMode> driveModes = new TreeMap<DriveRoutineType, DriveMode>();
+	private Map<DriveRoutineType, DriveRoutine> driveModes = new TreeMap<DriveRoutineType, DriveRoutine>();
 
 	@Override
-	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine, ControlMode controlMode) {
+	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine) {
 		log.sub("%s: Registered %s drive routine", name, routine.getName());
-		driveModes.put(mode, new DriveMode(routine, controlMode));
+		driveModes.put(mode, routine);
 	}
 
 	@Override

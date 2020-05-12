@@ -1,13 +1,11 @@
 package frc.robot.mock;
 
-import org.strongback.components.Motor.ControlMode;
-
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.DrivebaseInterface;
 import frc.robot.interfaces.Log;
 
 public class MockDrivebase implements DrivebaseInterface  {
-	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE);
+	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE_DUTY_CYCLE);
 	private boolean ClimbModeEnabled = false;
 	private boolean BrakeApplied = false;
 	String name = "MockDrivebase";
@@ -48,7 +46,7 @@ public class MockDrivebase implements DrivebaseInterface  {
 	}
 
 	@Override
-	public DriveRoutineParameters getDriveRoutine() {
+	public DriveRoutineParameters getDriveRoutineParameters() {
 		return parameters;
 	}
 
@@ -58,7 +56,7 @@ public class MockDrivebase implements DrivebaseInterface  {
 	}
 
 	@Override
-	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine, ControlMode controlMode) {
+	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine) {
 	}
 	
 	@Override

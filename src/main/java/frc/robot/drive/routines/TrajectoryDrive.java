@@ -5,6 +5,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import java.util.function.Supplier;
 
 import org.strongback.components.Clock;
+import org.strongback.components.Motor.ControlMode;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.robot.Constants;
+import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.interfaces.Log;
@@ -22,7 +24,7 @@ import frc.robot.interfaces.Log;
 /**
  * Walks the drivebase through a supplied list of waypoints.
  */
-public class TrajectoryDrive implements DriveRoutine {
+public class TrajectoryDrive extends DriveRoutine {
 
 	private final Supplier<Pose2d> m_pose;
 	private final RamseteController m_follower;
@@ -58,6 +60,7 @@ public class TrajectoryDrive implements DriveRoutine {
 	private Log log;
 
 	public TrajectoryDrive(LocationInterface location, Clock clock, Log log) {
+		super("Trajectory Drive", ControlMode.Voltage,  log);
 		this.log = log;
 		this.clock = clock;
 		m_startTime = clock.currentTime();
@@ -179,10 +182,5 @@ public class TrajectoryDrive implements DriveRoutine {
 			return true;
 		}
 		return false;
-	}
-	
-	@Override
-	public String getName() {
-		return "Trajectory";
 	}
 }

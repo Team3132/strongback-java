@@ -19,7 +19,7 @@ public class RobotName {
      */
     public static String get(String path) {
         String robotName;
-        var filename = Paths.get(path, "robotname.txt");
+        var filename = Paths.get(path);
         try {
             robotName = new String(Files.readAllBytes(filename));
             // Take the first line.
