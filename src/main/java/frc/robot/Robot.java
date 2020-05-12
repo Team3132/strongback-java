@@ -347,7 +347,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void startLogging() {
 		// Tell the logger what symbolic link to the log file based on the match name to use.
-		String matchDescription = String.format("%t_%s_%s_M%d_R%d_%s_P%d", 
+		String matchDescription = String.format("_%t_%s_%s_M%d_R%d_%s_P%d", 
 				new SimpleDateFormat("YYMMDD't'hhIISS").format(Calendar.getInstance.getTime()),
 				driverStation.getEventName(),
 				driverStation.getMatchType().toString(), driverStation.getMatchNumber(),
