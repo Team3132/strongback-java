@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.io.File;
 import java.util.function.Supplier;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import org.jibble.simplewebserver.SimpleWebServer;
 import org.strongback.Executable;
@@ -345,7 +347,9 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void startLogging() {
 		// Tell the logger what symbolic link to the log file based on the match name to use.
-		String matchDescription = String.format("%s_%s_M%d_R%d_%s_P%d", driverStation.getEventName(),
+		String matchDescription = String.format("_%t_%s_%s_M%d_R%d_%s_P%d", 
+				new SimpleDateFormat("yyyyMMdd't'hhmmss").format(Calendar.getInstance().getTime()),
+				driverStation.getEventName(),
 				driverStation.getMatchType().toString(), driverStation.getMatchNumber(),
 				driverStation.getReplayNumber(), driverStation.getAlliance().toString(), driverStation.getLocation());
 		log.logCompletedElements(matchDescription);
