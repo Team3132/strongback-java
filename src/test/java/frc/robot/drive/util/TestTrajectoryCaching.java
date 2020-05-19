@@ -76,44 +76,31 @@ public class TestTrajectoryCaching {
         Translation2d testTranslation1 = new Translation2d(1,1);
         Translation2d testTranslation2 = new Translation2d(-2,-2);
         List<Translation2d> testInteriorWaypoints = List.of(testTranslation1, testTranslation2);
-        Pose2d testEnd = new Pose2d(53,31, new Rotation2d(-70));
+        Pose2d testEnd = new Pose2d(53,31, new Rotation2d(-80));
         boolean testForward = true;
 
-        // If the above values are changed, uncomment the below code to generate a new file. Make sure to record the new hash in the line above 
-        // and update gitignore accordingly.
-
-        int hash = 1532419827;
+        int hash = Arrays.deepHashCode(new Object[] {testStart, testInteriorWaypoints, testEnd, testForward});
         
-        // String trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
-        // Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+        String trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
+        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
             
-        // try {
-        //     Files.deleteIfExists(trajectoryPath);
-        // } catch (IOException e) {
-        //     System.out.println(e);
-        // }
+        try {
+            Files.deleteIfExists(trajectoryPath);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
         
-        // hash = Arrays.deepHashCode(new Object[] {testStart, testInteriorWaypoints, testEnd, testForward});
-        // System.out.println(hash);
-        // trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
-        // trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-        
-        // Trajectory trajectory = TrajectoryGenerator.generateTrajectory(testStart, testInteriorWaypoints, testEnd, createConfig(testForward));
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(testStart, testInteriorWaypoints, testEnd, createConfig(testForward));
 
-        // try {
-        //     TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
-        // } catch (IOException e) {
-        //     System.out.println(e);
-        // }
-
-
-
-        String testTrajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
-        Path testTrajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(testTrajectoryJSON);
+        try {
+            TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
+        } catch (IOException e) {
+            fail(e.toString());
+        }
 
         Trajectory trajectoryA;
         try {
-            trajectoryA = TrajectoryUtil.fromPathweaverJson(testTrajectoryPath);
+            trajectoryA = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
         } catch (FileNotFoundException e) {
             fail("Trajectory file not found.");
             return;
@@ -121,12 +108,8 @@ public class TestTrajectoryCaching {
             fail(e1.toString());
             return;
         }
-
-        Trajectory expectedTrajectory = TrajectoryGenerator.generateTrajectory(testStart, testInteriorWaypoints, testEnd, createConfig(testForward));
-        assertTrue(trajectoryA.getStates().equals(expectedTrajectory.getStates()));
+        assertTrue(trajectoryA.getStates().equals(trajectory.getStates()));
     }
-
-
     
     @Test
     public void testInitial() {
