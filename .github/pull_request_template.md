@@ -4,12 +4,12 @@
 ## Description 💬
 <!-- Please describe your changes in detail -->
 resolves #42 <!-- replace 42 with the number for the corresponding issue -->
-<!-- The issue you're resolving should have describe the problem well. -->
+<!-- The issue you're resolving should describe the problem well. -->
 
 
 ## How Has This Been Tested? 🖥️
 <!-- Please describe how you tested your changes. -->
-<!-- e.g. unit tests, test board, actual robot, different robot, etc. -->
+<!-- e.g. unit tests, test board, comp robot, practise robot, different robot, etc. -->
 <!-- Before/After videos/screenshots etc are welcome but not required -->
 
 ## Checklist ✅:
@@ -20,4 +20,5 @@ resolves #42 <!-- replace 42 with the number for the corresponding issue -->
 - [ ] Referenced the corresponding issue using the "resolves #99" syntax
 - [ ] Make sure you are assigned to the corresponding issue
 - [ ] Added details of how I tested my changes
+- [ ] Move the corresponding issue into the "Review in Progress" column
 <!-- Once you've checked all of these you can probably delete this checklist for brevity -->
