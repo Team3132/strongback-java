@@ -13,9 +13,9 @@ import frc.robot.lib.WheelColour;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 import frc.robot.controller.Sequence.SequenceBuilder;
+import static frc.robot.lib.PoseHelper.createPose2d;
 
 /**
  * Control sequences for most robot operations.
@@ -80,7 +80,7 @@ public class Sequences {
 	 */
 	public static Sequence getDriveToWaypointSequence(double x, double y, double angle) {
 		Pose2d start = new Pose2d();
-		Pose2d end = new Pose2d(x, y, new Rotation2d(Math.toRadians(angle)));
+		Pose2d end = createPose2d(x,y,angle);
 		SequenceBuilder builder = new SequenceBuilder(String.format("drive to %s", end));
 		builder.then().driveRelativeWaypoints(start, List.of(), end, true);
 		driveToWaypointSeq = builder.build();

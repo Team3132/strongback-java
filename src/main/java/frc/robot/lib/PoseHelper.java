@@ -6,6 +6,19 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import static frc.robot.Constants.*;
 
 public class PoseHelper {
+
+	/**
+	 * Create a new pose
+	 * @param x the x value of the pose in meters
+	 * @param y the y value of the pose in meters
+	 * @param degrees the angle of the pose in degrees
+	 * 
+	 * @return a pose2d with the corresponding (x,y,a)
+	 */
+	public static Pose2d createPose2d(double x, double y, double degrees) {
+		return new Pose2d(x, y, new Rotation2d(MathUtil.degreesToRadians(degrees)));
+	}
+
     /**
 	 * Stops at a distance as we approach a pose
 	 * 
@@ -17,7 +30,7 @@ public class PoseHelper {
 		double x = dist * MathUtil.cos(bearing);
 		double y = dist * MathUtil.sin(bearing);
 		
-		return new Pose2d(pose.getTranslation().getX() + x, pose.getTranslation().getY() + y, new Rotation2d(MathUtil.degreesToRadians(bearing)));
+		return createPose2d(pose.getTranslation().getX() + x,pose.getTranslation().getY() + y,bearing);
 	}
 
 	/**

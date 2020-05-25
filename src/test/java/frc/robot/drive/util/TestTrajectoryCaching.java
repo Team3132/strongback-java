@@ -12,11 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import static frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters.generateTrajectory;
+import static frc.robot.lib.PoseHelper.createPose2d;
 
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
@@ -33,9 +33,9 @@ import frc.robot.Constants;
  */
 public class TestTrajectoryCaching {
 
-    Pose2d start = new Pose2d(0, 0, new Rotation2d(0));
+    Pose2d start = createPose2d(0,0,0);
     List<Translation2d> interiorWaypoints = List.of();
-    Pose2d end = new Pose2d(1, 1, new Rotation2d(0));
+    Pose2d end = createPose2d(1,1,0);
     boolean forward = true;
     boolean relative = true; // should not affect trajectories
 
@@ -72,11 +72,11 @@ public class TestTrajectoryCaching {
     @Test
     public void testReadingFromFile() {
         
-        Pose2d testStart = new Pose2d(-31, 32, new Rotation2d(10));
+        Pose2d testStart = createPose2d(-31,32,10);
         Translation2d testTranslation1 = new Translation2d(1,1);
         Translation2d testTranslation2 = new Translation2d(-2,-2);
         List<Translation2d> testInteriorWaypoints = List.of(testTranslation1, testTranslation2);
-        Pose2d testEnd = new Pose2d(53,31, new Rotation2d(-80));
+        Pose2d testEnd = createPose2d(53,31,-80);
         boolean testForward = true;
 
         int hash = Arrays.deepHashCode(new Object[] {testStart, testInteriorWaypoints, testEnd, testForward});
@@ -121,7 +121,7 @@ public class TestTrajectoryCaching {
      */
     @Test
     public void testStart() {
-        start = new Pose2d(-1,-1, new Rotation2d(30));
+        start = createPose2d(-1,-1,30);
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
@@ -143,7 +143,7 @@ public class TestTrajectoryCaching {
     */
     @Test
     public void testEnd() {
-        end = new Pose2d(1,1, new Rotation2d(5));
+        end = createPose2d(1,1,5);
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
