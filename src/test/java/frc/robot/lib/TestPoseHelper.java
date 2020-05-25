@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.is;
 import static frc.robot.lib.PoseHelper.*;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import org.junit.Test;
 
 /**
@@ -16,7 +15,7 @@ import org.junit.Test;
  *   ./gradlew test --tests "frc.robot.lib.TestPoseHelper"
  */
 public class TestPoseHelper {
-    Pose2d zero = new Pose2d(0, 0, new Rotation2d(0));
+    Pose2d zero = createPose2d(0,0,0);
     Pose2d pose = createPose2d(-10,10,150); 
 
     @Test
@@ -56,8 +55,8 @@ public class TestPoseHelper {
     public void testWeirderAngles() {
         double dist = 5.0;
         
-        assertThat(approachPose(zero, dist, -90), is(createPose2d(0,-dist,270)));
-        assertThat(approachPose(zero, dist, 450), is(createPose2d(0,dist,90)));
+        assertThat(approachPose(zero, dist, -90), is(createPose2d(0,-dist,-90)));
+        assertThat(approachPose(zero, dist, 450), is(createPose2d(0,dist,450)));
         assertThat(approachPose(zero, dist, 30), is(createPose2d(dist * Math.sqrt(3) / 2,dist / 2,30)));
         assertThat(approachPose(pose, 0, 275), is(createPose2d(-10,10,275)));
         assertThat(approachPose(pose, -41.5, 300), is(createPose2d(- 10 + -41.5 / 2,10 - -41.5 * Math.sqrt(3) / 2,300)));
@@ -76,7 +75,7 @@ public class TestPoseHelper {
         assertThat(approachPose(thirdQuadrant, -3, 30), is(createPose2d(-13 - 3.0 * Math.sqrt(3) / 2,-198.4 - 3.0 / 2,30)));
 
         Pose2d fourthQuadrant = createPose2d(17,-2,150);
-        assertThat(approachPose(fourthQuadrant, -3, -30), is(createPose2d(17 - 3.0 * Math.sqrt(3) / 2,-2 + 3.0 / 2,330)));      
+        assertThat(approachPose(fourthQuadrant, -3, -30), is(createPose2d(17 - 3.0 * Math.sqrt(3) / 2,-2 + 3.0 / 2,-30)));      
 
     }
 

@@ -16,7 +16,7 @@ public class PoseHelper {
 	 * @return a pose2d with the corresponding (x,y,a)
 	 */
 	public static Pose2d createPose2d(double x, double y, double degrees) {
-		return new Pose2d(x, y, new Rotation2d(MathUtil.degreesToRadians(degrees)));
+		return new Pose2d(x, y, Rotation2d.fromDegrees(degrees));
 	}
 
     /**
