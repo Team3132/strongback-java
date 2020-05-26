@@ -15,6 +15,7 @@ import java.util.List;
 import static frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters.generateTrajectory;
 import static frc.robot.lib.PoseHelper.createPose2d;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -72,53 +73,55 @@ public class TestTrajectoryCaching {
     }
 
     /**
-     * Test that we are actually reading from a cached file (src/main/deploy/paths/test/1532419827.wpilib.json)
+     * Test that we are actually reading from a cached file by caching trajectoryA under trajectoryB's file name,
+     * and checking that generateTrajectory() will actually get trajectoryA from the trajectoryB when given trajectoryB
+     * as input
      */
 
     @Test
     public void testReadingFromFile() {
-        
-        Pose2d testStart = createPose2d(-31,32,10);
-        Translation2d testTranslation1 = new Translation2d(1,1);
-        Translation2d testTranslation2 = new Translation2d(-2,-2);
-        List<Translation2d> testInteriorWaypoints = List.of(testTranslation1, testTranslation2);
-        Pose2d testEnd = createPose2d(53,31,-80);
-        boolean testForward = true;
+        // initialise some values for two test trajectories
+        Pose2d testStartA = createPose2d(-31,32,10);
+        Translation2d testTranslationA1 = new Translation2d(1,1);
+        Translation2d testTranslationA2 = new Translation2d(-2,-2);
+        List<Translation2d> testInteriorWaypointsA = List.of(testTranslationA1, testTranslationA2);
+        Pose2d testEndA = createPose2d(53,31,-80);
+        boolean testForwardA = true;
 
-        int hash = Arrays.deepHashCode(new Object[] {testStart, testInteriorWaypoints, testEnd, testForward});
-        createTempDir();
-        Path trajectoryPath = Paths.get(tempDir.toString(), String.valueOf(hash) + ".wpilib.json");
+        Pose2d testStartB = createPose2d(-34,18,10);
+        Translation2d testTranslationB1 = new Translation2d(21,1);
+        Translation2d testTranslationB2 = new Translation2d(-23,-2);
+        List<Translation2d> testInteriorWaypointsB = List.of(testTranslationB1, testTranslationB2);
+        Pose2d testEndB = createPose2d(53,12,-50);
+        boolean testForwardB = true;
+
+        // get the path for trajectoryB
+        int hashB = Arrays.deepHashCode(new Object[] {testStartB, testInteriorWaypointsB, testEndB, testForwardB});
+        Path trajectoryPathB = Paths.get(tempDir.toString(), String.valueOf(hashB) + ".wpilib.json");
         
+        // ensure the file doesn't already exist
         try {
-            Files.deleteIfExists(trajectoryPath);
+            Files.deleteIfExists(trajectoryPathB);
         } catch (IOException e) {
             fail(e.toString());
         }
         
-        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(testStart, testInteriorWaypoints, testEnd, createConfig(testForward));
-
+        // generate trajectoryA and save it under trajectoryB's hash
+        Trajectory trajectoryA = TrajectoryGenerator.generateTrajectory(testStartA, testInteriorWaypointsA, testEndA, createConfig(testForwardA));
         try {
-            TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
+            TrajectoryUtil.toPathweaverJson(trajectoryA, trajectoryPathB);
         } catch (IOException e) {
             fail(e.toString());
         }
 
-        Trajectory trajectoryA;
-        try {
-            trajectoryA = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-        } catch (FileNotFoundException e) {
-            fail("Trajectory file not found.");
-            return;
-        } catch (IOException e1) {
-            fail(e1.toString());
-            return;
-        }
+        // giving our generateTrajectory() method details for trajectory B, check that the trajectory we get is actually trajectoryA 
+        // (which is saved under trajectoryB's hash)
+        Trajectory trajectory = generateTrajectory(testStartB, testInteriorWaypointsB, testEndB, testForwardB, relative, tempDir);
         assertTrue(trajectoryA.getStates().equals(trajectory.getStates()));
     }
     
     @Test
     public void testInitial() throws IOException {
-        createTempDir();
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
 
@@ -129,7 +132,6 @@ public class TestTrajectoryCaching {
      */
     @Test
     public void testStart() throws IOException {
-        createTempDir();
         start = createPose2d(-1,-1,30);
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
@@ -140,7 +142,6 @@ public class TestTrajectoryCaching {
     */
     @Test
     public void testInteriorWaypoints() throws IOException {
-        createTempDir();
         Translation2d translation1 = new Translation2d(2,2);
         Translation2d translation2 = new Translation2d(-5,-5);
         interiorWaypoints = List.of(translation1, translation2);
@@ -153,7 +154,6 @@ public class TestTrajectoryCaching {
     */
     @Test
     public void testEnd() throws IOException {
-        createTempDir();
         end = createPose2d(1,1,5);
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
@@ -164,7 +164,6 @@ public class TestTrajectoryCaching {
     */
     @Test
     public void initialTest() throws IOException {
-        createTempDir();
         forward = false; 
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
@@ -175,13 +174,13 @@ public class TestTrajectoryCaching {
     */
     @Test
     public void testRelative() throws IOException {
-        createTempDir();
         relative = false;
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
-
-    private void createTempDir() {
+    
+    @Before
+    public void createTempDir() {
         if(tempDir == null) {
             try {
                 tempDir = Files.createTempDirectory("trajectories");
