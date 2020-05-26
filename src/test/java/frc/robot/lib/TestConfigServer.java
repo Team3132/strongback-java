@@ -33,9 +33,7 @@ public class TestConfigServer {
 "vfrg<><><><><???0110100001101001R$%Y#$#$H$#GEBV#V$\n" +
 "vGREG#$https://www.youtube.com/watch?v=ub82Xb1C8oseH$#F#FESE\n" +
 "^#%>^@?!%$%G#FWFER#@^$#&\n" +
-"😀 😁 😂 🤣 😃 😄 😅 😆\n" +
 "F#F#$%  %$#$FGEWBREW\n" +
-"(╯°□°)╯︵ ┻━┻\n" +
 "qfewg#Y#r3fG$H^^$WGH34wgd\n" +
 "end.";
 

@@ -1,16 +1,20 @@
 package frc.robot.interfaces;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import org.strongback.Executable;
 
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import frc.robot.Constants;
 import frc.robot.drive.routines.DriveRoutine;
 
@@ -101,29 +105,10 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 		public static DriveRoutineParameters getDriveWaypoints(Pose2d start, List<Translation2d> interiorWaypoints,
 				Pose2d end, boolean forward, boolean relative) {
+			
 			DriveRoutineParameters p = new DriveRoutineParameters(DriveRoutineType.TRAJECTORY);
-			// Build the trajectory on start so that it's ready when needed.
-			// Create a voltage constraint to ensure we don't accelerate too fast
-			var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-					new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
-							Constants.DriveConstants.kvVoltSecondsPerMeter,
-							Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
-					Constants.DriveConstants.kDriveKinematics, 10);
-
-			// Create config for trajectory
-			TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
-					Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared)
-							// Add kinematics to ensure max speed is actually obeyed
-							.setKinematics(Constants.DriveConstants.kDriveKinematics)
-							// Apply the voltage constraint
-							.addConstraint(autoVoltageConstraint)
-							.setReversed(!forward);
-
-			// An example trajectory to follow. All units in meters.
-			long t = System.currentTimeMillis();
-			p.trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
-			System.out.printf("Trajectory Generator: took %d milliseconds to generate this spline\n", System.currentTimeMillis() - t);
-
+			
+			p.trajectory = generateTrajectory(start, interiorWaypoints, end, forward, relative);
 			p.relative = relative;
 			return p;
 		}
@@ -136,6 +121,61 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 		public static DriveRoutineParameters positionPIDArcade() {
 			return new DriveRoutineParameters(DriveRoutineType.POSITION_PID_ARCADE);
+		}
+
+		/**
+		 * Returns a trajectory by first checking for any cached trajectories in the deploy directory. 
+		 * If it doesn't already exist, generate a trajectory then export it. 
+		 * 
+		 * This should only be used for unit tests.
+		 */
+		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
+				Pose2d end, boolean forward, boolean relative, Path path) {
+			
+			int hash = Arrays.deepHashCode(new Object[] {start, interiorWaypoints, end, forward});
+			String trajectoryJSON = String.valueOf(hash) + ".wpilib.json";
+			Path trajectoryPath = path.resolve(trajectoryJSON);
+			
+			try {
+				return TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+			} catch (FileNotFoundException e) {
+				System.out.println("Trajectory file not found: Starting to generate and caching spline.");		
+			} catch (IOException e1) {
+				System.out.println(e1);
+			}
+
+			// Build the trajectory on start so that it's ready when needed.
+			// Create config for trajectory
+			TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
+					Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared)
+							// Add kinematics to ensure max speed is actually obeyed
+							.setKinematics(Constants.DriveConstants.kDriveKinematics)
+							// Apply the voltage constraint
+							.addConstraint(Constants.DriveConstants.kAutoVoltageConstraint)
+							.setReversed(!forward);
+
+			// An example trajectory to follow. All units in meters.
+			long t = System.currentTimeMillis();
+			Trajectory trajectory = TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, config);
+
+			try {
+				TrajectoryUtil.toPathweaverJson(trajectory, trajectoryPath);
+				System.out.printf("Trajectory Generator: took %d milliseconds to generate and write this spline to file\n", System.currentTimeMillis() - t);
+			} catch (IOException e) {
+				System.out.println(e);
+			}
+
+			return trajectory;
+		}
+
+		/**
+		 * Returns a trajectory by first checking for any cached trajectories in the deploy directory. 
+		 * If it doesn't already exist, generate a trajectory then export it. 
+		 */
+		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
+				Pose2d end, boolean forward, boolean relative)  {
+			Path path = Filesystem.getDeployDirectory().toPath().resolve("paths");
+			return generateTrajectory(start, interiorWaypoints, end, forward, relative, path);
 		}
 
 		public DriveRoutineType type = DriveRoutineType.ARCADE_DUTY_CYCLE;

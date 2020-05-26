@@ -4,10 +4,14 @@ import java.nio.file.Paths;
 
 import com.revrobotics.ColorMatch;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 import edu.wpi.first.wpilibj.util.Color;
+
+import static frc.robot.lib.PoseHelper.createPose2d;
 
 /**
  * These are constants used by the robot. They define physical things about the world, or the robot.
@@ -89,15 +93,15 @@ public class Constants {
 	public static final double OPPOSING_TRENCH_BALLS_YPOS = -ALLIANCE_TRENCH_BALLS_YPOS;
 
 	// Field Positions 
-	public static final Pose2d ALLIANCE_TRENCH_FIRST_BALL = new Pose2d(TRENCH_DIST_BETWEEN_BALLS * 2, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
-	public static final Pose2d ALLIANCE_TRENCH_SECOND_BALL = new Pose2d(TRENCH_DIST_BETWEEN_BALLS, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
-	public static final Pose2d ALLIANCE_TRENCH_THIRD_BALL = new Pose2d(0 , ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
-	public static final Pose2d ALLIANCE_TRENCH_FIFTH_BALL = new Pose2d(-65.53 * INCHES_TO_METRES, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0)));
+	public static final Pose2d ALLIANCE_TRENCH_FIRST_BALL = createPose2d(TRENCH_DIST_BETWEEN_BALLS * 2,ALLIANCE_TRENCH_BALLS_YPOS,0);
+	public static final Pose2d ALLIANCE_TRENCH_SECOND_BALL = createPose2d(TRENCH_DIST_BETWEEN_BALLS,ALLIANCE_TRENCH_BALLS_YPOS,0);
+	public static final Pose2d ALLIANCE_TRENCH_THIRD_BALL = createPose2d(0 ,ALLIANCE_TRENCH_BALLS_YPOS,0);
+	public static final Pose2d ALLIANCE_TRENCH_FIFTH_BALL = createPose2d(-65.53 * INCHES_TO_METRES,ALLIANCE_TRENCH_BALLS_YPOS,0);
 
 	// Auto Starting Positions
-	public static final Pose2d AUTO_LINE_ALLIANCE_TRENCH = new Pose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH, ALLIANCE_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0))); 
-	public static final Pose2d AUTO_LINE_GOAL = new Pose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH, GOAL_YPOS, new Rotation2d(Math.toRadians(0))); 
-	public static final Pose2d AUTO_LINE_OPPOSING_TRENCH = new Pose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH, OPPOSING_TRENCH_BALLS_YPOS, new Rotation2d(Math.toRadians(0))); 
+	public static final Pose2d AUTO_LINE_ALLIANCE_TRENCH = createPose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH,ALLIANCE_TRENCH_BALLS_YPOS,0); 
+	public static final Pose2d AUTO_LINE_GOAL = createPose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH,GOAL_YPOS,0); 
+	public static final Pose2d AUTO_LINE_OPPOSING_TRENCH = createPose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH,OPPOSING_TRENCH_BALLS_YPOS,0); 
 
 	/*
 	 *  Intake constants 
@@ -203,6 +207,16 @@ public class Constants {
 		// seconds
 		public static final double kRamseteB = 2;
 		public static final double kRamseteZeta = 0.7;
+
+		public static final double kMaxVoltage = 10;
+
+		// Create a voltage constraint to ensure we don't accelerate too fast
+		public static final TrajectoryConstraint kAutoVoltageConstraint = new DifferentialDriveVoltageConstraint(
+			new SimpleMotorFeedforward(Constants.DriveConstants.ksVolts,
+					Constants.DriveConstants.kvVoltSecondsPerMeter,
+					Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+			Constants.DriveConstants.kDriveKinematics, 
+			Constants.DriveConstants.kMaxVoltage);
 	}
 	/*
 	 * Colour Wheel

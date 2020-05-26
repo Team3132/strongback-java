@@ -16,6 +16,7 @@ import frc.robot.lib.MathUtil;
 import frc.robot.lib.NavXGyroscope;
 import frc.robot.lib.Position;
 import frc.robot.lib.Subsystem;
+import static frc.robot.lib.PoseHelper.createPose2d;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
 
@@ -183,7 +184,7 @@ public class Location extends Subsystem implements LocationInterface {
      */
     @Override
     public void setCurrentLocation(Position location) {
-		setCurrentLocation(new Pose2d(location.x, location.y, Rotation2d.fromDegrees(location.heading)));
+		setCurrentLocation(createPose2d(location.x,location.y,location.heading));
 	}
 
 	/**
