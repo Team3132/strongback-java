@@ -1,14 +1,13 @@
 package frc.robot.mock;
 
 import frc.robot.interfaces.ShooterInterface;
-import frc.robot.interfaces.Log;
 
 public class MockShooter implements ShooterInterface {
 
     private double targetRPS = 0;
 	private boolean isExtended = false;
 
-    public MockShooter(Log log) {
+    public MockShooter() {
     }
 
     @Override

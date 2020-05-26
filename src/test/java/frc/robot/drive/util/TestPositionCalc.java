@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.*;
 import org.junit.Test;
 import org.strongback.mock.MockClock;
 
-import frc.robot.mock.MockLog;
-
 public class TestPositionCalc {
 	
 	/**
@@ -20,9 +18,8 @@ public class TestPositionCalc {
 		double speed = 1;
 		double maxJerk = 1;
 		MockClock clock = new MockClock();
-		MockLog log = new MockLog();
 
-		PositionCalc calc = new PositionCalc(position, speed, maxJerk, clock, log);
+		PositionCalc calc = new PositionCalc(position, speed, maxJerk, clock);
 		long dtMSec = 1000;  // A whole second.
 		clock.incrementByMilliseconds(dtMSec);
 		double newPos = calc.update();

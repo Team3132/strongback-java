@@ -1,13 +1,12 @@
 package frc.robot.mock;
 
 import frc.robot.interfaces.LoaderInterface;
-import frc.robot.interfaces.Log;
 
 public class MockLoader implements LoaderInterface {
     private double spinnerRPS = 0;
     private double passthroughPower = 0;
 
-    public MockLoader(Log log) {
+    public MockLoader() {
     }
     // Paddle
     private boolean isPaddleBlocking = false;

@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import com.fazecast.jSerialComm.*;
 
 import frc.robot.interfaces.JevoisInterface;
-import frc.robot.interfaces.Log;
+import frc.robot.lib.log.Log;
 
 public class Jevois implements JevoisInterface {
 
@@ -159,7 +159,6 @@ public class Jevois implements JevoisInterface {
         }
     }
 
-    private Log log;
     private static final Mode webcamMode;
     private static final Mode visionMode;
 
@@ -204,29 +203,28 @@ public class Jevois implements JevoisInterface {
      * 
      * @throws IOException
      */
-    public Jevois(Log log) throws IOException {
-        this.log = log;
+    public Jevois() throws IOException {
         SerialPort[] ports = SerialPort.getCommPorts();
         for (int i = 0; i < ports.length; i++) {
             SerialPort port = ports[i];
-            log.info("Found port %s\n", port.getDescriptivePortName());
+            Log.info("Found port %s\n", port.getDescriptivePortName());
             if (port.getDescriptivePortName().startsWith("JeVois")) {
                 port.openPort();
-                log.info("Found camera %s on %s\n", port.getDescriptivePortName(), port.getSystemPortName());
+                Log.info("Found camera %s on %s\n", port.getDescriptivePortName(), port.getSystemPortName());
                 // Don't block too long in case a command needs to be sent.
                 port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 10, 0);
                 istream = port.getInputStream();
                 ostream = port.getOutputStream();
                 connected = true;
-                log.info(issueCommand("listmappings"));
+                Log.info(issueCommand("listmappings"));
                 setCameraMode(CameraMode.VISION); // Restore any mode if one has been set.
-                log.info(issueCommand("info"));
+                Log.info(issueCommand("info"));
                 // Turn on the serial output over USB
-                log.info(issueCommand("setpar serout USB"));
+                Log.info(issueCommand("setpar serout USB"));
                 return;
             }
         }
-        log.error("Failed to find JeVois camera, is it plugged in to a USB port and has an orange light?");
+        Log.error("Failed to find JeVois camera, is it plugged in to a USB port and has an orange light?");
     }
 
     public boolean isConnected() {
@@ -245,19 +243,19 @@ public class Jevois implements JevoisInterface {
             setParameters(visionMode);
             break;
         default:
-            log.error("Jevois: Unsupported vision mode %s\n", mode.toString());
+            Log.error("Jevois: Unsupported vision mode %s\n", mode.toString());
         }
     }
 
     private void setParameters(Mode mode) throws IOException {
         if (!isConnected())
             return; // No connection, give up.
-        log.info("Setting %s camera mode.\n", mode.name);
+        Log.info("Setting %s camera mode.\n", mode.name);
         if (!mode.modeString.isEmpty()) {
-            log.info(issueCommand(mode.modeString));
+            Log.info(issueCommand(mode.modeString));
         }
         for (String command : mode.toString().split("\n")) {
-            log.info(issueCommand(command));
+            Log.info(issueCommand(command));
         }
     }
 
@@ -278,14 +276,14 @@ public class Jevois implements JevoisInterface {
     @Override
     public String readLine() throws IOException {
         if (!isConnected()){
-            log.sub("CAMERA NOT CONNECTED");
+            Log.debug("CAMERA NOT CONNECTED");
             throw new IOException("No camera connected"); // No connection, give up.
 
         }
         StringBuffer line = new StringBuffer(200);
         while (true) {
             synchronized (this) {
-               //log.sub(line.toString());
+               //Logger.debug(line.toString());
                 try {
                     int b = istream.read();
                     if (b < 0) {
@@ -306,7 +304,7 @@ public class Jevois implements JevoisInterface {
                     }
                     line.append((char) b);
                 } catch (SerialPortTimeoutException e) {
-                    log.sub("Jevois: There is serial port timeout!!!!!!!!!");
+                    Log.debug("Jevois: There is serial port timeout!!!!!!!!!");
                     // Give up reading in case a command needs to be sent.
                 }
             }
@@ -325,7 +323,7 @@ public class Jevois implements JevoisInterface {
         if (!isConnected())
             return "ERR: JeVois not connected";
 
-        log.info(command);
+        Log.info(command);
         ostream.write(command.getBytes());
         String newline = "\n";
         ostream.write(newline.getBytes());

@@ -6,9 +6,10 @@ import org.strongback.components.Solenoid;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.ShooterInterface;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 /**
  * On the 2020 robot, there are three shooter motors. 
@@ -19,12 +20,12 @@ public class Shooter extends Subsystem implements ShooterInterface {
     private final ShooterWheel flyWheel;
     private final Solenoid hood;
 
-    public Shooter(Motor shooterMotor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
-        super("Shooter", dashboard, log);
+    public Shooter(Motor shooterMotor, Solenoid solenoid, DashboardInterface dashboard) {
+        super("Shooter", dashboard);
         this.hood = solenoid;
         flyWheel = new ShooterWheel(shooterMotor);
-        log.register(true, () -> isHoodExtended(), "%s/extended", name)
-            .register(true, () -> isHoodRetracted(), "%s/retracted", name);
+        Chart.register(() -> isHoodExtended(), "%s/extended", name);
+        Chart.register(() -> isHoodRetracted(), "%s/retracted", name);
     }
 
     @Override
@@ -80,11 +81,11 @@ public class Shooter extends Subsystem implements ShooterInterface {
         public ShooterWheel(Motor motor) {
             this.motor = motor;
 
-            log.register(false, () -> getTargetRPS(), "shooter/flyWheel/targetSpeed", name)
-            .register(false, () -> getRPS(), "shooter/flyWheel/rps", name)
-            .register(false, motor::getOutputVoltage, "shooter/flyWheel/outputVoltage", name)
-            .register(false, motor::getOutputPercent, "shooter/flyWheel/outputPercent", name)
-            .register(false, motor::getOutputCurrent, "shooter/flyWheel/outputCurrent", name);
+            Chart.register(() -> getTargetRPS(), "shooter/flyWheel/targetSpeed", name);
+            Chart.register(() -> getRPS(), "shooter/flyWheel/rps", name);
+            Chart.register(motor::getOutputVoltage, "shooter/flyWheel/outputVoltage", name);
+            Chart.register(motor::getOutputPercent, "shooter/flyWheel/outputPercent", name);
+            Chart.register(motor::getOutputCurrent, "shooter/flyWheel/outputCurrent", name);
         }
         
         public void setTargetRPS(double rps) {
@@ -96,12 +97,12 @@ public class Shooter extends Subsystem implements ShooterInterface {
             // change the control mode from percent output, to avoid putting
             // unnecessary load on the battery and motor.
             if (rps == 0) { 
-                log.sub("Turning shooter wheel off.");
+                Log.debug("Turning shooter wheel off.");
                 motor.set(ControlMode.DutyCycle, 0); 
             } else {
                 motor.set(ControlMode.Speed, rps);
             }
-            log.sub("Setting shooter target speed to %f", targetRPS);
+            Log.debug("Setting shooter target speed to %f", targetRPS);
         }
 
         public double getTargetRPS() {

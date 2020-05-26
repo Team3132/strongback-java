@@ -6,7 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
 
+import frc.robot.Constants;
+
 /**
+ * Read a speciall file on the filesystem to get the robot name.
+ * 
+ * The logging and charting files will put their files in a subdirectory of
+ * this name so that multiple robots worth of log files can be overlaid with
+ * rsync and not overwrite each other.
  */
 public class RobotName {
 
@@ -42,5 +49,15 @@ public class RobotName {
             }
         }
         return robotName;
+    }
+
+    /**
+     * Attempts to read the first line of a file to get the robot name. If the file
+     * doesn't exist it will create a new random name, write the file and return
+     * that.
+     * @return name of the robot as a String.
+     */
+    public static String get() {
+        return get(Constants.ROBOT_NAME_FILE_PATH);
     }
 }

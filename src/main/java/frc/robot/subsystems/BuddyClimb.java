@@ -4,20 +4,18 @@ import org.strongback.components.Solenoid;
 
 import frc.robot.interfaces.BuddyClimbInterface;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.chart.Chart;
 
 public class BuddyClimb extends Subsystem implements BuddyClimbInterface {
    private Solenoid solenoid;
 
-   public BuddyClimb(Solenoid solenoid, DashboardInterface dashboard, Log log) {
-       super("BuddyClimb", dashboard, log);  
+   public BuddyClimb(Solenoid solenoid, DashboardInterface dashboard) {
+       super("BuddyClimb", dashboard);  
        this.solenoid = solenoid;
-       // Motors, sensors here etc….
 
-       log.register(true, () -> isExtended(), "%s/extended", name)
-          .register(true, () -> isRetracted(), "%s/retracted", name);
-       // More logging here...
+       Chart.register(() -> isExtended(), "%s/extended", name);
+       Chart.register(() -> isRetracted(), "%s/retracted", name);
    }
 
    @Override
@@ -49,6 +47,5 @@ public class BuddyClimb extends Subsystem implements BuddyClimbInterface {
    public void updateDashboard() {
        dashboard.putString("Buddy climb position",
            isExtended() ? "extended" : isRetracted() ? "retracted" : "moving");
-       // Motors, sensors here etc….
    }
 }

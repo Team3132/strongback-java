@@ -4,7 +4,8 @@ import frc.robot.controller.Controller;
 import frc.robot.controller.Sequence;
 import frc.robot.controller.Sequence.SequenceBuilder;
 import frc.robot.controller.Sequences;
-import frc.robot.interfaces.Log;
+import frc.robot.lib.log.Log;
+
 import static frc.robot.lib.PoseHelper.*;
 
 import static frc.robot.Constants.*;
@@ -22,11 +23,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * Auto routines should be defined in Sequences.java
  */
 public class Auto {
-	private final Log log;
 	private SendableChooser<Sequence> autoProgram = new SendableChooser<Sequence>();
 	private SendableChooser<Integer> initBallSelector = new SendableChooser<Integer>();
-	public Auto(Log log) {
-		this.log = log;
+	public Auto() {
 		addAutoOptions();
 		initAutoChooser();
 		addBallOptions();
@@ -44,13 +43,13 @@ public class Auto {
 
 	public void executedSelectedSequence(Controller controller) {
 		Sequence seq = autoProgram.getSelected();
-		log.info("Starting selected auto program %s", seq.getName());
+		Log.info("Starting selected auto program %s", seq.getName());
 		controller.doSequence(seq);
 	}
 
 	public int getSelectedBallAmount() {
 		Integer numBalls = initBallSelector.getSelected();
-		log.info("Starting with %s balls", numBalls);
+		Log.info("Starting with %s balls", numBalls);
 		return numBalls;
 	}
 

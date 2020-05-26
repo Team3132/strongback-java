@@ -12,7 +12,6 @@ import org.strongback.mock.MockPneumaticsModule;
 
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.WheelColour;
 import frc.robot.mock.MockBuddyClimb;
 import frc.robot.mock.MockColourWheel;
@@ -20,7 +19,6 @@ import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLEDStrip;
 import frc.robot.mock.MockLocation;
-import frc.robot.mock.MockLog;
 import frc.robot.mock.MockLoader;
 import frc.robot.mock.MockShooter;
 import frc.robot.simulator.IntakeSimulator;
@@ -37,7 +35,6 @@ public class TestController {
 	private final long kRandomSeed = 123456;
 	private final double kMaxWaitTimeSeconds = 4;
 	protected DashboardInterface dashboard = new MockDashboard();
-	protected Log log = new MockLog(true);
 	private MockClock clock;
 	private Subsystems subsystems;
 	// Store direct access to the simulators so the simulator-only
@@ -55,18 +52,18 @@ public class TestController {
 	public void setUp() {
 		System.out.println("\n******************************");
 		clock = new MockClock();
-		subsystems = new Subsystems(new MockDashboard(), null, clock, log);
+		subsystems = new Subsystems(new MockDashboard(), clock);
 
 		subsystems.intake = intake = new IntakeSimulator();
 		subsystems.compressor = new MockPneumaticsModule(); 
-		subsystems.drivebase = new MockDrivebase(log);
-		subsystems.loader = new MockLoader(log);
-		subsystems.shooter = new MockShooter(log);
+		subsystems.drivebase = new MockDrivebase();
+		subsystems.loader = new MockLoader();
+		subsystems.shooter = new MockShooter();
 		subsystems.location = new MockLocation();
-		subsystems.colourWheel = new MockColourWheel(log);
+		subsystems.colourWheel = new MockColourWheel();
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
-		subsystems.buddyClimb = new MockBuddyClimb(log);
+		subsystems.buddyClimb = new MockBuddyClimb();
 		subsystems.ledStrip = new MockLEDStrip();
 		
 		exec = new Controller(subsystems, getFMSColour());

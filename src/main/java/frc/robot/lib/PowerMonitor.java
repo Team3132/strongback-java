@@ -1,7 +1,8 @@
 package frc.robot.lib;
 
 import frc.robot.interfaces.DashboardUpdater;
-import frc.robot.interfaces.Log;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
@@ -20,23 +21,23 @@ public class PowerMonitor implements DashboardUpdater {		// no interface, as thi
 	
 	PowerDistributionPanel pdp;
 	
-	public PowerMonitor (PowerDistributionPanel pdp, int[] channelsToMonitor, boolean enabled, Log log) {
+	public PowerMonitor (PowerDistributionPanel pdp, int[] channelsToMonitor, boolean enabled) {
 		final String name = "Power";
 		this.pdp = pdp;
 		this.enabled = enabled;
 		if (!enabled) {
-			log.sub("PDP not enabled");
+			Log.debug("PDP not enabled");
 			return;
 		}
-		log.sub("PDP enabled");
-		log.register(false, (() -> { return pdp.getTotalEnergy(); } ),	"%s/totalEnergy", name)
-			.register(false, (() -> { return pdp.getTotalPower(); } ),		"%s/totalPower", name)
-			.register(false, (() -> { return pdp.getTotalCurrent(); } ),	"%s/totalCurrent", name)
-			.register(false, (() -> { return pdp.getTemperature(); } ),	"%s/temperature", name)
-			.register(false, (() -> { return pdp.getVoltage(); } ),		"%s/inputVoltage", name);
+		Log.debug("PDP enabled");
+		Chart.register((() -> { return pdp.getTotalEnergy(); } ), "%s/totalEnergy", name);
+		Chart.register((() -> { return pdp.getTotalPower(); } ), "%s/totalPower", name);
+		Chart.register((() -> { return pdp.getTotalCurrent(); } ), "%s/totalCurrent", name);
+		Chart.register((() -> { return pdp.getTemperature(); } ), "%s/temperature", name);
+		Chart.register((() -> { return pdp.getVoltage(); } ), "%s/inputVoltage", name);
 		for (int i = 0; i < channelsToMonitor.length; i++) {
 			final int channel = channelsToMonitor[i];
-			log.register(false, (() -> { return pdp.getCurrent(channel); } ), "%s/channelCurrent/%d", name, channel);
+			Chart.register((() -> { return pdp.getCurrent(channel); } ), "%s/channelCurrent/%d", name, channel);
 		}
 	}
 

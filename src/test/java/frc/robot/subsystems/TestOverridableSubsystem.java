@@ -5,23 +5,20 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
 import frc.robot.interfaces.IntakeInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.mock.MockIntake;
-import frc.robot.mock.MockLog;
 
 public class TestOverridableSubsystem {
-    private Log log = new MockLog();
     
     @Test
     public void testNormalMode() {
         // This is when the controller should talk through to the real
         // subsystem and the button box is passed through to the mock.
         // We only want to use mock here so that they can be checked.
-        IntakeInterface real = new MockIntake(log);
-        IntakeInterface simulator = new MockIntake(log);
-        IntakeInterface mock = new MockIntake(log);
+        IntakeInterface real = new MockIntake();
+        IntakeInterface simulator = new MockIntake();
+        IntakeInterface mock = new MockIntake();
         // Create the sim and pass it the three different endpoints.
-        OverridableSubsystem<IntakeInterface> intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, real, simulator, mock, log);
+        OverridableSubsystem<IntakeInterface> intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, real, simulator, mock);
         // Get the endpoint that the controller would use.
         IntakeInterface normalIntake = intakeOverride.getNormalInterface();	
         // Get the endpoint that the diag box uses.

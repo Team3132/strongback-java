@@ -11,8 +11,9 @@ import frc.robot.drive.routines.ConstantDrive;
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DrivebaseInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 /**
  * Subsystem responsible for the drivetrain
@@ -31,37 +32,35 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 	private final Motor right;
 	private Solenoid ptoSolenoid;
 	private Solenoid brakeSolenoid;
-	private final Log log;
 	private DriveMotion currentMotion;
 
 	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, 
-			DashboardInterface dashboard, Log log) {
-		super("Drive", dashboard, log);
+			DashboardInterface dashboard) {
+		super("Drive", dashboard);
 		this.left = left;
 		this.right = right;
 		this.ptoSolenoid = ptoSolenoid;
 		this.brakeSolenoid = brakeSolenoid;
-		this.log = log;
 
 		currentMotion = new DriveMotion(0, 0);
-		routine = new ConstantDrive("Constant Drive", ControlMode.DutyCycle, log);
+		routine = new ConstantDrive("Constant Drive", ControlMode.DutyCycle);
 		disable(); // disable until we are ready to use it.
-		log.register(true, () -> currentMotion.left, "%s/setpoint/Left", name)
-				.register(true, () -> currentMotion.right, "%s/setpoint/Right", name)
-				.register(false, () -> left.getPosition(), "%s/position/Left", name)
-				.register(false, () -> right.getPosition(), "%s/position/Right", name)
-				.register(false, () -> left.getSpeed(), "%s/speed/Left", name)
-				.register(false, () -> right.getSpeed(), "%s/speed/Right", name)
-				.register(false, () -> left.getOutputVoltage(), "%s/outputVoltage/Left", name)
-				.register(false, () -> right.getOutputVoltage(), "%s/outputVoltage/Right", name)
-				.register(false, () -> left.getOutputPercent(), "%s/outputPercentage/Left", name)
-				.register(false, () -> right.getOutputPercent(), "%s/outputPercentage/Right", name)
-				.register(false, () -> left.getOutputCurrent(), "%s/outputCurrent/Left", name)
-				.register(false, () -> right.getOutputCurrent(), "%s/outputCurrent/Right", name)
-				.register(true, () -> isClimbModeEnabled(), "%s/extended", name)
-				.register(true, () -> isDriveModeEnabled(), "%s/retracted", name)
-				.register(true, () -> isBrakeApplied(), "%s/extended", name)
-          		.register(true, () -> isBrakeReleased(), "%s/retracted", name);
+		Chart.register(() -> currentMotion.left, "%s/setpoint/Left", name);
+		Chart.register(() -> currentMotion.right, "%s/setpoint/Right", name);
+		Chart.register(() -> left.getPosition(), "%s/position/Left", name);
+		Chart.register(() -> right.getPosition(), "%s/position/Right", name);
+		Chart.register(() -> left.getSpeed(), "%s/speed/Left", name);
+		Chart.register(() -> right.getSpeed(), "%s/speed/Right", name);
+		Chart.register(() -> left.getOutputVoltage(), "%s/outputVoltage/Left", name);
+		Chart.register(() -> right.getOutputVoltage(), "%s/outputVoltage/Right", name);
+		Chart.register(() -> left.getOutputPercent(), "%s/outputPercentage/Left", name);
+		Chart.register(() -> right.getOutputPercent(), "%s/outputPercentage/Right", name);
+		Chart.register(() -> left.getOutputCurrent(), "%s/outputCurrent/Left", name);
+		Chart.register(() -> right.getOutputCurrent(), "%s/outputCurrent/Right", name);
+		Chart.register(() -> isClimbModeEnabled(), "%s/extended", name);
+		Chart.register(() -> isDriveModeEnabled(), "%s/retracted", name);
+		Chart.register(() -> isBrakeApplied(), "%s/extended", name);
+        Chart.register(() -> isBrakeReleased(), "%s/retracted", name);
 	}
 
 	@Override
@@ -89,7 +88,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 	@Override
 	public void setDriveRoutine(DriveRoutineParameters parameters) {
 		if (this.parameters != null && parameters.equals(this.parameters)) {
-			log.sub("%s: Parameters are identical not setting these", name);
+			Log.debug("%s: Parameters are identical not setting these", name);
 			return;
 		}
 		// Drive routine has changed.
@@ -97,12 +96,12 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 		// Find a routine to handle it
 		DriveRoutine newRoutine = driveModes.getOrDefault(parameters.type, null);
 		if (newRoutine == null) {
-			log.error("%s: Bad drive mode %s", name, parameters.type);
+			Log.error("%s: Bad drive mode %s", name, parameters.type);
 			return;
 		}
 		// Tell the drive routine to change what it is doing.
 		newRoutine.reset(parameters);
-		log.sub("%s: Switching to %s drive routine using ControlMode %s", name, newRoutine.getName(), newRoutine.getControlMode());
+		Log.debug("%s: Switching to %s drive routine using ControlMode %s", name, newRoutine.getName(), newRoutine.getControlMode());
 		if (newRoutine != null) newRoutine.disable();
 		newRoutine.enable();
 		routine = newRoutine;
@@ -120,7 +119,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 		if (routine == null) return;  // No drive routine set yet.
 		// Ask for the power to supply to each side. Pass in the current wheel speeds.
 		DriveMotion motion = routine.getMotion(left.getSpeed(), right.getSpeed());
-		//log.debug("drive subsystem motion = %.1f, %.1f", motion.left, motion.right);
+		//Logger.debug("drive subsystem motion = %.1f, %.1f", motion.left, motion.right);
 		if (motion.equals(currentMotion)) {
 			return; // No change.
 		}
@@ -170,31 +169,31 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 
 	@Override
 	public void registerDriveRoutine(DriveRoutineType mode, DriveRoutine routine) {
-		log.sub("%s: Registered %s drive routine", name, routine.getName());
+		Log.debug("%s: Registered %s drive routine", name, routine.getName());
 		driveModes.put(mode, routine);
 	}
 
 	@Override
 	public boolean isClimbModeEnabled() {
-		// log.sub("Is intake extended: " + solenoid.isExtended());
+		// Logger.debug("Is intake extended: " + solenoid.isExtended());
 		return ptoSolenoid.isExtended();
 	}
 
 	@Override
 	public boolean isDriveModeEnabled() {
-		// log.sub("Is intake extended: " + solenoid.isExtended());
+		// Logger.debug("Is intake extended: " + solenoid.isExtended());
 		return ptoSolenoid.isRetracted();
 	}
 
 	@Override
 	public boolean isBrakeApplied() {
-		// log.sub("Is intake extended: " + solenoid.isExtended());
+		// Logger.debug("Is intake extended: " + solenoid.isExtended());
 		return brakeSolenoid.isExtended();
 	}
 
 	@Override
 	public boolean isBrakeReleased() {
-		// log.sub("Is intake extended: " + solenoid.isExtended());
+		// Logger.debug("Is intake extended: " + solenoid.isExtended());
 		return brakeSolenoid.isRetracted();
 	}
 

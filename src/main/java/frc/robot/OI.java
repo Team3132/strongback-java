@@ -14,6 +14,7 @@ import frc.robot.interfaces.*;
 import frc.robot.lib.GamepadButtonsX;
 import frc.robot.lib.OperatorBoxButtons;
 import frc.robot.lib.WheelColour;
+import frc.robot.lib.log.Log;
 import frc.robot.subsystems.*;
 
 
@@ -21,15 +22,12 @@ public class OI implements OIInterface {
 
 	private SwitchReactor reactor = Strongback.switchReactor();
 	private Controller exec;
-	private Log log;
 	private Subsystems subsystems;
 
 
-	public OI(Controller controller, Subsystems subsystems, Log log) {
+	public OI(Controller controller, Subsystems subsystems) {
 		this.exec = controller;
 		this.subsystems = subsystems;
-		this.log = log;
-
 	}
     
 	/*
@@ -312,7 +310,7 @@ public class OI implements OIInterface {
 				if (active) {
 					return;
 				}
-				log.sub("Activating " + name);
+				Log.debug("Activating " + name);
 				exec.doSequence(activatedSeq);
 				active = true;
 			});
@@ -320,7 +318,7 @@ public class OI implements OIInterface {
 				if (!active) {
 					return;
 				}
-				log.sub("Deactivating " + name);
+				Log.debug("Deactivating " + name);
 				exec.doSequence(deactivedSeq);
 				active = false;
 			});
@@ -424,10 +422,10 @@ public class OI implements OIInterface {
 		public ToggleSwitch(Switch swtch, String name, Sequence onSeq, Sequence offSeq) {
 			Strongback.switchReactor().onTriggered(swtch, () -> {
 				if (!toggled) {
-					log.sub("Toggling on " + name);
+					Log.debug("Toggling on " + name);
 					exec.doSequence(onSeq);
 				} else {
-					log.sub("Toggling off " + name);
+					Log.debug("Toggling off " + name);
 					exec.doSequence(offSeq);
 				}
 				toggled = !toggled;

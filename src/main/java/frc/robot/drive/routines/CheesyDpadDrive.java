@@ -5,7 +5,6 @@ import org.strongback.components.Switch;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.ContinuousRange;
 import org.strongback.components.ui.DirectionalAxis;
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.lib.GamepadButtonsX;
 
@@ -36,8 +35,8 @@ public class CheesyDpadDrive extends DriveRoutine {
 	static final double kTopHatSpeed = 0.7;
 
 	public CheesyDpadDrive(String name, DirectionalAxis dPad, ContinuousRange throttle, ContinuousRange wheel,
-			Switch isQuickTurn, Log log) {
-		super(name, ControlMode.DutyCycle, log);
+			Switch isQuickTurn) {
+		super(name, ControlMode.DutyCycle);
 		this.dPad = dPad;
 		this.throttleCR = throttle;
 		this.wheelCR = wheel;

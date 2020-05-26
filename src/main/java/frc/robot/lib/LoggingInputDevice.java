@@ -1,7 +1,8 @@
 package frc.robot.lib;
 
-import frc.robot.interfaces.Log;
 import org.strongback.components.ui.InputDevice;
+
+import frc.robot.lib.chart.Chart;
 
 /**
  * Add generic logging to a Human Interface device (an InputDevice)
@@ -10,20 +11,20 @@ import org.strongback.components.ui.InputDevice;
  */
 public class LoggingInputDevice {
 	
-	public static void AddLog(InputDevice input, String name, Log log) {
+	public static void AddLog(InputDevice input, String name) {
 		for (int i = 0; i < input.getAxisCount(); i++) {
 			final int axis = i;
-			log.register(false, () -> input.getAxis(axis).read(), "%s/Axis/%d", name, i);
+			Chart.register(() -> input.getAxis(axis).read(), "%s/Axis/%d", name, i);
 		}
 
 		for (int i = 0; i < input.getButtonCount(); i++) {
 			final int button = i+1;
-			log.register(false, input.getButton(button), "%s/Button/%d", name, i);
+			Chart.register(input.getButton(button), "%s/Button/%d", name, i);
 		}
 		
 		for (int i = 0; i < input.getPOVCount(); i++) {
 			final int axis = i;
-			log.register(false, input.getDPad(axis), "%s/DPad/%d", name, i);
+			Chart.register(input.getDPad(axis), "%s/DPad/%d", name, i);
 		}
 	}
 }

@@ -4,7 +4,6 @@ import org.strongback.Executable;
 import org.strongback.command.Requirable;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.NetworkTableHelperInterface;
 import edu.wpi.first.wpilibj.Notifier;
 
@@ -24,17 +23,15 @@ public abstract class Subsystem implements Requirable, Executable, DashboardUpda
 	protected Notifier notifier;
 	protected boolean enabled;
 	protected DashboardInterface dashboard;
-	protected Log log;
 	protected NetworkTableHelperInterface networkTable;
 	
-	public Subsystem(String name, DashboardInterface dashboard, Log log) {
-		this(name, null, dashboard, log);
+	public Subsystem(String name, DashboardInterface dashboard) {
+		this(name, null, dashboard);
 	}
 
-	public Subsystem(String name, NetworkTableHelperInterface networkTable, DashboardInterface dashboard, Log log) {
+	public Subsystem(String name, NetworkTableHelperInterface networkTable, DashboardInterface dashboard) {
 		this.name = name;
 		this.dashboard = dashboard;
-		this.log = log;
 		this.networkTable = networkTable;
 		enabled = false;	// we start out disabled
 	}

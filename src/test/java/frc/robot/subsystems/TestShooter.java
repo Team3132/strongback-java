@@ -11,7 +11,6 @@ import org.strongback.mock.MockMotor;
 import org.strongback.mock.MockSolenoid;
 
 import frc.robot.mock.MockDashboard;
-import frc.robot.mock.MockLog;
 
 
 public class TestShooter {
@@ -25,7 +24,7 @@ public class TestShooter {
     public void setUp() {
         shooterMotor = Mock.stoppedMotor();
         shooterSolenoid = Mock.Solenoids.singleSolenoid(0);
-        shooter = new Shooter(shooterMotor, shooterSolenoid, new MockDashboard(), new MockLog());
+        shooter = new Shooter(shooterMotor, shooterSolenoid, new MockDashboard());
     }
 
     @Test
