@@ -21,7 +21,7 @@ assignees: ''
 <!-- You shouldn't go into too much detail. Just enough to set whoever takes on this issue down the right track -->
 <!-- Delete this section if it is empty -->
 
-## Checklist ✅:
+## Checklist ✅
 <!-- Go over all the following points, and check all the boxes. -->
 <!-- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
 - [ ] Added a description of what we are trying to improve
