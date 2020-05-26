@@ -11,7 +11,7 @@ assignees: ''
 <!-- Please provide a general summary of the new feature in the Title above 🚀 -->
 
 ## Description 💬
-<!-- Please describe what could be working better (not the solution) -->
+<!-- Please describe what could be improved -->
 <!-- Video, screenshots etc are highly encouraged -->
 <!-- Link to the corresponding card on the robot problems Trello if relevant -->
 
