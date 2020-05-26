@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.io.File;
 import java.util.function.Supplier;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import org.jibble.simplewebserver.SimpleWebServer;
 import org.strongback.Executable;
@@ -27,19 +29,16 @@ import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.OIInterface;
 import frc.robot.lib.ConfigServer;
 import frc.robot.lib.LEDColour;
-import frc.robot.lib.LogGraph;
 import frc.robot.lib.Position;
 import frc.robot.lib.PowerMonitor;
 import frc.robot.lib.RedundantTalonSRX;
-import frc.robot.lib.RobotConfiguration;
-import frc.robot.lib.RobotName;
 import frc.robot.lib.WheelColour;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 import frc.robot.subsystems.Subsystems;
 
 public class Robot extends IterativeRobot implements Executable {
 	private Clock clock;
-	private RobotConfiguration config;
-	private LogGraph log;
 
 	// User interface.
 	private DriverStation driverStation;
@@ -67,13 +66,9 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void robotInit() {
 		clock = Strongback.timeSystem();
-		var robotName = RobotName.get(Constants.ROBOT_NAME_FILE_PATH);
-		log = new LogGraph(robotName, Constants.WEB_BASE_PATH, Constants.LOG_BASE_PATH, Constants.LOG_DATA_EXTENSION,
-				Constants.LOG_DATE_EXTENSION, Constants.LOG_LATEST_EXTENSION, Constants.LOG_EVENT_EXTENSION, false, clock);
-		config = new RobotConfiguration(Constants.CONFIG_FILE_PATH, log);
 		startWebServer();
 		startConfigServer();
-		log.info("Waiting for driver's station to connect before setting up UI");
+		Log.info("Waiting for driver's station to connect before setting up UI");
 		// Do the reset of the initialization in init().
 	}
 
@@ -85,7 +80,7 @@ public class Robot extends IterativeRobot implements Executable {
 			setupCompleted = true;
 		} catch (Exception e) {
 			// Write the exception to the log file.
-			log.exception("Exception caught while initializing robot", e);
+			Log.exception("Exception caught while initializing robot", e);
 			throw e; // Cause it to abort the robot startup.
 		}
 	}
@@ -97,12 +92,14 @@ public class Robot extends IterativeRobot implements Executable {
 		Strongback.logConfiguration();
 		Strongback.setExecutionPeriod(Constants.EXECUTOR_CYCLE_INTERVAL_MSEC);
 
-		log.info("Robot initialization started");
+		Log.info("Robot initialization started");
+		// Write out the example config and print any config warnings.
+		Config.finishLoadingConfig();
 
 		createInputDevices();
 
 		// Setup the hardware/subsystems. Listed here so can be quickly jumped to.
-		subsystems = new Subsystems(createDashboard(), config, clock, log);
+		subsystems = new Subsystems(createDashboard(), clock);
 		subsystems.createLEDStrip();
 		subsystems.createPneumatics();
 		subsystems.createDrivebaseLocation(driverLeftJoystick, driverRightJoystick);
@@ -129,9 +126,9 @@ public class Robot extends IterativeRobot implements Executable {
 		Strongback.start();
 
 		// Setup the auto sequence chooser.
-		auto = new Auto(log);
+		auto = new Auto();
 
-		log.info("Robot initialization successful");
+		Log.info("Robot initialization successful");
 	}
 
 	/**
@@ -150,7 +147,7 @@ public class Robot extends IterativeRobot implements Executable {
 	public void disabledInit() {
 		PortForwarder.add(Constants.RSYNC_PORT, Constants.RSYNC_HOSTNAME, 22); // Start forwarding to port 22 (ssh port) for pulling logs using rsync.
 		maybeInit();  // Called before robotPeriodic().
-		log.info("disabledInit");
+		Log.info("disabledInit");
 		// Log any failures again on disable.
 		RedundantTalonSRX.printStatus();
 		// Tell the controller to give up on whatever it was processing.
@@ -173,8 +170,9 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void autonomousInit() {
 		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
-		log.restartLogs();
-		log.info("auto has started");
+		Chart.restartCharts();
+		Log.restartLogs();
+		Log.info("auto has started");
 		subsystems.enable();
 
 		controller.doSequence(Sequences.getStartSequence());
@@ -201,8 +199,9 @@ public class Robot extends IterativeRobot implements Executable {
 	@Override
 	public void teleopInit() {
 		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
-		log.restartLogs();
-		log.info("teleop has started");
+		Chart.restartCharts();
+		Log.restartLogs();
+		Log.info("teleop has started");
 		subsystems.enable();
 		controller.doSequence(Sequences.setDrivebaseToArcade());
 		subsystems.setLEDColour(allianceLEDColour());
@@ -227,7 +226,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void testInit() {
-		log.restartLogs();
+		Chart.restartCharts();
+		Log.restartLogs();
 		subsystems.enable();
 	}
 
@@ -263,8 +263,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 * Create the camera servers so the driver & operator can see what the robot can see.
 	 */
 	public void createCameraServers() {
-		if (!config.visionIsPresent) {
-			log.sub("Vision not enabled, not creating a camera server");
+		if (!Config.vision.present) {
+			Log.debug("Vision not enabled, not creating a camera server");
 			return;
 		}
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
@@ -280,8 +280,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void createPowerMonitor() {
 		// Do not monitor if not present, or we have been asked not to monitor
-		boolean enabled = config.pdpIsPresent || config.pdpMonitor;
-		pdp = new PowerMonitor(new PowerDistributionPanel(config.pdpCanId), config.pdpChannelsToMonitor, enabled, log);
+		boolean enabled = Config.pdp.present || Config.pdp.monitor;
+		pdp = new PowerMonitor(new PowerDistributionPanel(Config.pdp.canId), Config.pdp.channelsToMonitor, enabled);
 	}
 
 	/**
@@ -294,9 +294,9 @@ public class Robot extends IterativeRobot implements Executable {
 		File fileDir = new File(Constants.WEB_BASE_PATH);
 		try {
 			new SimpleWebServer(fileDir, Constants.WEB_PORT);
-			log.sub("WebServer started at port: " + Constants.WEB_PORT);
+			Log.debug("WebServer started at port: " + Constants.WEB_PORT);
 		} catch (Exception e) {
-			log.sub("Failed to start webserver on directory " + fileDir.getAbsolutePath());
+			Log.debug("Failed to start webserver on directory " + fileDir.getAbsolutePath());
 
 			e.printStackTrace();
 		}
@@ -308,9 +308,9 @@ public class Robot extends IterativeRobot implements Executable {
 	private void startConfigServer() {
 		try {
 			new ConfigServer(Constants.CONFIG_WEB_ROOT, Constants.CONFIG_FILE_PATH, Constants.ROBOT_NAME_FILE_PATH, Constants.CONFIG_WEB_PORT);
-			log.sub("Config webserver started at port: " + Constants.WEB_PORT);
+			Log.debug("Config webserver started at port: " + Constants.WEB_PORT);
 		} catch (Exception e) {
-			log.sub("Failed to start config webserver.");
+			Log.debug("Failed to start config webserver.");
 			e.printStackTrace();
 		}
 	}
@@ -331,13 +331,13 @@ public class Robot extends IterativeRobot implements Executable {
 	 * box if it's attached.
 	 */
 	private void setupUserInterface() {
-		oi = new OI(controller, subsystems, log);
+		oi = new OI(controller, subsystems);
 		oi.configureJoysticks(driverLeftJoystick, driverRightJoystick, operatorJoystick);
 		if (operatorBox.getButtonCount() > 0) {
-			log.info("Operator box detected");
+			Log.info("Operator box detected");
 			oi.configureDiagBox(operatorBox);
 		}
-		log.register(false, driverStation::getMatchTime, "DriverStation/MatchTime");
+		Chart.register(driverStation::getMatchTime, "DriverStation/MatchTime");
 	}
 
 	/**
@@ -345,22 +345,24 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void startLogging() {
 		// Tell the logger what symbolic link to the log file based on the match name to use.
-		String matchDescription = String.format("%s_%s_M%d_R%d_%s_P%d", driverStation.getEventName(),
+		String matchDescription = String.format("_%t_%s_%s_M%d_R%d_%s_P%d", 
+				new SimpleDateFormat("yyyyMMdd't'hhmmss").format(Calendar.getInstance().getTime()),
+				driverStation.getEventName(),
 				driverStation.getMatchType().toString(), driverStation.getMatchNumber(),
 				driverStation.getReplayNumber(), driverStation.getAlliance().toString(), driverStation.getLocation());
-		log.logCompletedElements(matchDescription);
-		if (config.doLogging) {
+		Chart.registrationComplete(matchDescription);
+		if (Config.doCharting) {
 			// Low priority means run every 20 * 4 = 80ms, or at 12.5Hz
 			// It polls almost everything on the CAN bus, so don't want it to be too fast.
-			Strongback.executor().register(log, Priority.LOW);
+			Strongback.executor().register(new Chart(), Priority.LOW);
 		} else {
-			log.error("Logging: Dygraph logging disabled");
+			Log.error("Logging: Dygraph logging disabled");
 		}
 	}
 
 	@Override
 	public void execute(long timeInMillis) {
-		//log.sub("Updating smartDashboard");
+		//Logger.debug("Updating smartDashboard");
 		maybeUpdateSmartDashboard();
 	}
 
@@ -384,7 +386,7 @@ public class Robot extends IterativeRobot implements Executable {
 	public WheelColour getFMSColour() {
 		String fmsColour = driverStation.getGameSpecificMessage();
 		if (!fmsColour.equals(lastColour)) {
-			log.info("FMS Colour: %s", fmsColour);
+			Log.info("FMS Colour: %s", fmsColour);
 			lastColour = fmsColour;
 		}
 		if (fmsColour.length() == 0) {

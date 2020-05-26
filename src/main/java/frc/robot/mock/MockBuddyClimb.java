@@ -1,12 +1,11 @@
 package frc.robot.mock;
 
 import frc.robot.interfaces.BuddyClimbInterface;
-import frc.robot.interfaces.Log;
 
 public class MockBuddyClimb implements BuddyClimbInterface {
     private boolean isExtended = false;
 
-    public MockBuddyClimb(Log log) {
+    public MockBuddyClimb() {
     }
 
     @Override

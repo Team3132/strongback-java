@@ -11,9 +11,10 @@ import frc.robot.interfaces.LoaderInterface;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.interfaces.LEDStripInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 public class Loader extends Subsystem implements LoaderInterface {
     final private Motor spinner, passthrough;
@@ -26,9 +27,8 @@ public class Loader extends Subsystem implements LoaderInterface {
     private double targetPassthroughDutyCycle = 0;
 
     public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
-            final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard,
-            final Log log) {
-        super("Loader", dashboard, log);
+            final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard) {
+        super("Loader", dashboard);
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
         this.paddleSolenoid = paddleSolenoid;
@@ -36,26 +36,26 @@ public class Loader extends Subsystem implements LoaderInterface {
         inSensorCount = new Counter("loader:inSensor", inSensor);
         outSensorCount = new Counter("loader:outSensor", outSensor);
 
-        log.register(true, () -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name)
-                .register(true, () -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name)
-                .register(true, () -> getSpinnerMotorRPS(), "%s/spinner/rps", name)
-                .register(true, () -> getTargetSpinnerRPS(), "%s/spinner/targetRPS", name)
-                .register(true, () -> spinner.getOutputCurrent(), "%s/spinner/Current", name)
-                .register(true, () -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name)
-                .register(true, () -> (double) getCurrentBallCount(), "%s/spinner/CurrentBallCount", name)
-                .register(true, () -> (double) inSensorCount.count, "%s/spinner/totalBallsIn", name)
-                .register(true, () -> (double) outSensorCount.count, "%s/spinner/totalBallsOut", name)
-                .register(true, () -> (double) initBallCount, "%s/spinner/initialBallCount", name)
-                .register(true, () -> isPaddleBlocking(), "%s/paddleRetracted", name)
-                .register(true, () -> inSensor.getAsBoolean(), "%s/spinner/inSensorState", name)
-                .register(true, () -> outSensor.getAsBoolean(), "%s/spinner/outSensorState", name);
+        Chart.register(() -> passthrough.getOutputCurrent(), "%s/passthrough/Current", name);
+        Chart.register(() -> passthrough.getOutputPercent(), "%s/passthrough/PercentOut", name);
+        Chart.register(() -> getSpinnerMotorRPS(), "%s/spinner/rps", name);
+        Chart.register(() -> getTargetSpinnerRPS(), "%s/spinner/targetRPS", name);
+        Chart.register(() -> spinner.getOutputCurrent(), "%s/spinner/Current", name);
+        Chart.register(() -> spinner.getOutputPercent(), "%s/spinner/PercentOut", name);
+        Chart.register(() -> (double) getCurrentBallCount(), "%s/spinner/CurrentBallCount", name);
+        Chart.register(() -> (double) inSensorCount.count, "%s/spinner/totalBallsIn", name);
+        Chart.register(() -> (double) outSensorCount.count, "%s/spinner/totalBallsOut", name);
+        Chart.register(() -> (double) initBallCount, "%s/spinner/initialBallCount", name);
+        Chart.register(() -> isPaddleBlocking(), "%s/paddleRetracted", name);
+        Chart.register(() -> inSensor.getAsBoolean(), "%s/spinner/inSensorState", name);
+        Chart.register(() -> outSensor.getAsBoolean(), "%s/spinner/outSensorState", name);
     }
 
     @Override
     public void setTargetSpinnerRPS(final double rps) {
 
         spinnerRPS = rps;
-        log.sub("%s: Setting loader motor rps to: %f", name, rps);
+        Log.debug("%s: Setting loader motor rps to: %f", name, rps);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
         if (rps == 0) {
@@ -76,7 +76,7 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     @Override
     public void setTargetPassthroughDutyCycle(double percent) {
-        log.sub("%s: Setting loader in motor percent output to: %f", name, percent);
+        Log.debug("%s: Setting loader in motor percent output to: %f", name, percent);
         // If motor is zero in velocity the PID will try and reverse the motor in order
         // to slow down
         targetPassthroughDutyCycle = percent;
@@ -104,7 +104,7 @@ public class Loader extends Subsystem implements LoaderInterface {
 
     @Override
     public boolean isPaddleNotBlocking() {
-        // log.sub("Is intake extended: " + solenoid.isExtended());
+        // Logger.debug("Is intake extended: " + solenoid.isExtended());
         return paddleSolenoid.isRetracted();
     }
 
@@ -166,7 +166,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         public Counter(final String name, final BooleanSupplier sensor) {
             this.name = name;
             this.sensor = sensor;
-            log.register(false, () -> (double) getCount(), "%s/count", name);
+            Chart.register(() -> (double) getCount(), "%s/count", name);
         }
 
         public int getCount() {

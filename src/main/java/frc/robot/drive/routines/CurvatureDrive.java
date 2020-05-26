@@ -3,7 +3,6 @@ package frc.robot.drive.routines;
 import org.strongback.components.Switch;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.ContinuousRange;
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.lib.MathUtil;
 
@@ -20,9 +19,8 @@ public class CurvatureDrive extends DriveRoutine {
     public static final double DEFAULT_MAXIMUM_SPEED = 1.0;
     private static final double SENSITIVITY_TURN = 1.0;
 
-    public CurvatureDrive(ContinuousRange throttle, ControlMode mode, ContinuousRange wheel, Switch isQuickTurn,
-            Log log) {
-        super("Curvature", mode, log);
+    public CurvatureDrive(ContinuousRange throttle, ControlMode mode, ContinuousRange wheel, Switch isQuickTurn) {
+        super("Curvature", mode);
         this.throttleCR = throttle;
         this.wheelCR = wheel;
         this.isQuickTurn = isQuickTurn;

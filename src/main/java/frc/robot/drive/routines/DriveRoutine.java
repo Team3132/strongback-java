@@ -2,7 +2,6 @@ package frc.robot.drive.routines;
 
 import org.strongback.components.Motor.ControlMode;
 
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.lib.MathUtil;
@@ -15,11 +14,9 @@ import frc.robot.lib.MathUtil;
 public abstract class DriveRoutine {
 	protected String name;
 	protected ControlMode mode;
-	protected Log log;
 
-	protected DriveRoutine(String name, ControlMode mode, Log log) {
+	protected DriveRoutine(String name, ControlMode mode) {
 		this.name = name;
-		this.log = log;
 	}
 	
 	/*

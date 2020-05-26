@@ -11,13 +11,14 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LocationInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.LocationHistory;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.NavXGyroscope;
 import frc.robot.lib.Position;
 import frc.robot.lib.Subsystem;
 import static frc.robot.lib.PoseHelper.createPose2d;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 /**
  *	Location Subsystem.
@@ -146,8 +147,8 @@ public class Location extends Subsystem implements LocationInterface {
 	 * @param gyro The gyro to get angles
 	 * @param log The log to store debug and other logging messages
 	 */
-    public Location(Runnable resetEncoders, DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard, Log log) {
-		super("Location", dashboard, log);	// always present!
+    public Location(Runnable resetEncoders, DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard) {
+		super("Location", dashboard);	// always present!
 		this.resetEncoders = resetEncoders;
 		this.leftDistance = leftDistance;
 		this.rightDistance = rightDistance;
@@ -161,16 +162,16 @@ public class Location extends Subsystem implements LocationInterface {
 		current = new Position(0, 0, 0, 0, clock.currentTime());
 		desired = new Position(0, 0, 0, 0, clock.currentTime());
 
-		log.register(true, () -> current.x, "%s/actual/x", name)
-           .register(true, () -> current.y, "%s/actual/y", name)
-		   .register(true, () -> current.heading, "%s/actual/a", name)
-		   .register(true, () -> current.speed, "%s/s/acutal/speed", name) 
-		   .register(true, () -> current.timeSec, "%s/actual/time", name)
-		   .register(true, () -> desired.x, "%s/desired/x", name)
-           .register(true, () -> desired.y, "%s/desired/y", name)
-		   .register(true, () -> desired.heading, "%s/desired/a", name)
-		   .register(true, () -> desired.speed, "%s/desired/speed", name) 
-		   .register(true, () -> desired.timeSec, "%s/desired/time", name);
+		Chart.register(() -> current.x, "%s/actual/x", name);
+        Chart.register(() -> current.y, "%s/actual/y", name);
+		Chart.register(() -> current.heading, "%s/actual/a", name);
+		Chart.register(() -> current.speed, "%s/s/acutal/speed", name);
+		Chart.register(() -> current.timeSec, "%s/actual/time", name);
+		Chart.register(() -> desired.x, "%s/desired/x", name);
+        Chart.register(() -> desired.y, "%s/desired/y", name);
+		Chart.register(() -> desired.heading, "%s/desired/a", name);
+		Chart.register(() -> desired.speed, "%s/desired/speed", name);
+		Chart.register(() -> desired.timeSec, "%s/desired/time", name);
 		
 		// Enable this subsystem by default.
 		enable();
@@ -193,7 +194,7 @@ public class Location extends Subsystem implements LocationInterface {
      */
     @Override
     public void setCurrentLocation(Pose2d pose) {
-		log.sub("%s: resetting to: %s", name, pose.toString());
+		Log.debug("%s: resetting to: %s", name, pose.toString());
     	((NavXGyroscope) gyro).setAngle(pose.getRotation().getDegrees());
     	current.speed = 0;
     	current.timeSec = clock.currentTime();  // time of last update
@@ -295,7 +296,7 @@ public class Location extends Subsystem implements LocationInterface {
 		// Average of the distance - inches.
 		double averageDistance = (newLeft + newRight) / 2.0;
 		
-		/*log.sub("%s: leftSupplier: %f, leftDelta: %f, rightSupplier: %f, rightDelta: %f", name,
+		/*Logger.debug("%s: leftSupplier: %f, leftDelta: %f, rightSupplier: %f, rightDelta: %f", name,
 				leftDistanceSupplier.getAsDouble(), newLeft,
 				rightDistanceSupplier.getAsDouble(), newRight);
 		*/
@@ -315,7 +316,7 @@ public class Location extends Subsystem implements LocationInterface {
     	history.addLocation(current);
     	
     	if (debug) {
-    		log.debug("%s: %s", name, current.toString());
+    		Log.debug("%s: %s", name, current.toString());
     	}
 	}
 

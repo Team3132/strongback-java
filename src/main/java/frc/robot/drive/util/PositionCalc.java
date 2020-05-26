@@ -2,8 +2,6 @@ package frc.robot.drive.util;
 
 import org.strongback.components.Clock;
 
-import frc.robot.interfaces.Log;
-
 /**
  * Takes a target speed for a wheel and calculates the expected encoder
  * position had the wheel been doing the target speed.
@@ -19,16 +17,14 @@ import frc.robot.interfaces.Log;
     private double maxJerk;
     private Clock clock;
     @SuppressWarnings("unused")
-    private Log log;
     private double lastTime;
 
-    public PositionCalc(double initialPosition, double initialSpeed, double maxJerk, Clock clock, Log log) {
+    public PositionCalc(double initialPosition, double initialSpeed, double maxJerk, Clock clock) {
         this.position = initialPosition;
         this.speed = this.targetSpeed = initialSpeed;
         this.accel = 0;
         this.maxJerk = maxJerk;
         this.clock = clock;
-        this.log = log;
         lastTime = clock.currentTime();
     }
 
@@ -54,8 +50,8 @@ import frc.robot.interfaces.Log;
         // Update the position based on the average speed over the last period.
         double averagespeed = (speed + lastSpeed) / 2;
         position += dtSec * averagespeed;
-        //log.sub("calc speed = %f", speed);
-        //log.sub("calc pos = %f", position);
+        //Logger.debug("calc speed = %f", speed);
+        //Logger.debug("calc pos = %f", position);
         return position;
     }
 
@@ -65,7 +61,7 @@ import frc.robot.interfaces.Log;
      */
     public void setTargetSpeed(double speed) {
         this.targetSpeed = speed;
-        //log.sub("target speed = %f", targetSpeed);
+        //Logger.debug("target speed = %f", targetSpeed);
     }
 
     public double getPosition() {

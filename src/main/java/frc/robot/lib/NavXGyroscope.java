@@ -2,7 +2,8 @@ package frc.robot.lib;
 
 import org.strongback.components.Gyroscope;
 import frc.robot.interfaces.DashboardUpdater;
-import frc.robot.interfaces.Log;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -41,7 +42,6 @@ public class NavXGyroscope implements Gyroscope, DashboardUpdater {
 		FINISHED
 	}
 	private AHRS ahrs = null;
-	private Log log;
     private double baseAngle = 0;
     private double basePitch = 0;
 	private double driftStartTime;	// In drift calculations we see how much the gyro drifts during a known stop period.
@@ -50,9 +50,8 @@ public class NavXGyroscope implements Gyroscope, DashboardUpdater {
 	private Drift driftState = Drift.NOT_STARTED;
 	private String name;
 
-	public NavXGyroscope(String name, boolean present, Log log) {
+	public NavXGyroscope(String name, boolean present) {
 		this.name = name;
-		this.log = log;
 		
 		ahrs = null;
 		if (present) {
@@ -67,21 +66,21 @@ public class NavXGyroscope implements Gyroscope, DashboardUpdater {
 		    }
 		}
 		if (ahrs != null) {
-			 log.register(true, (() -> { return getAngle(); } ), "%s/angle", name)
-			 	.register(true, (() -> { return getYaw(); } ), "%s/yaw", name)
-				.register(true, (() -> { return getRoll(); } ), "%s/roll", name)
-				.register(true, (() -> { return getPitch(); } ), "%s/pitch", name)
-				.register(true, (() -> { return driftRate; } ), "%s/drift", name)
-				.register(true, (() -> { return isCalibrating()?1.0:0.0; } ), "%s/Misc/Calibrating", name)
-				.register(false, (() -> { return getDisplacementX(); } ), "%s/disp/X", name)
-				.register(false, (() -> { return getDisplacementY(); } ), "%s/disp/Y", name)
-				.register(false, (() -> { return getDisplacementZ(); } ), "%s/disp/Z", name)
-				.register(false, (() -> { return getWorldLinearAccelX(); } ), "%s/WorldAccel/X", name)
-				.register(false, (() -> { return getWorldLinearAccelY(); } ), "%s/WorldAccel/Y", name)
-				.register(false, (() -> { return getWorldLinearAccelZ(); } ), "%s/WorldAccel/Z", name)
-				.register(false, (() -> { return getRawAccelX(); } ), "%s/RawAccel/X", name) 
-				.register(false, (() -> { return getRawAccelY(); } ), "%s/RawAccel/Y", name) 
-				.register(false, (() -> { return getRawAccelZ(); } ), "%s/RawAccel/Z", name);
+		    Chart.register((() -> { return getAngle(); } ), "%s/angle", name);
+		 	Chart.register((() -> { return getYaw(); } ), "%s/yaw", name);
+			Chart.register((() -> { return getRoll(); } ), "%s/roll", name);
+			Chart.register((() -> { return getPitch(); } ), "%s/pitch", name);
+			Chart.register((() -> { return driftRate; } ), "%s/drift", name);
+			Chart.register((() -> { return isCalibrating()?1.0:0.0; } ), "%s/Misc/Calibrating", name);
+			Chart.register((() -> { return getDisplacementX(); } ), "%s/disp/X", name);
+			Chart.register((() -> { return getDisplacementY(); } ), "%s/disp/Y", name);
+			Chart.register((() -> { return getDisplacementZ(); } ), "%s/disp/Z", name);
+			Chart.register((() -> { return getWorldLinearAccelX(); } ), "%s/WorldAccel/X", name);
+			Chart.register((() -> { return getWorldLinearAccelY(); } ), "%s/WorldAccel/Y", name);
+			Chart.register((() -> { return getWorldLinearAccelZ(); } ), "%s/WorldAccel/Z", name);
+			Chart.register((() -> { return getRawAccelX(); } ), "%s/RawAccel/X", name);
+			Chart.register((() -> { return getRawAccelY(); } ), "%s/RawAccel/Y", name); 
+			Chart.register((() -> { return getRawAccelZ(); } ), "%s/RawAccel/Z", name);
 		}
 		zero();
 	}
@@ -105,7 +104,7 @@ public class NavXGyroscope implements Gyroscope, DashboardUpdater {
 	public void endDriftCalculation() {
 		driftRate = (getRawAngle() - driftStartHeading) / (Timer.getFPGATimestamp() - driftStartTime);
 		driftState = Drift.FINISHED;
-		log.debug("Finished Drift Calculation: %f degrees per second", driftRate);
+		Log.debug("Finished Drift Calculation: %f degrees per second", driftRate);
 	}
 	
 	public Drift currentDriftCalculation() {
@@ -144,14 +143,14 @@ public class NavXGyroscope implements Gyroscope, DashboardUpdater {
 			driftStartTime = Timer.getFPGATimestamp();
 		}
 		System.out.println("reset baseAngle = " + baseAngle);
-		log.debug("reset baseAngle = %f", baseAngle);
+		Log.debug("reset baseAngle = %f", baseAngle);
 		return this;
 	}
 
 	public void setAngle(double angle) {
 		zero();
 		baseAngle -= angle;
-		log.debug("set baseAngle = %f", baseAngle);
+		Log.debug("set baseAngle = %f", baseAngle);
 	}
 	
 	private double getRawAngle() {

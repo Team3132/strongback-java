@@ -6,9 +6,9 @@ import java.util.function.DoubleSupplier;
 import org.strongback.components.Clock;
 import org.strongback.components.Motor.ControlMode;
 
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.lib.log.Log;
 import frc.robot.Constants;
 import frc.robot.drive.util.LowPassFilter;
 import frc.robot.drive.util.PositionPID;
@@ -31,11 +31,11 @@ public class PositionalPIDDrive extends DriveRoutine {
 
 	public PositionalPIDDrive(String name, BooleanSupplier finished, DoubleSupplier targetSpeed,
 			DoubleSupplier targetTurn, double speedScale, double turnScale, double maxJerk, DoubleSupplier leftDistance,
-			DoubleSupplier leftSpeed, DoubleSupplier rightDistance, DoubleSupplier rightSpeed, Clock clock, Log log) {
-		super(name, ControlMode.DutyCycle, log);
+			DoubleSupplier leftSpeed, DoubleSupplier rightDistance, DoubleSupplier rightSpeed, Clock clock) {
+		super(name, ControlMode.DutyCycle);
 		this.finished = finished;
 		this.clock = clock;
-		log.info("Starting to drive positional PID");
+		Log.info("Starting to drive positional PID");
 
 		/*
 		 * There is an issue here. If the targetSpeed increases too rapidly, then even
@@ -48,22 +48,22 @@ public class PositionalPIDDrive extends DriveRoutine {
 		LowPassFilter filteredSpeed = new LowPassFilter(targetSpeed, 0.2);
 		leftPID = createPID("Drive/" + name + "/left", () -> {
 			return speedScale * filteredSpeed.getAsDouble() + turnScale * targetTurn.getAsDouble();
-		}, maxJerk, leftDistance, leftSpeed, clock, log);
+		}, maxJerk, leftDistance, leftSpeed, clock);
 		rightPID = createPID("Drive/" + name + "/right", () -> {
 			return speedScale * filteredSpeed.getAsDouble() - turnScale * targetTurn.getAsDouble();
-		}, maxJerk, rightDistance, rightSpeed, clock, log);
+		}, maxJerk, rightDistance, rightSpeed, clock);
 	}
 
 	public PositionalPIDDrive(String name, DoubleSupplier targetSpeed, DoubleSupplier targetTurn, double speedScale,
 			double turnScale, double maxJerk, DoubleSupplier leftDistance, DoubleSupplier leftSpeed,
-			DoubleSupplier rightDistance, DoubleSupplier rightSpeed, Clock clock, Log log) {
+			DoubleSupplier rightDistance, DoubleSupplier rightSpeed, Clock clock) {
 		this(name, () -> true, targetSpeed, targetTurn, speedScale, turnScale, maxJerk, leftDistance, leftSpeed,
-				rightDistance, rightSpeed, clock, log);
+				rightDistance, rightSpeed, clock);
 	}
 
 	private PositionPID createPID(String name, DoubleSupplier targetSpeed, double maxJerk, DoubleSupplier distance,
-			DoubleSupplier speed, Clock clock, Log log) {
-		PositionPID pid = new PositionPID(name, targetSpeed, maxJerk, distance, speed, clock, log);
+			DoubleSupplier speed, Clock clock) {
+		PositionPID pid = new PositionPID(name, targetSpeed, maxJerk, distance, speed, clock);
 		double kV = 0.3;
 		double kA = 0, kI = 0, kD = 0;// 0.5;
 		double kP = 0.64;
@@ -98,7 +98,7 @@ public class PositionalPIDDrive extends DriveRoutine {
 		if (!finished.getAsBoolean()) {
 			timestamp = clock.currentTime();
 		}
-		log.sub("%s: left=%f right=%f", name, leftPower, rightPower);
+		Log.debug("%s: left=%f right=%f", name, leftPower, rightPower);
 		return new DriveMotion(leftPower, rightPower);
 	}
 

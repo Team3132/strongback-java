@@ -14,7 +14,6 @@ import org.strongback.mock.MockSolenoid;
 
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.mock.MockDashboard;
-import frc.robot.mock.MockLog;
 
 public class TestLoader {
     MockMotor spinner, passthrough;
@@ -25,7 +24,6 @@ public class TestLoader {
     int outSensorCounts = 0;
     LEDStripInterface led;
     MockDashboard dashboard;
-    MockLog log;
     MockClock clock;
 
     @Before
@@ -34,12 +32,11 @@ public class TestLoader {
         passthrough = Mock.stoppedMotor();
         led = Mock.ledStrip(); 
         clock = Mock.clock();
-        log = new MockLog();
         inSensor = () -> {
             if (inSensorCounts.size() == 0) return false;
             return inSensorCounts.get(0);
         };
-        loader = new Loader(spinner, passthrough, paddle, inSensor, outSensor, led, dashboard, log);
+        loader = new Loader(spinner, passthrough, paddle, inSensor, outSensor, led, dashboard);
     }
 
     @Test

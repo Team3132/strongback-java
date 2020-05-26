@@ -18,7 +18,6 @@ import frc.robot.interfaces.ColourWheelInterface.ColourAction;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.lib.WheelColour;
 import frc.robot.mock.MockDashboard;
-import frc.robot.mock.MockLog;
 
 public class TestColourwheel {
 
@@ -36,7 +35,7 @@ public class TestColourwheel {
         solenoid = Mock.Solenoids.singleSolenoid(0);
         clock = Mock.clock();
         ledStrip = Mock.ledStrip();
-        colourWheel = new ColourWheel(motor, solenoid, () -> colour, ledStrip, clock, new MockDashboard(), new MockLog());
+        colourWheel = new ColourWheel(motor, solenoid, () -> colour, ledStrip, clock, new MockDashboard());
     }
 
 

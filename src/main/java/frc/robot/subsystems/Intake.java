@@ -6,8 +6,9 @@ import org.strongback.components.Motor.ControlMode;
 
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.IntakeInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 /**
  * Intake Subsystem 2019:
@@ -19,18 +20,18 @@ public class Intake extends Subsystem implements IntakeInterface
     private Solenoid solenoid;
     private IntakeWheel intakeWheel;
 
-    public Intake(Motor motor, Solenoid solenoid, DashboardInterface dashboard, Log log) {
-        super("Intake", dashboard, log);   
+    public Intake(Motor motor, Solenoid solenoid, DashboardInterface dashboard) {
+        super("Intake", dashboard);   
         this.motor = motor;
         this.solenoid = solenoid;
         intakeWheel = new IntakeWheel(motor);
-        log.register(true, () -> isExtended(), "%s/extended", name)
-               .register(true, () -> isRetracted(), "%s/retracted", name)
-			   .register(false, motor::getOutputVoltage, "%s/outputVoltage", name)
-			   .register(false, motor::getOutputPercent, "%s/outputPercent", name)
-               .register(false, motor::getOutputCurrent, "%s/outputCurrent", name)
-               .register(false, () -> intakeWheel.getTargetRPS(), "%s/targetRPS", name)
-               .register(false, () -> intakeWheel.getRPS(), "%s/rps", name);
+        Chart.register(() -> isExtended(), "%s/extended", name);
+        Chart.register(() -> isRetracted(), "%s/retracted", name);
+		Chart.register(motor::getOutputVoltage, "%s/outputVoltage", name);
+		Chart.register(motor::getOutputPercent, "%s/outputPercent", name);
+        Chart.register(motor::getOutputCurrent, "%s/outputCurrent", name);
+        Chart.register(() -> intakeWheel.getTargetRPS(), "%s/targetRPS", name);
+        Chart.register(() -> intakeWheel.getRPS(), "%s/rps", name);
    
     }
 
@@ -56,7 +57,7 @@ public class Intake extends Subsystem implements IntakeInterface
 
     @Override
     public boolean isExtended() {
-        //log.sub("Is intake extended: " +  solenoid.isExtended());
+        //Logger.debug("Is intake extended: " +  solenoid.isExtended());
         return solenoid.isExtended();
     }
 
@@ -97,12 +98,12 @@ public class Intake extends Subsystem implements IntakeInterface
             // change the control mode from percent output, to avoid putting
             // unnecessary load on the battery and motor.
             if (rps == 0) { 
-                log.sub("Turning intake wheel off.");
+                Log.debug("Turning intake wheel off.");
                 motor.set(ControlMode.DutyCycle, 0); 
             } else {
                 motor.set(ControlMode.Speed, rps);
             }
-            log.sub("Setting intake target speed to %f", targetRPS);
+            Log.debug("Setting intake target speed to %f", targetRPS);
         }
 
         public double getTargetRPS() {

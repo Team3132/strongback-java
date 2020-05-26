@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.strongback.command.TestCommandGroup;
 import frc.robot.controller.TestController;
-import frc.robot.lib.RobotConfigurationTest;
+import frc.robot.lib.TestConfigReader;
 import frc.robot.lib.TestLogFileWriter;
 import frc.robot.lib.TestMovementSimulator;
 import frc.robot.lib.TestRedundantTalonSRX;
@@ -18,7 +18,7 @@ import frc.robot.subsystems.TestVision;
 @Suite.SuiteClasses({
 		TestCommandGroup.class,
 		TestController.class,
-        RobotConfigurationTest.class,
+        TestConfigReader.class,
         TestLogFileWriter.class,
         TestMovementSimulator.class,
         TestRedundantTalonSRX.class,

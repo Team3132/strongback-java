@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.robot.Constants;
 import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 import frc.robot.interfaces.LocationInterface;
-import frc.robot.interfaces.Log;
 
 /**
  * Walks the drivebase through a supplied list of waypoints.
@@ -57,11 +58,9 @@ public class TrajectoryDrive extends DriveRoutine {
 	private Boolean enabled = false;
 
 	private Clock clock;
-	private Log log;
 
-	public TrajectoryDrive(LocationInterface location, Clock clock, Log log) {
-		super("Trajectory Drive", ControlMode.Voltage,  log);
-		this.log = log;
+	public TrajectoryDrive(LocationInterface location, Clock clock) {
+		super("Trajectory Drive", ControlMode.Voltage);
 		this.clock = clock;
 		m_startTime = clock.currentTime();
 		m_pose = location::getPose;
@@ -75,26 +74,26 @@ public class TrajectoryDrive extends DriveRoutine {
 		m_leftController =  new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0);
         m_rightController = new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0);
 
-		log.register(true, () -> clock.currentTime() - m_startTime, "TrajectoryDrive/elapsedTime")
-				.register(true, () -> m_trajectory == null ? 0 : m_trajectory.getTotalTimeSeconds(), "TrajectoryDrive/totalTime")
-				.register(true, () -> m_leftSpeedSetpoint, "TrajectoryDrive/trajectory/speed/leftSepoint")
-				.register(true, () -> m_rightSpeedSetpoint, "TrajectoryDrive/trajectory/speed/rightSepoint")
-				.register(true, () -> m_leftSpeedError, "TrajectoryDrive/trajectory/speed/leftError")
-				.register(true, () -> m_rightSpeedError, "TrajectoryDrive/trajectory/speed/rightError")
-				.register(true, () -> m_leftPIDResult, "TrajectoryDrive/trajectory/speed/leftPIDResult")
-				.register(true, () -> m_rightPIDResult, "TrajectoryDrive/trajectory/speed/rightPIDResult")
-				.register(true, () -> m_leftOutput, "TrajectoryDrive/leftOutput")
-				.register(true, () -> m_rightOutput, "TrajectoryDrive/rightOutput")
-				.register(true, () -> m_targetSpeed, "TrajectoryDrive/targetSpeed")
-				.register(true, () -> m_targetPose.getTranslation().getX(), "TrajectoryDrive/desired/x")
-				.register(true, () -> m_targetPose.getTranslation().getY(), "TrajectoryDrive/desired/y")
-				.register(true, () -> m_targetPose.getRotation().getDegrees(), "TrajectoryDrive/desired/a")
-				.register(true, () -> m_actualPose.getTranslation().getX(), "TrajectoryDrive/actual/x")
-				.register(true, () -> m_actualPose.getTranslation().getY(), "TrajectoryDrive/actual/y")
-				.register(true, () -> m_actualPose.getRotation().getDegrees(), "TrajectoryDrive/actual/a")
-				.register(true, () -> m_errorPose.getTranslation().getX(), "TrajectoryDrive/error/x")
-				.register(true, () -> m_errorPose.getTranslation().getY(), "TrajectoryDrive/error/y")
-				.register(true, () -> m_errorPose.getRotation().getDegrees(), "TrajectoryDrive/error/a");
+		Chart.register(() -> clock.currentTime() - m_startTime, "TrajectoryDrive/elapsedTime");
+		Chart.register(() -> m_trajectory == null ? 0 : m_trajectory.getTotalTimeSeconds(), "TrajectoryDrive/totalTime");
+		Chart.register(() -> m_leftSpeedSetpoint, "TrajectoryDrive/trajectory/speed/leftSepoint");
+		Chart.register(() -> m_rightSpeedSetpoint, "TrajectoryDrive/trajectory/speed/rightSepoint");
+		Chart.register(() -> m_leftSpeedError, "TrajectoryDrive/trajectory/speed/leftError");
+		Chart.register(() -> m_rightSpeedError, "TrajectoryDrive/trajectory/speed/rightError");
+		Chart.register(() -> m_leftPIDResult, "TrajectoryDrive/trajectory/speed/leftPIDResult");
+		Chart.register(() -> m_rightPIDResult, "TrajectoryDrive/trajectory/speed/rightPIDResult");
+		Chart.register(() -> m_leftOutput, "TrajectoryDrive/leftOutput");
+		Chart.register(() -> m_rightOutput, "TrajectoryDrive/rightOutput");
+		Chart.register(() -> m_targetSpeed, "TrajectoryDrive/targetSpeed");
+		Chart.register(() -> m_targetPose.getTranslation().getX(), "TrajectoryDrive/desired/x");
+		Chart.register(() -> m_targetPose.getTranslation().getY(), "TrajectoryDrive/desired/y");
+		Chart.register(() -> m_targetPose.getRotation().getDegrees(), "TrajectoryDrive/desired/a");
+		Chart.register(() -> m_actualPose.getTranslation().getX(), "TrajectoryDrive/actual/x");
+		Chart.register(() -> m_actualPose.getTranslation().getY(), "TrajectoryDrive/actual/y");
+		Chart.register(() -> m_actualPose.getRotation().getDegrees(), "TrajectoryDrive/actual/a");
+		Chart.register(() -> m_errorPose.getTranslation().getX(), "TrajectoryDrive/error/x");
+		Chart.register(() -> m_errorPose.getTranslation().getY(), "TrajectoryDrive/error/y");
+		Chart.register(() -> m_errorPose.getRotation().getDegrees(), "TrajectoryDrive/error/a");
 	}
 	
 	/**
@@ -178,7 +177,7 @@ public class TrajectoryDrive extends DriveRoutine {
 	@Override
 	public boolean hasFinished() {
 		if (clock.currentTime() - m_startTime > m_trajectory.getTotalTimeSeconds()){
-			log.sub("%s: Finished spline with %s error", getName(), m_errorPose);
+			Log.debug("%s: Finished spline with %s error", getName(), m_errorPose);
 			return true;
 		}
 		return false;

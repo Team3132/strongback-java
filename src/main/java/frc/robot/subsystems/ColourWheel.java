@@ -12,10 +12,11 @@ import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LEDStripInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.Subsystem;
 import frc.robot.lib.WheelColour;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 /**
  * This subsystem is made to spin the Colour Wheel on the control panel in the
@@ -58,19 +59,19 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   private final Supplier<WheelColour> colourSensor;
 
   public ColourWheel(Motor motor, Solenoid solenoid, Supplier<WheelColour> colourSensor, LEDStripInterface ledStrip,
-      Clock clock, DashboardInterface dash, Log log) {
-    super("ColourWheel", dash, log);
-    log.info("Creating Colour Wheel Subsystem");
+      Clock clock, DashboardInterface dash) {
+    super("ColourWheel", dash);
+    Log.info("Creating Colour Wheel Subsystem");
     this.motor = motor;
     this.clock = clock;
     this.colourSensor = colourSensor;
     this.ledStrip = ledStrip;
     this.solenoid = solenoid;
-    log.register(false, () -> (double) colour.id, "%s/colour", name)
-        .register(false, () -> (double) rotCount, "%s/rotCount", name)
-        .register(false, () -> (double) motor.getOutputPercent(), "%s/motorspeed", name)
-        .register(false, () -> (double) nextColour.id, "%s/nextColour", name)
-        .register(false, () -> (double) spinTime, "%s/spinTime", name);
+    Chart.register(() -> (double) colour.id, "%s/colour", name);
+    Chart.register(() -> (double) rotCount, "%s/rotCount", name);
+    Chart.register(() -> (double) motor.getOutputPercent(), "%s/motorspeed", name);
+    Chart.register(() -> (double) nextColour.id, "%s/nextColour", name);
+    Chart.register(() -> (double) spinTime, "%s/spinTime", name);
   }
 
   public void update() {
@@ -97,7 +98,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
       break;
     default:
-      log.error("%s: Unknown Type %s", name, action.type);
+      Log.error("%s: Unknown Type %s", name, action.type);
       break;
     }
     if (newSpeed != speed) {
@@ -132,14 +133,14 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
    */
   public double rotationalControl() {
     if (colour.equals(nextColour)) {
-      log.info("%s: Found %s.", name, colour);
-      log.info("%s: Added one to rotations. %d", name, rotCount);
+      Log.info("%s: Found %s.", name, colour);
+      Log.info("%s: Added one to rotations. %d", name, rotCount);
       rotCount += 1;
       firstLoop = true;
     }
     if (firstLoop) {
       nextColour = colour.next(speed);
-      log.info("%s: Next Colour is %s.", name, nextColour);
+      Log.info("%s: Next Colour is %s.", name, nextColour);
       firstLoop = false;
     }
     if (rotCount < Constants.COLOUR_WHEEL_ROTATION_TARGET) {
@@ -201,7 +202,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         return motor.get();
       } else {
         action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
-        log.info("ColourWheel: Desired colour found.");
+        Log.info("ColourWheel: Desired colour found.");
         return Constants.COLOUR_WHEEL_MOTOR_OFF;
       }
     }
@@ -235,7 +236,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   public ColourWheelInterface setDesiredAction(ColourAction action) {
     this.action = action;
     if (action == new ColourAction(ColourWheelType.POSITION, WheelColour.UNKNOWN)) {
-      log.error("%s: No colour found in FMS!", name);
+      Log.error("%s: No colour found in FMS!", name);
       setDesiredAction(new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN));
     }
     firstLoop = true;

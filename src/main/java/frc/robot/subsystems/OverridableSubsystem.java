@@ -4,7 +4,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import frc.robot.interfaces.Log;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 /**
  * A shim layer between a real subsystem and the robot controller so that the
@@ -24,7 +25,7 @@ import frc.robot.interfaces.Log;
  * 
  * USE AT YOUR OWN RISK!!
  * 
- * Example: OverrideableSubsystem overridable = new OverridableSubsystem("Lift", LiftInterface.class, lift, liftSimulator, mockLift, log);
+ * Example: OverrideableSubsystem overridable = new OverridableSubsystem("Lift", LiftInterface.class, lift, liftSimulator, mockLift);
  *    // Get the endpoint that the controller would use.
  *    IntakeInterface normalIntake = intakeOverride.getNormalInterface();	
  *    // Get the endpoint that the diag box uses.
@@ -48,7 +49,6 @@ public class OverridableSubsystem<SubIF> {
 	// The real and simulator lifts that commands are sent to depending on the mode.
 	private String name;
 	private SubIF normalInterface, overrideInterface;
-	private Log log;
 
 	private enum OverrideMode {
 		AUTOMATIC(1), MANUAL(-1), OFF(0);
@@ -62,10 +62,9 @@ public class OverridableSubsystem<SubIF> {
 	private OverrideMode mode = OverrideMode.AUTOMATIC;
 
 	@SuppressWarnings("unchecked")
-	public OverridableSubsystem(String name, Class<?> clazz, SubIF real, SubIF simulator, SubIF mock, Log log) {
+	public OverridableSubsystem(String name, Class<?> clazz, SubIF real, SubIF simulator, SubIF mock) {
 		this.name = name;
-		this.log = log;
-		log.register(true, () -> (double)mode.value, "%s/overrideMode", name);
+		Chart.register(() -> (double)mode.value, "%s/overrideMode", name);
 
 		// Create the magic that allows this class to pick between which backend is used by what.
 		InvocationHandler normalHandler = new InvocationHandler() {
@@ -120,19 +119,19 @@ public class OverridableSubsystem<SubIF> {
 	// Mode change methods.
 	public void setAutomaticMode() {
 		// This may need to be more clever to carry over state.
-		log.sub("%s switched to normal/automatic mode", name);
+		Log.debug("%s switched to normal/automatic mode", name);
 		mode = OverrideMode.AUTOMATIC;
 	}
 
 	public void setManualMode() {
 		// This may need to be more clever to carry over state.
-		log.sub("%s switched manual mode", name);
+		Log.debug("%s switched manual mode", name);
 		mode = OverrideMode.MANUAL;
 	}
 
 	public void turnOff() {
 		// This may need to be more clever to carry over state.
-		log.sub("%s switched off", name);
+		Log.debug("%s switched off", name);
 		mode = OverrideMode.OFF;
 	}
 

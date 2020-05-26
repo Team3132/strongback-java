@@ -19,8 +19,8 @@ public enum LEDColour {
     public final int b;
 
     LEDColour(int r, int g, int b) {
-        this.r = (int)(r * Constants.LED_PERCENTAGE);
-        this.g = (int)(g * Constants.LED_PERCENTAGE);
-        this.b = (int)(b * Constants.LED_PERCENTAGE);
+        this.r = (int)(r * Constants.LED_BRIGHTNESS_PERCENTAGE);
+        this.g = (int)(g * Constants.LED_BRIGHTNESS_PERCENTAGE);
+        this.b = (int)(b * Constants.LED_BRIGHTNESS_PERCENTAGE);
     }
 }

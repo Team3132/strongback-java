@@ -8,10 +8,11 @@ import frc.robot.Constants;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.JevoisInterface;
 import frc.robot.interfaces.LocationInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.interfaces.VisionInterface;
 import frc.robot.lib.Position;
 import frc.robot.lib.Subsystem;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 public class Vision extends Subsystem implements VisionInterface, Runnable {
 	private JevoisInterface jevois;
@@ -24,8 +25,8 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 
 	public Vision(JevoisInterface jevois, LocationInterface location, DashboardInterface dashboard, Clock clock,
 			double visionHMin, double visionSMin, double visionVMin, double visionHMax, double visionSMax,
-			double visionVMax, Log log) {
-		super("Vision", dashboard, log);
+			double visionVMax) {
+		super("Vision", dashboard);
 		this.jevois = jevois;
 		this.location = location;
 		this.clock = clock;
@@ -36,16 +37,15 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 		this.visionSMax = visionSMax;
 		this.visionVMax = visionVMax;
 
-		log.register(true, () -> isConnected(), "%s/connected", name)
-				.register(true, () -> lastSeenTarget.location.x, "%s/curX", name)
-				.register(true, () -> lastSeenTarget.location.y, "%s/curY", name)
-				.register(true, () -> lastSeenTarget.location.heading, "%s/heading", name)
-				// .register(true, () -> clock.currentTime() - lastSeenTarget.seenAtSec,
-				// "%s/seenAt", name)
-				.register(true, () -> lastSeenTarget.imageTimestamp, "%s/seenAtSec", name)
-				.register(true, () -> lastSeenTarget.targetFound, "%s/targetFound", name)
-				.register(true, () -> lastSeenTarget.distance, "%s/distance", name)
-				.register(true, () -> lastSeenTarget.angle, "%s/angle", name);
+		Chart.register(() -> isConnected(), "%s/connected", name);
+		Chart.register(() -> lastSeenTarget.location.x, "%s/curX", name);
+		Chart.register(() -> lastSeenTarget.location.y, "%s/curY", name);
+		Chart.register(() -> lastSeenTarget.location.heading, "%s/heading", name);
+		// Chart.register(() -> clock.currentTime() - lastSeenTarget.seenAtSec, "%s/seenAt", name)
+		Chart.register(() -> lastSeenTarget.imageTimestamp, "%s/seenAtSec", name);
+		Chart.register(() -> lastSeenTarget.targetFound, "%s/targetFound", name);
+		Chart.register(() -> lastSeenTarget.distance, "%s/distance", name);
+		Chart.register(() -> lastSeenTarget.angle, "%s/angle", name);
 		// Start reading from the Jevois camera.
 		(new Thread(this)).start();
 	}
@@ -65,16 +65,16 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			log.sub("Vision waiting for the camera server to start up");
+			Log.debug("Vision waiting for the camera server to start up");
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e1) {
 			}
-			log.sub("Starting to read from Jevois camera\n");
+			Log.debug("Starting to read from Jevois camera\n");
 			try {
 				// Attempt to detect if there is a camera plugged in. It will throw an exception
 				// if not.
-				log.sub(jevois.issueCommand("info"));
+				Log.debug(jevois.issueCommand("info"));
 				connected = true;
 
 				// Update the HSV filter ranges from the config values.
@@ -88,7 +88,7 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 					processLine(jevois.readLine());
 				}
 			} catch (IOException e) {
-				log.error("Failed to read from jevois, aborting vision processing\n");
+				Log.error("Failed to read from jevois, aborting vision processing\n");
 				connected = false;
 				e.printStackTrace();
 			}
@@ -120,10 +120,10 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 		String[] parts = line.split("\\s+");
 
 		if (!parts[0].equals("D3")) {
-			log.info("Ignoring non-vision target line: %s", line);
+			Log.info("Ignoring non-vision target line: %s", line);
 			return;
 		}
-		//log.sub("Vision::processLine(%s)\n", line);
+		//Logger.debug("Vision::processLine(%s)\n", line);
 		TargetDetails newTarget = new TargetDetails();
 		newTarget.targetFound = Boolean.parseBoolean(parts[2]);
 
@@ -142,7 +142,7 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 		
 			newTarget.location.heading += newTarget.angle - newTarget.skew;
 
-			// log.sub("Location set.");
+			// Logger.debug("Location set.");
 			// newTarget.location.heading += newTarget.angle
 
 
@@ -158,7 +158,7 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 			synchronized (this) {
 				lastSeenTarget = newTarget;
 			}
-			// log.sub("Vision: Updated target %s", lastSeenTarget);
+			// Logger.debug("Vision: Updated target %s", lastSeenTarget);
 
 		}
 

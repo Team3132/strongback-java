@@ -1,7 +1,6 @@
 package frc.robot.mock;
 
 import frc.robot.interfaces.IntakeInterface;
-import frc.robot.interfaces.Log;
 
 
 /**
@@ -11,7 +10,7 @@ public class MockIntake implements IntakeInterface {
 	private double output = 0;
 	private boolean isExtended = false;
 
-	public MockIntake(Log log) {
+	public MockIntake() {
 	}
 
 	@Override

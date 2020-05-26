@@ -3,7 +3,7 @@ package frc.robot.drive.util;
 import java.util.function.DoubleSupplier;
 
 import org.strongback.components.Clock;
-import frc.robot.interfaces.Log;
+import frc.robot.lib.chart.Chart;
 
 /**
  * Using a PositionCalc, takes a target speed and calculates what the encoder
@@ -31,14 +31,14 @@ import frc.robot.interfaces.Log;
     private boolean enabled = true;
 
     public PositionPID(String name, DoubleSupplier targetSpeed, double maxJerk,
-         DoubleSupplier encoderPos, DoubleSupplier encoderSpeed, Clock clock, Log log) {
+         DoubleSupplier encoderPos, DoubleSupplier encoderSpeed, Clock clock) {
         this.targetSpeed = targetSpeed;
         this.encoderPos = encoderPos;
         this.encoderSpeed = encoderSpeed;
-        calc = new PositionCalc(encoderPos.getAsDouble(), encoderSpeed.getAsDouble(), maxJerk, clock, log);
-        log.register(true, () -> calc.getSpeed(), "%s/targetSpeed", name)
-           .register(true, () -> calc.getPosition(), "%s/targetPos", name)
-           .register(true, () -> encoderPos.getAsDouble(), "%s/actualPos", name);
+        calc = new PositionCalc(encoderPos.getAsDouble(), encoderSpeed.getAsDouble(), maxJerk, clock);
+        Chart.register(() -> calc.getSpeed(), "%s/targetSpeed", name);
+        Chart.register(() -> calc.getPosition(), "%s/targetPos", name);
+        Chart.register(() -> encoderPos.getAsDouble(), "%s/actualPos", name);
     }
 
     public void setVAPID(double kV, double kA, double kP, double kI, double kD) {

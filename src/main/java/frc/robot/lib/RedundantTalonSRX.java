@@ -11,7 +11,8 @@ import org.strongback.components.Motor;
 import org.strongback.components.TalonSensorCollection;
 import org.strongback.hardware.HardwareTalonSRX;
 
-import frc.robot.interfaces.Log;
+import frc.robot.lib.chart.Chart;
+import frc.robot.lib.log.Log;
 
 /**
  * Creates what appears to be a single TalonSRX, but is really a list of
@@ -36,7 +37,6 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements TalonSensorCo
 	private static ArrayList<HardwareTalonSRX> badTalons = new ArrayList<>();  // Talons that have drawn so much current.
 	private static ArrayList<HardwareTalonSRX> badEncoders = new ArrayList<>(); // Talons that have bad encoders.
 	private Clock clock;
-	private static Log log;
 	
 	// Current draw.
 	// Record how long each talon has been an outlier for current draw. If they are long enough,
@@ -58,22 +58,21 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements TalonSensorCo
 	ControlMode lastMode = ControlMode.Speed;
 	double lastDemand0 = 0;
 	
-	public RedundantTalonSRX(ArrayList<HardwareTalonSRX> potentialLeaders, ArrayList<HardwareTalonSRX> followers, Clock clock, Log log) {
+	public RedundantTalonSRX(ArrayList<HardwareTalonSRX> potentialLeaders, ArrayList<HardwareTalonSRX> followers, Clock clock) {
 		super(potentialLeaders.get(0).getTalonSRX());
 		this.potentialLeaders = potentialLeaders;
 		this.followers = followers;
 		this.clock = clock;
-		RedundantTalonSRX.log = log;
 		activeTalons = new ArrayList<HardwareTalonSRX>();
 		activeTalons.addAll(potentialLeaders);
 		activeTalons.addAll(followers);
 		otherLeaders = new ArrayList<HardwareTalonSRX>();
 		changeLeader(0);
 		for(HardwareTalonSRX talon : activeTalons) {
-			log.register(false, () -> talon.getOutputCurrent(), "Talons/%d/Current", talon.getDeviceID());
+			Chart.register(() -> talon.getOutputCurrent(), "Talons/%d/Current", talon.getDeviceID());
 		}
-		log.register(false, () -> (double)badEncoders.size(), "RedundantTalons/numBadEncoders");
-		log.register(false, () -> (double)badTalons.size(), "RedundantTalons/numBadTalons");
+		Chart.register(() -> (double)badEncoders.size(), "RedundantTalons/numBadEncoders");
+		Chart.register(() -> (double)badTalons.size(), "RedundantTalons/numBadTalons");
 		// Ensure execute gets called to check the talons/encoders.
 		// Disable for performance.
     	//Strongback.executor().register(this, Priority.LOW);
@@ -221,7 +220,7 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements TalonSensorCo
 		// Has it been long enough since the last log message?
 		if (now - lastErrorTime.getOrDefault(key, 0.) < kMinLoggingIntervalSec) return;
 		// It has. Log now.
-		log.error(msg, args);
+		Log.error(msg, args);
 		// Update the last log time.
 		lastErrorTime.put(key, now);		
 	}
@@ -239,7 +238,7 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements TalonSensorCo
 		}
 		// Disable it now that it's not the leader.
 		talon.set(ControlMode.Disabled, 0);
-		log.error("Disabled TalonSRX with CAN ID %d", talon.getDeviceID());
+		Log.error("Disabled TalonSRX with CAN ID %d", talon.getDeviceID());
 	}
 	
 	/**
@@ -255,9 +254,9 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements TalonSensorCo
 		// If it was the leader, then find a new leader.
 		if (leader == talon) {
 			changeLeader(0);
-			log.error("Bad encoder on leader TalonSRX %d, changed leadership", talon.getDeviceID());
+			Log.error("Bad encoder on leader TalonSRX %d, changed leadership", talon.getDeviceID());
 		} else {
-			log.error("Converted potential leader TalonSRX %d with bad encoder to a follower only", talon.getDeviceID());
+			Log.error("Converted potential leader TalonSRX %d with bad encoder to a follower only", talon.getDeviceID());
 
 		}
 		// It will have been setup as a follower now.
@@ -286,21 +285,20 @@ public class RedundantTalonSRX extends HardwareTalonSRX implements TalonSensorCo
 	 * Print out any issues seen across all RedundantTalonSRX's.
 	 */
 	public static void printStatus() {
-		if (log == null) return;
 		if (!badEncoders.isEmpty()) {
-			log.error("The following talons have a bad encoder:");
+			Log.error("The following talons have a bad encoder:");
 			for (HardwareTalonSRX talon : badEncoders) {
-				log.error("  Talon SRX %d", talon.getDeviceID());
+				Log.error("  Talon SRX %d", talon.getDeviceID());
 			}
 		}
 		if (!badTalons.isEmpty()) {
-			log.error("The following talons or motors have drawn a large amount of current:");
+			Log.error("The following talons or motors have drawn a large amount of current:");
 			for (HardwareTalonSRX talon : badTalons) {
-				log.error("  Talon SRX %d", talon.getDeviceID());
+				Log.error("  Talon SRX %d", talon.getDeviceID());
 			}
 		}
 		if (badTalons.isEmpty() && badEncoders.isEmpty()) {
-			log.info("No bad talons or encoders found");
+			Log.info("No bad talons or encoders found");
 		}
 	}
 	

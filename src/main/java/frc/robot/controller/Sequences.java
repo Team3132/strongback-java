@@ -90,7 +90,7 @@ public class Sequences {
 
 	public static Sequence startSlowDriveForward() {
 		SequenceBuilder builder = new SequenceBuilder("Slow drive forward");
-		builder.then().setDrivebasePower(DRIVE_OFF_LEVEL_TWO_POWER);
+		builder.then().setDrivebasePower(DRIVE_SLOW_POWER);
 		return builder.build();
 	}
 

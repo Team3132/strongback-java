@@ -30,8 +30,6 @@ public class Constants {
 	public static final double FULL_CIRCLE = 360.0;		// size of a full circle in internal units (degrees)
 	public static final double HALF_CIRCLE = 180.0;		// size of a half circle in internal units (degrees)
 	public static final double QUARTER_CIRCLE = 90.0;	// size of a quarter circle in internal units (degrees)
-	public static final int NUM_JOYSTICK_BUTTONS = 32;	// maximum number of push buttons on a joystick
-	public static final int NUM_JOYSTICK_DIRECTIONS = 10;
 	public static final double INCHES_TO_METRES = 0.0254;
 
 	public static final double JOYSTICK_DEADBAND_MINIMUM_VALUE = 0.05;	// below this we deadband the value away
@@ -55,16 +53,9 @@ public class Constants {
 	 * 
 	 * The robot has motors on each side. This is the information that defines these motors and their behaviour
 	 */
-	public static final boolean DRIVE_PRESENT_DEFAULT = false;
-	public static final int[] DRIVE_LEFT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {4,5};
-	public static final int[] DRIVE_LEFT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST	 = {};
-	public static final int[] DRIVE_RIGHT_TALON_WITH_ENCODERS_CAN_ID_LIST	 = {1,2}; 
-	public static final int[] DRIVE_RIGHT_TALON_WITHOUT_ENCODERS_CAN_ID_LIST = {};
-	public static final boolean DRIVE_BRAKE_MODE			= true;
-	
 	public static final String MOTOR_CONTROLLER_TYPE_TALONSRX 	= "TalonSRX";
 	public static final String MOTOR_CONTROLLER_TYPE_SPARKMAX 	= "SparkMAX";
-	public static final String DRIVE_DEFAULT_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
+	public static final String DEFAULT_MOTOR_CONTROLLER_TYPE	= MOTOR_CONTROLLER_TYPE_TALONSRX;
 
 	// Encoder values
 	public static final double FALCON_ENCODER_TICKS = 2048;  // Falon inbuilt encoders.
@@ -76,29 +67,10 @@ public class Constants {
 	public static final double DRIVE_WHEEL_DIAMETER_METRES  = 6 * INCHES_TO_METRES; // 6" wheels.
 	public static final double DRIVE_METRES_PER_REV = DRIVE_WHEEL_DIAMETER_METRES * Math.PI;
 	public static final double DRIVE_GEABOX_RATIO = 189.0/17.0;
-	
-	// This magic number is the "fastest" we want the motor to go. It is calculated
-	// by running the motor at full speed and observing what the quad encoder
-	// velocity returns.
-	// This number is very suspect.
-	public static final double DRIVE_COUNT_100ms = 13.0;
-	// A more sensible number.
-	public static final double DRIVE_MAX_SPEED = 4;
-	public static final double DRIVE_MAX_ACCELERATION = 2; // Inches/sec/sec
-	public static final double DRIVE_MAX_JERK = 1; // Inches/sec/sec/sec.
-	public static final double DRIVE_P = 0.0;//5;//1.0;
-	public static final double DRIVE_I = 0.0;
-	public static final double DRIVE_D = 0.0;//0.01;
-	public static final double DRIVE_F = 0.7;//0.665;
-	public static final double DRIVE_DEADBAND = 0.05;
-	public static final double DRIVE_RAMP_RATE = 0.01; //0.175; sluggish but smooth //0.1375; jittered	// seconds from neutral to full
+
 	public static final String DRIVE_MODE_ARCADE = "arcade";
 	public static final String DRIVE_MODE_CHEESY = "cheesy";	
-	public static final String DRIVE_DEFAULT_MODE = DRIVE_MODE_ARCADE;  // Joystick teleop mode.
-	public static final int DRIVE_CONT_CURRENT = 38;	// current limit to this value if...
-	public static final int DRIVE_PEAK_CURRENT = 80;	// the current exceeds this value for 100ms
-	public static final int DRIVE_SCALE_FACTOR = 128;
-	public static final double DRIVE_OFF_LEVEL_TWO_POWER = 0.3;
+	public static final double DRIVE_SLOW_POWER = 0.3;
 
 	
 	/**
@@ -132,42 +104,15 @@ public class Constants {
 	public static final Pose2d AUTO_LINE_OPPOSING_TRENCH = createPose2d(AUTO_LINE_XPOS - HALF_ROBOT_LENGTH,OPPOSING_TRENCH_BALLS_YPOS,0); 
 
 	/*
-	 * LED constants
-	 */
-	// brightness
-	public static final double LED_PERCENTAGE = 0.2;
-
-	/*
 	 *  Intake constants 
 	 */
-	public static final boolean INTAKE_PRESENT_DEFAULT = false;
-	public static final int INTAKE_CAN_ID = 10;
 	public static final double INTAKE_ENCODER_GEARBOX_RATIO = 3;
 	public static final double INTAKE_TARGET_RPS = 30;
-	public static final double INTAKE_F = 0.019;
-	public static final double INTAKE_P = 0.015;
-	public static final double INTAKE_I = 0;
-	public static final double INTAKE_D = 15.0;
-
-
-
-	public static final int INTAKE_SOLENOID_PORT = 1;
-
-	public static final int[] TEST_SPARK_MOTOR_CAN_ID_LIST = {50, 51};
-
-	public static final int[] OUTTAKE_MOTOR_TALON_CAN_ID_LIST = {15};
 
 	/*
 	* Shooter constants
 	*/
-	public static final boolean SHOOTER_PRESENT_DEFAULT = false;
-	public static final int[] SHOOTER_TALON_CAN_ID_LIST	 = {30, 31, 32};
-	public static final int SHOOTER_HOOD_SOLENOID_PORT = 3;
 	public static final double SHOOTER_SPEED_TOLERANCE_RPS = 3.33;
-	public static final double SHOOTER_F = 0.08;//0.075;
-	public static final double SHOOTER_P = 0.7;
-	public static final double SHOOTER_I = 0;
-	public static final double SHOOTER_D = 0;
 	public static final double SHOOTER_CLOSE_TARGET_SPEED_RPS = 62;
 	public static final double SHOOTER_AUTO_LINE_TARGET_SPEED_RPS = 90;
 	public static final double SHOOTER_FAR_TARGET_SPEED_RPS = 95;
@@ -175,29 +120,11 @@ public class Constants {
 	
 	/*
 	* Loader
-	*/
-	public static final boolean LOADER_PRESENT_DEFAULT = false;
-	public static final int LOADER_SPINNER_MOTOR_CAN_ID = 12;
-	public static final int LOADER_PASSTHROUGH_MOTOR_CAN_ID = 11;
-	public static final int IN_BALL_DETECTOR_DIO_PORT = 0;
-	public static final int OUT_BALL_DETECTOR_DIO_PORT = 1;
-	public static final int PADDLE_SOLENOID_PORT = 2; 
+	*/ 
 	public static final double LOADER_MOTOR_INTAKING_RPS = 18;
 	public static final double LOADER_MOTOR_SHOOTING_RPS = 8;
 	public static final double PASSTHROUGH_MOTOR_CURRENT = 0.8;
 	public static final double LOADER_MAIN_MOTOR_GEARBOX_RATIO = 1; // Encoder is on output shaft.
-	public static final double LOADER_SPINNER_P = 0.3;
-	public static final double LOADER_SPINNER_I = 0;
-	public static final double LOADER_SPINNER_D = 30;
-	public static final double LOADER_SPINNER_F = 0.1;
-
-	// Power distribution Panel (PDP)
-	public static final boolean PDP_PRESENT_DEFAULT = false;
-	public static final int PDP_CAN_ID = 62;
-	
-	// Pneumatic Control Modules (PCM)
-	public static final boolean PCM_PRESENT_DEFAULT = false;
-	public static final int PCM_CAN_ID = 61;
 
 	/*
 	 * Camera server constants
@@ -207,7 +134,6 @@ public class Constants {
 	public static final int CAMERA_RESOULTION_HEIGHT = 252;
 	public static final int CAMERA_FRAMES_PER_SECOND = 60;
 	// Vision (all need tuning)
-	public static final boolean VISION_PRESENT_DEFAULT = false;
 	public static final double VISON_MAX_TARGET_AGE_SECS = 2;
 	public static final double VISION_MAX_VELOCITY_JERK = 32; // m/s/s
 	public static final double VISION_SPEED_SCALE = 2.4 * INCHES_TO_METRES;
@@ -223,30 +149,13 @@ public class Constants {
 	public static final double VISION_AIM_TIME_COMPLETE = 0.5; // seconds
 
 
-
-	// Vision filter parameters
-	public static final double VISION_H_MIN = 40;
-	public static final double VISION_H_MAX = 100;
-	public static final double VISION_S_MIN = 20;
-	public static final double VISION_S_MAX = 255;
-	public static final double VISION_V_MIN = 40;
-	public static final double VISION_V_MAX = 255;
-
 	// Vision low pass filter (needs tuning)
 	public static final double GOAL_LOWPASS_ALPHA = 0.2;
 
 	// Turn to angle (all need tuning)
 	public static final double TURN_TO_ANGLE_MAX_VELOCITY_JERK = 50;
 	public static final double TURN_TO_ANGLE_ANGLE_SCALE = 0.3;
-
-	// Climber
-	public static final int CLIMBER_PTO_SOLENOID_PORT = 6;
-	public static final int CLIMBER_BRAKE_SOLENOID_PORT = 0; 
 	
-	// Buddy climb
-	public static final boolean BUDDYCLIMB_PRESENT_DEFAULT = false;
-	public static final int BUDDYCLIMB_SOLENOID_PORT = 7;
-
 	// logging information constants
 	public static final String USB_FLASH_DRIVE = "/media/sda1/";
 	public static final String WEB_BASE_PATH = USB_FLASH_DRIVE;		// where web server's data lives
@@ -256,7 +165,6 @@ public class Constants {
 	public static final String LOG_LATEST_EXTENSION = "latest";
 	public static final String LOG_EVENT_EXTENSION = "event";
 	public static final int	 WEB_PORT = 5800;// first open port for graph/log web server
-	public static final double LOG_GRAPH_PERIOD = 0.05;	// run the graph updater every 50ms
 
 	// Config WebServer
 	public static final String CONFIG_WEB_ROOT = "/home/lvuser/www";
@@ -266,15 +174,9 @@ public class Constants {
 	public static final int LOCATION_HISTORY_MEMORY_SECONDS = 5;
 	public static final int LOCATION_HISTORY_CYCLE_SPEED = 100; // in hz
 
-	// NavX (gyro)
-	public static final boolean NAVX_PRESENT_DEFAULT = DRIVE_PRESENT_DEFAULT;
-	
 	/*
 	 * Command timings
 	 */
-	public static final double TIME_COMMAND_RUN_PERIOD = (1.0/50.0);		// run the commands 50 times a second
-	public static final double TIME_LOCATION_PERIOD = (1.0/(double)LOCATION_HISTORY_CYCLE_SPEED);	// update the location subsystem 100 times a second
-	public static final double TIME_DRIVEBASE_PERIOD = (1.0/40.0);	// update the drivebase 40 times a second
 
 	public static final class DriveConstants {
 		public static final double kTrackwidthMeters = 0.71;
@@ -319,9 +221,6 @@ public class Constants {
 	/*
 	 * Colour Wheel
 	 */
-	public static final boolean COLOUR_WHEEL_PRESENT_DEFAULT = false;
-	public static final int COLOUR_WHEEL_CAN_ID = 7;
-	public static final int COLOUR_WHEEL_SOLENOID_PORT = 5;
 	// Values callibrated using vynl sticker for control panel.
 	public static final Color COLOUR_WHEEL_BLUE_TARGET = ColorMatch.makeColor(0.147, 0.437, 0.416); // Values from the colour sensor used to match colours.
 	// public static final Color COLOUR_WHEEL_GREEN_TARGET = ColorMatch.makeColor(0.189, 0.559, 0.250); // This is the real green value.
@@ -337,12 +236,10 @@ public class Constants {
 	public static final int COLOUR_WHEEL_DELAY = 15; // Time in miliseconds to wait before disabling motor when correct colour found.
 
 	/*
-	 * LED Strip
+	 * LED constants
 	 */
-	public static final boolean LED_STRIP_PRESENT_DEFAULT = false;
-	public static final int LED_STRIP_PWM_PORT = 0;
-	public static final int LED_STRIP_NUMBER_OF_LEDS = 30;
 	public static final int LED_STRIP_COUNTDOWN = 15;
+	public static final double LED_BRIGHTNESS_PERCENTAGE = 0.2;
 
 	/*
 	 * Log Syncing

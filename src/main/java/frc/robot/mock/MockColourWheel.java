@@ -1,7 +1,6 @@
 package frc.robot.mock;
 
 import frc.robot.interfaces.ColourWheelInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.WheelColour;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 
@@ -9,7 +8,7 @@ public class MockColourWheel implements ColourWheelInterface {
     private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
     private boolean extended = false;
 
-    public MockColourWheel(Log log) {
+    public MockColourWheel() {
     }
 
     @Override

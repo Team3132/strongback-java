@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import frc.robot.interfaces.LEDStripInterface;
-import frc.robot.interfaces.Log;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.MathUtil;
 
@@ -13,12 +12,9 @@ public class LEDStrip implements LEDStripInterface {
     public AddressableLED ledStrip;
     public AddressableLEDBuffer ledStripBuffer;
     private final int numberOfLEDs;
-    @SuppressWarnings("unused")
-    private final Log log;
 
-    public LEDStrip(int PWM_Port, int numberOfLEDs, Log log) {   
+    public LEDStrip(int PWM_Port, int numberOfLEDs) {   
         this.numberOfLEDs = numberOfLEDs;
-        this.log = log;
 
         ledStrip = new AddressableLED(PWM_Port);
         ledStripBuffer = new AddressableLEDBuffer(numberOfLEDs);
