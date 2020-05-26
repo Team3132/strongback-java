@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +23,6 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj.Filesystem;
 
 import frc.robot.Constants;
 
@@ -39,10 +39,16 @@ public class TestTrajectoryCaching {
     boolean forward = true;
     boolean relative = true; // should not affect trajectories
 
+    Path tempDir;
+    
     /**
-     * Check that cached trajectories return the same trajectory as TrajectoryGenerator
+     * Check that cached trajectories return the same trajectory as
+     * TrajectoryGenerator
+     * 
+     * @throws IOException
      */
-    private void testTrajectory(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward, boolean relative) {
+    private void testTrajectory(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward,
+            boolean relative) throws IOException {
         // Ensure there is no existing trajectory file
         clearPath(start, interiorWaypoints, end, forward);
 
@@ -50,7 +56,7 @@ public class TestTrajectoryCaching {
         assertFalse(Files.exists(getPath(start, interiorWaypoints, end, forward)));
 
         // Creating trajectory file (and saving it to deploy/paths/test)
-        Trajectory trajectoryA = generateTrajectory(start, interiorWaypoints, end, forward, relative);
+        Trajectory trajectoryA = generateTrajectory(start, interiorWaypoints, end, forward, relative, tempDir);
 
         // Double check that file has been created
         assertTrue(Files.exists(getPath(start, interiorWaypoints, end, forward)));      
@@ -60,7 +66,7 @@ public class TestTrajectoryCaching {
         assertTrue(trajectoryA.getStates().equals(expectedTrajectory.getStates()));
 
         // Creating trajectory from existing file we created earlier
-        Trajectory trajectoryB = generateTrajectory(start, interiorWaypoints, end, forward, relative);    
+        Trajectory trajectoryB = generateTrajectory(start, interiorWaypoints, end, forward, relative, tempDir);    
         // Compare trajectory to TrajectoryGenerator's trajectory
         assertTrue(trajectoryB.getStates().equals(expectedTrajectory.getStates()));
     }
@@ -80,14 +86,13 @@ public class TestTrajectoryCaching {
         boolean testForward = true;
 
         int hash = Arrays.deepHashCode(new Object[] {testStart, testInteriorWaypoints, testEnd, testForward});
+        createTempDir();
+        Path trajectoryPath = Paths.get(tempDir.toString(), String.valueOf(hash) + ".wpilib.json");
         
-        String trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
-        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-            
         try {
             Files.deleteIfExists(trajectoryPath);
         } catch (IOException e) {
-            System.out.println(e);
+            fail(e.toString());
         }
         
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(testStart, testInteriorWaypoints, testEnd, createConfig(testForward));
@@ -112,15 +117,19 @@ public class TestTrajectoryCaching {
     }
     
     @Test
-    public void testInitial() {
+    public void testInitial() throws IOException {
+        createTempDir();
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
 
     /**
      * Changing Pose2d start
+     * 
+     * @throws IOException
      */
     @Test
-    public void testStart() {
+    public void testStart() throws IOException {
+        createTempDir();
         start = createPose2d(-1,-1,30);
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
@@ -130,7 +139,8 @@ public class TestTrajectoryCaching {
     * Changing List<Translation2d> interiorWaypoints
     */
     @Test
-    public void testInteriorWaypoints() {
+    public void testInteriorWaypoints() throws IOException {
+        createTempDir();
         Translation2d translation1 = new Translation2d(2,2);
         Translation2d translation2 = new Translation2d(-5,-5);
         interiorWaypoints = List.of(translation1, translation2);
@@ -142,7 +152,8 @@ public class TestTrajectoryCaching {
     * Changing Pose2d end 
     */
     @Test
-    public void testEnd() {
+    public void testEnd() throws IOException {
+        createTempDir();
         end = createPose2d(1,1,5);
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
@@ -152,7 +163,8 @@ public class TestTrajectoryCaching {
     * Changing boolean forward 
     */
     @Test
-    public void initialTest() {
+    public void initialTest() throws IOException {
+        createTempDir();
         forward = false; 
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
@@ -162,21 +174,37 @@ public class TestTrajectoryCaching {
     * Changing boolean relative 
     */
     @Test
-    public void testRelative() {        
+    public void testRelative() throws IOException {
+        createTempDir();
         relative = false;
 
         testTrajectory(start, interiorWaypoints, end, forward, relative);
     }
 
+    private void createTempDir() {
+        if(tempDir == null) {
+            try {
+                tempDir = Files.createTempDirectory("trajectories");
+                System.out.println(tempDir.toString());
+    
+            } catch (IOException e) {
+                fail(e.toString());
+                return;
+            }
+        }
+        return;
+    }
+    
     /**
      * returns path for trajectory file
+     * 
+     * @throws IOException
      */
-    private Path getPath(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward) {
+    private Path getPath(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, boolean forward)
+            throws IOException {
         int hash = Arrays.deepHashCode(new Object[] { start, interiorWaypoints, end, forward });
         // System.out.println(hash);
-        String trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
-        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-        return trajectoryPath;
+        return Paths.get(tempDir.toString(), String.valueOf(hash) + ".wpilib.json");
     }
 
     /**

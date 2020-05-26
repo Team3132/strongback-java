@@ -128,18 +128,12 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		 * If it doesn't already exist, generate a trajectory then export it. 
 		 */
 		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
-				Pose2d end, boolean forward, boolean relative)  {
+				Pose2d end, boolean forward, boolean relative, Path path) {
 			
 			int hash = Arrays.deepHashCode(new Object[] {start, interiorWaypoints, end, forward});
-			String trajectoryJSON;
-			if (System.getProperty("user.name") == "lvuser") { 
-				trajectoryJSON = "paths/" + String.valueOf(hash) + ".wpilib.json";
-			} else { 
-				trajectoryJSON = "paths/test/" + String.valueOf(hash) + ".wpilib.json";
-			}
-
-			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-
+			String trajectoryJSON = String.valueOf(hash) + ".wpilib.json";
+			Path trajectoryPath = path.resolve(trajectoryJSON);
+			
 			try {
 				return TrajectoryUtil.fromPathweaverJson(trajectoryPath);
 			} catch (FileNotFoundException e) {
@@ -170,6 +164,12 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			}
 
 			return trajectory;
+		}
+
+		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
+				Pose2d end, boolean forward, boolean relative)  {
+			Path path = Filesystem.getDeployDirectory().toPath().resolve("paths");
+			return generateTrajectory(start, interiorWaypoints, end, forward, relative, path);
 		}
 
 		public DriveRoutineType type = DriveRoutineType.ARCADE_DUTY_CYCLE;
