@@ -126,6 +126,8 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 		/**
 		 * Returns a trajectory by first checking for any cached trajectories in the deploy directory. 
 		 * If it doesn't already exist, generate a trajectory then export it. 
+		 * 
+		 * This should only be used for unit tests.
 		 */
 		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
 				Pose2d end, boolean forward, boolean relative, Path path) {
@@ -166,6 +168,10 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 			return trajectory;
 		}
 
+		/**
+		 * Returns a trajectory by first checking for any cached trajectories in the deploy directory. 
+		 * If it doesn't already exist, generate a trajectory then export it. 
+		 */
 		public static Trajectory generateTrajectory(Pose2d start, List<Translation2d> interiorWaypoints,
 				Pose2d end, boolean forward, boolean relative)  {
 			Path path = Filesystem.getDeployDirectory().toPath().resolve("paths");
