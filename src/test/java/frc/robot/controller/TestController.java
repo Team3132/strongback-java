@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.strongback.mock.MockClock;
 import org.strongback.mock.MockPneumaticsModule;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.lib.WheelColour;
 import frc.robot.mock.MockBuddyClimb;
@@ -149,9 +149,9 @@ public class TestController {
 		test.thenSet(sequence(Sequences.startIntaking()));
 		
 		// Then assert that the robot is actually intaking
-		test.thenAssert(intakeMotorRPS(Constants.INTAKE_TARGET_RPS),
-			passthrougMotorPower(Constants.PASSTHROUGH_MOTOR_CURRENT),
-			spinnerMotorRPS(Constants.LOADER_MOTOR_INTAKING_RPS));
+		test.thenAssert(intakeMotorRPS(Config.intake.targetRPS),
+			passthrougMotorPower(Config.loader.passthrough.motorDutyCycle),
+			spinnerMotorRPS(Config.loader.spinner.speed.intakingRPS));
 
 		// Run the stop intaking sequence
 		test.thenSet(sequence(Sequences.stopIntaking()));
@@ -165,17 +165,17 @@ public class TestController {
 		test.thenSet(sequence(Sequences.startIntaking()));
 
 		// Then assert that the robot is actually intaking
-		test.thenAssert(intakeMotorRPS(Constants.INTAKE_TARGET_RPS),
-			passthrougMotorPower(Constants.PASSTHROUGH_MOTOR_CURRENT),
-			spinnerMotorRPS(Constants.LOADER_MOTOR_INTAKING_RPS));
+		test.thenAssert(intakeMotorRPS(Config.intake.targetRPS),
+			passthrougMotorPower(Config.loader.passthrough.motorDutyCycle),
+			spinnerMotorRPS(Config.loader.spinner.speed.intakingRPS));
 
 		// Run the stop intaking sequence
 		test.thenSet(sequence(Sequences.stopIntaking()));
 
 		// Let the controller move into the wait between stopping the intake and stopping everything else
 		test.thenAssert(intakeMotorRPS(0),
-			passthrougMotorPower(Constants.PASSTHROUGH_MOTOR_CURRENT),
-			spinnerMotorRPS(Constants.LOADER_MOTOR_INTAKING_RPS));
+			passthrougMotorPower(Config.loader.passthrough.motorDutyCycle),
+			spinnerMotorRPS(Config.loader.spinner.speed.intakingRPS));
 
 		// Interrupt the sequence
 		test.thenSet(sequence(Sequences.getEmptySequence()));

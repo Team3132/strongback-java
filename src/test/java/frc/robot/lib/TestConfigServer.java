@@ -1,7 +1,5 @@
 package frc.robot.lib;
 
-import frc.robot.Constants;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,6 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Test;
+
+import frc.robot.Config;
 
 public class TestConfigServer {
 
@@ -50,7 +50,7 @@ public class TestConfigServer {
         String webRoot = Paths.get("src","main", "deploy", "www").toString();
         write(config, configContent);
         write(robotName, robotNameContent);
-        new ConfigServer(webRoot, config.getAbsolutePath(), robotName.getAbsolutePath(), Constants.CONFIG_WEB_PORT);
+        new ConfigServer(webRoot, config.getAbsolutePath(), robotName.getAbsolutePath(), Config.config.webserver.port);
         //This line makes the test wait 100 seconds, only use when testing the webserver.
         //Thread.sleep(100000);
 	}

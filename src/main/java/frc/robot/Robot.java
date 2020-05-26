@@ -90,7 +90,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	public void init() {
 		Strongback.logConfiguration();
-		Strongback.setExecutionPeriod(Constants.EXECUTOR_CYCLE_INTERVAL_MSEC);
+		Strongback.setExecutionPeriod(Config.intervals.executorCycleMSec);
 
 		Log.info("Robot initialization started");
 		// Write out the example config and print any config warnings.
@@ -145,7 +145,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void disabledInit() {
-		PortForwarder.add(Constants.RSYNC_PORT, Constants.RSYNC_HOSTNAME, 22); // Start forwarding to port 22 (ssh port) for pulling logs using rsync.
+		// Start forwarding to port 22 (ssh port) for pulling logs using rsync.
+		PortForwarder.add(Config.logging.rsync.port, Config.logging.rsync.hostname, 22);
 		maybeInit();  // Called before robotPeriodic().
 		Log.info("disabledInit");
 		// Log any failures again on disable.
@@ -169,7 +170,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void autonomousInit() {
-		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
+		PortForwarder.remove(Config.logging.rsync.port); // Stop forwarding port to stop rsync and save bandwidth.
 		Chart.restartCharts();
 		Log.restartLogs();
 		Log.info("auto has started");
@@ -198,7 +199,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	@Override
 	public void teleopInit() {
-		PortForwarder.remove(Constants.RSYNC_PORT); // Stop forwarding port to stop rsync and save bandwidth.
+		// Stop forwarding port to stop rsync and save bandwidth.
+		PortForwarder.remove(Config.logging.rsync.port);
 		Chart.restartCharts();
 		Log.restartLogs();
 		Log.info("teleop has started");
@@ -216,7 +218,8 @@ public class Robot extends IterativeRobot implements Executable {
 
 	@Override
 	public void teleopPeriodic() {
-		if (0 <= driverStation.getMatchTime() && driverStation.getMatchTime() <= Constants.LED_STRIP_COUNTDOWN) { // While in teleop out of a match, the match time is -1.
+		// While in teleop out of a match, the match time is -1.
+		if (0 <= driverStation.getMatchTime() && driverStation.getMatchTime() <= Config.ledStrip.countdown) { 
 			subsystems.setLEDFinalCountdown(driverStation.getMatchTime());
 		}
 	}
@@ -270,8 +273,8 @@ public class Robot extends IterativeRobot implements Executable {
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
 		// Select FIRST Python processor on the Jevois camera by setting a particular
 		// resolution, frame rate and format.
-		camera.setVideoMode(VideoMode.PixelFormat.kYUYV, Constants.CAMERA_RESOLUTION_WIDTH,
-				Constants.CAMERA_RESOULTION_HEIGHT, Constants.CAMERA_FRAMES_PER_SECOND);
+		camera.setVideoMode(VideoMode.PixelFormat.kYUYV, Config.vision.camera.resolution.width,
+				Config.vision.camera.resolution.height, Config.vision.camera.framesPerSecond);
 	}
 
 	/**
@@ -281,7 +284,7 @@ public class Robot extends IterativeRobot implements Executable {
 	private void createPowerMonitor() {
 		// Do not monitor if not present, or we have been asked not to monitor
 		boolean enabled = Config.pdp.present || Config.pdp.monitor;
-		pdp = new PowerMonitor(new PowerDistributionPanel(Config.pdp.canId), Config.pdp.channelsToMonitor, enabled);
+		pdp = new PowerMonitor(new PowerDistributionPanel(Config.pdp.canId), Config.pdp.channels, enabled);
 	}
 
 	/**
@@ -291,10 +294,10 @@ public class Robot extends IterativeRobot implements Executable {
 	 * 
 	 */
 	private void startWebServer() {
-		File fileDir = new File(Constants.WEB_BASE_PATH);
+		File fileDir = new File(Config.logging.webserver.path);
 		try {
-			new SimpleWebServer(fileDir, Constants.WEB_PORT);
-			Log.debug("WebServer started at port: " + Constants.WEB_PORT);
+			new SimpleWebServer(fileDir, Config.logging.webserver.port);
+			Log.debug("WebServer started at port: " + Config.logging.webserver.port);
 		} catch (Exception e) {
 			Log.debug("Failed to start webserver on directory " + fileDir.getAbsolutePath());
 
@@ -307,8 +310,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void startConfigServer() {
 		try {
-			new ConfigServer(Constants.CONFIG_WEB_ROOT, Constants.CONFIG_FILE_PATH, Constants.ROBOT_NAME_FILE_PATH, Constants.CONFIG_WEB_PORT);
-			Log.debug("Config webserver started at port: " + Constants.WEB_PORT);
+			new ConfigServer(Config.config.webserver.root, Config.config.filePath, Config.config.robotNameFilePath, Config.config.webserver.port);
+			Log.debug("Config webserver started at port: " + Config.logging.webserver.port);
 		} catch (Exception e) {
 			Log.debug("Failed to start config webserver.");
 			e.printStackTrace();
@@ -351,13 +354,13 @@ public class Robot extends IterativeRobot implements Executable {
 				driverStation.getMatchType().toString(), driverStation.getMatchNumber(),
 				driverStation.getReplayNumber(), driverStation.getAlliance().toString(), driverStation.getLocation());
 		Chart.registrationComplete(matchDescription);
-		if (Config.doCharting) {
-			// Low priority means run every 20 * 4 = 80ms, or at 12.5Hz
-			// It polls almost everything on the CAN bus, so don't want it to be too fast.
-			Strongback.executor().register(new Chart(), Priority.LOW);
-		} else {
-			Log.error("Logging: Dygraph logging disabled");
+		if (!Config.charting.enabled) {
+			Log.error("Chart sampling disabled");
+			return;
 		}
+		// Low priority means run every 20 * 4 = 80ms, or at 12.5Hz
+		// It polls almost everything on the CAN bus, so don't want it to be too fast.
+		Strongback.executor().register(new Chart(), Priority.LOW);
 	}
 
 	@Override
@@ -373,7 +376,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 */
 	private void maybeUpdateSmartDashboard() {
 		double now = Strongback.timeSystem().currentTime();
-		if (now < lastDashboardUpdateSec + Constants.DASHBOARD_UPDATE_INTERVAL_SEC)
+		if (now < lastDashboardUpdateSec + Config.intervals.dashboardUpdateSec)
 			return;
 		lastDashboardUpdateSec = now;
 		subsystems.dashboard.putString("FMS Colour: ", getFMSColour().toString());

@@ -8,8 +8,6 @@ import frc.robot.lib.log.Log;
 
 import static frc.robot.lib.PoseHelper.*;
 
-import static frc.robot.Constants.*;
-
 import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -54,7 +52,7 @@ public class Auto {
 
 	private void addAutoOptions() {
 		autoProgram.setDefaultOption("Nothing", Sequences.getEmptySequence());
-		autoProgram.addOption("Drive forward 10in", Sequences.getDriveToWaypointSequence(10 * INCHES_TO_METRES, 0, 0));
+		autoProgram.addOption("Drive forward 10in", Sequences.getDriveToWaypointSequence(10 * Config.constants.inchesToMetres, 0, 0));
 		addDriveTestSequence();
 		addDriveTestSplineSequence();
 		addDriveTestUSequence();
@@ -140,10 +138,10 @@ public class Auto {
 	private void addBasicShootIntakeDriveShootSequence() {
 		SequenceBuilder builder = new SequenceBuilder("Basic shoot intake drive shoot", false);
 
-		builder.then().setCurrentPostion(AUTO_LINE_GOAL);
+		builder.then().setCurrentPostion(Config.field.autoLineGoal);
 
 		// Start shooting
-		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.spinUpFarShot(Config.shooter.speed.autoLineRPS));
 		builder.appendSequence(Sequences.startShooting());
 		builder.then().setDelayDelta(2);		
 
@@ -152,19 +150,19 @@ public class Auto {
 		
 		// Drive backwards to pick up the three balls.
 		// Drive to third ball via the first ball
-		builder.then().driveRelativeWaypoints(AUTO_LINE_GOAL, List.of(ALLIANCE_TRENCH_FIRST_BALL.getTranslation()), intakeAt(ALLIANCE_TRENCH_THIRD_BALL, 0), false);  // backwards.
+		builder.then().driveRelativeWaypoints(Config.field.autoLineGoal, List.of(Config.field.allianceTrenchFirstBall.getTranslation()), intakeAt(Config.field.allianceTrenchThirdBall, 0), false);  // backwards.
 
 		// Stop intaking
 		builder.appendSequence(Sequences.stopIntaking());
 
 		// Go forwards 2m to shoot.
-		Pose2d end = approachPose(ALLIANCE_TRENCH_THIRD_BALL, 2, 0);
+		Pose2d end = approachPose(Config.field.allianceTrenchThirdBall, 2, 0);
 
-		builder.then().driveRelativeWaypoints(intakeAt(ALLIANCE_TRENCH_THIRD_BALL, 0), List.of(), end, true);
+		builder.then().driveRelativeWaypoints(intakeAt(Config.field.allianceTrenchThirdBall, 0), List.of(), end, true);
 
 		builder.then().doVisionAim();
 		// Shoot the balls.
-		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_FAR_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.spinUpFarShot(Config.shooter.speed.farTargetRPS));
 		builder.appendSequence(Sequences.startShooting());
 		builder.then().setDelayDelta(2);	
 
@@ -177,9 +175,9 @@ public class Auto {
 		
 		SequenceBuilder builder = new SequenceBuilder("Basic trench routine", false);
 
-		builder.then().setCurrentPostion(AUTO_LINE_ALLIANCE_TRENCH);
+		builder.then().setCurrentPostion(Config.field.autoLineAllianceTrench);
 
-		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.spinUpFarShot(Config.shooter.speed.autoLineRPS));
 		builder.appendSequence(Sequences.startShooting());		
 		builder.then().deployIntake();
 
@@ -191,7 +189,7 @@ public class Auto {
 
 		// Drive backwards to pick up the two balls, starting with front bumpers on auto line
 
-		builder.then().driveRelativeWaypoints(AUTO_LINE_ALLIANCE_TRENCH, List.of(), intakeAt(ALLIANCE_TRENCH_SECOND_BALL, 0), false); // backwards
+		builder.then().driveRelativeWaypoints(Config.field.autoLineAllianceTrench, List.of(), intakeAt(Config.field.allianceTrenchSecondBall, 0), false); // backwards
 
 		// Stop intaking
 		builder.then().setIntakeRPS(0)
@@ -201,17 +199,17 @@ public class Auto {
 		builder.then().doVisionAim();
 
 		// Start shooting
-		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.spinUpFarShot(Config.shooter.speed.autoLineRPS));
 		builder.appendSequence(Sequences.startShooting());
 		builder.then().setDelayDelta(2);		
 
 		// Pick up the last 3 balls 
 		builder.appendSequence(Sequences.startIntaking());
 	
-		builder.then().driveRelativeWaypoints(intakeAt(ALLIANCE_TRENCH_SECOND_BALL, 0), List.of(), intakeAt(ALLIANCE_TRENCH_FIFTH_BALL, 0), false);
+		builder.then().driveRelativeWaypoints(intakeAt(Config.field.allianceTrenchSecondBall, 0), List.of(), intakeAt(Config.field.allianceTrenchFifthBall, 0), false);
 
 		// Drive forward and shoot
-		builder.then().driveRelativeWaypoints(intakeAt(ALLIANCE_TRENCH_FIFTH_BALL, 0), List.of(), intakeAt(ALLIANCE_TRENCH_SECOND_BALL, 0), true);
+		builder.then().driveRelativeWaypoints(intakeAt(Config.field.allianceTrenchFifthBall, 0), List.of(), intakeAt(Config.field.allianceTrenchSecondBall, 0), true);
 
 		// Stop intaking
 		builder.then().setIntakeRPS(0)
@@ -221,7 +219,7 @@ public class Auto {
 		builder.then().doVisionAim();
 
 		// Shoot the balls.
-		builder.appendSequence(Sequences.spinUpFarShot(SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		builder.appendSequence(Sequences.spinUpFarShot(Config.shooter.speed.autoLineRPS));
 		builder.appendSequence(Sequences.startShooting());
 		builder.then().setDelayDelta(2);	
 

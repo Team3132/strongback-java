@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.lib.RobotName;
 
 /**
@@ -56,7 +56,7 @@ public class LogFileNumber {
      * the log file number back out.
      */
     public static void increment() {
-        var path = Paths.get(Constants.LOG_BASE_PATH, RobotName.get(), "lognumber.txt");
+        var path = Paths.get(Config.logging.basePath, RobotName.get(), "lognumber.txt");
         try {
             BufferedReader br = Files.newBufferedReader(path);
             String s = br.readLine(); // read the line into the buffer.

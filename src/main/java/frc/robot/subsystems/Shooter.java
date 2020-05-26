@@ -4,7 +4,7 @@ import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Solenoid;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.ShooterInterface;
 import frc.robot.lib.Subsystem;
@@ -50,7 +50,7 @@ public class Shooter extends Subsystem implements ShooterInterface {
     
     @Override
     public boolean isAtTargetSpeed() {
-        return Math.abs(flyWheel.getRPS() - flyWheel.getTargetRPS()) < Constants.SHOOTER_SPEED_TOLERANCE_RPS;
+        return Math.abs(flyWheel.getRPS() - flyWheel.getTargetRPS()) < Config.shooter.speed.toleranceRPS;
     }
 
     @Override

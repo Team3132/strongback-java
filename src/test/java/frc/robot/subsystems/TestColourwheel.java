@@ -11,7 +11,7 @@ import org.strongback.mock.MockClock;
 import org.strongback.mock.MockMotor;
 import org.strongback.mock.MockSolenoid;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.LEDStripInterface;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction;
@@ -55,7 +55,7 @@ public class TestColourwheel {
 
         colourWheel.setDesiredAction(new ColourAction(ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN));
         colourWheel.execute(0);
-        assertEquals(-Constants.COLOUR_WHEEL_MOTOR_ADJUST, motor.get(), 0.01);
+        assertEquals(-Config.colourWheel.motor.adjust, motor.get(), 0.01);
         assertFalse(colourWheel.isFinished());
 
         colourWheel.disable();
@@ -70,7 +70,7 @@ public class TestColourwheel {
         colourWheel.enable();
         colourWheel.setDesiredAction(new ColourAction(ColourWheelType.ADJUST_WHEEL_CLOCKWISE, WheelColour.UNKNOWN));
         colourWheel.execute(0);
-        assertEquals(-Constants.COLOUR_WHEEL_MOTOR_ADJUST, motor.get(), 0.01);
+        assertEquals(-Config.colourWheel.motor.adjust, motor.get(), 0.01);
         assertFalse(colourWheel.isFinished());
     }
 
@@ -79,7 +79,7 @@ public class TestColourwheel {
         colourWheel.enable();
         colourWheel.setDesiredAction(new ColourAction(ColourWheelType.ADJUST_WHEEL_ANTICLOCKWISE, WheelColour.UNKNOWN));
         colourWheel.execute(0);
-        assertEquals(Constants.COLOUR_WHEEL_MOTOR_ADJUST, motor.get(), 0.01);
+        assertEquals(Config.colourWheel.motor.adjust, motor.get(), 0.01);
         assertFalse(colourWheel.isFinished());
     }
 
@@ -102,15 +102,15 @@ public class TestColourwheel {
     public void doRotational(int x) {
         colourWheel.enable();
         colourWheel.setDesiredAction(new ColourAction(ColourWheelType.ROTATION, WheelColour.UNKNOWN));
-        for (int i = 0; i < Constants.COLOUR_WHEEL_ROTATION_TARGET; i++) {
+        for (int i = 0; i < Config.colourWheel.rotationTarget; i++) {
             colour = WheelColour.of(3-((i+x) % 4));
             colourWheel.execute(0);
-            assertEquals(Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+            assertEquals(Config.colourWheel.motor.full, motor.get(), 0.01);
             assertFalse(colourWheel.isFinished());
         }
-        colour = WheelColour.of(3-((Constants.COLOUR_WHEEL_ROTATION_TARGET + x) % 4));
+        colour = WheelColour.of(3-((Config.colourWheel.rotationTarget + x) % 4));
         colourWheel.execute(0);
-        assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
+        assertEquals(Config.colourWheel.motor.off, motor.get(), 0.01);
         assertTrue(colourWheel.isFinished());
     }
 
@@ -123,12 +123,12 @@ public class TestColourwheel {
         if (amount == 3) amount = 1;
         colourWheel.execute(0);
         if (!desired.equals(start)) {
-            assertEquals(Math.signum(motor.get())*Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+            assertEquals(Math.signum(motor.get())*Config.colourWheel.motor.full, motor.get(), 0.01);
             assertFalse(colourWheel.isFinished());
             for (int i = 0; i < amount; i++) {
                 colour = WheelColour.of((colour.id + WheelColour.NUM_COLOURS + -(int) Math.signum(motor.get())) % WheelColour.NUM_COLOURS);
                 colourWheel.execute(0);
-                assertEquals(Math.signum(motor.get())*Constants.COLOUR_WHEEL_MOTOR_FULL, motor.get(), 0.01);
+                assertEquals(Math.signum(motor.get())*Config.colourWheel.motor.full, motor.get(), 0.01);
                 assertFalse(colourWheel.isFinished());
                 rotations++;
                 if (desired.equals(colour)) break;
@@ -136,7 +136,7 @@ public class TestColourwheel {
         }
         clock.incrementByMilliseconds(50);
         colourWheel.execute(0);
-        assertEquals(Constants.COLOUR_WHEEL_MOTOR_OFF, motor.get(), 0.01);
+        assertEquals(Config.colourWheel.motor.off, motor.get(), 0.01);
         assertTrue(colourWheel.isFinished());
         assertEquals(amount, rotations);
     }

@@ -8,7 +8,7 @@ import org.strongback.components.Gyroscope;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.lib.LocationHistory;
@@ -337,7 +337,7 @@ public class Location extends Subsystem implements LocationInterface {
 	 */
 	@Override
 	public double getBearing() {
-		return (MathUtil.normalise(getHeading(), Constants.FULL_CIRCLE));
+		return (MathUtil.normalise(getHeading(), Config.constants.fullCircle));
 	}
 	
 	/**
@@ -361,9 +361,9 @@ public class Location extends Subsystem implements LocationInterface {
 	public double getUnitHeading() {
 		double bearing = getBearing();
 		if (bearing < 0.0) {
-			bearing += Constants.FULL_CIRCLE;
+			bearing += Config.constants.fullCircle;
 		}
-		return bearing / Constants.FULL_CIRCLE;
+		return bearing / Config.constants.fullCircle;
 	}
 	
 	@Override

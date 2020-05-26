@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.strongback.components.Clock;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.DashboardInterface;
 import frc.robot.interfaces.JevoisInterface;
 import frc.robot.interfaces.LocationInterface;
@@ -133,7 +133,7 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 			// change as the caller uses it.
 
 			newTarget.imageTimestamp = clock.currentTime() - Double.parseDouble(parts[1]);
-			newTarget.distance = Double.parseDouble(parts[3])*Constants.INCHES_TO_METRES;
+			newTarget.distance = Double.parseDouble(parts[3])*Config.constants.inchesToMetres;
 			newTarget.angle = -Double.parseDouble(parts[4]);
 			newTarget.skew = Double.parseDouble(parts[5]);
 
@@ -148,7 +148,7 @@ public class Vision extends Subsystem implements VisionInterface, Runnable {
 
 			// Low pass filter 
 			// We reject the last seen target if it is older than <timeOffset> seconds
-			double alpha = Constants.GOAL_LOWPASS_ALPHA; 
+			double alpha = Config.vision.goalLowPassAlpha; 
 			if (lastSeenTarget.isValid(clock.currentTime())) {
 				newTarget.location.x = alpha * newTarget.location.x + (1-alpha) * lastSeenTarget.location.x;
 				newTarget.location.y = alpha * newTarget.location.y + (1-alpha) * lastSeenTarget.location.y;

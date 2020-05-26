@@ -1,6 +1,6 @@
 package frc.robot.interfaces;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.lib.Position;
 
 /**
@@ -23,7 +23,7 @@ public interface VisionInterface extends DashboardUpdater {
 		
 		public boolean isValid(double currentTime) {
 			double lockAgeSec = currentTime - imageTimestamp;
-			return targetFound && lockAgeSec < Constants.VISON_MAX_TARGET_AGE_SECS;
+			return targetFound && lockAgeSec < Config.vision.maxTargetAgeSecs;
 		}
 
 		@Override

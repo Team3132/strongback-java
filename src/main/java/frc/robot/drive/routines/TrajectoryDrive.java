@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.lib.chart.Chart;
@@ -64,15 +64,15 @@ public class TrajectoryDrive extends DriveRoutine {
 		this.clock = clock;
 		m_startTime = clock.currentTime();
 		m_pose = location::getPose;
-		m_follower = new RamseteController(Constants.DriveConstants.kRamseteB, Constants.DriveConstants.kRamseteZeta);
-		m_kinematics = Constants.DriveConstants.kDriveKinematics;
+		m_follower = new RamseteController(Config.drivebase.trajectory.kRamseteB, Config.drivebase.trajectory.kRamseteZeta);
+		m_kinematics = Config.drivebase.trajectory.driveKinematics;
 
 		m_feedforward = new SimpleMotorFeedforward(
-				Constants.DriveConstants.ksVolts,
-				Constants.DriveConstants.kvVoltSecondsPerMeter,
-				Constants.DriveConstants.kaVoltSecondsSquaredPerMeter);
-		m_leftController =  new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0);
-        m_rightController = new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0);
+				Config.drivebase.trajectory.ksVolts,
+				Config.drivebase.trajectory.kvVoltSecondsPerMeter,
+				Config.drivebase.trajectory.kaVoltSecondsSquaredPerMeter);
+		m_leftController =  new PIDController(Config.drivebase.trajectory.kPDriveVel, 0, 0);
+        m_rightController = new PIDController(Config.drivebase.trajectory.kPDriveVel, 0, 0);
 
 		Chart.register(() -> clock.currentTime() - m_startTime, "TrajectoryDrive/elapsedTime");
 		Chart.register(() -> m_trajectory == null ? 0 : m_trajectory.getTotalTimeSeconds(), "TrajectoryDrive/totalTime");

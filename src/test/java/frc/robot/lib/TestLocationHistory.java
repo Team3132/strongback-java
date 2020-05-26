@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.strongback.mock.Mock;
 import org.strongback.mock.MockClock;
-import frc.robot.Constants;
+import frc.robot.Config;
 
 /**
  * Test the LocationHistory class - a work in progress.
@@ -30,7 +30,7 @@ public class TestLocationHistory {
         MockClock clock = Mock.clock();
         LocationHistory history = new LocationHistory(clock);
 
-        for (int i=0; i<Constants.LOCATION_HISTORY_MEMORY_SECONDS * Constants.LOCATION_HISTORY_CYCLE_SPEED; i++) {
+        for (int i=0; i<Config.location.history.memorySecs * Config.location.history.cycleSpeedHz; i++) {
             Position p = new Position(20*i, i, 0, 0, clock.currentTime());
             history.addLocation(p);
             assertPosition(20*i, i, 0, clock.currentTime(), history.getLocation(clock.currentTime()));

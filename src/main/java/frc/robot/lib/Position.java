@@ -1,6 +1,6 @@
 package frc.robot.lib;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 
 /*
  * The position class defines a position on the field.
@@ -121,9 +121,9 @@ public class Position {
 
 		if (diffX == 0.0 && diffY == 0.0) {
 			// Special case. The heading to the same point stays as the current heading
-			return MathUtil.normalise(target.heading, Constants.FULL_CIRCLE);
+			return MathUtil.normalise(target.heading, Config.constants.fullCircle);
 		}
-		return MathUtil.normalise(MathUtil.radiansToDegrees(Math.atan2(diffY, diffX)) - heading, Constants.FULL_CIRCLE);
+		return MathUtil.normalise(MathUtil.radiansToDegrees(Math.atan2(diffY, diffX)) - heading, Config.constants.fullCircle);
 	}
 
 	public double distanceTo(Position dest) {
@@ -139,7 +139,7 @@ public class Position {
 	 * @return the normalised angle between the two headings
 	 */
 	public double angleBetweenBearings(Position dest) {
-		return Math.abs(MathUtil.normalise(dest.heading - heading, Constants.FULL_CIRCLE));
+		return Math.abs(MathUtil.normalise(dest.heading - heading, Config.constants.fullCircle));
 	}
 	
 	public String getDygraphHeader(String name) {

@@ -1,7 +1,7 @@
 package frc.robot.mock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.LocationInterface;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
@@ -61,7 +61,7 @@ public class MockLocation implements LocationInterface {
 
 	@Override
 	public double getBearing() {
-		return MathUtil.normalise(heading, Constants.FULL_CIRCLE);
+		return MathUtil.normalise(heading, Config.constants.fullCircle);
 	}
 
 	@Override

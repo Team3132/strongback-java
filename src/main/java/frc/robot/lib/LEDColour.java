@@ -1,6 +1,6 @@
 package frc.robot.lib;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 
 public enum LEDColour {
     RED(255, 0, 0),
@@ -19,8 +19,8 @@ public enum LEDColour {
     public final int b;
 
     LEDColour(int r, int g, int b) {
-        this.r = (int)(r * Constants.LED_BRIGHTNESS_PERCENTAGE);
-        this.g = (int)(g * Constants.LED_BRIGHTNESS_PERCENTAGE);
-        this.b = (int)(b * Constants.LED_BRIGHTNESS_PERCENTAGE);
+        this.r = (int)(r * Config.ledStrip.brightnessPercentage);
+        this.g = (int)(g * Config.ledStrip.brightnessPercentage);
+        this.b = (int)(b * Config.ledStrip.brightnessPercentage);
     }
 }

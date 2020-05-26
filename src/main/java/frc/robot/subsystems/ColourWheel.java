@@ -7,7 +7,7 @@ import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Solenoid;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.ColourWheelInterface;
 import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
 import frc.robot.interfaces.DashboardInterface;
@@ -80,22 +80,22 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     switch (action.type) {
     case ROTATION:
       newSpeed = rotationalControl();
-      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.YELLOW, ((double) rotCount) / Constants.COLOUR_WHEEL_ROTATION_TARGET);
+      ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.YELLOW, ((double) rotCount) / Config.colourWheel.rotationTarget);
       break;
     case POSITION:
       newSpeed = positionalControl(action.colour);
       ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_ANTICLOCKWISE:
-      newSpeed = Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      newSpeed = Config.colourWheel.motor.adjust;
       ledStrip.setColour(colour.convert());
       break;
     case ADJUST_WHEEL_CLOCKWISE:
-      newSpeed = -Constants.COLOUR_WHEEL_MOTOR_ADJUST;
+      newSpeed = -Config.colourWheel.motor.adjust;
       ledStrip.setColour(colour.convert());
       break;
     case NONE:
-      newSpeed = Constants.COLOUR_WHEEL_MOTOR_OFF;
+      newSpeed = Config.colourWheel.motor.off;
       break;
     default:
       Log.error("%s: Unknown Type %s", name, action.type);
@@ -143,11 +143,11 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
       Log.info("%s: Next Colour is %s.", name, nextColour);
       firstLoop = false;
     }
-    if (rotCount < Constants.COLOUR_WHEEL_ROTATION_TARGET) {
-      return Constants.COLOUR_WHEEL_MOTOR_FULL;
+    if (rotCount < Config.colourWheel.rotationTarget) {
+      return Config.colourWheel.motor.full;
     } else {
       action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
-      return Constants.COLOUR_WHEEL_MOTOR_OFF;
+      return Config.colourWheel.motor.off;
     }
   }
 
@@ -185,12 +185,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
     if (newSpeed == -3) {
       newSpeed += 4; // If above calculation is -3, set speed to 1.
     }
-    newSpeed = Constants.COLOUR_WHEEL_MOTOR_FULL * Math.signum(newSpeed);
+    newSpeed = Config.colourWheel.motor.full * Math.signum(newSpeed);
     if (colour.equals(WheelColour.UNKNOWN)) { // Colour is unknown, move in current direcion until colour identified.
       if (speed != 0) {
         return speed;
       } else {
-        return Constants.COLOUR_WHEEL_MOTOR_FULL;
+        return Config.colourWheel.motor.full;
       }
     }
     if (desired.equals(colour)) { // If correct colour found, move slowly to line up better and then stop.
@@ -198,12 +198,12 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
         spinTime = clock.currentTimeInMillis(); // Check time when correct colour found.
         firstLoop = false;
       }
-      if (clock.currentTimeInMillis() - spinTime < Constants.COLOUR_WHEEL_DELAY) {
+      if (clock.currentTimeInMillis() - spinTime < Config.colourWheel.delayMS) {
         return motor.get();
       } else {
         action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
         Log.info("ColourWheel: Desired colour found.");
-        return Constants.COLOUR_WHEEL_MOTOR_OFF;
+        return Config.colourWheel.motor.off;
       }
     }
     return newSpeed;

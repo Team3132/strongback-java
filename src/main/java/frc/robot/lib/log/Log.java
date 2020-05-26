@@ -26,7 +26,7 @@ import java.util.Calendar;
 
 import org.strongback.Strongback;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.LogWriter;
 import frc.robot.lib.RobotName;
 
@@ -130,8 +130,8 @@ public class Log {
 		String timestampStr = new SimpleDateFormat("yyyyMMdd_HH-mm-ss.SSS").format(timestamp.getTime());
 		try {
 			// Create links based on the timestamp.
-			writer.createSymbolicLink(Constants.LOG_DATE_EXTENSION, timestampStr);
-			writer.createSymbolicLink(Constants.LOG_EVENT_EXTENSION, matchDescription);
+			writer.createSymbolicLink(Config.logging.dateExtension, timestampStr);
+			writer.createSymbolicLink(Config.logging.eventExtension, matchDescription);
 		} catch (Exception e) {
 			System.out.printf("Error creating logging symlinks\n");
 			e.printStackTrace();
@@ -146,7 +146,7 @@ public class Log {
 	private static LogWriter createWriter() {
 		if (System.getProperty("user.name").equals("lvuser")) {
 			// Running on the robot. Log for real.
-			String baseDir  = Paths.get(Constants.LOG_BASE_PATH, RobotName.get()).toString();
+			String baseDir  = Paths.get(Config.logging.basePath, RobotName.get()).toString();
 			long logNum = LogFileNumber.get();
 			try {
 				return new TimestampedLogWriter(baseDir, "log", logNum, "txt");

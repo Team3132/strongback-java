@@ -15,7 +15,6 @@ import org.strongback.hardware.HardwareSparkMAX;
 import org.strongback.hardware.HardwareTalonSRX;
 
 import frc.robot.Config;
-import frc.robot.Constants;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
 
@@ -26,9 +25,9 @@ public class MotorFactory {
 		int[] canIds = leftMotor ? Config.drivebase.canIdsLeftWithEncoders : Config.drivebase.canIdsRightWithEncoders;
 
 		switch (Config.drivebase.motorControllerType) {
-			case Constants.MOTOR_CONTROLLER_TYPE_SPARKMAX: {
+			case Config.motorController.sparkMAX: {
 			HardwareSparkMAX spark = getSparkMAX("drive", canIds, leftMotor, NeutralMode.Brake, Config.drivebase.pidf);
-			spark.setScale(Constants.SPARKMAX_ENCODER_TICKS, Constants.DRIVE_GEABOX_RATIO, Constants.DRIVE_METRES_PER_REV);
+			spark.setScale(Config.encoder.SparkMAXTicks, Config.drivebase.gearboxRatio, Config.drivebase.metresPerRev);
 			spark.setSensorPhase(Config.drivebase.sensorPhase);
 
 			/*
@@ -47,9 +46,9 @@ public class MotorFactory {
 					Config.drivebase.motorControllerType);
 			// Falling through to TalonSRX.
 
-		case Constants.MOTOR_CONTROLLER_TYPE_TALONSRX:
+		case Config.motorController.talonSRX:
 			HardwareTalonSRX talon = getTalon("drive", canIds, leftMotor, NeutralMode.Brake, Config.drivebase.pidf); // don't invert output
-			talon.setScale(Constants.FALCON_ENCODER_TICKS, Constants.DRIVE_GEABOX_RATIO, Constants.DRIVE_METRES_PER_REV);
+			talon.setScale(Config.encoder.falconTicks, Config.drivebase.gearboxRatio, Config.drivebase.metresPerRev);
 			talon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
 			talon.setSensorPhase(Config.drivebase.sensorPhase);
 			talon.configClosedloopRamp(Config.drivebase.rampRate, 10);
@@ -71,7 +70,7 @@ public class MotorFactory {
 	
 	public static HardwareSparkMAX getIntakeMotor() {
 		HardwareSparkMAX motor = getSparkMAX("intake", Config.intake.canID, true, NeutralMode.Brake, Config.intake.pidf);
-		motor.setScale(Constants.SPARKMAX_ENCODER_TICKS, Constants.INTAKE_ENCODER_GEARBOX_RATIO);
+		motor.setScale(Config.encoder.SparkMAXTicks, Config.intake.gearboxRatio);
 		motor.setClosedLoopRampRate(0.5);
 		return motor;
 	}
@@ -83,21 +82,21 @@ public class MotorFactory {
 	}
 
 	public static HardwareTalonSRX getLoaderSpinnerMotor() {	
-		HardwareTalonSRX motor = getTalon("loader spinner", Config.loader.spinnerCanID, false, NeutralMode.Brake,
-				Config.loader.spinnderPIDF);
+		HardwareTalonSRX motor = getTalon("loader spinner", Config.loader.spinner.canID, false, NeutralMode.Brake,
+				Config.loader.spinner.pidf);
 		// In sensor (beambreak) for loader
 		motor.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
 		// Out sensor (beambreak) for loader
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.NormallyOpen, 10);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(Constants.VERSA_INTEGRATED_ENCODER_TICKS, Constants.LOADER_MAIN_MOTOR_GEARBOX_RATIO);
+		motor.setScale(Config.encoder.versaIntegratedTicks, Config.loader.spinner.gearboxRatio);
 		motor.configClosedloopRamp(0, 10);
 		return motor;
 	}
 
 	public static HardwareSparkMAX getLoaderPassthroughMotor() {
-		HardwareSparkMAX motor = getSparkMAX("loader passthrough", Config.loader.passthroughCanID, true,
-				NeutralMode.Brake, Config.loader.passthroughPIDF);
+		HardwareSparkMAX motor = getSparkMAX("loader passthrough", Config.loader.passthrough.canID, true,
+				NeutralMode.Brake, Config.loader.passthrough.pidf);
 		return motor;
 	}
 	
@@ -106,7 +105,7 @@ public class MotorFactory {
 				Config.shooter.pidf);
 		motor.setSensorPhase(true);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-		motor.setScale(Constants.S4T_ENCODER_TICKS, Constants.SHOOTER_GEARBOX_RATIO);
+		motor.setScale(Config.encoder.s4tTicks, Config.shooter.gearboxRatio);
 		motor.selectProfileSlot(0, 0);
 		
 		motor.configClosedloopRamp(1, 10);
@@ -131,8 +130,8 @@ public class MotorFactory {
 			PIDF pidf) {
     	HardwareTalonSRX leader = Hardware.Motors.talonSRX(abs(canIDs[0]), invert, mode);
 		Chart.register(() -> leader.getOutputCurrent(), "Talons/%d/Current", canIDs[0]);
-		leader.configContinuousCurrentLimit(Constants.DEFAULT_CONTINUOUS_CURRENT_LIMIT, 10);
-		leader.configPeakCurrentLimit(Constants.DEFAULT_PEAK_CURRENT_LIMIT, 10);
+		leader.configContinuousCurrentLimit(Config.motorController.currentLimit.defaultContinuousAmps, 10);
+		leader.configPeakCurrentLimit(Config.motorController.currentLimit.defaultPeakAmps, 10);
 		TunableMotor.tuneMotor(leader, pidf, new NetworkTablesHelper(name));
 
     	for (int n = 1; n < canIDs.length; n++) {
@@ -182,8 +181,8 @@ public class MotorFactory {
 		HardwareSparkMAX leader = Hardware.Motors.sparkMAX(abs(canIDs[0]), MotorType.kBrushless, invert);
 		leader.setIdleMode(mode == NeutralMode.Brake ? IdleMode.kBrake : IdleMode.kCoast);
 		Chart.register(() -> leader.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[0]);
-		leader.setSmartCurrentLimit(Constants.DEFAULT_CONTINUOUS_CURRENT_LIMIT, 10);
-		leader.setSecondaryCurrentLimit(Constants.DEFAULT_PEAK_CURRENT_LIMIT, 10);
+		leader.setSmartCurrentLimit(Config.motorController.currentLimit.defaultContinuousAmps, 10);
+		leader.setSecondaryCurrentLimit(Config.motorController.currentLimit.defaultPeakAmps, 10);
 		TunableMotor.tuneMotor(leader, pidf, new NetworkTablesHelper(name));
 
 		for (int n = 1; n < canIDs.length; n++) {

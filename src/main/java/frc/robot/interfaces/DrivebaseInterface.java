@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.drive.routines.DriveRoutine;
 
 /**
@@ -146,12 +146,12 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 			// Build the trajectory on start so that it's ready when needed.
 			// Create config for trajectory
-			TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
-					Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared)
+			TrajectoryConfig config = new TrajectoryConfig(Config.drivebase.trajectory.maxSpeedMetersPerSecond,
+					Config.drivebase.trajectory.maxAccelerationMetersPerSecondSquared)
 							// Add kinematics to ensure max speed is actually obeyed
-							.setKinematics(Constants.DriveConstants.kDriveKinematics)
+							.setKinematics(Config.drivebase.trajectory.driveKinematics)
 							// Apply the voltage constraint
-							.addConstraint(Constants.DriveConstants.kAutoVoltageConstraint)
+							.addConstraint(Config.drivebase.trajectory.autoVoltageConstraint)
 							.setReversed(!forward);
 
 			// An example trajectory to follow. All units in meters.

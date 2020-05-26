@@ -22,7 +22,6 @@ import frc.robot.lib.Position;
  * The location subsystem is also responsible for keeping track of where the robot was on the field.
  * It can be asked for the historical location of the robot. We do not have to keep history from the start of the match,
  * only the last number of seconds.
- * The history parameters are defined in the Constants file as both a period and number of samples per second.
  * 
  * The Location system is an independent entity within the drive code. It is implemented to obtain information from sources,
  * possibly including gyros, the drivebase, other sensors, maybe even video and keep track of the robot's position at all times.

@@ -1,7 +1,7 @@
 package frc.robot.lib;
 
 import org.strongback.components.Clock;
-import frc.robot.Constants;
+import frc.robot.Config;
 
 /**
  * This class provides a history of where the robot was. It is used by the vision system to accurately determine where the robot was,
@@ -14,7 +14,7 @@ public class LocationHistory {
 	private final Position[] historyArray = new Position[HISTORY_LENGTH];
 	private int nextWriteIndex;
 	private double latestLocationTime = 0;
-	private static final int HISTORY_LENGTH = Constants.LOCATION_HISTORY_MEMORY_SECONDS * Constants.LOCATION_HISTORY_CYCLE_SPEED;
+	private static final int HISTORY_LENGTH = Config.location.history.memorySecs * Config.location.history.cycleSpeedHz;
 	
 	public LocationHistory(Clock clock) {
 		setInitial(new Position(0,0,0,0,clock.currentTime()));
@@ -26,7 +26,7 @@ public class LocationHistory {
 	 * @return position at specified time accurate to the nearest 5ms or a position with 0 values if there is no existing position yet
 	 */
 	public Position getLocation(double timeSec) {
-		if (timeSec < latestLocationTime - Constants.LOCATION_HISTORY_MEMORY_SECONDS) {
+		if (timeSec < latestLocationTime - Config.location.history.memorySecs) {
 			// too long ago. 
 			return historyArray[nextWriteIndex];	// oldest value we have!
 		}
@@ -69,6 +69,6 @@ public class LocationHistory {
 	 * @return index to be called in historyArray
 	 */
 	private int secondsToIndex(double timeSec){
-		return ((int)(Math.round(timeSec*Constants.LOCATION_HISTORY_CYCLE_SPEED))) % HISTORY_LENGTH;
+		return ((int)(Math.round(timeSec*Config.location.history.cycleSpeedHz))) % HISTORY_LENGTH;
 	}
 }

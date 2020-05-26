@@ -24,8 +24,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-
-import frc.robot.Constants;
+import frc.robot.Config;
 
 /**
  * Tests trajectory generation and caching 
@@ -221,12 +220,12 @@ public class TestTrajectoryCaching {
      * Create config for trajectory
      */
     private TrajectoryConfig createConfig (boolean forward) {
-        TrajectoryConfig config = new TrajectoryConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond,
-                Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared)
+        TrajectoryConfig config = new TrajectoryConfig(Config.drivebase.trajectory.maxSpeedMetersPerSecond,
+        Config.drivebase.trajectory.maxAccelerationMetersPerSecondSquared)
                         // Add kinematics to ensure max speed is actually obeyed
-                        .setKinematics(Constants.DriveConstants.kDriveKinematics)
+                        .setKinematics(Config.drivebase.trajectory.driveKinematics)
                         // Apply the voltage constraint
-                        .addConstraint(Constants.DriveConstants.kAutoVoltageConstraint)
+                        .addConstraint(Config.drivebase.trajectory.autoVoltageConstraint)
                         .setReversed(!forward);
         return config;
     }

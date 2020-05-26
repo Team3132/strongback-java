@@ -5,7 +5,7 @@
  */
 package frc.robot.controller;
 
-import static frc.robot.Constants.*;
+import frc.robot.Config;
 
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
@@ -90,7 +90,7 @@ public class Sequences {
 
 	public static Sequence startSlowDriveForward() {
 		SequenceBuilder builder = new SequenceBuilder("Slow drive forward");
-		builder.then().setDrivebasePower(DRIVE_SLOW_POWER);
+		builder.then().setDrivebasePower(0.3);
 		return builder.build();
 	}
 
@@ -111,9 +111,9 @@ public class Sequences {
 		builder.then().deployIntake()
 			.blockShooter();
 		//builder.add().setIntakeMotorOutput(INTAKE_MOTOR_OUTPUT)
-		builder.then().setIntakeRPS(INTAKE_TARGET_RPS)
-			.setSpinnerRPS(LOADER_MOTOR_INTAKING_RPS)
-			.setPassthroughDutyCycle(PASSTHROUGH_MOTOR_CURRENT);
+		builder.then().setIntakeRPS(Config.intake.targetRPS)
+			.setSpinnerRPS(Config.loader.spinner.speed.intakingRPS)
+			.setPassthroughDutyCycle(Config.loader.passthrough.motorDutyCycle);
 		//builder.add().waitForBalls(5);
 		// Reverse to eject excess > 5 balls to avoid penalty
 		/*builder.add().setIntakeRPS(-INTAKE_TARGET_RPS);
@@ -126,8 +126,8 @@ public class Sequences {
 
 	public static Sequence reverseIntaking() {
 		SequenceBuilder builder = new SequenceBuilder("Reverse intaking");
-		builder.then().setIntakeRPS(-INTAKE_TARGET_RPS)
-			.setPassthroughDutyCycle(-LOADER_MOTOR_INTAKING_RPS);
+		builder.then().setIntakeRPS(-Config.intake.targetRPS)
+			.setPassthroughDutyCycle(-Config.loader.passthrough.motorDutyCycle);
 		return builder.build();
 	}
 
@@ -172,7 +172,7 @@ public class Sequences {
 	public static Sequence startIntakingOnly() {
 		SequenceBuilder builder = new SequenceBuilder("Start Intaking only");
 		builder.then().deployIntake();
-		builder.then().setIntakeRPS(INTAKE_TARGET_RPS).deployIntake();
+		builder.then().setIntakeRPS(Config.intake.targetRPS).deployIntake();
 		return builder.build();
 	}
 
@@ -186,7 +186,7 @@ public class Sequences {
 	// This is to test the Loader system
 	public static Sequence startLoader() {
 		SequenceBuilder builder = new SequenceBuilder("Start loader");
-		builder.then().setSpinnerRPS(LOADER_MOTOR_INTAKING_RPS);
+		builder.then().setSpinnerRPS(Config.loader.spinner.speed.intakingRPS);
 		return builder.build();
 	}
 
@@ -233,9 +233,9 @@ public class Sequences {
 		// Let the balls out of the loader and into the shooter.
 		builder.then().unblockShooter();
 		// Spin passthrough
-		builder.then().setPassthroughDutyCycle(PASSTHROUGH_MOTOR_CURRENT)
+		builder.then().setPassthroughDutyCycle(Config.loader.passthrough.motorDutyCycle)
 		// Start the loader to push the balls.
-				.setSpinnerRPS(LOADER_MOTOR_SHOOTING_RPS);
+				.setSpinnerRPS(Config.loader.spinner.speed.shootingRPS);
 		/*
 		// Wait for all of the balls to leave.
 		builder.add().waitForBalls(0);

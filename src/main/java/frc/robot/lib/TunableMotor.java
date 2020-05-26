@@ -5,7 +5,7 @@ import org.strongback.Executor.Priority;
 import org.strongback.Strongback;
 import org.strongback.components.Motor;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.NetworkTableHelperInterface;
 
 /**
@@ -37,7 +37,7 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
 	@Override
 	public void execute(long timeInMillis) {
 		double now = Strongback.timeSystem().currentTime();
-		if (now < lastUpdateSec + Constants.DASHBOARD_UPDATE_INTERVAL_SEC)
+		if (now < lastUpdateSec + Config.intervals.dashboardUpdateSec)
 			return;
 		update();
 		lastUpdateSec = now;

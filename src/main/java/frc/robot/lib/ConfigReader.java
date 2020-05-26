@@ -1,7 +1,5 @@
 package frc.robot.lib;
 
-import static frc.robot.Constants.*;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,7 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.lib.log.Log;
 
 /**
@@ -42,7 +40,7 @@ public class ConfigReader {
 	private ArrayList<String> exampleText = new ArrayList<String>();
 
 	public ConfigReader() {
-		this(Constants.CONFIG_FILE_PATH);
+		this(Config.config.filePath);
 	}
 
 	public ConfigReader(String filePath) {
@@ -124,14 +122,14 @@ public class ConfigReader {
 		String type = getString(parameterName, defaultValue);
 		switch (type) {
 			default:
-				Log.error("Invalid value '%s' for parameter '%s'.  Using %s.", type, parameterName, DEFAULT_MOTOR_CONTROLLER_TYPE);
-				return DEFAULT_MOTOR_CONTROLLER_TYPE;
+				Log.error("Invalid value '%s' for parameter '%s'.  Using %s.", type, parameterName, Config.motorController.defaultType);
+				return Config.motorController.defaultType;
 
-			case MOTOR_CONTROLLER_TYPE_TALONSRX:
-				return MOTOR_CONTROLLER_TYPE_TALONSRX;
+			case Config.motorController.talonSRX:
+				return Config.motorController.talonSRX;
 
-			case MOTOR_CONTROLLER_TYPE_SPARKMAX:
-				return MOTOR_CONTROLLER_TYPE_SPARKMAX;
+			case Config.motorController.sparkMAX:
+				return Config.motorController.sparkMAX;
 		}
 	}
 

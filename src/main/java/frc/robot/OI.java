@@ -126,11 +126,11 @@ public class OI implements OIInterface {
 		onUntriggered(stick.getAxis(GamepadButtonsX.LEFT_X_AXIS, GamepadButtonsX.AXIS_THRESHOLD), Sequences.stopColourWheel());
 
 		// Close/ender shot
-		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpCloseShot(Constants.SHOOTER_CLOSE_TARGET_SPEED_RPS));
+		onTriggered(stick.getAxis(GamepadButtonsX.LEFT_TRIGGER_AXIS, GamepadButtonsX.TRIGGER_THRESHOLD), Sequences.spinUpCloseShot(Config.shooter.speed.closeRPS));
 		// Auto line/front trench shot
-		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.spinUpFarShot(Constants.SHOOTER_AUTO_LINE_TARGET_SPEED_RPS));
+		onTriggered(stick.getButton(GamepadButtonsX.LEFT_BUMPER), Sequences.spinUpFarShot(Config.shooter.speed.autoLineRPS));
 		// Colourwheel/back trench shot
-		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpFarShot(Constants.SHOOTER_FAR_TARGET_SPEED_RPS));
+		onTriggered(stick.getButton(GamepadButtonsX.RIGHT_BUMPER), Sequences.spinUpFarShot(Config.shooter.speed.farTargetRPS));
 
 		// Acutally shoot the balls
 		// YOU MUST use one of the spinUp buttons before pressing this
@@ -161,7 +161,7 @@ public class OI implements OIInterface {
 			() -> shooterIF.setHoodExtended(false));
 		whileTriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), () -> {
 			shooterIF.setTargetRPS(
-					1.5 * Constants.SHOOTER_CLOSE_TARGET_SPEED_RPS * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
+					1.5 * Config.shooter.speed.closeRPS * box.getAxis(OperatorBoxButtons.SHOOTER_POT).read());
 		});
 		onUntriggered(box.getButton(OperatorBoxButtons.SHOOTER_SPEED), 
 			() -> shooterIF.setTargetRPS(0));
@@ -174,7 +174,7 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.INTAKE_DISABLE, OperatorBoxButtons.INTAKE_MANUAL, intakeOverride);
 	    // While the intake speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
-			() -> intakeIF.setTargetRPS(box.getAxis(OperatorBoxButtons.INTAKE_POT).read() * Constants.INTAKE_TARGET_RPS));
+			() -> intakeIF.setTargetRPS(box.getAxis(OperatorBoxButtons.INTAKE_POT).read() * Config.intake.targetRPS));
 		onUntriggered(box.getButton(OperatorBoxButtons.INTAKE_MOTOR), 
 			() -> intakeIF.setTargetRPS(0));
 		onTriggered(box.getButton(OperatorBoxButtons.INTAKE_DEPLOY), 
@@ -189,7 +189,7 @@ public class OI implements OIInterface {
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
 		// While the loader speed button is pressed, set the target speed. Does not turn off.
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR), 
-			() -> loaderIF.setTargetSpinnerRPS(1.5*Constants.LOADER_MOTOR_INTAKING_RPS*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
+			() -> loaderIF.setTargetSpinnerRPS(1.5*Config.loader.spinner.speed.intakingRPS*box.getAxis(OperatorBoxButtons.LOADER_SPINNER_POT).read()));
 		onUntriggered(box.getButton(OperatorBoxButtons.LOADER_SPINNER_MOTOR),
 			() -> loaderIF.setTargetSpinnerRPS(0));
 		whileTriggered(box.getButton(OperatorBoxButtons.LOADER_PASSTHROUGH_MOTOR), 

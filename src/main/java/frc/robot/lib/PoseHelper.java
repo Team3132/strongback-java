@@ -2,8 +2,7 @@ package frc.robot.lib;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-
-import static frc.robot.Constants.*;
+import frc.robot.Config;
 
 public class PoseHelper {
 
@@ -40,6 +39,6 @@ public class PoseHelper {
 	 * @param bearing the bearing we approach pose from
 	 */
 	public static Pose2d intakeAt(Pose2d pose, double bearing) {		
-		return approachPose(pose, HALF_ROBOT_LENGTH, bearing);
+		return approachPose(pose, Config.robot.halfRobotLength, bearing);
 	}
 }

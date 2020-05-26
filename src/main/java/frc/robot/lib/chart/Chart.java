@@ -13,7 +13,7 @@ import org.strongback.Strongback;
 import org.strongback.components.Switch;
 import org.strongback.components.ui.DirectionalAxis;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.interfaces.LogWriter;
 import frc.robot.lib.RobotName;
 import frc.robot.lib.log.LogFileNumber;
@@ -163,7 +163,7 @@ public class Chart implements Executable {
 		try {
 			if (System.getProperty("user.name").equals("lvuser")) {
 				// Running on the robot. Write for real.
-				String baseDir = Paths.get(Constants.LOG_BASE_PATH, RobotName.get()).toString();
+				String baseDir = Paths.get(Config.logging.basePath, RobotName.get()).toString();
 				long logNum = LogFileNumber.get();
 				// Open all files. Also creates Latest symlink.
 				csvWriter = new TimestampedLogWriter(baseDir, "data", logNum, "csv");
@@ -175,7 +175,7 @@ public class Chart implements Executable {
 			state = State.CREATED;
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.err.printf("Failed to create log files in %s: %s\n", Constants.LOG_BASE_PATH, e.getMessage());
+			System.err.printf("Failed to create log files in %s: %s\n", Config.logging.basePath, e.getMessage());
 			state = State.ERRORED;
 		}
 	}
@@ -292,18 +292,18 @@ public class Chart implements Executable {
 		String timestampStr = new SimpleDateFormat("yyyyMMdd_HH-mm-ss.SSS").format(timestamp.getTime());
 		try {
 			// Create links based on the timestamp.
-			csvWriter.createSymbolicLink(Constants.LOG_DATE_EXTENSION, timestampStr);
-			chartHTMLWriter.createSymbolicLink(Constants.LOG_DATE_EXTENSION, timestampStr);
-			locationHTMLWriter.createSymbolicLink(Constants.LOG_DATE_EXTENSION, timestampStr);
+			csvWriter.createSymbolicLink(Config.logging.dateExtension, timestampStr);
+			chartHTMLWriter.createSymbolicLink(Config.logging.dateExtension, timestampStr);
+			locationHTMLWriter.createSymbolicLink(Config.logging.dateExtension, timestampStr);
 			// And on event name, match type, match number, replay number, alliance and
 			// position. These details should be available at the same time now that the
 			// drivers station is able to talk to the robot.
-			csvWriter.createSymbolicLink(Constants.LOG_EVENT_EXTENSION, matchDescription);
-			chartHTMLWriter.createSymbolicLink(Constants.LOG_EVENT_EXTENSION, matchDescription);
-			locationHTMLWriter.createSymbolicLink(Constants.LOG_EVENT_EXTENSION, matchDescription);
+			csvWriter.createSymbolicLink(Config.logging.eventExtension, matchDescription);
+			chartHTMLWriter.createSymbolicLink(Config.logging.eventExtension, matchDescription);
+			locationHTMLWriter.createSymbolicLink(Config.logging.eventExtension, matchDescription);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.printf("Error creating symlinks in %s: %s\n", Constants.LOG_BASE_PATH, e.getMessage());
+			System.out.printf("Error creating symlinks in %s: %s\n", Config.logging.basePath, e.getMessage());
 		}
 	}
 }

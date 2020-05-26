@@ -9,7 +9,7 @@ import org.strongback.components.Motor.ControlMode;
 import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
 import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
 import frc.robot.lib.log.Log;
-import frc.robot.Constants;
+import frc.robot.Config;
 import frc.robot.drive.util.LowPassFilter;
 import frc.robot.drive.util.PositionPID;
 
@@ -105,6 +105,6 @@ public class PositionalPIDDrive extends DriveRoutine {
 	@Override
 	public boolean hasFinished() {
 		// Check that aiming has stayed within tolerance before next state
-		return clock.currentTime() - timestamp > Constants.VISION_AIM_TIME_COMPLETE;
+		return clock.currentTime() - timestamp > Config.vision.aimTimeCompleteSecs;
 	}
 }

@@ -24,7 +24,6 @@ import org.strongback.mock.Mock;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Config;
-import frc.robot.Constants;
 import frc.robot.drive.routines.ArcadeDrive;
 import frc.robot.drive.routines.CheesyDpadDrive;
 import frc.robot.drive.routines.ConstantDrive;
@@ -196,9 +195,9 @@ public class Subsystems implements DashboardUpdater {
 		// The old favourite arcade drive with throttling if a button is pressed.
 		drivebase.registerDriveRoutine(DriveRoutineType.ARCADE_DUTY_CYCLE,
 				new ArcadeDrive("ArcadeDutyCycle", ControlMode.DutyCycle, 1.0,
-						leftStick.getAxis(1).invert().deadband(Constants.JOYSTICK_DEADBAND_MINIMUM_VALUE)
+						leftStick.getAxis(1).invert().deadband(Config.ui.joystick.deadbandMinValue)
 								.scale(leftStick.getButton(1).isTriggered() ? 1 : 0.6), // Throttle.
-						rightStick.getAxis(0).invert().deadband(Constants.JOYSTICK_DEADBAND_MINIMUM_VALUE)
+						rightStick.getAxis(0).invert().deadband(Config.ui.joystick.deadbandMinValue)
 								.scale(leftStick.getButton(1).isTriggered() ? 1 : 0.6), // Turn power.
 						true));
 
@@ -206,9 +205,9 @@ public class Subsystems implements DashboardUpdater {
 		// using velocity mode.
 		drivebase.registerDriveRoutine(DriveRoutineType.ARCADE_VELOCITY,
 				new ArcadeDrive("ArcadeVelocity", ControlMode.Speed,  Config.drivebase.maxSpeed,
-						leftStick.getAxis(1).invert().deadband(Constants.JOYSTICK_DEADBAND_MINIMUM_VALUE)
+						leftStick.getAxis(1).invert().deadband(Config.ui.joystick.deadbandMinValue)
 								.scale(leftStick.getButton(1).isTriggered() ? 1 : 0.6), // Throttle
-						rightStick.getAxis(0).invert().deadband(Constants.JOYSTICK_DEADBAND_MINIMUM_VALUE)
+						rightStick.getAxis(0).invert().deadband(Config.ui.joystick.deadbandMinValue)
 								.scale(leftStick.getButton(1).isTriggered() ? 1 : 0.6), // Turn power.
 						true));
 
@@ -227,25 +226,25 @@ public class Subsystems implements DashboardUpdater {
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_ASSIST,
 				new PositionalPIDDrive("visionAssist",
 						() -> getVisionDriveSpeed(10 /* maxSpeed */, 40 /* (stopAtDistance */),
-						() -> getVisionTurnWaypointAdjustment(), Constants.VISION_SPEED_SCALE,
-						Constants.VISION_ASSIST_ANGLE_SCALE, Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance,
+						() -> getVisionTurnWaypointAdjustment(), Config.vision.speedScale,
+						Config.vision.assistAngleScale, Config.vision.maxVelocityJerk, leftDriveDistance,
 						leftDriveSpeed, rightDriveDistance, rightDriveSpeed, clock));
 
 		// Vision aiming for shooter
 		drivebase.registerDriveRoutine(DriveRoutineType.VISION_AIM,
 				new PositionalPIDDrive("visionAim",
-						() -> (Math.abs(getVisionTurnAdjustment()) < Constants.VISION_AIM_ANGLE_TOLERANCE)
-								&& (Math.abs(getVisionDistance()) < Constants.VISION_AIM_DISTANCE_TOLERANCE),
-						() -> MathUtil.clamp(getVisionDistance() * Constants.VISION_AIM_DISTANCE_SCALE,
-								-Constants.VISION_MAX_DRIVE_SPEED, Constants.VISION_MAX_DRIVE_SPEED),
-						() -> getVisionTurnAdjustment(), Constants.VISION_SPEED_SCALE, Constants.VISION_AIM_ANGLE_SCALE,
-						Constants.VISION_MAX_VELOCITY_JERK, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
+						() -> (Math.abs(getVisionTurnAdjustment()) < Config.vision.aimAngleToleranceDegrees)
+								&& (Math.abs(getVisionDistance()) < Config.vision.aimDistanceToleranceMetres),
+						() -> MathUtil.clamp(getVisionDistance() * Config.vision.aimDistanceScale,
+								-Config.vision.maxDriveSpeedMPerSec, Config.vision.maxDriveSpeedMPerSec),
+						() -> getVisionTurnAdjustment(), Config.vision.speedScale, Config.vision.aimAngleScale,
+						Config.vision.maxVelocityJerk, leftDriveDistance, leftDriveSpeed, rightDriveDistance,
 						rightDriveSpeed, clock));
 
 		// Turns on the spot to a specified angle.
 		drivebase.registerDriveRoutine(DriveRoutineType.TURN_TO_ANGLE,
 				new PositionalPIDDrive("angle", () -> 0, () -> getTurnToAngleTurnAdjustment(), 0,
-						Constants.TURN_TO_ANGLE_ANGLE_SCALE, Constants.TURN_TO_ANGLE_MAX_VELOCITY_JERK,
+						Config.drivebase.turnToAngle.angleScale, Config.drivebase.turnToAngle.maxVelocityJerk,
 						leftDriveDistance, leftDriveSpeed, rightDriveDistance, rightDriveSpeed, clock));
 						
 		// Map joysticks in arcade mode for testing/tuning
@@ -271,7 +270,7 @@ public class Subsystems implements DashboardUpdater {
 	 * waypoint is located directly infront of the vision target at a distance of
 	 * half the distance between the robot and the target
 	 * 
-	 * If the robot is within Constants.VISION_SPLINE_MIN_DISTANCE of the target we
+	 * If the robot is within Config.VISION_SPLINE_MIN_DISTANCE of the target we
 	 * return the location of the target
 	 * 
 	 * This effectively makes the robot drive on a spline.
@@ -294,8 +293,8 @@ public class Subsystems implements DashboardUpdater {
 		// current.bearingTo(details.location));
 
 		// Scale turnadjustment depending on distance from goal
-		double turnAdjustment = Math.max(0, Constants.VISION_MAX_DRIVE_SPEED - Math.abs(getVisionDistance()) * 2.5);
-		turnAdjustment = MathUtil.scale(turnAdjustment, 0, Constants.VISION_MAX_DRIVE_SPEED, 0.1, 1);
+		double turnAdjustment = Math.max(0, Config.vision.maxDriveSpeedMPerSec - Math.abs(getVisionDistance()) * 2.5);
+		turnAdjustment = MathUtil.scale(turnAdjustment, 0, Config.vision.maxDriveSpeedMPerSec, 0.1, 1);
 		return turnAdjustment * -current.bearingTo(details.location);
 	}
 
@@ -310,7 +309,7 @@ public class Subsystems implements DashboardUpdater {
 		
 		// We have a recent target position relative to the robot starting position.
 		Position current = location.getCurrentLocation();
-		double distance = current.distanceTo(details.location) - Constants.VISION_STOP_DISTANCE;
+		double distance = current.distanceTo(details.location) - Config.VISION_STOP_DISTANCE;
 		return distance; 
 		*/
 		return 0;
@@ -321,9 +320,9 @@ public class Subsystems implements DashboardUpdater {
 			return new Position(0, 0);
 		TargetDetails details = vision.getTargetDetails();
 		Position current = location.getCurrentLocation();
-		if (current.distanceTo(details.location) > Constants.VISION_SPLINE_MIN_DISTANCE) {
+		if (current.distanceTo(details.location) > Config.vision.splineMinDistanceMetres) {
 			return details.location
-					.addVector(-current.distanceTo(details.location) * Constants.VISION_WAYPOINT_DISTANCE_SCALE, 0);
+					.addVector(-current.distanceTo(details.location) * Config.vision.waypointDistanceScale, 0);
 		} else {
 			return details.location;
 		}
@@ -415,24 +414,24 @@ public class Subsystems implements DashboardUpdater {
 
 		ColorSensorV3 colourSensor = new ColorSensorV3(i2cPort);
 		ColorMatch colourMatcher = new ColorMatch();
-		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_BLUE_TARGET); // Adding colours to the colourMatcher
-		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_GREEN_TARGET);
-		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_RED_TARGET);
-		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_YELLOW_TARGET);
-		colourMatcher.addColorMatch(Constants.COLOUR_WHEEL_WHITE_TARGET);
+		colourMatcher.addColorMatch(Config.colourWheel.target.blue); // Adding colours to the colourMatcher
+		colourMatcher.addColorMatch(Config.colourWheel.target.green);
+		colourMatcher.addColorMatch(Config.colourWheel.target.red);
+		colourMatcher.addColorMatch(Config.colourWheel.target.yellow);
+		colourMatcher.addColorMatch(Config.colourWheel.target.white);
 
 		colourWheel = new ColourWheel(motor, colourWheelSolenoid, new Supplier<WheelColour>() {
 			@Override
 			public WheelColour get() {
 				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
 				WheelColour sensedColour = WheelColour.UNKNOWN;
-				if (match.color == Constants.COLOUR_WHEEL_BLUE_TARGET) {
+				if (match.color == Config.colourWheel.target.blue) {
 					sensedColour = WheelColour.BLUE;
-				} else if (match.color == Constants.COLOUR_WHEEL_RED_TARGET) {
+				} else if (match.color == Config.colourWheel.target.red) {
 					sensedColour = WheelColour.RED;
-				} else if (match.color == Constants.COLOUR_WHEEL_GREEN_TARGET) {
+				} else if (match.color == Config.colourWheel.target.green) {
 					sensedColour = WheelColour.GREEN;
-				} else if (match.color == Constants.COLOUR_WHEEL_YELLOW_TARGET) {
+				} else if (match.color == Config.colourWheel.target.yellow) {
 					sensedColour = WheelColour.YELLOW;
 				}
 				return sensedColour;
@@ -459,7 +458,7 @@ public class Subsystems implements DashboardUpdater {
 	}
 
 	public void setLEDFinalCountdown(double time) {
-		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time / Constants.LED_STRIP_COUNTDOWN);
+		ledStrip.setProgressColour(LEDColour.GREEN, LEDColour.RED, time / Config.ledStrip.countdown);
 	}
 
 	@SuppressWarnings("resource")
@@ -475,8 +474,8 @@ public class Subsystems implements DashboardUpdater {
 		Solenoid paddleSolenoid = Hardware.Solenoids.singleSolenoid(Config.pcm.canId, Config.loader.solenoidPort,
 				0.1, 0.1); // TODO: Test and work out correct timings.
 		// The ball sensors are connected to the DIO ports on the rio.
-		DigitalInput inBallSensor = new DigitalInput(Config.loader.ballInDetectorPort);
-		DigitalInput outBallSensor = new DigitalInput(Config.loader.ballOutDetectorPort);
+		DigitalInput inBallSensor = new DigitalInput(Config.loader.ballDetector.inPort);
+		DigitalInput outBallSensor = new DigitalInput(Config.loader.ballDetector.outPort);
 		BooleanSupplier loaderInSensor = () -> !inBallSensor.get();
 		BooleanSupplier loaderOutSensor = () -> !outBallSensor.get();
 		loader = hwLoader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor,

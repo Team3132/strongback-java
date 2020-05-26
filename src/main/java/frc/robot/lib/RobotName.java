@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
 
-import frc.robot.Constants;
+import frc.robot.Config;
 
 /**
  * Read a speciall file on the filesystem to get the robot name.
@@ -58,6 +58,6 @@ public class RobotName {
      * @return name of the robot as a String.
      */
     public static String get() {
-        return get(Constants.ROBOT_NAME_FILE_PATH);
+        return get(Config.config.robotNameFilePath);
     }
 }
