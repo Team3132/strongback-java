@@ -18,7 +18,7 @@ package org.strongback.components;
 
 import org.strongback.StrongbackRequirementException;
 
-import edu.wpi.first.wpilibj.Utility;
+import edu.wpi.first.wpilibj.RobotController;
 
 /**
  * The system that provides information about match time.
@@ -35,6 +35,15 @@ public interface Clock {
      */
     public long currentTimeInMicros();
 
+    /**
+     * Return the elapsed time, in seconds. Resolution is in nanoseconds
+     * 
+     * @return the elapsed time, in seconds. Resolution is in nanoseconds
+     */
+    default public double currentTime() {
+    	return ((double)currentTimeInMicros() / 1_000_000.0);
+    }
+    
     /**
      * Return the current time, in nanoseconds.
      *
@@ -54,6 +63,36 @@ public interface Clock {
     }
 
     /**
+     * Sleep for the specified number of seconds.
+     * @param seconds the number of seconds to sleep.
+     */
+    default public void sleepSeconds(double seconds) {
+    	sleepMilliseconds(seconds * 1000);
+    }
+
+    /**
+     * Sleep for the specified number of milliseconds.
+     * @param milliseconds the number of milliseconds to sleep.
+     */
+    default public void sleepMilliseconds(double milliseconds) {
+    	sleepMicroseconds((long) (milliseconds * 1000));
+    }
+
+    /**
+     * Sleep for the specified number of microseconds.
+     * @param microseconds the number of microseconds to sleep.
+     */
+	default public void sleepMicroseconds(long micros) {
+		try {
+			long millis = micros / 1000;
+			int nanos = (int) ((1000 * micros) % 1000);
+			Thread.sleep(millis, nanos);
+		} catch (InterruptedException e) {
+			/* eat this exception */
+		}
+	}
+
+    /**
      * Create a new time system that uses the FPGA clock. At this time, the precision of the resulting clock has not been
      * verified or tested.
      *
@@ -62,9 +101,9 @@ public interface Clock {
      */
     public static Clock fpga() {
         try {
-            Utility.getFPGATime();
+            RobotController.getFPGATime();
             // If we're here, then the method did not throw an exception and there is FPGA hardware on this platform ...
-            return Utility::getFPGATime;
+            return RobotController::getFPGATime;
         } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
             throw new StrongbackRequirementException("Missing FPGA hardware or software", e);
         }
@@ -112,6 +151,11 @@ public interface Clock {
             @Override
             public long currentTimeInMillis() {
                 return (long) (currentTimeInNanos() / 1_000_000.0);
+            }
+            
+            @Override
+            public double currentTime() {
+            	return ((double)currentTimeInNanos() / 1_000_000_000.0);
             }
         };
     }

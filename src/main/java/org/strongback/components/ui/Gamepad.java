@@ -16,6 +16,7 @@
 
 package org.strongback.components.ui;
 
+import java.util.function.IntSupplier;
 import java.util.function.IntToDoubleFunction;
 
 import org.strongback.components.Switch;
@@ -59,7 +60,8 @@ public interface Gamepad extends InputDevice {
     public abstract Switch getRightStick();
 
     public static Gamepad create(IntToDoubleFunction axisToValue, IntToBooleanFunction buttonNumberToSwitch,
-            IntToIntFunction dPad, ContinuousRange leftX, ContinuousRange leftY, ContinuousRange rightX, ContinuousRange rightY,
+            IntToIntFunction dPad, IntSupplier axisCount, IntSupplier buttonCount, IntSupplier POVCount,
+            ContinuousRange leftX, ContinuousRange leftY, ContinuousRange rightX, ContinuousRange rightY,
             ContinuousRange leftTrigger, ContinuousRange rightTrigger, Switch leftBumper, Switch rightBumper, Switch buttonA,
             Switch buttonB, Switch buttonX, Switch buttonY, Switch startButton, Switch selectButton, Switch leftStick,
             Switch rightStick) {
@@ -67,6 +69,11 @@ public interface Gamepad extends InputDevice {
             @Override
             public ContinuousRange getAxis(int axis) {
                 return () -> axisToValue.applyAsDouble(axis);
+            }
+
+            @Override
+            public Switch getAxis(int axis, double threshold) {
+                return () -> Math.abs(axisToValue.applyAsDouble(axis)) >= threshold;
             }
 
             @Override
@@ -78,6 +85,25 @@ public interface Gamepad extends InputDevice {
             public DirectionalAxis getDPad(int pad) {
                 return ()->dPad.applyAsInt(pad);
             }
+
+            @Override
+            public Switch getDPad(int pad, int direction) {
+                return ()->dPad.applyAsInt(pad) == direction;
+            }
+            
+			@Override
+			public int getAxisCount() {
+				return axisCount.getAsInt();
+			}
+			
+			@Override
+			public int getButtonCount() {
+				return buttonCount.getAsInt();
+			}
+			
+			public int getPOVCount() {
+				return POVCount.getAsInt();
+			}
 
             @Override
             public ContinuousRange getLeftX() {

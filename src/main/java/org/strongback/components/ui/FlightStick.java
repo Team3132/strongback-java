@@ -16,6 +16,7 @@
 
 package org.strongback.components.ui;
 
+import java.util.function.IntSupplier;
 import java.util.function.IntToDoubleFunction;
 
 import org.strongback.components.Switch;
@@ -39,12 +40,18 @@ public interface FlightStick extends InputDevice {
     public Switch getThumb();
 
     public static FlightStick create(IntToDoubleFunction axisToValue, IntToBooleanFunction buttonNumberToSwitch,
-            IntToIntFunction padToValue, ContinuousRange pitch, ContinuousRange yaw, ContinuousRange roll,
+            IntToIntFunction padToValue, IntSupplier axisCount, IntSupplier buttonCount, IntSupplier POVCount,
+            ContinuousRange pitch, ContinuousRange yaw, ContinuousRange roll,
             ContinuousRange throttle, Switch trigger, Switch thumb) {
         return new FlightStick() {
             @Override
             public ContinuousRange getAxis(int axis) {
                 return () -> axisToValue.applyAsDouble(axis);
+            }
+
+            @Override
+            public Switch getAxis(int axis, double threshold) {
+                return () -> Math.abs(axisToValue.applyAsDouble(axis)) >= threshold;
             }
 
             @Override
@@ -56,6 +63,25 @@ public interface FlightStick extends InputDevice {
             public DirectionalAxis getDPad(int pad) {
                 return () -> padToValue.applyAsInt(pad);
             }
+
+            @Override
+            public Switch getDPad(int pad, int direction) {
+                return ()->padToValue.applyAsInt(pad) == direction;
+            }
+            
+			@Override
+			public int getAxisCount() {
+				return axisCount.getAsInt();
+			}
+			
+			@Override
+			public int getButtonCount() {
+				return buttonCount.getAsInt();
+			}
+			
+			public int getPOVCount() {
+				return POVCount.getAsInt();
+			}
 
             @Override
             public ContinuousRange getPitch() {

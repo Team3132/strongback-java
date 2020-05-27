@@ -1,561 +1,486 @@
-/*
- * Strongback
- * Copyright 2015, Strongback and individual contributors by the @authors tag.
- * See the COPYRIGHT.txt in the distribution for a full listing of individual
- * contributors.
- *
- * Licensed under the MIT License; you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://opensource.org/licenses/MIT
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.strongback.hardware;
 
-import java.util.function.DoubleSupplier;
+import org.strongback.components.Motor;
+import org.strongback.components.TalonSensorCollection;
 
-import org.strongback.Strongback;
-import org.strongback.annotation.Immutable;
-import org.strongback.components.CurrentSensor;
-import org.strongback.components.Gyroscope;
-import org.strongback.components.Switch;
-import org.strongback.components.TalonSRX;
-import org.strongback.components.TemperatureSensor;
-import org.strongback.components.VoltageSensor;
+import frc.robot.lib.PIDF;
 
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.TalonControlMode;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.ParamEnum;
+import com.ctre.phoenix.motion.MotionProfileStatus;
+import com.ctre.phoenix.motion.TrajectoryPoint;
+import com.ctre.phoenix.motorcontrol.ControlFrame;
+import com.ctre.phoenix.motorcontrol.Faults;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.IMotorController;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
+import com.ctre.phoenix.motorcontrol.SensorTerm;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.StickyFaults;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-/**
- * Talon speed controller with position and current sensor
- *
- * @author Nathan Brown
- * @see TalonSRX
- * @see CANTalon
+/*
+ * Package to wrap a CTRE talon SRX controller.
+ * 
+ * This is the hardware interface class that implements the interface we use.
+ * 
+ * We have a scale factor. This is useful in position and velocity close loop feedback modes.
+ * 	For reading it we divide by the scale factor, when writing values we multiply by the scale factor.
+ * 
  */
-@Immutable
-class HardwareTalonSRX implements TalonSRX {
+public class HardwareTalonSRX implements Motor {
+	private HardwareSensorCollection sensorCollection;
+	private com.ctre.phoenix.motorcontrol.can.TalonSRX talon;
+	private double scale = 1.0;
+	private double lastDemand = 0;
+	private ControlMode lastMode = ControlMode.Disabled;
 
-    protected static interface InputSensor extends Gyroscope {
-        public double rawPositionForAngleInDegrees( double angle );
-        public double angleInDegreesFromRawPosition( double position );
-    }
+	private boolean scalable(ControlMode mode) {
+		return ((mode == ControlMode.Speed) || (mode == ControlMode.Position) || (mode == ControlMode.MotionMagic));
+	}
 
-    protected static final InputSensor NO_OP_SENSOR = new InputSensor() {
+	protected HardwareTalonSRX(com.ctre.phoenix.motorcontrol.can.TalonSRX talon) {
+		this.talon = talon;
+		sensorCollection = new HardwareSensorCollection(talon);
+	}
 
-        @Override
-        public double getAngle() {
-            return 0;
-        }
+	@Override
+	public void set(ControlMode mode, double demand) {
+		lastMode = mode;
+		lastDemand = demand;  // Pre-scaling.
+		if (scalable(mode)) {
+			demand *= scale;
+		}
+		if (mode.equals(Motor.ControlMode.Voltage)) {
+			// TalonSRX doesn't support voltage as a control mode, so percent output is used instead.
+			mode = ControlMode.DutyCycle;
+			demand /= talon.getBusVoltage();
+		}
+		if (mode.equals(Motor.ControlMode.Speed)) {
+			// In Velocity mode, the talon expects position change / 100ms.
+			// Convert ticks / sec to ticks / 100ms.
+			demand /= 10;
+		}
+		talon.set(mode.talonControlMode, demand);
+	}
 
-        @Override
-        public double getRate() {
-            return 0;
-        }
-        @Override
-        public InputSensor zero() {
-            return this; // do nothing
-        }
+	@Override
+	public double get() {
+		return lastDemand;
+	}
 
-        @Override
-        public double rawPositionForAngleInDegrees(double angleInDegrees) {
-            return 0.0;
-        }
+	@Override
+    public Motor setPosition(double position) {
+		setSelectedSensorPosition(position, 0, 30);
+        return this;        
+	}
+	
+	@Override
+	public double getPosition() {
+		return talon.getSelectedSensorPosition(0) / scale;
+	}
 
-        @Override
-        public double angleInDegreesFromRawPosition(double position) {
-            return 0.0;
-        }
-    };
+	@Override
+	public double getSpeed() {
+		// TalonSRX::getSelectedSensorVelocity() returns ticks / 100ms.
+		// Convert from ticks / 100ms to ticks / second and then scale.
+		return 10 * talon.getSelectedSensorVelocity() / scale;
+	}
 
-    protected static final class EncoderInputSensor implements InputSensor {
-        private double zero = 0.0;
-        private final DoubleSupplier positionInEdges;
-        private final DoubleSupplier velocityInEdgesPerCycle;
-        private final DoubleSupplier cyclePeriodInSeconds;
-        private final double pulsesPerDegree;
-        private final double edgesPerPulse;
+	@Override
+    public Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameter) {
+		scale = ticksPerTurn * gearRatio / wheelDiameter;
+		if (scale == 0) {
+			throw new RuntimeException("WARNING: HardwareSparkMAX::setScale() was passed zero, this isn't what you want!");
+		}
+		return this;
+	}
+	
+	public void neutralOutput() {
+		talon.neutralOutput();
+	}
 
-        protected EncoderInputSensor( DoubleSupplier positionInEdges, DoubleSupplier velocityInEdgesPerCycle,
-            double pulsesPerDegree, int edgesPerPulse, DoubleSupplier cyclesPeriodInSeconds ) {
-            this.positionInEdges = positionInEdges;
-            this.velocityInEdgesPerCycle = velocityInEdgesPerCycle;
-            this.cyclePeriodInSeconds = cyclesPeriodInSeconds;
-            this.pulsesPerDegree = pulsesPerDegree;
-            this.edgesPerPulse = edgesPerPulse;
-        }
+	public void setNeutralMode(NeutralMode neutralMode) {
+		talon.setNeutralMode(neutralMode);
+	}
 
-        @Override
-        public double rawPositionForAngleInDegrees(double angle) {
-            // Units: (degrees) x (pulses/degrees) * (edges/pulses) = (edges)
-            double relativeInput = angle * pulsesPerDegree * edgesPerPulse;
-            return relativeInput + zero;
-        }
+	@Override
+	public Motor setSensorPhase(boolean phase) {
+		talon.setSensorPhase(phase);
+		return this;
+	}
 
-        @Override
-        public double angleInDegreesFromRawPosition(double position) {
-            // Units: (edges) x (pulse/edges) x (degrees/pulse) = degrees
-            return (position - zero) / edgesPerPulse / pulsesPerDegree;
-        }
+	public double getBusVoltage() {
+		return talon.getBusVoltage();
+	}
 
-        @Override
-        public double getAngle() {
-            return angleInDegreesFromRawPosition(positionInEdges.getAsDouble());
-        }
+	@Override
+	public double getOutputPercent() {
+		return talon.getMotorOutputPercent();
+	}
 
-        @Override
-        public double getRate() {
-            // Units: (edges/cycle) * (pulses/edge) x (degrees/pulse) x (cycles/second) = (degrees/second)
-            return velocityInEdgesPerCycle.getAsDouble() / edgesPerPulse / pulsesPerDegree / cyclePeriodInSeconds.getAsDouble();
-        }
+	@Override
+	public double getOutputVoltage() {
+		return talon.getMotorOutputVoltage();
+	}
 
-        @Override
-        public Gyroscope zero() {
-            zero = positionInEdges.getAsDouble();
-            return this;
-        }
-    }
+	@Override
+	public double getOutputCurrent() {
+		return talon.getStatorCurrent();
+	}
 
-    protected static final class AnalogInputSensor implements InputSensor {
-        private double zero = 0.0;
-        private final DoubleSupplier analogPosition;
-        private final DoubleSupplier changeInVoltsPerCycle;
-        private final DoubleSupplier cyclePeriodInSeconds;
-        private final double analogRange;
-        private final double analogTurnsPerVolt;
-        private final double voltageRange;
+	@Override
+	public double getTemperature() {
+		return talon.getTemperature();
+	}
 
-        protected AnalogInputSensor( DoubleSupplier analogPosition, DoubleSupplier changeInVoltsPerCycle,
-                double analogRange, double analogTurnsPerVolt, double voltageRange, DoubleSupplier cyclePeriodInSeconds ) {
-            this.analogPosition = analogPosition;
-            this.changeInVoltsPerCycle = changeInVoltsPerCycle;
-            this.cyclePeriodInSeconds = cyclePeriodInSeconds;
-            this.analogRange = analogRange;
-            this.analogTurnsPerVolt = analogTurnsPerVolt;
-            this.voltageRange = voltageRange;
-        }
+	public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeoutMs) {
+		if (scalable(lastMode)) {
+			sensorPos = (int) (sensorPos * scale);
+		}
+		System.out.printf("Calling setSelectedSensorPosition(%f)\n", sensorPos);
+		return talon.setSelectedSensorPosition((int) sensorPos, pidIdx, timeoutMs);
+	}
 
-        @Override
-        public double rawPositionForAngleInDegrees(double angle) {
-            // Units: (0-1023) / 1023 x (turns/volt) x (volts) x (degrees/turn) = degrees
-            // Units: (degrees) x (turns/degrees) x (1/volts) x (volts/turn) * 1023  = (0-1023)
-            double relativeInput = angle / 360.0 / voltageRange / analogTurnsPerVolt * analogRange;
-            return relativeInput + zero;
-        }
+	@Override
+	public Motor setInverted(boolean invert) {
+		talon.setInverted(invert);
+		return this;
+	}
 
-        @Override
-        public double angleInDegreesFromRawPosition(double position) {
-            // Units: (0-1023) / 1023 x (turns/volt) x (volts) x (degrees/turn) = degrees
-            return (position - zero) / analogRange * analogTurnsPerVolt * voltageRange * 360.0;
-        }
-        @Override
-        public double getAngle() {
-            return angleInDegreesFromRawPosition(analogPosition.getAsDouble());
-        }
+	@Override
+	public boolean getInverted() {
+		return talon.getInverted();
+	}
 
-        @Override
-        public double getRate() {
-            // Units: (0-1023)/cycle / 1023 x (turns/volt) x (volts) x (degrees/turn) x (cycles/second) = (degrees/second)
-            return changeInVoltsPerCycle.getAsDouble() / analogRange * analogTurnsPerVolt * voltageRange * 360.0
-                    / cyclePeriodInSeconds.getAsDouble();
-        }
+	public ErrorCode configSelectedFeedbackSensor(FeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) {
+		return talon.configSelectedFeedbackSensor(feedbackDevice, pidIdx, timeoutMs);
+	}
 
-        @Override
-        public Gyroscope zero() {
-            zero = analogPosition.getAsDouble();
-            return this;
-        }
-    }
+	public ErrorCode setStatusFramePeriod(StatusFrameEnhanced frame, int periodMs, int timeoutMs) {
+		return talon.setStatusFramePeriod(frame, periodMs, timeoutMs);
+	}
 
-    protected static EncoderInputSensor encoderInput(DoubleSupplier positionInPulses, DoubleSupplier velocityInPulsesPerCycle,
-            double pulsesPerDegree, int risesPerPulse, DoubleSupplier cyclePeriodInSeconds) {
-        if ( pulsesPerDegree <= 0.0000001d && pulsesPerDegree >= 0.0000001d ) return null;
-        return new EncoderInputSensor(positionInPulses, velocityInPulsesPerCycle, pulsesPerDegree, risesPerPulse, cyclePeriodInSeconds);
-    }
+	public int getStatusFramePeriod(StatusFrameEnhanced frame, int timeoutMs) {
+		return talon.getStatusFramePeriod(frame, timeoutMs);
+	}
 
-    protected static AnalogInputSensor analogInput(DoubleSupplier analogPosition, DoubleSupplier changeInVoltsPerCycle,
-            double analogRange, double analogTurnsPerVolt, double voltageRange, DoubleSupplier cyclesPeriodInSeconds) {
-        if ( analogTurnsPerVolt <= 0.0000001d && analogTurnsPerVolt >= 0.0000001d ) return null;
-        return new AnalogInputSensor(analogPosition, changeInVoltsPerCycle, analogRange, analogTurnsPerVolt, voltageRange, cyclesPeriodInSeconds);
-    }
+	public ErrorCode configVelocityMeasurementPeriod(VelocityMeasPeriod period, int timeoutMs) {
+		return talon.configVelocityMeasurementPeriod(period, timeoutMs);
+	}
 
-    private static final double DEFAULT_ANALOG_RATE = 0.100;
-    private static final double DEFAULT_QUADRATURE_RATE = 0.100;
-    private static final double DEFAULT_FEEDBACK_RATE = 0.020;
+	public ErrorCode configVelocityMeasurementWindow(int windowSize, int timeoutMs) {
+		return talon.configVelocityMeasurementWindow(windowSize, timeoutMs);
+	}
 
-    private static final int RISES_PER_PULSE = 4; // 4x mode
-    private static final double MAX_ANALOG_VOLTAGE = 3.3; // 0-3.3V
-    private static final double MAX_ANALOG_RANGE = 1023; // 10 bits non-continuous
+	public ErrorCode configForwardLimitSwitchSource(LimitSwitchSource type, LimitSwitchNormal normalOpenOrClose,
+			int timeoutMs) {
+		return talon.configForwardLimitSwitchSource(type, normalOpenOrClose, timeoutMs);
+	}
 
-    protected final CANTalon talon;
-    protected final InputSensor encoderInput;
-    protected final InputSensor analogInput;
-    protected final InputSensor selectedEncoderInput;
-    protected final InputSensor selectedAnalogInput;
-    protected volatile InputSensor selectedInput = NO_OP_SENSOR;
-    protected volatile double quadratureRateInSeconds = DEFAULT_QUADRATURE_RATE;
-    protected volatile double analogRateInSeconds = DEFAULT_ANALOG_RATE;
-    protected volatile double feedbackRateInSeconds = DEFAULT_FEEDBACK_RATE;
-    protected final Switch forwardLimitSwitch;
-    protected final Switch reverseLimitSwitch;
-    protected final CurrentSensor outputCurrent;
-    protected final VoltageSensor outputVoltage;
-    protected final VoltageSensor busVoltage;
-    protected final TemperatureSensor temperature;
-    protected final Faults instantaneousFaults;
-    protected final Faults stickyFaults;
+	public ErrorCode configReverseLimitSwitchSource(LimitSwitchSource type, LimitSwitchNormal normalOpenOrClose,
+			int timeoutMs) {
+		return talon.configReverseLimitSwitchSource(type, normalOpenOrClose, timeoutMs);
+	}
 
-    HardwareTalonSRX(CANTalon talon, double pulsesPerDegree, double analogTurnsOverVoltageRange) {
-        this.talon = talon;
+	public ErrorCode configPeakCurrentLimit(int amps, int timeoutMs) {
+		return talon.configPeakCurrentLimit(amps, timeoutMs);
+	}
 
-        this.forwardLimitSwitch = talon::isFwdLimitSwitchClosed;
-        this.reverseLimitSwitch = talon::isRevLimitSwitchClosed;
-        this.outputCurrent = talon::getOutputCurrent;
-        this.outputVoltage = talon::getOutputVoltage;
-        this.busVoltage = talon::getBusVoltage;
-        this.temperature = talon::getTemperature;
-        this.encoderInput = encoderInput(talon::getEncPosition,
-                                             talon::getEncVelocity,
-                                             pulsesPerDegree,
-                                             RISES_PER_PULSE,
-                                             () -> quadratureRateInSeconds);
-        this.analogInput = analogInput(talon::getAnalogInPosition,
-                                           talon::getAnalogInVelocity,
-                                           MAX_ANALOG_RANGE,
-                                           analogTurnsOverVoltageRange / MAX_ANALOG_VOLTAGE,
-                                           MAX_ANALOG_VOLTAGE,
-                                           () -> analogRateInSeconds);
-        this.selectedEncoderInput = encoderInput(talon::getPosition,
-                                             talon::getSpeed,
-                                             pulsesPerDegree,
-                                             RISES_PER_PULSE,
-                                             () -> feedbackRateInSeconds);
-        this.selectedAnalogInput = analogInput(talon::getPosition,
-                                           talon::getSpeed,
-                                           MAX_ANALOG_RANGE,
-                                           analogTurnsOverVoltageRange / MAX_ANALOG_VOLTAGE,
-                                           MAX_ANALOG_VOLTAGE,
-                                           () -> feedbackRateInSeconds);
-        this.instantaneousFaults = new Faults() {
-            @Override
-            public Switch forwardLimitSwitch() {
-                return () -> talon.getFaultForLim() != 0;
-            }
+	public ErrorCode configPeakCurrentDuration(int milliseconds, int timeoutMs) {
+		return talon.configPeakCurrentDuration(milliseconds, timeoutMs);
+	}
 
-            @Override
-            public Switch reverseLimitSwitch() {
-                return () -> talon.getFaultRevLim() != 0;
-            }
+	public ErrorCode configContinuousCurrentLimit(int amps, int timeoutMs) {
+		return talon.configContinuousCurrentLimit(amps, timeoutMs);
+	}
 
-            @Override
-            public Switch forwardSoftLimit() {
-                return () -> talon.getFaultForSoftLim() != 0;
-            }
+	public void enableCurrentLimit(boolean enable) {
+		talon.enableCurrentLimit(enable);
+	}
 
-            @Override
-            public Switch reverseSoftLimit() {
-                return () -> talon.getFaultRevSoftLim() != 0;
-            }
+	public ErrorCode configOpenloopRamp(double secondsFromNeutralToFull, int timeoutMs) {
+		return talon.configOpenloopRamp(secondsFromNeutralToFull, timeoutMs);
+	}
 
-            @Override
-            public Switch hardwareFailure() {
-                return () -> talon.getFaultHardwareFailure() != 0;
-            }
+	public ErrorCode configClosedloopRamp(double secondsFromNeutralToFull, int timeoutMs) {
+		return talon.configClosedloopRamp(secondsFromNeutralToFull, timeoutMs);
+	}
 
-            @Override
-            public Switch overTemperature() {
-                return () -> talon.getFaultOverTemp() != 0;
-            }
+	public ErrorCode configPeakOutputForward(double percentOut, int timeoutMs) {
+		return talon.configPeakOutputForward(percentOut, timeoutMs);
+	}
 
-            @Override
-            public Switch underVoltage() {
-                return () -> talon.getFaultUnderVoltage() != 0;
-            }
-        };
-        this.stickyFaults = new Faults() {
-            @Override
-            public Switch forwardLimitSwitch() {
-                return () -> talon.getStickyFaultForLim() != 0;
-            }
+	public ErrorCode configPeakOutputReverse(double percentOut, int timeoutMs) {
+		return talon.configPeakOutputReverse(percentOut, timeoutMs);
+	}
 
-            @Override
-            public Switch reverseLimitSwitch() {
-                return () -> talon.getStickyFaultRevLim() != 0;
-            }
+	public ErrorCode configNominalOutputForward(double percentOut, int timeoutMs) {
+		return talon.configNominalOutputForward(percentOut, timeoutMs);
+	}
 
-            @Override
-            public Switch forwardSoftLimit() {
-                return () -> talon.getStickyFaultForSoftLim() != 0;
-            }
+	public ErrorCode configNominalOutputReverse(double percentOut, int timeoutMs) {
+		return talon.configNominalOutputReverse(percentOut, timeoutMs);
+	}
 
-            @Override
-            public Switch reverseSoftLimit() {
-                return () -> talon.getStickyFaultRevSoftLim() != 0;
-            }
+	public ErrorCode configNeutralDeadband(double percentDeadband, int timeoutMs) {
+		return talon.configNeutralDeadband(percentDeadband, timeoutMs);
+	}
 
-            @Override
-            public Switch hardwareFailure() {
-                return () -> talon.getFaultHardwareFailure() != 0; // no sticky version!
-            }
+	public ErrorCode configVoltageCompSaturation(double voltage, int timeoutMs) {
+		return talon.configVoltageCompSaturation(voltage, timeoutMs);
+	}
 
-            @Override
-            public Switch overTemperature() {
-                return () -> talon.getStickyFaultOverTemp() != 0;
-            }
+	public ErrorCode configVoltageMeasurementFilter(int filterWindowSamples, int timeoutMs) {
+		return talon.configVoltageMeasurementFilter(filterWindowSamples, timeoutMs);
+	}
 
-            @Override
-            public Switch underVoltage() {
-                return () -> talon.getStickyFaultUnderVoltage() != 0;
-            }
-        };
-    }
+	public void enableVoltageCompensation(boolean enable) {
+		talon.enableVoltageCompensation(enable);
+	}
 
-    @Override
-    public int getDeviceID() {
-        return talon.getDeviceID();
-    }
+	public ErrorCode configSelectedFeedbackSensor(RemoteFeedbackDevice feedbackDevice, int pidIdx, int timeoutMs) {
+		return talon.configSelectedFeedbackSensor(feedbackDevice, pidIdx, timeoutMs);
+	}
 
-    @Override
-    public double getSpeed() {
-        talon.changeControlMode(TalonControlMode.PercentVbus);
-        return talon.get();
-    }
+	public ErrorCode configRemoteFeedbackFilter(int deviceID, RemoteSensorSource remoteSensorSource, int remoteOrdinal,
+			int timeoutMs) {
+		return talon.configRemoteFeedbackFilter(deviceID, remoteSensorSource, remoteOrdinal, timeoutMs);
+	}
 
-    @Override
-    public TalonSRX setSpeed(double speed) {
-        talon.changeControlMode(TalonControlMode.PercentVbus);
-        talon.set(speed);
+	public ErrorCode configSensorTerm(SensorTerm sensorTerm, FeedbackDevice feedbackDevice, int timeoutMs) {
+		return talon.configSensorTerm(sensorTerm, feedbackDevice, timeoutMs);
+	}
+
+	public ErrorCode setControlFramePeriod(ControlFrame frame, int periodMs) {
+		return talon.setControlFramePeriod(frame, periodMs);
+	}
+
+	public ErrorCode setStatusFramePeriod(StatusFrame frame, int periodMs, int timeoutMs) {
+		return talon.setStatusFramePeriod(frame, periodMs, timeoutMs);
+	}
+
+	public int getStatusFramePeriod(StatusFrame frame, int timeoutMs) {
+		return talon.getStatusFramePeriod(frame, timeoutMs);
+	}
+
+	public ErrorCode configForwardLimitSwitchSource(RemoteLimitSwitchSource type, LimitSwitchNormal normalOpenOrClose,
+			int deviceID, int timeoutMs) {
+		return talon.configForwardLimitSwitchSource(type, normalOpenOrClose, deviceID, timeoutMs);
+	}
+
+	public ErrorCode configReverseLimitSwitchSource(RemoteLimitSwitchSource type, LimitSwitchNormal normalOpenOrClose,
+			int deviceID, int timeoutMs) {
+		return talon.configReverseLimitSwitchSource(type, normalOpenOrClose, deviceID, timeoutMs);
+	}
+
+	public void overrideLimitSwitchesEnable(boolean enable) {
+		talon.overrideLimitSwitchesEnable(enable);
+	}
+
+	public ErrorCode configForwardSoftLimitThreshold(int forwardSensorLimit, int timeoutMs) {
+		return talon.configForwardSoftLimitThreshold(forwardSensorLimit, timeoutMs);
+	}
+
+	public ErrorCode configReverseSoftLimitThreshold(int reverseSensorLimit, int timeoutMs) {
+		return talon.configReverseSoftLimitThreshold(reverseSensorLimit, timeoutMs);
+	}
+
+	public ErrorCode configForwardSoftLimitEnable(boolean enable, int timeoutMs) {
+		return talon.configForwardSoftLimitEnable(enable, timeoutMs);
+	}
+
+	public ErrorCode configReverseSoftLimitEnable(boolean enable, int timeoutMs) {
+		return talon.configReverseSoftLimitEnable(enable, timeoutMs);
+	}
+
+	public void overrideSoftLimitsEnable(boolean enable) {
+		talon.overrideSoftLimitsEnable(enable);
+	}
+
+	@Override
+	public Motor setPIDF(int slotIdx, PIDF pidf) {
+		// Ignore return values.
+		talon.config_kP(slotIdx, pidf.p, 10);
+		talon.config_kI(slotIdx, pidf.i, 10);
+		talon.config_kD(slotIdx, pidf.d, 10);
+		talon.config_kF(slotIdx, pidf.f, 10);
+		return this;
+	}
+
+	@Override
+	public Motor selectProfileSlot(int slotIdx) {
+        // Not implmented by default.
         return this;
     }
 
-    @Override
-    public void stop() {
-        talon.enableBrakeMode(true);
-        talon.set(0);
-    }
+	public ErrorCode config_IntegralZone(int slotIdx, int izone, int timeoutMs) {
+		return talon.config_IntegralZone(slotIdx, izone, timeoutMs);
+	}
 
-    @Override
-    public Gyroscope getEncoderInput() {
-        return encoderInput;
-    }
+	public ErrorCode configAllowableClosedloopError(int slotIdx, int allowableCloseLoopError, int timeoutMs) {
+		return talon.configAllowableClosedloopError(slotIdx, allowableCloseLoopError, timeoutMs);
+	}
 
-    @Override
-    public Gyroscope getAnalogInput() {
-        return analogInput;
-    }
+	public ErrorCode configMaxIntegralAccumulator(int slotIdx, double iaccum, int timeoutMs) {
+		return talon.configMaxIntegralAccumulator(slotIdx, iaccum, timeoutMs);
+	}
 
-    @Override
-    public Gyroscope getSelectedSensor() {
-        return selectedInput;
-    }
+	public ErrorCode setIntegralAccumulator(double iaccum, int pidIdx, int timeoutMs) {
+		return talon.setIntegralAccumulator(iaccum, pidIdx, timeoutMs);
+	}
 
-    @Override
-    public TalonSRX setFeedbackDevice(FeedbackDevice device) {
-        talon.setFeedbackDevice(CANTalon.FeedbackDevice.valueOf(device.value()));
-        switch(device) {
-            case ANALOG_POTENTIOMETER:
-            case ANALOG_ENCODER:
-                if ( selectedAnalogInput != null ) {
-                    selectedInput = selectedAnalogInput;
-                } else {
-                    Strongback.logger().error("Unable to use the analog input for feedback, since the Talon SRX (device " + getDeviceID() + ") was not instantiated with an analog input. Check how this device was created using Strongback's Hardware class.");
-                    selectedInput = NO_OP_SENSOR;
-                }
-                break;
-            case QUADRATURE_ENCODER:
-            case ENCODER_RISING:
-                if ( selectedEncoderInput != null ) {
-                    selectedInput = selectedEncoderInput;
-                } else {
-                    Strongback.logger().error("Unable to use the quadrature encoder input for feedback, since the Talon SRX (device " + getDeviceID() + ") was not instantiated with an encoder input. Check how this device was created using Strongback's Hardware class.");
-                    selectedInput = NO_OP_SENSOR;
-                }
-                break;
-            case ENCODER_FALLING:
-                // for 2015 the Talon SRX firmware did not support the falling or rising mode ...
-                selectedInput = NO_OP_SENSOR;
-                break;
-            case MAGNETIC_ENCODER_ABSOLUTE:
-                selectedInput = NO_OP_SENSOR;
-                break;
-            case MAGNETIC_ENCODER_RELATIVE:
-                selectedInput = NO_OP_SENSOR;
-                break;
-            case PULSE_WIDTH:
-                selectedInput = NO_OP_SENSOR;
-                break;
-        }
-        return this;
-    }
+	public int getClosedLoopError(int pidIdx) {
+		int value = talon.getClosedLoopError(pidIdx);
 
-    @Override
-    public TalonSRX setStatusFrameRate(StatusFrameRate frameRate, int periodMillis) {
-        talon.setStatusFrameRateMs(CANTalon.StatusFrameRate.valueOf(frameRate.value()), periodMillis);
-        double periodInSeconds = periodMillis / 1000.0;
-        switch(frameRate) {
-            case FEEDBACK:
-                feedbackRateInSeconds = periodInSeconds;
-                break;
-            case QUADRATURE_ENCODER:
-                quadratureRateInSeconds = periodInSeconds;
-                break;
-            case ANALOG_TEMPERATURE_BATTERY_VOLTAGE:
-                analogRateInSeconds = periodInSeconds;
-                break;
-            case GENERAL:
-                // nothing to set, since our code doesn't use the "general" frames
-                break;
-        }
-        return this;
-    }
+		if (scalable(lastMode)) {
+			value = (int) (value / scale);
+		}
+		return value;
+	}
 
-    @Override
-    public TalonSRX reverseSensor(boolean flip) {
-        talon.reverseSensor(flip);
-        return this;
-    }
+	public double getIntegralAccumulator(int pidIdx) {
+		return talon.getIntegralAccumulator(pidIdx);
+	}
 
-    @Override
-    public Switch getForwardLimitSwitch() {
-        return forwardLimitSwitch;
-    }
+	public double getErrorDerivative(int pidIdx) {
+		return talon.getErrorDerivative(pidIdx);
+	}
 
-    @Override
-    public Switch getReverseLimitSwitch() {
-        return reverseLimitSwitch;
-    }
+	public void selectProfileSlot(int slotIdx, int pidIdx) {
+		talon.selectProfileSlot(slotIdx, pidIdx);
+	}
 
-    @Override
-    public CurrentSensor getCurrentSensor() {
-        return outputCurrent;
-    }
+	public int getActiveTrajectoryPosition() {
+		return talon.getActiveTrajectoryPosition();
+	}
 
-    @Override
-    public VoltageSensor getVoltageSensor() {
-        return outputVoltage;
-    }
+	public int getActiveTrajectoryVelocity() {
+		return talon.getActiveTrajectoryVelocity();
+	}
 
-    @Override
-    public VoltageSensor getBusVoltageSensor() {
-        return busVoltage;
-    }
+	public double getActiveTrajectoryHeading() {
+		// return talon.getActiveTrajectoryHeading();
+		return talon.getActiveTrajectoryPosition(1);
+	}
 
-    @Override
-    public TemperatureSensor getTemperatureSensor() {
-        return temperature;
-    }
+	public ErrorCode configMotionCruiseVelocity(int sensorUnitsPer100ms, int timeoutMs) {
+		return talon.configMotionCruiseVelocity(sensorUnitsPer100ms, timeoutMs);
+	}
 
-    @Override
-    public TalonSRX setForwardSoftLimit(int forwardLimitDegrees) {
-        // Compute the desired forward limit in terms of the current selected input sensor ...
-        if ( this.selectedInput != null ) {
-            double rawPosition = this.selectedInput.rawPositionForAngleInDegrees(forwardLimitDegrees);
-            talon.setForwardSoftLimit(rawPosition);
-        }
-        return this;
-    }
+	public ErrorCode configMotionAcceleration(int sensorUnitsPer100msPerSec, int timeoutMs) {
+		return talon.configMotionAcceleration(sensorUnitsPer100msPerSec, timeoutMs);
+	}
 
-    @Override
-    public HardwareTalonSRX enableForwardSoftLimit(boolean enable) {
-        talon.enableForwardSoftLimit(enable);
-        return this;
-    }
+	public ErrorCode clearMotionProfileTrajectories() {
+		return talon.clearMotionProfileTrajectories();
+	}
 
-    @Override
-    public HardwareTalonSRX setReverseSoftLimit(int reverseLimitDegrees) {
-        // Compute the desired reverse limit in terms of the current selected input sensor ...
-        if ( this.selectedInput != null ) {
-            double rawPosition = this.selectedInput.rawPositionForAngleInDegrees(reverseLimitDegrees);
-            talon.setReverseSoftLimit(rawPosition);
-        }
-        return this;
-    }
+	public int getMotionProfileTopLevelBufferCount() {
+		return talon.getMotionProfileTopLevelBufferCount();
+	}
 
-    @Override
-    public HardwareTalonSRX enableReverseSoftLimit(boolean enable) {
-        talon.enableReverseSoftLimit(enable);
-        return this;
-    }
+	public ErrorCode pushMotionProfileTrajectory(TrajectoryPoint trajPt) {
+		return talon.pushMotionProfileTrajectory(trajPt);
+	}
 
-    @Override
-    public TalonSRX enableLimitSwitch(boolean forward, boolean reverse) {
-        talon.enableLimitSwitch(forward, reverse);
-        return this;
-    }
+	public boolean isMotionProfileTopLevelBufferFull() {
+		return talon.isMotionProfileTopLevelBufferFull();
+	}
 
-    @Override
-    public TalonSRX enableBrakeMode(boolean brake) {
-        talon.enableBrakeMode(brake);
-        return this;
-    }
+	public void processMotionProfileBuffer() {
+		talon.processMotionProfileBuffer();
+	}
 
-    @Override
-    public TalonSRX setForwardLimitSwitchNormallyOpen(boolean normallyOpen) {
-        talon.ConfigFwdLimitSwitchNormallyOpen(normallyOpen);
-        return this;
-    }
+	public ErrorCode getMotionProfileStatus(MotionProfileStatus statusToFill) {
+		return talon.getMotionProfileStatus(statusToFill);
+	}
 
-    @Override
-    public TalonSRX setReverseLimitSwitchNormallyOpen(boolean normallyOpen) {
-        talon.ConfigRevLimitSwitchNormallyOpen(normallyOpen);
-        return this;
-    }
+	public ErrorCode clearMotionProfileHasUnderrun(int timeoutMs) {
+		return talon.clearMotionProfileHasUnderrun(timeoutMs);
+	}
 
-    @Override
-    public TalonSRX setVoltageRampRate(double rampRate) {
-        talon.setVoltageRampRate(rampRate);
-        return this;
-    }
+	public ErrorCode changeMotionControlFramePeriod(int periodMs) {
+		return talon.changeMotionControlFramePeriod(periodMs);
+	}
 
-    @Override
-    public Faults faults() {
-        return instantaneousFaults;
-    }
+	public ErrorCode getLastError() {
+		return talon.getLastError();
+	}
 
-    @Override
-    public Faults stickyFaults() {
-        return stickyFaults;
-    }
+	public ErrorCode getFaults(Faults toFill) {
+		return talon.getFaults(toFill);
+	}
 
-    @Override
-    public TalonSRX clearStickyFaults() {
-        talon.clearStickyFaults();
-        return this;
-    }
+	public ErrorCode getStickyFaults(StickyFaults toFill) {
+		return talon.getStickyFaults(toFill);
+	}
 
-    @Override
-    public long getFirmwareVersion() {
-        return talon.GetFirmwareVersion();
-    }
+	public ErrorCode clearStickyFaults(int timeoutMs) {
+		return talon.clearStickyFaults(timeoutMs);
+	}
 
-    @Override
-    public boolean isSafetyEnabled() {
-        return talon.isSafetyEnabled();
-    }
+	public int getFirmwareVersion() {
+		return talon.getFirmwareVersion();
+	}
 
-    @Override
-    public TalonSRX setSafetyEnabled(boolean enabled) {
-        talon.setSafetyEnabled(enabled);
-        return this;
-    }
+	public boolean hasResetOccurred() {
+		return talon.hasResetOccurred();
+	}
 
-    @Override
-    public double getExpiration() {
-        return talon.getExpiration();
-    }
+	public ErrorCode configSetCustomParam(int newValue, int paramIndex, int timeoutMs) {
+		return talon.configSetCustomParam(newValue, paramIndex, timeoutMs);
+	}
 
-    @Override
-    public TalonSRX setExpiration(double timeout) {
-        talon.setExpiration(timeout);
-        return this;
-    }
+	public int configGetCustomParam(int paramIndex, int timoutMs) {
+		return talon.configGetCustomParam(paramIndex, timoutMs);
+	}
 
-    @Override
-    public boolean isAlive() {
-        return talon.isAlive();
-    }
+	public ErrorCode configSetParameter(ParamEnum param, double value, int subValue, int ordinal, int timeoutMs) {
+		return talon.configSetParameter(param, value, subValue, ordinal, timeoutMs);
+	}
+
+	public ErrorCode configSetParameter(int param, double value, int subValue, int ordinal, int timeoutMs) {
+		return talon.configSetParameter(param, value, subValue, ordinal, timeoutMs);
+	}
+
+	public double configGetParameter(ParamEnum paramEnum, int ordinal, int timeoutMs) {
+		return talon.configGetParameter(paramEnum, ordinal, timeoutMs);
+	}
+
+	public double configGetParameter(int paramEnum, int ordinal, int timeoutMs) {
+		return talon.configGetParameter(paramEnum, ordinal, timeoutMs);
+	}
+
+	public int getBaseID() {
+		return talon.getBaseID();
+	}
+
+	public int getDeviceID() {
+		return talon.getDeviceID();
+	}
+
+	public TalonSensorCollection getSensorCollection() {
+		return sensorCollection;
+	}
+
+	public HardwareTalonSRX follow(IMotorController master) {
+		talon.follow(master);
+		return this;
+	}
+
+	public IMotorController getHWTalon() {
+		return talon;
+	}
+
+	public TalonSRX getTalonSRX() {
+		return talon;
+	}
 }

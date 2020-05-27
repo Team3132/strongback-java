@@ -815,6 +815,17 @@ public final class Strongback {
     }
 
     /**
+     * Update the execution period of the executor.
+     * Can only be called when strongback isn't running.
+     * 
+     * @param executionPeriodInMillis time between executions.
+     * @return if it was successful.
+     */
+    public static boolean setExecutionPeriod(long executionPeriodInMillis) {
+    	return ENGINE.setExecutionPeriod(executionPeriodInMillis);
+    }
+
+    /**
      * Get the number of times the {@link #executor() executor} has been unable to execute all work within the time period
      * {@link Configurator#useExecutionPeriod(long, TimeUnit) specified in the configuration}.
      *
@@ -1072,9 +1083,9 @@ public final class Strongback {
                         try {
                             customHandler.handle(actualTimeInMillis, desiredTimeInMillis);
                         } catch (Throwable t) {
-                            logger().error(t, "Error with custom handler for excessive execution times");
-                            logger().error("Unable to execute all activities within " + desiredTimeInMillis + " milliseconds ("
-                                    + actualTimeInMillis + " ms too long)!");
+                            //logger().error(t, "Error with custom handler for excessive execution times");
+                            //logger().error("Unable to execute all activities within " + desiredTimeInMillis + " milliseconds ("
+                            //        + actualTimeInMillis + " ms too long)!");
                         }
                     }
 
@@ -1089,8 +1100,8 @@ public final class Strongback {
                     @Override
                     public void handle(long actualTimeInMillis, long desiredTimeInMillis) {
                         executorDelayCounter.incrementAndGet();
-                        logger().error("Unable to execute all activities within " + desiredTimeInMillis + " milliseconds ("
-                                + actualTimeInMillis + " ms too long)!");
+                        //logger().error("Unable to execute all activities within " + desiredTimeInMillis + " milliseconds ("
+                        //        + actualTimeInMillis + " ms too long)!");
                     }
 
                     @Override

@@ -14,25 +14,40 @@
  * limitations under the License.
  */
 
-package org.strongback.components;
+package org.strongback.mock;
 
 import org.strongback.annotation.ThreadSafe;
+import org.strongback.components.VoltageSensor;
 
 /**
- * A component that can report and control the speed.
+ * A {@link VoltageSensor} implementation useful for testing, where the {@link VoltageSensor} can be explicitly set in the test
+ * case so that the known value is read by the component that uses an {@link VoltageSensor}.
  *
  * @author Randall Hauch
  */
 @ThreadSafe
-@FunctionalInterface
-public interface SpeedController {
+public class MockVoltageSensor implements VoltageSensor {
+
+    private volatile double voltage = 0;
+
+    @Override
+    public double getVoltage() {
+        return voltage;
+    }
 
     /**
-     * Sets the speed.
+     * Set the voltage value {@link #getVoltage() returned} by this object.
      *
-     * @param speed the new speed as a double
+     * @param voltage the voltage
      * @return this object to allow chaining of methods; never null
      */
-    public SpeedController setSpeed(double speed);
+    public MockVoltageSensor setVoltage(double voltage) {
+        this.voltage = voltage;
+        return this;
+    }
 
+    @Override
+    public String toString() {
+        return Double.toString(getVoltage()) + " V";
+    }
 }

@@ -32,11 +32,11 @@ public interface Solenoid extends Requirable {
      */
     static enum Direction {
         /** The solenoid is extending. */
-        EXTENDING,
+        EXTENDED,
         /** The solenoid is retracting. */
-        RETRACTING,
+        RETRACTED,
         /** The solenoid is stopped. */
-        STOPPED;
+        STOPPED
     }
 
     /**
@@ -59,31 +59,23 @@ public interface Solenoid extends Requirable {
     Solenoid retract();
 
     /**
-     * Determine if this solenoid is or was extending.
+     * Determine if this solenoid is extended.
      *
-     * @return {@code true} if this solenoid is in the process of extending but not yet fully extended, or {@code false}
-     *         otherwise
+     * @return {@code true} if this solenoid is fully extended
      */
-    default boolean isExtending() {
-        return getDirection() == Direction.EXTENDING;
-    }
+    boolean isExtended();
 
     /**
-     * Determine if this solenoid is or was retracting.
+     * Determine if this solenoid is retracted.
      *
-     * @return {@code true} if this solenoid is in the process of retracting but not yet fully retracted, or {@code false}
-     *         otherwise
+     * @return {@code true} if this solenoid is fully retracted
      */
-    default boolean isRetracting() {
-        return getDirection() == Direction.RETRACTING;
-    }
+    boolean isRetracted();
 
     /**
      * Determine if this solenoid is stopped.
      *
-     * @return {@code true} if this solenoid is not retracting or extending, or false otherwise
+     * @return {@code true} if this solenoid is not moving, or false otherwise
      */
-    default boolean isStopped() {
-        return getDirection() == Direction.STOPPED;
-    }
+    boolean isStopped();
 }

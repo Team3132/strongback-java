@@ -19,7 +19,6 @@ package org.strongback.hardware;
 import org.strongback.components.Motor;
 import org.strongback.function.DoubleToDoubleFunction;
 
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.SpeedController;
 
 /**
@@ -41,17 +40,28 @@ class HardwareMotor implements Motor {
     }
 
     @Override
-    public HardwareMotor setSpeed(double speed) {
-        controller.set(speedValidator.applyAsDouble(speed));
-        return this;
+    public void set(ControlMode mode, double demand) {
+        if (mode != ControlMode.DutyCycle) {
+            // These types of motors only support duty cycle, so only 
+            // pass through either a duty cycle demand or zero demand.
+            demand = 0;
+        }
+        controller.set(speedValidator.applyAsDouble(demand));
     }
 
+    /**
+     * Speed detection is not available for these motor controllers.
+     */
     @Override
     public double getSpeed() {
-        return controller.get();
+        return 0;
     }
 
-    public short getSpeedAsShort() {
-        return (short) ((PWM) (controller)).getRaw();
+    /**
+     * Returns the last set duty cycle.
+     */
+    @Override
+    public double get() {
+        return controller.get();
     }
 }

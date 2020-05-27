@@ -53,6 +53,13 @@ public interface Controller extends Requirable {
     */
    public Controller disable();
 
+   /**
+    * Set the target value for this controller
+    * @param value
+    * @return this object so that methods can be chained; never null
+    */
+	public Controller setValue(double value);
+	
     /**
      * Get the current measured value for this controller.
      * @return the current value

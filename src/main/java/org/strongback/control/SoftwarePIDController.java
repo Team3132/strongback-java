@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -33,10 +32,6 @@ import org.strongback.Executor;
 import org.strongback.Strongback;
 import org.strongback.annotation.Immutable;
 import org.strongback.annotation.ThreadSafe;
-
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 /**
  * A software-only Proportional Integral Differential (PID) controller with optional support for feed forward. The source of
@@ -86,7 +81,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  * @author Randall Hauch
  */
 @ThreadSafe
-public class SoftwarePIDController implements LiveWindowSendable, PIDController {
+public class SoftwarePIDController implements PIDController {
 
     public static int DEFAULT_PROFILE = 0;
 
@@ -107,17 +102,10 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
     private volatile double totalError = 0.0d;
     private volatile double prevError = 0.0d;
     private volatile double result = 0.0d;
-    private volatile ITable table;
     private final Executable executable = new Executable() {
         @Override
         public void execute(long timeInMillis) {
             computeOutput();
-        }
-    };
-    private final ITableListener listener = new ITableListener() {
-        @Override
-        public void valueChanged(ITable table, String key, Object value, boolean isNew) {
-            SoftwarePIDController.this.valueChanged(table, key, value, isNew);
         }
     };
 
@@ -181,7 +169,6 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
     @Override
     public SoftwarePIDController enable() {
         enabled.set(true);
-        onTable(table -> table.putBoolean("enabled", true));
         return this;
     }
 
@@ -190,7 +177,6 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
         enabled.set(false);
         output.accept(0.0d);
         reset();
-        onTable(table -> table.putBoolean("enabled", false));
         return this;
     }
 
@@ -251,13 +237,6 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
             this.gainsByProfile.put(profile, newGains);
             if (profile == this.currentProfile) {
                 this.gains = newGains;
-                onTable(table -> {
-                    table.putNumber("p", gains.p);
-                    table.putNumber("i", gains.i);
-                    table.putNumber("d", gains.d);
-                    table.putNumber("f", gains.feedForward);
-                    table.putNumber("profile", profile);
-                });
             }
         }
         return this;
@@ -290,13 +269,6 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
         synchronized (this) {
             this.gains = gains;
             this.currentProfile = profile;
-            onTable(table -> {
-                table.putNumber("p", gains.p);
-                table.putNumber("i", gains.i);
-                table.putNumber("d", gains.d);
-                table.putNumber("f", gains.feedForward);
-                table.putNumber("profile", profile);
-            });
         }
         return this;
     }
@@ -351,6 +323,11 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
         updateSetpoint(target);
         return this;
     }
+    
+    @Override
+    public SoftwarePIDController setValue(double value) {
+    	return withTarget(value);
+    }
 
     @Override
     public double getTarget() {
@@ -382,7 +359,6 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
 
     private void updateSetpoint(Target target) {
         reset();
-        onTable(table -> table.putNumber("setpoint", target.setpoint));
     }
 
     /**
@@ -679,84 +655,4 @@ public class SoftwarePIDController implements LiveWindowSendable, PIDController 
             return output;
         }
     }
-
-    protected void onTable(Consumer<ITable> updateTable) {
-        ITable table = this.table;
-        if (table != null) updateTable.accept(table);
-    }
-
-    protected void valueChanged(ITable table, String key, Object value, boolean isNew) {
-        if (key.equals("profile")) {
-            int profile = (int) table.getNumber("profile", 0);
-            if (gainsByProfile.containsKey(profile)) {
-                useProfile(profile);
-            }
-        } else if (key.equals("p") || key.equals("i") || key.equals("d") || key.equals("f")) {
-            Gains gains = this.gains;
-            if (gains.p != table.getNumber("p", 0.0) || gains.i != table.getNumber("i", 0.0)
-                    || gains.d != table.getNumber("d", 0.0) || gains.feedForward != table.getNumber("f", 0.0)) {
-                withGains(table.getNumber("p", 0.0),
-                          table.getNumber("i", 0.0),
-                          table.getNumber("d", 0.0),
-                          table.getNumber("f", 0.0));
-            }
-        } else if (key.equals("setpoint")) {
-            Target target = this.target;
-            if (target.setpoint != ((Double) value).doubleValue()) {
-                withTarget(((Double) value).doubleValue());
-            }
-        } else if (key.equals("enabled")) {
-            if (isEnabled() != ((Boolean) value).booleanValue()) {
-                if (((Boolean) value).booleanValue()) {
-                    enable();
-                } else {
-                    disable();
-                }
-            }
-        }
-    }
-
-    @Override
-    public synchronized void initTable(ITable subtable) {
-        if (this.table != null) {
-            this.table.removeTableListener(listener);
-        }
-        this.table = subtable;
-        if (table != null) {
-            Gains gains = this.gains;
-            Target target = this.target;
-            table.putNumber("p", gains.p);
-            table.putNumber("i", gains.i);
-            table.putNumber("d", gains.d);
-            table.putNumber("f", gains.feedForward);
-            table.putNumber("setpoint", target.setpoint);
-            table.putBoolean("enabled", isEnabled());
-            table.putNumber("profile", getCurrentProfile());
-            table.addTableListener(listener, false);
-        }
-    }
-
-    @Override
-    public String getSmartDashboardType() {
-        return "PIDController";
-    }
-
-    @Override
-    public ITable getTable() {
-        return table;
-    }
-
-    @Override
-    public void startLiveWindowMode() {
-        disable();
-    }
-
-    @Override
-    public void stopLiveWindowMode() {
-    }
-
-    @Override
-    public void updateTable() {
-    }
-
 }

@@ -27,7 +27,7 @@ import org.strongback.util.Iterators;
 
 /**
  * A threadsafe {@link DataRecorder} that allows for switches, motors and other functions to be registered, and then to
- * {@link #start() start} recording the values.
+ * {@link DataRecorderDriver#start() start} recording the values.
  *
  * @author Randall Hauch
  */

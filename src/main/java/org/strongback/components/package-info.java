@@ -42,7 +42,7 @@
  * but it is intended primarily as a base interface for {@link org.strongback.components.Motor}.</li>
  * <li>{@link org.strongback.components.Accelerometer} - A sensor that provides the acceleration along a single axis.</li>
  * <li>{@link org.strongback.components.Relay} - A device that can be turned on and off.</li>
- * <li>{@link org.strongback.components.Solenoid} - A device that can be is a device that can be extended and retracted. Although similar to a
+ * <li>{@link org.strongback.components.InstantaneousSolenoid} - A device that can be is a device that can be extended and retracted. Although similar to a
  * {@link org.strongback.components.Relay}, pneumatic solenoids are common enough in FRC to distinguish as a separate low-level component.</li>
  * </ul>
  * <h2>Higher-level components</h2>
@@ -63,7 +63,7 @@
  * <li>{@link org.strongback.components.ThreeAxisAccelerometer} - A combination of two single-axis {@link org.strongback.components.Accelerometer}s. It can be used to represent
  * a physical 3-axis accelerometer, such as the ADXL345 or built-in accelerometer on the RoboRIO.</li>
  * <li>{@link org.strongback.components.PowerPanel} - An abstraction of the sensors on the Power Distribution Panel.</li>
- * <li>{@link org.strongback.components.SolenoidWithPosition} - A {@link org.strongback.components.Solenoid} that can determine its position. Typically this would be used to
+ * <li>{@link org.strongback.components.Solenoid} - A {@link org.strongback.components.InstantaneousSolenoid} that can determine its position. Typically this would be used to
  * represent a pneumatic solenoid with reed switches.</li>
  * </ul>
  * <h2>Utility interfaces</h2>

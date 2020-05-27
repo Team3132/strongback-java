@@ -16,7 +16,6 @@
 
 package org.strongback.hardware;
 
-import org.strongback.annotation.Experimental;
 import org.strongback.components.Accelerometer;
 import org.strongback.components.AngleSensor;
 import org.strongback.components.DistanceSensor;
@@ -25,20 +24,21 @@ import org.strongback.components.Motor;
 import org.strongback.components.PneumaticsModule;
 import org.strongback.components.PowerPanel;
 import org.strongback.components.Relay;
+import org.strongback.components.Servo;
 import org.strongback.components.Solenoid;
 import org.strongback.components.Switch;
-import org.strongback.components.TalonSRX;
 import org.strongback.components.ThreeAxisAccelerometer;
 import org.strongback.components.TwoAxisAccelerometer;
 import org.strongback.components.ui.FlightStick;
 import org.strongback.components.ui.Gamepad;
 import org.strongback.components.ui.InputDevice;
-import org.strongback.control.TalonController;
 import org.strongback.function.DoubleToDoubleFunction;
 import org.strongback.util.Values;
 
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.TalonControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.ADXL345_I2C;
 import edu.wpi.first.wpilibj.ADXL345_SPI;
@@ -81,6 +81,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  * @author Zach Anderson
  * @author Randall Hauch
  */
+@SuppressWarnings("resource")
 public class Hardware {
 
     /**
@@ -110,6 +111,35 @@ public class Hardware {
      */
     public static PneumaticsModule pneumaticsModule(int canID) {
         return new HardwarePneumaticsModule(new Compressor(canID));
+    }
+    
+    /**
+     * Factory method for servos.
+     */
+    public static final class Servos {
+    	/**
+    	 * Create a {@link Servo} that uses a WPILib {@link edu.wpi.first.wpilibj.Servo} on the specified channel.
+    	 * 
+    	 * @param channel the channel the servo is plugged into
+    	 * @return The new servo; never null
+    	 */
+    	public static Servo servo(int channel) {
+    		return new HardwareServo(new edu.wpi.first.wpilibj.Servo(channel));
+    	}
+
+    	/**
+    	 * Create a {@link HardwareTimedServo} that uses a WPILib {@link edu.wpi.first.wpilibj.Servo} on the specified channel.
+    	 * 
+    	 * @param channel the channel the servo is plugged into
+    	 * @param min minimum position allowed for the servo
+    	 * @param max maximum position allowed for the servo
+    	 * @param travelPerSecond speed at which the servo changes position
+    	 * @param initial the initial position of the servo
+    	 * @return The new servo; never null
+    	 */
+    	public static Servo timedServo(int channel, double min, double max, double travelPerSecond, double initial) {
+    		return new HardwareTimedServo(new edu.wpi.first.wpilibj.Servo(channel), min, max, travelPerSecond, initial);
+    	}
     }
 
     /**
@@ -574,126 +604,6 @@ public class Hardware {
         }
 
         /**
-         * Creates a {@link TalonSRX} motor controlled by a Talon SRX with no sensors wired as inputs.
-         * <p>
-         * The resulting {@link TalonSRX} will have a null {@link TalonSRX#getAnalogInput()} and a null
-         * {@link TalonSRX#getEncoderInput()}.
-         *
-         * @param deviceNumber the CAN device number for the Talon SRX; may not be null
-         * @return a {@link TalonSRX} motor; never null
-         */
-        public static TalonSRX talonSRX(int deviceNumber) {
-            return talonSRX(deviceNumber, 0.0d, 0.0d);
-        }
-
-        /**
-         * Creates a {@link TalonSRX} motor controlled by a Talon SRX with an optional quadrature encoder and no analog input
-         * wired into the Talon.
-         * <p>
-         * The resulting {@link TalonSRX} will have a non-null {@link TalonSRX#getEncoderInput()} when the
-         * <code>pulsesPerDegree</code> is non-zero. But the resulting {@link TalonSRX} will always have a null
-         * {@link TalonSRX#getAnalogInput()}.
-         *
-         * @param deviceNumber the CAN device number for the Talon SRX; may not be null
-         * @param pulsesPerDegree the number of encoder pulses per degree of revolution of the final shaft; may be 0 if unused
-         * @return a {@link TalonSRX} motor; never null
-         */
-        @Experimental
-        public static TalonSRX talonSRX(int deviceNumber, double pulsesPerDegree) {
-            return talonSRX(deviceNumber, pulsesPerDegree, 0.0d);
-        }
-
-        /**
-         * Creates a {@link TalonSRX} motor controlled by a Talon SRX with an optional quadrature encoder and no an analog 3.3V
-         * input wired into the Talon.
-         * <p>
-         * The resulting {@link TalonSRX} will have a non-null {@link TalonSRX#getEncoderInput()} when the
-         * <code>pulsesPerDegree</code> is non-zero. Likewise, the resulting {@link TalonSRX} will have a non-null
-         * {@link TalonSRX#getAnalogInput()} when the <code>analogTurnsOverVoltageRange</code> is non-zero.
-         *
-         * @param deviceNumber the CAN device number for the Talon SRX; may not be null
-         * @param pulsesPerDegree the number of encoder pulses per degree of revolution of the final shaft; may be 0 if unused
-         * @param analogTurnsOverVoltageRange the number of turns of an analog pot or analog encoder over the 0-3.3V range; may
-         *        be 0 if unused
-         * @return a {@link TalonSRX} motor; never null
-         */
-        @Experimental
-        public static TalonSRX talonSRX(int deviceNumber, double pulsesPerDegree, double analogTurnsOverVoltageRange) {
-            CANTalon talon = new CANTalon(deviceNumber);
-            return talonSRX(talon, pulsesPerDegree, analogTurnsOverVoltageRange);
-        }
-
-        /**
-         * Creates a {@link TalonSRX} motor controlled by a Talon SRX. The {@link CANTalon} object passed into this method
-         * should be already configured by the calling code.
-         * <p>
-         * The resulting {@link TalonSRX} will have a null {@link TalonSRX#getEncoderInput()} and a null
-         * {@link TalonSRX#getAnalogInput()}, and the {@link TalonSRX#getSelectedSensor()} will always return 0.
-         *
-         * @param talon the already configured {@link CANTalon} instance; may not be null
-         * @return a {@link TalonSRX} motor; never null
-         */
-        public static TalonSRX talonSRX(CANTalon talon) {
-            return talonSRX(talon, 0.0, 0.0d);
-        }
-
-        /**
-         * Creates a {@link TalonSRX} motor controlled by a Talon SRX with an optional (angle) sensor. The {@link CANTalon}
-         * object passed into this method should be already configured by the calling code.
-         * <p>
-         * The resulting {@link TalonSRX} will have a non-null {@link TalonSRX#getEncoderInput()} when the
-         * <code>pulsesPerDegree</code> is non-zero. But the resulting {@link TalonSRX} will always have a null
-         * {@link TalonSRX#getAnalogInput()}.
-         *
-         * @param talon the already configured {@link CANTalon} instance; may not be null
-         * @param pulsesPerDegree the number of encoder pulses per degree of revolution of the final shaft
-         * @return a {@link TalonSRX} motor; never null
-         */
-        @Experimental
-        public static TalonSRX talonSRX(CANTalon talon, double pulsesPerDegree) {
-            return talonSRX(talon, pulsesPerDegree, 0.0d);
-        }
-
-        /**
-         * Creates a {@link TalonSRX} motor controlled by a Talon SRX with and optional quadrature encoder and/or an analog 3.3V
-         * input wired into the Talon. The {@link CANTalon} object passed into this method should be already configured by the
-         * calling code.
-         * <p>
-         * The resulting {@link TalonSRX} will have a non-null {@link TalonSRX#getEncoderInput()} when the
-         * <code>pulsesPerDegree</code> is non-zero. Likewise, the resulting {@link TalonSRX} will have a non-null
-         * {@link TalonSRX#getAnalogInput()} when the <code>analogTurnsOverVoltageRange</code> is non-zero.
-         *
-         * @param talon the already configured {@link CANTalon} instance; may not be null
-         * @param pulsesPerDegree the number of encoder pulses per degree of revolution of the final shaft
-         * @param analogTurnsOverVoltageRange the number of turns of an analog pot or analog encoder over the 0-3.3V range; may
-         *        be 0 if unused
-         * @return a {@link TalonSRX} motor; never null
-         */
-        @Experimental
-        public static TalonSRX talonSRX(CANTalon talon, double pulsesPerDegree, double analogTurnsOverVoltageRange) {
-            if (talon == null) throw new IllegalArgumentException("The CANTalon reference may not be null");
-            return new HardwareTalonSRX(talon, pulsesPerDegree, analogTurnsOverVoltageRange);
-        }
-
-        /**
-         * Creates a {@link TalonSRX} motor controller that follows another Talon SRX. The resulting TalonSRX will have neither
-         * a {@link TalonSRX#getAnalogInput()} or a {@link TalonSRX#getEncoderInput()}.
-         *
-         * @param deviceNumber the CAN device number for the Talon SRX; may not be null
-         * @param leader the Talon SRX that is to be followed; may not be null
-         * @param reverse <code>true</code> if the resulting Talon should have inverted output compared to the leader, or
-         *        <code>false</code> if the output should exactly match the leader
-         * @return a {@link TalonSRX} motor controller that follows the leader; never null
-         */
-        public static TalonSRX talonSRX(int deviceNumber, TalonSRX leader, boolean reverse) {
-            CANTalon talon = new CANTalon(deviceNumber);
-            talon.changeControlMode(TalonControlMode.Follower);
-            talon.set(leader.getDeviceID());
-            talon.reverseOutput(reverse);
-            return talonSRX(talon, 0.0d, 0.0d);
-        }
-
-        /**
          * Create a motor driven by a <a href="http://www.revrobotics.com/SPARK">RevRobotics Spark Motor Controller</a> on the
          * specified channel. The speed output is limited to [-1.0,1.0] inclusive.
          *
@@ -715,54 +625,59 @@ public class Hardware {
         public static Motor spark(int channel, DoubleToDoubleFunction speedLimiter) {
             return new HardwareSpark(new Spark(channel), SPEED_LIMITER);
         }
-    }
-
-    /**
-     * Factory method for hardware-based controllers.
-     */
-    public static final class Controllers {
 
         /**
-         * Create a component that manages and uses the hardware-based PID controller on the Talon SRX with a quadrature encoder
-         * and/or an analog 3.3V input sensor wired into the Talon.
-         * <p>
-         * The resulting {@link TalonSRX} will have a non-null {@link TalonSRX#getEncoderInput()} when the
-         * <code>pulsesPerDegree</code> is non-zero. Likewise, the resulting {@link TalonSRX} will have a non-null
-         * {@link TalonSRX#getAnalogInput()} when the <code>analogTurnsOverVoltageRange</code> is non-zero.
-         *
-         * @param deviceNumber the CAN device number; may not be null
-         * @param pulsesPerDegree the number of encoder pulses per degree of revolution of the final shaft
-         * @param analogTurnsOverVoltageRange the number of turns of an analog pot or analog encoder over the 0-3.3V range; may
-         *        be 0 if unused
-         * @return the interface for managing and using the Talon SRX hardware-based PID controller; never null
+         * Create a TalsonSRX using the specified CAN ID.
+         * @param canID the CAN ID to use.
+         * @param invert invert the motor if necessary.
+         * @return a motor
          */
-        @Experimental
-        public static TalonController talonController(int deviceNumber, double pulsesPerDegree,
-                double analogTurnsOverVoltageRange) {
-            CANTalon talon = new CANTalon(deviceNumber);
-            HardwareTalonController c = new HardwareTalonController(talon, pulsesPerDegree, analogTurnsOverVoltageRange);
-            return c;
-        }
-
+        public static HardwareTalonSRX talonSRX(int canID, boolean invert) {
+    		com.ctre.phoenix.motorcontrol.can.TalonSRX talon = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canID);
+			talon.setInverted(invert);
+    		return new HardwareTalonSRX(talon);
+    	}
+    	
+    	public static HardwareTalonSRX talonSRX(int canID, boolean invert, NeutralMode mode) {
+    		com.ctre.phoenix.motorcontrol.can.TalonSRX talon = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canID);
+    		talon.setInverted(invert);
+			talon.setNeutralMode(mode);
+    		return new HardwareTalonSRX(talon);
+    	}
+    	
+    	public static HardwareTalonSRX talonSRX(int[] canIDs, NeutralMode mode) {
+    		com.ctre.phoenix.motorcontrol.can.TalonSRX master = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canIDs[0]);
+    		master.setNeutralMode(mode);
+    		for (int i = 1; i < canIDs.length; i++) {
+    			com.ctre.phoenix.motorcontrol.can.TalonSRX slave = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canIDs[i]);
+    			slave.follow(master);
+    			slave.setNeutralMode(mode);
+    		}
+    		return new HardwareTalonSRX(master);
+    	}
+    	
+    	public static HardwareTalonSRX talonSRX(int[] canIDs, boolean invert, NeutralMode mode) {
+    		com.ctre.phoenix.motorcontrol.can.TalonSRX master = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canIDs[0]);
+    		master.setInverted(invert);
+    		master.setNeutralMode(mode);
+    		for (int i = 1; i < canIDs.length; i++) {
+    			com.ctre.phoenix.motorcontrol.can.TalonSRX slave = new com.ctre.phoenix.motorcontrol.can.TalonSRX(canIDs[i]);
+    			slave.setInverted(invert);
+    			slave.follow(master);
+    			slave.setNeutralMode(mode);
+    		}
+    		return new HardwareTalonSRX(master);
+    	}
+    
         /**
-         * Create a component that manages and uses the hardware-based PID controller on the Talon SRX with a quadrature encoder
-         * and/or an analog 3.3V input sensor wired into the Talon.
-         * <p>
-         * The resulting {@link TalonSRX} will have a non-null {@link TalonSRX#getEncoderInput()} when the
-         * <code>pulsesPerDegree</code> is non-zero. Likewise, the resulting {@link TalonSRX} will have a non-null
-         * {@link TalonSRX#getAnalogInput()} when the <code>analogTurnsOverVoltageRange</code> is non-zero.
-         *
-         * @param talon the already configured {@link CANTalon} instance; may not be null
-         * @param pulsesPerDegree the number of encoder pulses per degree of revolution of the final shaft
-         * @param analogTurnsOverVoltageRange the number of turns of an analog pot or analog encoder over the 0-3.3V range; may
-         *        be 0 if unused
-         * @return the interface for managing and using the Talon SRX hardware-based PID controller; never null
+         * Factory Methods for SparkMAX.
+         * Only supports brushless mode for now.
          */
-        @Experimental
-        public static TalonController talonController(CANTalon talon, double pulsesPerDegree,
-                double analogTurnsOverVoltageRange) {
-            return new HardwareTalonController(talon, pulsesPerDegree, analogTurnsOverVoltageRange);
-        }
+        public static HardwareSparkMAX sparkMAX(int canID, MotorType type, boolean invert) {
+    		CANSparkMax spark = new CANSparkMax(canID, type);
+			spark.setInverted(invert);
+    		return new HardwareSparkMAX(spark);
+    	}
     }
 
     /**
@@ -774,12 +689,10 @@ public class Hardware {
          *
          * @param extendChannel the channel that extends the solenoid
          * @param retractChannel the channel that retracts the solenoid
-         * @param initialDirection the initial direction for the solenoid; may not be null
          * @return a solenoid on the specified channels; never null
          */
-        public static Solenoid doubleSolenoid(int extendChannel, int retractChannel, Solenoid.Direction initialDirection) {
-            DoubleSolenoid solenoid = new DoubleSolenoid(extendChannel, retractChannel);
-            return new HardwareDoubleSolenoid(solenoid, initialDirection);
+        public static Solenoid doubleSolenoid(int extendChannel, int retractChannel) {
+            return new HardwareDoubleSolenoid(new DoubleSolenoid(extendChannel, retractChannel), 0, 0);
         }
 
         /**
@@ -788,13 +701,82 @@ public class Hardware {
          * @param module the module for the channels
          * @param extendChannel the channel that extends the solenoid
          * @param retractChannel the channel that retracts the solenoid
-         * @param initialDirection the initial direction for the solenoid; may not be null
          * @return a solenoid on the specified channels; never null
          */
-        public static Solenoid doubleSolenoid(int module, int extendChannel, int retractChannel,
-                Solenoid.Direction initialDirection) {
-            DoubleSolenoid solenoid = new DoubleSolenoid(module, extendChannel, retractChannel);
-            return new HardwareDoubleSolenoid(solenoid, initialDirection);
+        public static Solenoid doubleSolenoid(int module, int extendChannel, int retractChannel) {
+            return new HardwareDoubleSolenoid(new DoubleSolenoid(module, extendChannel, retractChannel), 0, 0);
+        }
+        /**
+         * Create a double-acting solenoid that uses the specified channels on the default module.
+         *
+         * @param extendChannel the channel that extends the solenoid
+         * @param retractChannel the channel that retracts the solenoid
+         * @param timeIn the amount of time it takes to retract the solenoid
+         * @param timeOut the amount of time it takes to extend the solenoid
+         * @return a solenoid on the specified channels; never null
+         */
+        public static Solenoid doubleSolenoid(int extendChannel, int retractChannel, double timeIn, double timeOut) {
+            return new HardwareDoubleSolenoid(new DoubleSolenoid(extendChannel, retractChannel), timeIn, timeOut);
+        }
+
+        /**
+         * Create a double-acting solenoid that uses the specified channels on the given module.
+         *
+         * @param module the module for the channels
+         * @param extendChannel the channel that extends the solenoid
+         * @param retractChannel the channel that retracts the solenoid
+         * @param timeIn the amount of time it takes to retract the solenoid
+         * @param timeOut the amount of time it takes to extend the solenoid
+         * @return a solenoid on the specified channels; never null
+         */
+        public static Solenoid doubleSolenoid(int module, int extendChannel, int retractChannel, double timeIn, double timeOut) {
+            return new HardwareDoubleSolenoid(new DoubleSolenoid(module, extendChannel, retractChannel), timeIn, timeOut);
+        }
+        
+        /**
+         * Create a single-acting solenoid that uses the specified channel on the default module.
+         *
+         * @param extendChannel the channel that extends the solenoid
+         * @return a solenoid on the specified channels; never null
+         */
+        public static Solenoid singleSolenoid(int extendChannel) {
+            return new HardwareSingleSolenoid(new edu.wpi.first.wpilibj.Solenoid(extendChannel), 0, 0);
+        }
+
+        /**
+         * Create a single-acting solenoid that uses the specified channel on the given module.
+         *
+         * @param module the module for the channel
+         * @param extendChannel the channel that extends the solenoid
+         * @return a solenoid on the specified channels; never null
+         */
+        public static Solenoid singleSolenoid(int module, int extendChannel) {
+            return new HardwareSingleSolenoid(new edu.wpi.first.wpilibj.Solenoid(module, extendChannel), 0, 0);
+        }
+        
+        /**
+         * Create a single-acting solenoid that uses the specified channel on the default module.
+         *
+         * @param extendChannel the channel that extends the solenoid
+         * @param timeIn the amount of time it takes to retract the solenoid
+         * @param timeOut the amount of time it takes to extend the solenoid
+         * @return a solenoid on the specified channels; never null
+         */
+        public static Solenoid singleSolenoid(int extendChannel, double timeIn, double timeOut) {
+            return new HardwareSingleSolenoid(new edu.wpi.first.wpilibj.Solenoid(extendChannel), timeIn, timeOut);
+        }
+
+        /**
+         * Create a single-acting solenoid that uses the specified channel on the given module.
+         *
+         * @param module the module for the channel
+         * @param extendChannel the channel that extends the solenoid
+         * @param timeIn the amount of time it takes to retract the solenoid
+         * @param timeOut the amount of time it takes to extend the solenoid
+         * @return a solenoid on the specified channels; never null
+         */
+        public static Solenoid singleSolenoid(int module, int extendChannel, double timeIn, double timeOut) {
+            return new HardwareSingleSolenoid(new edu.wpi.first.wpilibj.Solenoid(module, extendChannel), timeIn, timeOut);
         }
 
         /**
@@ -824,7 +806,7 @@ public class Hardware {
         public static InputDevice driverStationJoystick(int port) {
             Joystick joystick = new Joystick(port);
             verifyJoystickConnected(joystick);
-            return InputDevice.create(joystick::getRawAxis, joystick::getRawButton, joystick::getPOV);
+            return InputDevice.create(joystick::getRawAxis, joystick::getRawButton, joystick::getPOV, joystick::getAxisCount, joystick::getButtonCount, joystick::getPOVCount);
         }
 
         /**
@@ -839,6 +821,9 @@ public class Hardware {
             return FlightStick.create(joystick::getRawAxis,
                                       joystick::getRawButton,
                                       joystick::getPOV,
+                                      joystick::getAxisCount,
+                                      joystick::getButtonCount,
+                                      joystick::getPOVCount,
                                       joystick::getY, // pitch
                                       () -> joystick.getTwist() * -1, // yaw is reversed
                                       joystick::getX, // roll
@@ -859,6 +844,9 @@ public class Hardware {
             return FlightStick.create(joystick::getRawAxis,
                                       joystick::getRawButton,
                                       joystick::getPOV,
+                                      joystick::getAxisCount,
+                                      joystick::getButtonCount,
+                                      joystick::getPOVCount,
                                       joystick::getY, // pitch
                                       joystick::getTwist, // yaw
                                       joystick::getX, // roll
@@ -879,6 +867,9 @@ public class Hardware {
             return FlightStick.create(joystick::getRawAxis,
                                       joystick::getRawButton,
                                       joystick::getPOV,
+                                      joystick::getAxisCount,
+                                      joystick::getButtonCount,
+                                      joystick::getPOVCount,
                                       () -> joystick.getY() * -1, // pitch is reversed
                                       joystick::getTwist, // yaw
                                       joystick::getX, // roll
@@ -899,6 +890,9 @@ public class Hardware {
             return Gamepad.create(joystick::getRawAxis,
                                   joystick::getRawButton,
                                   joystick::getPOV,
+                                  joystick::getAxisCount,
+                                  joystick::getButtonCount,
+                                  joystick::getPOVCount,
                                   () -> joystick.getRawAxis(0),
                                   () -> joystick.getRawAxis(1) * -1,
                                   () -> joystick.getRawAxis(2),
@@ -929,6 +923,9 @@ public class Hardware {
             return Gamepad.create(joystick::getRawAxis,
                                   joystick::getRawButton,
                                   joystick::getPOV,
+                                  joystick::getAxisCount,
+                                  joystick::getButtonCount,
+                                  joystick::getPOVCount,
                                   () -> joystick.getRawAxis(0),
                                   () -> joystick.getRawAxis(1) * -1,
                                   () -> joystick.getRawAxis(4),
@@ -959,6 +956,9 @@ public class Hardware {
             return Gamepad.create(joystick::getRawAxis,
                                   joystick::getRawButton,
                                   joystick::getPOV,
+                                  joystick::getAxisCount,
+                                  joystick::getButtonCount,
+                                  joystick::getPOVCount,
                                   () -> joystick.getRawAxis(0),
                                   () -> joystick.getRawAxis(1) * -1,
                                   () -> joystick.getRawAxis(4),

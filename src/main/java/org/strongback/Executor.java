@@ -49,7 +49,7 @@ public interface Executor {
      * This executor runs high priority tasks every cycle, medium priority tasks slightly every other cycles, and low priority
      * tasks every 4 cycles. All {@link Executable} tasks are called on the first cycle.
      *
-     * @param task the executable task
+     * @param conveyor the executable task
      * @param priority the priority of the executable; may not be null
      * @return {@code true} if the executable task was registered for the first time at the given priority, or {@code false} if
      *         {@code task} was null or was already registered with this executor at the given priority

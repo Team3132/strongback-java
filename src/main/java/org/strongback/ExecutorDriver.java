@@ -177,7 +177,8 @@ final class ExecutorDriver implements Stoppable {
                     // Pause until our next period begins ...
                     nextTimeInMillis = startTimeInMillis + executionPeriodInMillis;
                     while (timeSystem.currentTimeInMillis() < nextTimeInMillis) {
-                        // busy loop ...
+                        // Don't busy wait here, free up the thread for the camera etc.
+                        timeSystem.sleepMilliseconds(nextTimeInMillis - timeSystem.currentTimeInMillis());
                     }
                 }
             }

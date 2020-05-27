@@ -19,7 +19,8 @@ package org.strongback.components;
 import org.strongback.annotation.ThreadSafe;
 import org.strongback.command.Requirable;
 import org.strongback.drive.TankDrive;
-import org.strongback.util.Values;
+
+import frc.robot.lib.PIDF;
 
 /**
  * A motor is a device that can be set to operate at a speed.
@@ -28,81 +29,302 @@ import org.strongback.util.Values;
  *
  */
 @ThreadSafe
-public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirable {
+public interface Motor extends SpeedSensor, Stoppable, Requirable {
 
-    public enum Direction {
-        FORWARD, REVERSE, STOPPED
+    public enum ControlMode {
+        /**
+         * Set the faction of time that the motor is being powered [-1,1].
+         * Same as percent output.
+         */
+        DutyCycle(0, com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput, com.revrobotics.ControlType.kDutyCycle),
+        /**
+         * Position closed loop
+         */
+        Position(1, com.ctre.phoenix.motorcontrol.ControlMode.Position, com.revrobotics.ControlType.kPosition),
+        /**
+         * Speed closed loop
+         * This is what both the Talon and the Spark MAX call velocity, but there is no direction component
+         * so we call it speed.
+         */
+        Speed(2, com.ctre.phoenix.motorcontrol.ControlMode.Velocity, com.revrobotics.ControlType.kVelocity),
+        /**
+         * Input current closed loop>
+         */
+        Current(3, com.ctre.phoenix.motorcontrol.ControlMode.Current, com.revrobotics.ControlType.kCurrent),
+        /**
+         * Follow other motor controller
+         * Not supported by Spark MAX.
+         */
+        Follower(5, com.ctre.phoenix.motorcontrol.ControlMode.Follower, com.revrobotics.ControlType.kDutyCycle),
+        /**
+         * Motion Profile
+         */
+        MotionProfile(6, com.ctre.phoenix.motorcontrol.ControlMode.MotionProfile, com.revrobotics.ControlType.kSmartMotion),
+        /**
+         * Motion Magic
+         */
+        MotionMagic(7, com.ctre.phoenix.motorcontrol.ControlMode.MotionMagic, com.revrobotics.ControlType.kSmartVelocity),
+        /**
+         * Motion Profile with auxiliary output
+         */
+        MotionProfileArc(10, com.ctre.phoenix.motorcontrol.ControlMode.MotionProfileArc, com.revrobotics.ControlType.kSmartMotion),
+
+        /**
+         * Disable Motor Controller
+         * Not supported by Spark MAX
+         */
+        Disabled(15, com.ctre.phoenix.motorcontrol.ControlMode.Disabled, com.revrobotics.ControlType.kDutyCycle),
+
+        /**
+         * Voltage
+         * Not natively supported by TalonSRX/Falon, so calculated in the wrapper class.
+         */
+        Voltage(20, com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput, com.revrobotics.ControlType.kVoltage);
+
+        /**
+         * Value of control mode
+         */
+        public final int value;
+        public final com.ctre.phoenix.motorcontrol.ControlMode talonControlMode;
+        public final com.revrobotics.ControlType revControlType;
+
+        /**
+         * Create ControlMode of initValue
+         * 
+         * @param initValue Value of ControlMode
+         */
+        ControlMode(final int initValue, com.ctre.phoenix.motorcontrol.ControlMode talonControlMode, com.revrobotics.ControlType revControlType) {
+            this.value = initValue;
+            this.talonControlMode = talonControlMode;
+            this.revControlType = revControlType;
+        }
+    };
+
+    /**
+     * Tell the motor what control mode and how fast/far.
+     * Some motor controllers don't support some modes.
+     * Normally for Speed mode, this is in rps, not ticks / 100ms.
+     * 
+     * @param mode percent output, position, velocity etc.
+     * @param demand for percent [-1,1].
+     */
+    public void set(final ControlMode mode, double demand);
+
+    /**
+     * Ask for the last set demand.
+     * Not normally useful without the control mode used.
+     */
+    public double get();
+
+    /**
+     * Returns the velocity after scaling.
+     * Normally in rps or in metres/sec.
+     * 
+     * Not supported by all motor controllers.
+     */
+    public default double getSpeed() {
+        // Not implmented by default.
+        return 0;
     }
 
     /**
-     * Gets the current speed.
-     *
-     * @return the speed, will be between -1.0 and 1.0 inclusive
+     * Returns the position in metres after scaling.
+     * 
+     * Not supported by all motor controllers.
      */
-    @Override
-    public double getSpeed();
-
-    /**
-     * Sets the speed of this {@link Motor}.
-     *
-     * @param speed the new speed as a double, clamped to -1.0 to 1.0 inclusive
-     * @return this object to allow chaining of methods; never null
-     */
-    @Override
-    public Motor setSpeed(double speed);
-
-    /**
-     * Stops this {@link Motor}. Same as calling {@code setSpeed(0.0)}.
-     */
-    @Override
-    default public void stop() {
-        setSpeed(0.0);
+    public default double getPosition() {
+        // Not implmented by default.
+        return 0;
     }
 
     /**
-     * Create a new motor that inverts this motor.
-     *
-     * @return the new inverted motor; never null
+     * Scale the values to/from the motors into more intuitive values.
+     * 
+     * getPosition() returns revolutions.
+     * getVelocity() returns revolutions/second.
+     * 
+     * Also consider setScale(double ticksPerTurn, double gearRatio, double wheelDiameterMetres).
+     * 
+     * @param ticksPerTurn How many encoder ticks per turn, eg 4096 or 42.
+     * @param gearRatio How many turns of the motor to turn the output shaft, eg 11
+     * @param wheelDiameterMetres How many metres does the wheel move for every turn.
+     * @return this.
      */
-    default Motor invert() {
-        return Motor.invert(this);
+    public default Motor setScale(double ticksPerTurn, double gearRatio) {
+        setScale(ticksPerTurn, gearRatio, 1);
+        return this;
     }
 
     /**
-     * Gets the current {@link Direction} of this {@link Motor}, can be {@code FORWARD}, {@code REVERSE}, or {@code STOPPED}.
-     *
-     * @return the {@link Direction} of this {@link Motor}
+     * Scale the values to/from the motors into more intuitive values.
+     * 
+     * getPosition() returns the number of metres.
+     * getVelocity() returns metres/second.
+     * 
+     * Also consider setScale(double ticksPerTurn, double gearRatio).
+     * 
+     * @param ticksPerTurn How many encoder ticks per turn, eg 4096 or 42.
+     * @param gearRatio How many turns of the motor to turn the output shaft, eg 11
+     * @param wheelDiameterMetres How many metres does the wheel move for every turn.
+     * @return this.
      */
-    default public Direction getDirection() {
-        int direction = Values.fuzzyCompare(getSpeed(), 0.0);
-        if (direction < 0)
-            return Direction.REVERSE;
-        else if (direction > 0)
-            return Direction.FORWARD;
-        else
-            return Direction.STOPPED;
+    public default Motor setScale(double ticksPerTurn, double gearRatio, double wheelDiameterMetres) {
+        // Default implementation does nothing.
+        return this;
+    }
+
+    public default Motor enable() {
+        return this;
+    }
+
+    public default Motor disable() {
+        stop();
+        return this;
+    }
+
+    /**
+     * Set PID parameters for motor controllers that support it.
+     */
+    public default Motor setPIDF(int slotIdx, PIDF pidf) {
+        // Not implmented by default.
+        return this;
+    }
+
+    /**
+     * Tell the motor controller which set of PID values to use.
+     */
+    public default Motor selectProfileSlot(int slotIdx) {
+        // Not implmented by default.
+        return this;
+    }
+
+    /**
+     * Query the forward limit switch.
+     * Not implemented on all motor controllers.
+     * @return true if the forward limit switch is triggered.
+     */
+    public default boolean isAtForwardLimit() {
+        // Not implmented by default.
+        return false;
+    }
+
+    /**
+     * Query the forward limit switch.
+     * Not implemented on all motor controllers.
+     * @return true if the forward limit switch is triggered.
+     */
+    public default boolean isAtReverseLimit() {
+        // Not implmented by default.
+        return false;
+    }
+
+    /**
+     * Returns the bus voltage for motor controllers that support it.
+     * @return voltage on the bus.
+     */
+    public default double getBusVoltage() {
+        // Not implmented by default.
+        return 0;
+    }
+
+    /**
+     * Returns the voltage being supplied to the motor for motor controllers that support it.
+     * @return voltage to the motor.
+     */
+    public default double getOutputVoltage() {
+        // Not implmented by default.
+        return 0;
+    }
+
+    /**
+     * Returns the percentage of the power being supplied to the motor for motor controllers that support it.
+     * @return percentage
+     */
+    public default double getOutputPercent() {
+        // Not implmented by default.
+        return 0;
+    }
+
+    /**
+     * Returns the current being supplied to the motor for motor controllers that support it.
+     * @return current in amps to the motor.
+     */
+    public default double getOutputCurrent() {
+        // Not implmented by default.
+        return 0;
+    }
+
+    /**
+     * returns the temperature of the motor controller.
+     * Not supported by all motor controllers.
+     */
+    public default double getTemperature() {
+        // Not implmented by default.
+        return 0;
+    }
+
+    /**
+     * Invert just the sensor.
+     */
+    public default Motor setSensorPhase(boolean phase) {
+        // Not implmented by default.
+        return this;
+    }
+
+    /**
+     * Override the position of the quadrature encoder.
+     */
+    public default Motor setPosition(double position) {
+        // Not implmented by default.
+        return this;        
+    }
+    
+    /**
+     * Invert both the motor and the sensor.
+     */
+	public default Motor setInverted(boolean invert) {
+        // Not implmented by default.
+        return this;
+    };
+	
+	public default boolean getInverted() {
+        // Not implmented by default.
+        return false;
+    }
+
+    /**
+     * Stops this {@link Motor}.
+     */
+    @Override
+    public default void stop() {
+        set(ControlMode.DutyCycle, 0);
     }
 
     /**
      * Create a new {@link Motor} instance that is actually composed of two other motors that will be controlled identically.
      * This is useful when multiple motors are controlled in the same way, such as on one side of a {@link TankDrive}.
+     * TalonSRX and Spark MAX controllers support following, so use that instead.
      *
      * @param motor1 the first motor, and the motor from which the speed is read; may not be null
      * @param motor2 the second motor; may not be null
      * @return the composite motor; never null
      */
-    static Motor compose(Motor motor1, Motor motor2) {
+    static Motor compose(final Motor motor1, final Motor motor2) {
         return new Motor() {
             @Override
-            public double getSpeed() {
-                return motor1.getSpeed();
+            public void set(final ControlMode mode, double demand) {
+                motor1.set(mode, demand);
+                motor2.set(mode, demand);
             }
 
             @Override
-            public Motor setSpeed(double speed) {
-                motor1.setSpeed(speed);
-                motor2.setSpeed(speed);
-                return this;
+            public double get() {
+                return motor1.get();
+            }
+
+            @Override
+            public double getSpeed() {
+                return motor1.getSpeed();
             }
         };
     }
@@ -116,56 +338,23 @@ public interface Motor extends SpeedSensor, SpeedController, Stoppable, Requirab
      * @param motor3 the third motor; may not be null
      * @return the composite motor; never null
      */
-    static Motor compose(Motor motor1, Motor motor2, Motor motor3) {
+    static Motor compose(final Motor motor1, final Motor motor2, final Motor motor3) {
         return new Motor() {
             @Override
-            public double getSpeed() {
-                return motor1.getSpeed();
+            public void set(final ControlMode mode, double demand) {
+                motor1.set(mode, demand);
+                motor2.set(mode, demand);
+                motor3.set(mode, demand);
             }
 
             @Override
-            public Motor setSpeed(double speed) {
-                motor1.setSpeed(speed);
-                motor2.setSpeed(speed);
-                motor3.setSpeed(speed);
-                return this;
-            }
-        };
-    }
-
-    /**
-     * Create a new {@link Motor} instance that inverts the speed sent to and read from another motor. This is useful on
-     * {@link TankDrive}, where all motors on one side are physically inverted compared to the motors on the other side.
-     * <p>
-     * For example:
-     * <pre>
-     *   Motor left = ...
-     *   Motor right = ...
-     *   DriveTrain drive = TankDrive.create(left, Motor.invert(right));
-     * </pre> or <pre>
-     *   Motor leftFront = ...
-     *   Motor leftRear = ...
-     *   Motor rightFront = ...
-     *   Motor rightRear = ...
-     *   Motor left = Motor.compose(leftFront,leftRear);
-     *   Motor right = Motor.compose(rightFront,rightRear);
-     *   DriveTrain drive = TankDrive.create(left, Motor.invert(right));
-     * </pre>
-     *
-     * @param motor the motor to invert; may not be null
-     * @return the inverted motor; never null
-     */
-    static Motor invert(Motor motor) {
-        return new Motor() {
-            @Override
-            public Motor setSpeed(double speed) {
-                motor.setSpeed(-1 * speed);
-                return this;
+            public double get() {
+                return motor1.get();
             }
 
             @Override
             public double getSpeed() {
-                return -1 * motor.getSpeed();
+                return motor1.getSpeed();
             }
         };
     }

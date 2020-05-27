@@ -16,6 +16,7 @@
 
 package org.strongback.components.ui;
 
+import java.util.function.IntSupplier;
 import java.util.function.IntToDoubleFunction;
 
 import org.strongback.components.Switch;
@@ -32,6 +33,13 @@ public interface InputDevice {
      * @return the analog axis, or null if there is no such axis
      */
     public ContinuousRange getAxis(int axis);
+
+    /**
+     * Get the button for the given axis number.
+     * @param axis the axis number
+     * @return a button which is triggered when the analog axis is beyond the threshold, or null if there is no such axis
+     */
+    public Switch getAxis(int axis, double threshold);
     /**
      * Get the button for the given number.
      * @param button the button number
@@ -46,26 +54,80 @@ public interface InputDevice {
     public DirectionalAxis getDPad(int pad);
 
     /**
+     * Get the button for the given D-pad number.
+     * @param pad the pad number
+     * @param direction the desired direction
+     * @return a button which is triggered when the directional axis faces direction, or null if there is no such axis for the given D-pad number
+     */
+    public Switch getDPad(int pad, int direction);
+    
+    /**
+     * Get the number of analog axis present on the input device
+     * @return the number of analog axis present on the input device
+     */
+    public int getAxisCount();
+
+    /**
+     * Get the number of buttons on the input device
+     * @return the number of buttons present on the input device
+     */
+    public int getButtonCount();
+
+    /**
+     * Get the number of POVs on the input device
+     * @return the number of POVs present on the input device
+     */
+    public int getPOVCount();
+    
+    /**
      * Create an input device from the supplied mapping functions.
      * @param axisToValue the function that maps an integer to a double value for the axis
      * @param buttonNumberToSwitch the function that maps an integer to whether the button is pressed
      * @param padToValue the function that maps an integer to the directional axis output
      * @return the resulting input device; never null
      */
-    public static InputDevice create( IntToDoubleFunction axisToValue, IntToBooleanFunction buttonNumberToSwitch, IntToIntFunction padToValue ) {
+    public static InputDevice create( IntToDoubleFunction axisToValue, IntToBooleanFunction buttonNumberToSwitch, IntToIntFunction padToValue,
+    		IntSupplier axisCount, IntSupplier buttonCount, IntSupplier POVCount) {
         return new InputDevice() {
             @Override
             public ContinuousRange getAxis(int axis) {
                 return ()->axisToValue.applyAsDouble(axis);
             }
+
+            @Override
+            public Switch getAxis(int axis, double threshold) {
+                return ()->Math.abs(axisToValue.applyAsDouble(axis)) >= threshold;
+            }
+            
             @Override
             public Switch getButton(int button) {
                 return ()->buttonNumberToSwitch.applyAsBoolean(button);
             }
+            
             @Override
             public DirectionalAxis getDPad(int pad) {
                 return ()->padToValue.applyAsInt(pad);
             }
+
+            @Override
+            public Switch getDPad(int pad, int direction) {
+                return ()->padToValue.applyAsInt(pad) == direction;
+            }
+            
+			@Override
+			public int getAxisCount() {
+				return axisCount.getAsInt();
+			}
+			
+			@Override
+			public int getButtonCount() {
+				return buttonCount.getAsInt();
+			}
+			
+			@Override
+			public int getPOVCount() {
+				return POVCount.getAsInt();
+			}
         };
     }
 }
