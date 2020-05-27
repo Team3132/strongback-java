@@ -16,20 +16,20 @@
 
 package org.strongback.hardware;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.fest.assertions.Delta;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.hardware.HardwareTalonSRX.AnalogInputSensor;
 
 public class HardwareTalonSRX_AnalogInputSensorTest {
 
-    private static final Delta DELTA = Delta.delta(1);
+    private static final Delta DELTA = Assertions.offset(1);
 
     private double analogPosition = 0.0;
     private double analogVelocity = 0.0; // changes in volts per cycle
-    private double analogRange = 1023;   // 10 bit values
+    private double analogRange = 1023; // 10 bit values
     private double analogTurnsOverVoltageRange = 1;
     private double analogVoltageRange = 3.3;
     private double cyclePeriodInSeconds = 0.1;
@@ -40,12 +40,8 @@ public class HardwareTalonSRX_AnalogInputSensorTest {
     }
 
     protected AnalogInputSensor createSensor() {
-        sensor = new AnalogInputSensor(() -> analogPosition,
-                                       () -> analogVelocity,
-                                       analogRange,
-                                       analogTurnsOverVoltageRange / analogVoltageRange,
-                                       analogVoltageRange,
-                                       () -> cyclePeriodInSeconds);
+        sensor = new AnalogInputSensor(() -> analogPosition, () -> analogVelocity, analogRange,
+                analogTurnsOverVoltageRange / analogVoltageRange, analogVoltageRange, () -> cyclePeriodInSeconds);
         return sensor;
     }
 
@@ -101,7 +97,7 @@ public class HardwareTalonSRX_AnalogInputSensorTest {
         assertThat(sensor.getAngle()).isEqualTo(1260.0d, DELTA);
         assertThat(sensor.getHeading()).isEqualTo(180.0d, DELTA);
         assertThat(sensor.getRate()).isEqualTo(0.0d, DELTA);
-        assertThat(sensor.rawPositionForAngleInDegrees(1260.0d)).isEqualTo(analogPosition, Delta.delta(5.0));
+        assertThat(sensor.rawPositionForAngleInDegrees(1260.0d)).isEqualTo(analogPosition, Assertions.offset(5.0));
     }
 
     @Test
@@ -113,7 +109,7 @@ public class HardwareTalonSRX_AnalogInputSensorTest {
         assertThat(sensor.getAngle()).isEqualTo(1260.0d, DELTA);
         assertThat(sensor.getHeading()).isEqualTo(180.0d, DELTA);
         assertThat(sensor.getRate()).isEqualTo(360.0 / cyclePeriodInSeconds, DELTA); // degrees per second
-        assertThat(sensor.rawPositionForAngleInDegrees(1260.0d)).isEqualTo(analogPosition, Delta.delta(5.0));
+        assertThat(sensor.rawPositionForAngleInDegrees(1260.0d)).isEqualTo(analogPosition, Assertions.offset(5.0));
     }
 
 }

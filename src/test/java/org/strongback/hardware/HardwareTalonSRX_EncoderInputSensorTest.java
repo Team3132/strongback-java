@@ -16,16 +16,17 @@
 
 package org.strongback.hardware;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.fest.assertions.Delta;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.hardware.HardwareTalonSRX.EncoderInputSensor;
 
 public class HardwareTalonSRX_EncoderInputSensorTest {
 
-    private static final Delta DELTA = Delta.delta(0.00001);
+    private static final Offset<Double> DELTA = Assertions.offset(0.00001);
 
     private double positionInEdges = 0.0;
     private double velocityInEdges = 0.0;

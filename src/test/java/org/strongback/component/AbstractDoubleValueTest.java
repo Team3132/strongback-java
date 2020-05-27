@@ -16,11 +16,11 @@
 
 package org.strongback.component;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.function.DoubleSupplier;
 
-import org.fest.assertions.Delta;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 
 /**
@@ -41,7 +41,7 @@ abstract class AbstractDoubleValueTest {
 
     protected static void assertValue(double value, DoubleSupplier getter, double result ) {
         setValue(value);
-        assertThat(getter.getAsDouble()).isEqualTo(result, Delta.delta(0.0001));
+        assertThat(getter.getAsDouble()).isEqualTo(result, Assertions.offset(0.0001));
     }
 
     @Before

@@ -16,9 +16,9 @@
 
 package org.strongback.component;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.fest.assertions.Delta;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.components.LimitedMotor;
@@ -115,7 +115,7 @@ public class LimitedMotorTest {
     }
 
     protected void assertStoppedAtReverseLimit() {
-        assertThat(limited.getSpeed()).isEqualTo(0.0,Delta.delta(0.00001));
+        assertThat(limited.getSpeed()).isEqualTo(0.0,Assertions.offset(0.00001));
         //assertThat(limited.isAtForwardLimit()).isEqualTo(false);  // not necessarily the case in all situations
         assertThat(limited.isAtReverseLimit()).isEqualTo(true);
         assertThat(limited.getPosition()).isEqualTo(Position.REVERSE_LIMIT);
@@ -123,7 +123,7 @@ public class LimitedMotorTest {
     }
 
     protected void assertStoppedAtUnknonwPosition() {
-        assertThat(limited.getSpeed()).isEqualTo(0.0,Delta.delta(0.00001));
+        assertThat(limited.getSpeed()).isEqualTo(0.0,Assertions.offset(0.00001));
         //assertThat(limited.isAtForwardLimit()).isEqualTo(false);  // not necessarily the case in all situations
         assertThat(limited.isAtReverseLimit()).isEqualTo(true);
         assertThat(limited.getPosition()).isEqualTo(Position.UNKNOWN);

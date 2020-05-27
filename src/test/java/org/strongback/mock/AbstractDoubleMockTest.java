@@ -16,12 +16,13 @@
 
 package org.strongback.mock;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-import org.fest.assertions.Delta;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.components.Zeroable;
@@ -36,8 +37,8 @@ public abstract class AbstractDoubleMockTest {
     protected static double[] TEST_VALUES = { 0.01, 1.0, 0.0000001, 2.000001, 5.5, 0.99999, -1.0, -0.01, -0.000001, -2.00001,
             -5.5 };
     protected static double TEST_VALUE = TEST_VALUES[0];
-    protected static Delta NEAR_ZERO = Delta.delta(0.0000000000000001d);
-    protected static Delta NOMINAL_TOLERANCE = Delta.delta(0.00001d);
+    protected static Offset<Double> NEAR_ZERO = Assertions.offset(0.0000000000000001d);
+    protected static Offset<Double> NOMINAL_TOLERANCE = Assertions.offset(0.00001d);
 
     private DoubleConsumer setter;
     private DoubleSupplier getter;
@@ -109,7 +110,7 @@ public abstract class AbstractDoubleMockTest {
         assertSetAndGet(value, NOMINAL_TOLERANCE);
     }
 
-    protected void assertSetAndGet(double value, Delta tolerance) {
+    protected void assertSetAndGet(double value, Offset<Double> tolerance) {
         setter.accept(value);
         double actual = getter.getAsDouble();
         assertThat(actual).isEqualTo(value, tolerance);

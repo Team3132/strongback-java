@@ -16,9 +16,10 @@
 
 package org.strongback.component;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.fest.assertions.Delta;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.Before;
 import org.junit.Test;
 import org.strongback.components.Compass;
@@ -35,7 +36,7 @@ public class CompassTest extends AngleSensorTest {
     private static final double[][] NEGATIVE_ANGLES = { { -1.0, 359 }, { -90.0, 270 }, { -180, 180 }, { -270, 90 },
             { -360, 0 }, { -361, 359 }, { -360 * 2, 0 } };
 
-    private static final Delta NOMINAL_TOLERANCE = Delta.delta(0.0001);
+    private static final Offset<Double> NOMINAL_TOLERANCE = Assertions.offset(0.0001);
 
     protected static void assertAngle(double newAngle) {
         assertValue(newAngle, sensor::getAngle, newAngle);

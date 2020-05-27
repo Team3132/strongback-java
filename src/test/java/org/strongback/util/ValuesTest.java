@@ -16,15 +16,16 @@
 
 package org.strongback.util;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.fest.assertions.Delta;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.Test;
 import org.strongback.function.DoubleToDoubleFunction;
 
 public class ValuesTest {
 
-    private static final Delta TOLERANCE = Delta.delta(0.00001);
+    private static final Offset<Double> TOLERANCE = Assertions.offset(0.00001);
 
     @Test
     public void shouldMapRangeFromZeroCenteredToPositiveOne() {
