@@ -6,7 +6,7 @@ import org.strongback.Strongback;
 import org.strongback.components.Motor;
 
 import frc.robot.Config;
-import frc.robot.interfaces.NetworkTableHelperInterface;
+import frc.robot.interfaces.NetworkTableHelper;
 
 /**
  *  Whenever a motor is created, networkTable for the motor PIDF values are implemented from here.
@@ -17,7 +17,7 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
 
  class TunableMotor implements Executable {
 	private final Motor motor;
-	private final NetworkTableHelperInterface networkTable;
+	private final NetworkTableHelper networkTable;
 	private double lastUpdateSec = 0;
 	private final PIDF pidf;
 

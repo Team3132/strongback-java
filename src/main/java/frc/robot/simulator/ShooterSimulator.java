@@ -1,14 +1,14 @@
 
 package frc.robot.simulator;
 
-import frc.robot.interfaces.ShooterInterface;
+import frc.robot.interfaces.Shooter;
 import frc.robot.lib.MovementSimulator;
 
 /**
  * Very basic intake simulator used for unit testing.
  * Does not do gravity/friction etc.
  */
-public class ShooterSimulator implements ShooterInterface {
+public class ShooterSimulator implements Shooter {
 
 	private final double kMaxSpeed = 180;  // degrees/sec
 	private final double kMaxAccel = 200;   // degrees/sec/sec
@@ -50,7 +50,7 @@ public class ShooterSimulator implements ShooterInterface {
     }
 
     @Override
-    public ShooterInterface setTargetRPS(double rps) {
+    public Shooter setTargetRPS(double rps) {
         this.targetRPS = rps;
         this.shooterTime = System.currentTimeMillis();
         return this;
@@ -71,7 +71,7 @@ public class ShooterSimulator implements ShooterInterface {
     }
 
 	@Override
-	public ShooterInterface setHoodExtended(boolean extend) {
+	public Shooter setHoodExtended(boolean extend) {
 		arm.setTargetPos(kMaxAngle);
 		return this;
 	}

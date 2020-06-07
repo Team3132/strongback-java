@@ -29,22 +29,22 @@ import frc.robot.drive.routines.CheesyDpadDrive;
 import frc.robot.drive.routines.ConstantDrive;
 import frc.robot.drive.routines.PositionalPIDDrive;
 import frc.robot.drive.routines.TrajectoryDrive;
-import frc.robot.interfaces.BuddyClimbInterface;
-import frc.robot.interfaces.ColourWheelInterface;
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.BuddyClimb;
+import frc.robot.interfaces.ColourWheel;
+import frc.robot.interfaces.Dashboard;
 import frc.robot.interfaces.DashboardUpdater;
-import frc.robot.interfaces.DrivebaseInterface;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
-import frc.robot.interfaces.IntakeInterface;
-import frc.robot.interfaces.JevoisInterface;
-import frc.robot.interfaces.LEDStripInterface;
-import frc.robot.interfaces.LoaderInterface;
-import frc.robot.interfaces.LocationInterface;
-import frc.robot.interfaces.ShooterInterface;
-import frc.robot.interfaces.VisionInterface;
-import frc.robot.interfaces.VisionInterface.TargetDetails;
+import frc.robot.interfaces.Drivebase;
+import frc.robot.interfaces.Drivebase.DriveRoutineType;
+import frc.robot.interfaces.Intake;
+import frc.robot.interfaces.Jevois;
+import frc.robot.interfaces.LEDStrip;
+import frc.robot.interfaces.Loader;
+import frc.robot.interfaces.Location;
+import frc.robot.interfaces.Shooter;
+import frc.robot.interfaces.Vision;
+import frc.robot.interfaces.Vision.TargetDetails;
 import frc.robot.lib.GamepadButtonsX;
-import frc.robot.lib.Jevois;
+import frc.robot.lib.JevoisImpl;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.MotorFactory;
@@ -53,15 +53,15 @@ import frc.robot.lib.Position;
 import frc.robot.lib.WheelColour;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
-import frc.robot.mock.MockBuddyClimb;
-import frc.robot.mock.MockColourWheel;
-import frc.robot.mock.MockDrivebase;
-import frc.robot.mock.MockIntake;
-import frc.robot.mock.MockLEDStrip;
-import frc.robot.mock.MockLoader;
-import frc.robot.mock.MockLocation;
-import frc.robot.mock.MockShooter;
-import frc.robot.mock.MockVision;
+import frc.robot.mock.MockBuddyClimbImpl;
+import frc.robot.mock.MockColourWheelImpl;
+import frc.robot.mock.MockDrivebaseImpl;
+import frc.robot.mock.MockMecanumIntake;
+import frc.robot.mock.MockLEDStripImpl;
+import frc.robot.mock.MockLoaderImpl;
+import frc.robot.mock.MockLocationImpl;
+import frc.robot.mock.MockFlywheelShooter;
+import frc.robot.mock.MockVisionImpl;
 import frc.robot.simulator.IntakeSimulator;
 
 /**
@@ -71,25 +71,25 @@ import frc.robot.simulator.IntakeSimulator;
  */
 public class Subsystems implements DashboardUpdater {
 	// Not really a subsystem, but used by all subsystems.
-	public DashboardInterface dashboard;
+	public Dashboard dashboard;
 	public Clock clock;
-	public LEDStripInterface ledStrip;
-	public LocationInterface location;
-	public DrivebaseInterface drivebase;
-	public IntakeInterface intake;
-	public IntakeInterface hwIntake;
-	public BuddyClimbInterface buddyClimb;
-	public OverridableSubsystem<IntakeInterface> intakeOverride;
-	public LoaderInterface loader;
-	public LoaderInterface hwLoader; // Keep track of the real hardware for dashboard update
-	public OverridableSubsystem<LoaderInterface> loaderOverride;
-	public ShooterInterface shooter;
-	public ShooterInterface hwShooter;
-	public OverridableSubsystem<ShooterInterface> shooterOverride;
-	public ColourWheelInterface colourWheel;
+	public LEDStrip ledStrip;
+	public Location location;
+	public Drivebase drivebase;
+	public Intake intake;
+	public Intake hwIntake;
+	public BuddyClimb buddyClimb;
+	public OverridableSubsystem<Intake> intakeOverride;
+	public Loader loader;
+	public Loader hwLoader; // Keep track of the real hardware for dashboard update
+	public OverridableSubsystem<Loader> loaderOverride;
+	public Shooter shooter;
+	public Shooter hwShooter;
+	public OverridableSubsystem<Shooter> shooterOverride;
+	public ColourWheel colourWheel;
 	public PneumaticsModule compressor;
-	public VisionInterface vision;
-	public JevoisInterface jevois;
+	public Vision vision;
+	public Jevois jevois;
 	// Drivebase encoder values.
 	public DoubleSupplier leftDriveDistance;
 	public DoubleSupplier rightDriveDistance;
@@ -98,7 +98,7 @@ public class Subsystems implements DashboardUpdater {
 
 	private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
-	public Subsystems(DashboardInterface dashboard, Clock clock) {
+	public Subsystems(Dashboard dashboard, Clock clock) {
 		this.dashboard = dashboard;
 		this.clock = clock;
 	}
@@ -147,8 +147,8 @@ public class Subsystems implements DashboardUpdater {
 	public void createDrivebaseLocation(InputDevice leftStick, InputDevice rightStick) {
 		if (! Config.drivebase.present) {
 			Log.debug("Using mock drivebase");
-			drivebase = new MockDrivebase();
-			location = new MockLocation();
+			drivebase = new MockDrivebaseImpl();
+			location = new MockLocationImpl();
 			Log.debug("Created a mock drivebase and location");
 			return;
 		}
@@ -178,11 +178,11 @@ public class Subsystems implements DashboardUpdater {
 
 		Gyroscope gyro = new NavXGyroscope("NavX", Config.navx.present);
 		gyro.zero();
-		location = new Location(() -> {
+		location = new LocationImpl(() -> {
 			leftMotor.setPosition(0);
 			rightMotor.setPosition(0);
 		}, leftDriveDistance, rightDriveDistance, gyro, clock, dashboard); // Encoders must return metres.
-		drivebase = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, dashboard);
+		drivebase = new DrivebaseImpl(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid, dashboard);
 		Strongback.executor().register(drivebase, Priority.HIGH);
 		Strongback.executor().register(location, Priority.HIGH);
 
@@ -368,7 +368,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createIntake() {
 		if (!Config.intake.present) {
-			intake = new MockIntake();
+			intake = new MockMecanumIntake();
 			Log.debug("Intake not present, using a mock intake instead");
 			return;
 		}
@@ -376,14 +376,14 @@ public class Subsystems implements DashboardUpdater {
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(Config.pcm.canId, Config.intake.solenoidPort,
 				0.2, 0.2); // TODO: Test and work out correct timings.
 		Motor intakeMotor = MotorFactory.getIntakeMotor();
-		intake = hwIntake = new Intake(intakeMotor, intakeSolenoid, dashboard);
+		intake = hwIntake = new MecanumIntake(intakeMotor, intakeSolenoid, dashboard);
 	}
 
 	public void createIntakeOverride() {
 		// Setup the diagBox so that it can take control.
 		IntakeSimulator simulator = new IntakeSimulator();
-		MockIntake mock = new MockIntake();
-		intakeOverride = new OverridableSubsystem<IntakeInterface>("intake", IntakeInterface.class, intake, simulator,
+		MockMecanumIntake mock = new MockMecanumIntake();
+		intakeOverride = new OverridableSubsystem<Intake>("intake", Intake.class, intake, simulator,
 				mock);
 		// Plumb accessing the intake through the override.
 		intake = intakeOverride.getNormalInterface();
@@ -392,19 +392,19 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createBuddyClimb() {
 		if (!Config.buddyClimb.present) {
-			buddyClimb = new MockBuddyClimb();
+			buddyClimb = new MockBuddyClimbImpl();
 			Log.debug("Buddy climb not present, using a mock buddy climb instead");
 			return;
 		}
 
 		Solenoid buddyClimbSolenoid = Hardware.Solenoids.singleSolenoid(Config.pcm.canId,
 				Config.buddyClimb.solenoidPort, 0.1, 0.1); // TODO: Test and work out correct timings.
-		buddyClimb = new BuddyClimb(buddyClimbSolenoid, dashboard);
+		buddyClimb = new BuddyClimbImpl(buddyClimbSolenoid, dashboard);
 	}
 
 	public void createColourWheel() {
 		if (!Config.colourWheel.present) {
-			colourWheel = new MockColourWheel();
+			colourWheel = new MockColourWheelImpl();
 			Log.debug("Colour Sensor not present, using a mock colour sensor instead");
 			return;
 		}
@@ -420,7 +420,7 @@ public class Subsystems implements DashboardUpdater {
 		colourMatcher.addColorMatch(Config.colourWheel.target.yellow);
 		colourMatcher.addColorMatch(Config.colourWheel.target.white);
 
-		colourWheel = new ColourWheel(motor, colourWheelSolenoid, new Supplier<WheelColour>() {
+		colourWheel = new ColourWheelImpl(motor, colourWheelSolenoid, new Supplier<WheelColour>() {
 			@Override
 			public WheelColour get() {
 				ColorMatchResult match = colourMatcher.matchClosestColor(colourSensor.getColor());
@@ -442,11 +442,11 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createLEDStrip() {
 		if (!Config.ledStrip.present) {
-			ledStrip = new MockLEDStrip();
+			ledStrip = new MockLEDStripImpl();
 			Log.debug("LED Strip not present, using a mock LED Strip instead.");
 			return;
 		}
-		ledStrip = new LEDStrip(Config.ledStrip.pwmPort, Config.ledStrip.numLEDs);
+		ledStrip = new LEDStripImpl(Config.ledStrip.pwmPort, Config.ledStrip.numLEDs);
 	}
 
 	public void updateIdleLED() {
@@ -464,7 +464,7 @@ public class Subsystems implements DashboardUpdater {
 	@SuppressWarnings("resource")
 	public void createLoader() {
 		if (!Config.loader.present) {
-			loader = new MockLoader();
+			loader = new MockLoaderImpl();
 			Log.debug("Created a mock loader!");
 			return;
 		}
@@ -478,7 +478,7 @@ public class Subsystems implements DashboardUpdater {
 		DigitalInput outBallSensor = new DigitalInput(Config.loader.ballDetector.outPort);
 		BooleanSupplier loaderInSensor = () -> !inBallSensor.get();
 		BooleanSupplier loaderOutSensor = () -> !outBallSensor.get();
-		loader = hwLoader = new Loader(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor,
+		loader = hwLoader = new LoaderImpl(spinnerMotor, loaderPassthroughMotor, paddleSolenoid, loaderInSensor,
 				loaderOutSensor, ledStrip, dashboard);
 		Strongback.executor().register(loader, Priority.LOW);
 
@@ -486,9 +486,9 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createLoaderOverride() {
 		// Setup the diagBox so that it can take control.
-		MockLoader simulator = new MockLoader(); // Nothing to simulate, use the mock
-		MockLoader mock = new MockLoader();
-		loaderOverride = new OverridableSubsystem<LoaderInterface>("loader", LoaderInterface.class, loader, simulator,
+		MockLoaderImpl simulator = new MockLoaderImpl(); // Nothing to simulate, use the mock
+		MockLoaderImpl mock = new MockLoaderImpl();
+		loaderOverride = new OverridableSubsystem<Loader>("loader", Loader.class, loader, simulator,
 				mock);
 		// Plumb accessing the lift through the override.
 		loader = loaderOverride.getNormalInterface();
@@ -496,7 +496,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createShooter() {
 		if (!Config.shooter.present) {
-			shooter = new MockShooter();
+			shooter = new MockFlywheelShooter();
 			Log.debug("Created a mock shooter!");
 			return;
 		}
@@ -505,14 +505,14 @@ public class Subsystems implements DashboardUpdater {
 				0.1, 0.1); // TODO: Test and work out correct timings.
 		Motor motor = MotorFactory.getShooterMotor(clock);
 
-		shooter = hwShooter = new Shooter(motor, hoodSolenoid, dashboard);
+		shooter = hwShooter = new FlywheelShooter(motor, hoodSolenoid, dashboard);
 	}
 
 	public void createShooterOverride() {
 		// Setup the diagBox so that it can take control.
-		MockShooter simulator = new MockShooter(); // Nothing to simulate, use a mock instead.
-		MockShooter mock = new MockShooter();
-		shooterOverride = new OverridableSubsystem<ShooterInterface>("shooter", ShooterInterface.class, shooter,
+		MockFlywheelShooter simulator = new MockFlywheelShooter(); // Nothing to simulate, use a mock instead.
+		MockFlywheelShooter mock = new MockFlywheelShooter();
+		shooterOverride = new OverridableSubsystem<Shooter>("shooter", Shooter.class, shooter,
 				simulator, mock);
 		// Plumb accessing the shooter through the override.
 		shooter = shooterOverride.getNormalInterface();
@@ -532,18 +532,18 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createVision() {
 		if (!Config.vision.present) {
-			vision = new MockVision();
+			vision = new MockVisionImpl();
 			Log.debug("Created a mock vision subsystem");
 			return;
 		}
 		try {
-			jevois = new Jevois();
-			vision = new Vision(jevois, location, dashboard, clock, Config.vision.hMin, Config.vision.sMin,
+			jevois = new JevoisImpl();
+			vision = new VisionImpl(jevois, location, dashboard, clock, Config.vision.hMin, Config.vision.sMin,
 					Config.vision.vMin, Config.vision.hMax, Config.vision.sMax, Config.vision.vMax);
 		} catch (IOException e) {
 			Log.exception("Unable to create an instance of the jevois camera", e);
 			e.printStackTrace();
-			vision = new MockVision();
+			vision = new MockVisionImpl();
 		}
 	}
 }

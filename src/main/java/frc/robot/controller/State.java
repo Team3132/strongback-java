@@ -8,10 +8,10 @@ import org.strongback.components.Clock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
-import frc.robot.interfaces.JevoisInterface.CameraMode;
+import frc.robot.interfaces.ColourWheel.ColourAction;
+import frc.robot.interfaces.Drivebase.DriveRoutineParameters;
+import frc.robot.interfaces.Drivebase.DriveRoutineType;
+import frc.robot.interfaces.Jevois.CameraMode;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.TimeAction;
 import frc.robot.lib.WheelColour;

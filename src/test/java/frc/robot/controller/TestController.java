@@ -11,16 +11,16 @@ import org.strongback.mock.MockClock;
 import org.strongback.mock.MockPneumaticsModule;
 
 import frc.robot.Config;
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.Dashboard;
 import frc.robot.lib.WheelColour;
-import frc.robot.mock.MockBuddyClimb;
-import frc.robot.mock.MockColourWheel;
-import frc.robot.mock.MockDashboard;
-import frc.robot.mock.MockDrivebase;
-import frc.robot.mock.MockLEDStrip;
-import frc.robot.mock.MockLocation;
-import frc.robot.mock.MockLoader;
-import frc.robot.mock.MockShooter;
+import frc.robot.mock.MockBuddyClimbImpl;
+import frc.robot.mock.MockColourWheelImpl;
+import frc.robot.mock.MockDashboardImpl;
+import frc.robot.mock.MockDrivebaseImpl;
+import frc.robot.mock.MockLEDStripImpl;
+import frc.robot.mock.MockLocationImpl;
+import frc.robot.mock.MockLoaderImpl;
+import frc.robot.mock.MockFlywheelShooter;
 import frc.robot.simulator.IntakeSimulator;
 import frc.robot.subsystems.Subsystems;
 
@@ -34,7 +34,7 @@ public class TestController {
 	private final long ktestStepMs = 10;
 	private final long kRandomSeed = 123456;
 	private final double kMaxWaitTimeSeconds = 4;
-	protected DashboardInterface dashboard = new MockDashboard();
+	protected Dashboard dashboard = new MockDashboardImpl();
 	private MockClock clock;
 	private Subsystems subsystems;
 	// Store direct access to the simulators so the simulator-only
@@ -52,19 +52,19 @@ public class TestController {
 	public void setUp() {
 		System.out.println("\n******************************");
 		clock = new MockClock();
-		subsystems = new Subsystems(new MockDashboard(), clock);
+		subsystems = new Subsystems(new MockDashboardImpl(), clock);
 
 		subsystems.intake = intake = new IntakeSimulator();
 		subsystems.compressor = new MockPneumaticsModule(); 
-		subsystems.drivebase = new MockDrivebase();
-		subsystems.loader = new MockLoader();
-		subsystems.shooter = new MockShooter();
-		subsystems.location = new MockLocation();
-		subsystems.colourWheel = new MockColourWheel();
+		subsystems.drivebase = new MockDrivebaseImpl();
+		subsystems.loader = new MockLoaderImpl();
+		subsystems.shooter = new MockFlywheelShooter();
+		subsystems.location = new MockLocationImpl();
+		subsystems.colourWheel = new MockColourWheelImpl();
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
-		subsystems.buddyClimb = new MockBuddyClimb();
-		subsystems.ledStrip = new MockLEDStrip();
+		subsystems.buddyClimb = new MockBuddyClimbImpl();
+		subsystems.ledStrip = new MockLEDStripImpl();
 		
 		exec = new Controller(subsystems, getFMSColour());
 

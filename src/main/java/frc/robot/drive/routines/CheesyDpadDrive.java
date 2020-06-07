@@ -5,7 +5,7 @@ import org.strongback.components.Switch;
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.ContinuousRange;
 import org.strongback.components.ui.DirectionalAxis;
-import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
+import frc.robot.interfaces.Drivebase.DriveMotion;
 import frc.robot.lib.GamepadButtonsX;
 
 /**

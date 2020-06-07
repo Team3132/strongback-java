@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters.generateTrajectory;
+import static frc.robot.interfaces.Drivebase.DriveRoutineParameters.generateTrajectory;
 import static frc.robot.lib.PoseHelper.createPose2d;
 
 import org.junit.Before;

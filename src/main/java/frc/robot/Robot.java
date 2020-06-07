@@ -25,8 +25,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpiutil.net.PortForwarder;
 import frc.robot.controller.Controller;
 import frc.robot.controller.Sequences;
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.OIInterface;
+import frc.robot.interfaces.Dashboard;
+import frc.robot.interfaces.OI;
 import frc.robot.lib.ConfigServer;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.Position;
@@ -42,7 +42,7 @@ public class Robot extends IterativeRobot implements Executable {
 
 	// User interface.
 	private DriverStation driverStation;
-	private OIInterface oi;
+	private OI oi;
 	private FlightStick driverLeftJoystick, driverRightJoystick;
 	private InputDevice operatorJoystick, operatorBox;
 
@@ -245,8 +245,8 @@ public class Robot extends IterativeRobot implements Executable {
 	 * Plumb the dashboard requests through to a real dashboard.
 	 * Allows us to mock out the dashboard in unit tests.
 	 */
-	private DashboardInterface createDashboard() {
-		return new DashboardInterface() {
+	private Dashboard createDashboard() {
+		return new Dashboard() {
 			@Override
 			public void putString(String key, String value) {
 				SmartDashboard.putString(key, value);
@@ -334,7 +334,7 @@ public class Robot extends IterativeRobot implements Executable {
 	 * box if it's attached.
 	 */
 	private void setupUserInterface() {
-		oi = new OI(controller, subsystems);
+		oi = new OIImpl(controller, subsystems);
 		oi.configureJoysticks(driverLeftJoystick, driverRightJoystick, operatorJoystick);
 		if (operatorBox.getButtonCount() > 0) {
 			Log.info("Operator box detected");
