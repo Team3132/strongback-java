@@ -56,9 +56,9 @@ import frc.robot.lib.log.Log;
 import frc.robot.mock.MockBuddyClimbImpl;
 import frc.robot.mock.MockColourWheelImpl;
 import frc.robot.mock.MockDrivebaseImpl;
-import frc.robot.mock.MockMecanumIntake;
+import frc.robot.mock.MockIntake;
 import frc.robot.mock.MockLEDStripImpl;
-import frc.robot.mock.MockLoaderImpl;
+import frc.robot.mock.MockLoader;
 import frc.robot.mock.MockLocationImpl;
 import frc.robot.mock.MockFlywheelShooter;
 import frc.robot.mock.MockVisionImpl;
@@ -368,7 +368,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createIntake() {
 		if (!Config.intake.present) {
-			intake = new MockMecanumIntake();
+			intake = new MockIntake();
 			Log.debug("Intake not present, using a mock intake instead");
 			return;
 		}
@@ -376,13 +376,13 @@ public class Subsystems implements DashboardUpdater {
 		Solenoid intakeSolenoid = Hardware.Solenoids.singleSolenoid(Config.pcm.canId, Config.intake.solenoidPort,
 				0.2, 0.2); // TODO: Test and work out correct timings.
 		Motor intakeMotor = MotorFactory.getIntakeMotor();
-		intake = hwIntake = new MecanumIntake(intakeMotor, intakeSolenoid, dashboard);
+		intake = hwIntake = new IntakeImpl(intakeMotor, intakeSolenoid, dashboard);
 	}
 
 	public void createIntakeOverride() {
 		// Setup the diagBox so that it can take control.
 		IntakeSimulator simulator = new IntakeSimulator();
-		MockMecanumIntake mock = new MockMecanumIntake();
+		MockIntake mock = new MockIntake();
 		intakeOverride = new OverridableSubsystem<Intake>("intake", Intake.class, intake, simulator,
 				mock);
 		// Plumb accessing the intake through the override.
@@ -464,7 +464,7 @@ public class Subsystems implements DashboardUpdater {
 	@SuppressWarnings("resource")
 	public void createLoader() {
 		if (!Config.loader.present) {
-			loader = new MockLoaderImpl();
+			loader = new MockLoader();
 			Log.debug("Created a mock loader!");
 			return;
 		}
@@ -486,8 +486,8 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createLoaderOverride() {
 		// Setup the diagBox so that it can take control.
-		MockLoaderImpl simulator = new MockLoaderImpl(); // Nothing to simulate, use the mock
-		MockLoaderImpl mock = new MockLoaderImpl();
+		MockLoader simulator = new MockLoader(); // Nothing to simulate, use the mock
+		MockLoader mock = new MockLoader();
 		loaderOverride = new OverridableSubsystem<Loader>("loader", Loader.class, loader, simulator,
 				mock);
 		// Plumb accessing the lift through the override.

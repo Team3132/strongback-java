@@ -19,7 +19,7 @@ import frc.robot.mock.MockDashboardImpl;
 import frc.robot.mock.MockDrivebaseImpl;
 import frc.robot.mock.MockLEDStripImpl;
 import frc.robot.mock.MockLocationImpl;
-import frc.robot.mock.MockLoaderImpl;
+import frc.robot.mock.MockLoader;
 import frc.robot.mock.MockFlywheelShooter;
 import frc.robot.simulator.IntakeSimulator;
 import frc.robot.subsystems.Subsystems;
@@ -57,7 +57,7 @@ public class TestController {
 		subsystems.intake = intake = new IntakeSimulator();
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebaseImpl();
-		subsystems.loader = new MockLoaderImpl();
+		subsystems.loader = new MockLoader();
 		subsystems.shooter = new MockFlywheelShooter();
 		subsystems.location = new MockLocationImpl();
 		subsystems.colourWheel = new MockColourWheelImpl();

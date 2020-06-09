@@ -14,13 +14,13 @@ import frc.robot.lib.log.Log;
  * Intake Subsystem 2019:
  * On the 2019 robot the intake is pneumatically driven and using one motor to intake game objects 
  */
-public class MecanumIntake extends Subsystem implements Intake
+public class IntakeImpl extends Subsystem implements Intake
  {
     private Motor motor;
     private Solenoid solenoid;
     private IntakeWheel intakeWheel;
 
-    public MecanumIntake(Motor motor, Solenoid solenoid, Dashboard dashboard) {
+    public IntakeImpl(Motor motor, Solenoid solenoid, Dashboard dashboard) {
         super("MecanumIntake", dashboard);   
         this.motor = motor;
         this.solenoid = solenoid;

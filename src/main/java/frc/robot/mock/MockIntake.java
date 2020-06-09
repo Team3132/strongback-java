@@ -6,11 +6,11 @@ import frc.robot.interfaces.Intake;
 /**
  * Mock subsystem responsible for the intake
  */
-public class MockMecanumIntake implements Intake {
+public class MockIntake implements Intake {
 	private double output = 0;
 	private boolean isExtended = false;
 
-	public MockMecanumIntake() {
+	public MockIntake() {
 	}
 
 	@Override

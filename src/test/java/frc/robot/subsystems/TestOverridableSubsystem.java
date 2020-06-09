@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
 import frc.robot.interfaces.Intake;
-import frc.robot.mock.MockMecanumIntake;
+import frc.robot.mock.MockIntake;
 
 public class TestOverridableSubsystem {
     
@@ -14,9 +14,9 @@ public class TestOverridableSubsystem {
         // This is when the controller should talk through to the real
         // subsystem and the button box is passed through to the mock.
         // We only want to use mock here so that they can be checked.
-        Intake real = new MockMecanumIntake();
-        Intake simulator = new MockMecanumIntake();
-        Intake mock = new MockMecanumIntake();
+        Intake real = new MockIntake();
+        Intake simulator = new MockIntake();
+        Intake mock = new MockIntake();
         // Create the sim and pass it the three different endpoints.
         OverridableSubsystem<Intake> intakeOverride = new OverridableSubsystem<Intake>("intake", Intake.class, real, simulator, mock);
         // Get the endpoint that the controller would use.
