@@ -2,10 +2,10 @@ package frc.robot.mock;
 
 import frc.robot.interfaces.BuddyClimb;
 
-public class MockBuddyClimbImpl implements BuddyClimb {
+public class MockBuddyClimb implements BuddyClimb {
     private boolean isExtended = false;
 
-    public MockBuddyClimbImpl() {
+    public MockBuddyClimb() {
     }
 
     @Override

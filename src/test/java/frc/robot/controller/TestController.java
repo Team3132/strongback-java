@@ -13,12 +13,12 @@ import org.strongback.mock.MockPneumaticsModule;
 import frc.robot.Config;
 import frc.robot.interfaces.Dashboard;
 import frc.robot.lib.WheelColour;
-import frc.robot.mock.MockBuddyClimbImpl;
-import frc.robot.mock.MockColourWheelImpl;
-import frc.robot.mock.MockDashboardImpl;
-import frc.robot.mock.MockDrivebaseImpl;
-import frc.robot.mock.MockLEDStripImpl;
-import frc.robot.mock.MockLocationImpl;
+import frc.robot.mock.MockBuddyClimb;
+import frc.robot.mock.MockColourWheel;
+import frc.robot.mock.MockDashboard;
+import frc.robot.mock.MockDrivebase;
+import frc.robot.mock.MockLEDStrip;
+import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLoader;
 import frc.robot.mock.MockFlywheelShooter;
 import frc.robot.simulator.IntakeSimulator;
@@ -34,7 +34,7 @@ public class TestController {
 	private final long ktestStepMs = 10;
 	private final long kRandomSeed = 123456;
 	private final double kMaxWaitTimeSeconds = 4;
-	protected Dashboard dashboard = new MockDashboardImpl();
+	protected Dashboard dashboard = new MockDashboard();
 	private MockClock clock;
 	private Subsystems subsystems;
 	// Store direct access to the simulators so the simulator-only
@@ -52,19 +52,19 @@ public class TestController {
 	public void setUp() {
 		System.out.println("\n******************************");
 		clock = new MockClock();
-		subsystems = new Subsystems(new MockDashboardImpl(), clock);
+		subsystems = new Subsystems(new MockDashboard(), clock);
 
 		subsystems.intake = intake = new IntakeSimulator();
 		subsystems.compressor = new MockPneumaticsModule(); 
-		subsystems.drivebase = new MockDrivebaseImpl();
+		subsystems.drivebase = new MockDrivebase();
 		subsystems.loader = new MockLoader();
 		subsystems.shooter = new MockFlywheelShooter();
-		subsystems.location = new MockLocationImpl();
-		subsystems.colourWheel = new MockColourWheelImpl();
+		subsystems.location = new MockLocation();
+		subsystems.colourWheel = new MockColourWheel();
 		subsystems.leftDriveDistance = () -> 0;
 		subsystems.rightDriveDistance = () -> 0;
-		subsystems.buddyClimb = new MockBuddyClimbImpl();
-		subsystems.ledStrip = new MockLEDStripImpl();
+		subsystems.buddyClimb = new MockBuddyClimb();
+		subsystems.ledStrip = new MockLEDStrip();
 		
 		exec = new Controller(subsystems, getFMSColour());
 

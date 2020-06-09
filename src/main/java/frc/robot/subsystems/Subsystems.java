@@ -53,15 +53,15 @@ import frc.robot.lib.Position;
 import frc.robot.lib.WheelColour;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
-import frc.robot.mock.MockBuddyClimbImpl;
-import frc.robot.mock.MockColourWheelImpl;
-import frc.robot.mock.MockDrivebaseImpl;
+import frc.robot.mock.MockBuddyClimb;
+import frc.robot.mock.MockColourWheel;
+import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockIntake;
-import frc.robot.mock.MockLEDStripImpl;
+import frc.robot.mock.MockLEDStrip;
 import frc.robot.mock.MockLoader;
-import frc.robot.mock.MockLocationImpl;
+import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockFlywheelShooter;
-import frc.robot.mock.MockVisionImpl;
+import frc.robot.mock.MockVision;
 import frc.robot.simulator.IntakeSimulator;
 
 /**
@@ -147,8 +147,8 @@ public class Subsystems implements DashboardUpdater {
 	public void createDrivebaseLocation(InputDevice leftStick, InputDevice rightStick) {
 		if (! Config.drivebase.present) {
 			Log.debug("Using mock drivebase");
-			drivebase = new MockDrivebaseImpl();
-			location = new MockLocationImpl();
+			drivebase = new MockDrivebase();
+			location = new MockLocation();
 			Log.debug("Created a mock drivebase and location");
 			return;
 		}
@@ -392,7 +392,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createBuddyClimb() {
 		if (!Config.buddyClimb.present) {
-			buddyClimb = new MockBuddyClimbImpl();
+			buddyClimb = new MockBuddyClimb();
 			Log.debug("Buddy climb not present, using a mock buddy climb instead");
 			return;
 		}
@@ -404,7 +404,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createColourWheel() {
 		if (!Config.colourWheel.present) {
-			colourWheel = new MockColourWheelImpl();
+			colourWheel = new MockColourWheel();
 			Log.debug("Colour Sensor not present, using a mock colour sensor instead");
 			return;
 		}
@@ -442,7 +442,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createLEDStrip() {
 		if (!Config.ledStrip.present) {
-			ledStrip = new MockLEDStripImpl();
+			ledStrip = new MockLEDStrip();
 			Log.debug("LED Strip not present, using a mock LED Strip instead.");
 			return;
 		}
@@ -532,7 +532,7 @@ public class Subsystems implements DashboardUpdater {
 
 	public void createVision() {
 		if (!Config.vision.present) {
-			vision = new MockVisionImpl();
+			vision = new MockVision();
 			Log.debug("Created a mock vision subsystem");
 			return;
 		}
@@ -543,7 +543,7 @@ public class Subsystems implements DashboardUpdater {
 		} catch (IOException e) {
 			Log.exception("Unable to create an instance of the jevois camera", e);
 			e.printStackTrace();
-			vision = new MockVisionImpl();
+			vision = new MockVision();
 		}
 	}
 }

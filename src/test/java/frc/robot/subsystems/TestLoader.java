@@ -13,7 +13,7 @@ import org.strongback.mock.MockMotor;
 import org.strongback.mock.MockSolenoid;
 
 import frc.robot.interfaces.LEDStrip;
-import frc.robot.mock.MockDashboardImpl;
+import frc.robot.mock.MockDashboard;
 
 public class TestLoader {
     MockMotor spinner, passthrough;
@@ -23,7 +23,7 @@ public class TestLoader {
     ArrayList<Boolean> inSensorCounts = new ArrayList<Boolean>(10);
     int outSensorCounts = 0;
     LEDStrip led;
-    MockDashboardImpl dashboard;
+    MockDashboard dashboard;
     MockClock clock;
 
     @Before

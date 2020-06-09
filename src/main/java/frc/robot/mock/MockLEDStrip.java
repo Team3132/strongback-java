@@ -5,7 +5,7 @@ import frc.robot.lib.LEDColour;
 
 // LED Strip Subsystem 2020
 
-public class MockLEDStripImpl implements LEDStrip {
+public class MockLEDStrip implements LEDStrip {
 
     @Override
     public void setColour(LEDColour c) {}

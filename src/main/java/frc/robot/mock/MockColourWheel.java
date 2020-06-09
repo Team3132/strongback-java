@@ -4,11 +4,11 @@ import frc.robot.interfaces.ColourWheel;
 import frc.robot.lib.WheelColour;
 import frc.robot.interfaces.ColourWheel.ColourAction.ColourWheelType;
 
-public class MockColourWheelImpl implements ColourWheel {
+public class MockColourWheel implements ColourWheel {
     private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
     private boolean extended = false;
 
-    public MockColourWheelImpl() {
+    public MockColourWheel() {
     }
 
     @Override

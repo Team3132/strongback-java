@@ -2,11 +2,11 @@ package frc.robot.mock;
 
 import frc.robot.interfaces.Vision;
 
-public class MockVisionImpl implements Vision {
+public class MockVision implements Vision {
 
 	TargetDetails details = new TargetDetails();
 
-	public MockVisionImpl() {
+	public MockVision() {
 		details.targetFound = false;
 		details.imageTimestamp = 0;
 	}

@@ -2,7 +2,7 @@ package frc.robot.mock;
 
 import frc.robot.interfaces.Compressor;
 
-public class MockCompressorImpl implements Compressor {
+public class MockCompressor implements Compressor {
 
 	private boolean enabled = true;
 	@Override

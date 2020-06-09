@@ -6,11 +6,11 @@ import java.util.List;
 
 import frc.robot.interfaces.Jevois;
 
-public class MockJevoisImpl implements Jevois {
+public class MockJevois implements Jevois {
 
     List<String> lines = new ArrayList<String>();
 
-    public MockJevoisImpl() {
+    public MockJevois() {
     }
 
     @Override

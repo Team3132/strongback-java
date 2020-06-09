@@ -3,13 +3,13 @@ package frc.robot.mock;
 import frc.robot.drive.routines.DriveRoutine;
 import frc.robot.interfaces.Drivebase;
 
-public class MockDrivebaseImpl implements Drivebase  {
+public class MockDrivebase implements Drivebase  {
 	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE_DUTY_CYCLE);
 	private boolean ClimbModeEnabled = false;
 	private boolean BrakeApplied = false;
 	String name = "MockDrivebase";
 	;
-	public MockDrivebaseImpl() {
+	public MockDrivebase() {
 	}
 
 	@Override

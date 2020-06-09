@@ -10,7 +10,7 @@ import org.strongback.mock.Mock;
 import org.strongback.mock.MockMotor;
 import org.strongback.mock.MockSolenoid;
 
-import frc.robot.mock.MockDashboardImpl;
+import frc.robot.mock.MockDashboard;
 
 
 public class TestShooter {
@@ -24,7 +24,7 @@ public class TestShooter {
     public void setUp() {
         shooterMotor = Mock.stoppedMotor();
         shooterSolenoid = Mock.Solenoids.singleSolenoid(0);
-        shooter = new FlywheelShooter(shooterMotor, shooterSolenoid, new MockDashboardImpl());
+        shooter = new FlywheelShooter(shooterMotor, shooterSolenoid, new MockDashboard());
     }
 
     @Test

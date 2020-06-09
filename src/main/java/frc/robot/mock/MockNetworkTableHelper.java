@@ -12,10 +12,10 @@ import frc.robot.interfaces.NetworkTableHelper;
 /**
  * Add your docs here.
  */
-public class MockNetworkTableHelperImpl implements NetworkTableHelper {
+public class MockNetworkTableHelper implements NetworkTableHelper {
 
     
-    public MockNetworkTableHelperImpl(String defaultName) {
+    public MockNetworkTableHelper(String defaultName) {
         
     }
 

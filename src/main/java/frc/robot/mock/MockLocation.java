@@ -6,7 +6,7 @@ import frc.robot.interfaces.Location;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
 
-public class MockLocationImpl implements Location {
+public class MockLocation implements Location {
 
 	Position here = new Position(0, 0, 0);
 	double heading = 0;
