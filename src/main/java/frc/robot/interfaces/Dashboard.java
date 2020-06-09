@@ -1,7 +1,7 @@
 package frc.robot.interfaces;
 
 
-public interface DashboardInterface {
+public interface Dashboard {
 
 	public void putNumber(String key, double value);
 

@@ -1,17 +1,17 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.ShooterInterface;
+import frc.robot.interfaces.Shooter;
 
-public class MockShooter implements ShooterInterface {
+public class MockFlywheelShooter implements Shooter {
 
     private double targetRPS = 0;
 	private boolean isExtended = false;
 
-    public MockShooter() {
+    public MockFlywheelShooter() {
     }
 
     @Override
-    public ShooterInterface setTargetRPS(double rps) {
+    public Shooter setTargetRPS(double rps) {
         targetRPS = rps;
         return this;
     }
@@ -27,7 +27,7 @@ public class MockShooter implements ShooterInterface {
     }
 
 	@Override
-	public ShooterInterface setHoodExtended(boolean extended) {
+	public Shooter setHoodExtended(boolean extended) {
 		isExtended = extended;
 		return this;
 	}

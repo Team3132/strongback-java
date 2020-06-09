@@ -1,11 +1,11 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.Dashboard;
 
 /**
  * Subsystem responsible for the for the outtake
  */
-public class MockDashboard implements DashboardInterface {
+public class MockDashboard implements Dashboard {
 	@Override
 	public void putNumber(String key, double value) {
 	}

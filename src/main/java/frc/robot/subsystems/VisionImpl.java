@@ -5,25 +5,25 @@ import java.io.IOException;
 import org.strongback.components.Clock;
 
 import frc.robot.Config;
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.JevoisInterface;
-import frc.robot.interfaces.LocationInterface;
-import frc.robot.interfaces.VisionInterface;
+import frc.robot.interfaces.Dashboard;
+import frc.robot.interfaces.Jevois;
+import frc.robot.interfaces.Location;
+import frc.robot.interfaces.Vision;
 import frc.robot.lib.Position;
 import frc.robot.lib.Subsystem;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
 
-public class Vision extends Subsystem implements VisionInterface, Runnable {
-	private JevoisInterface jevois;
-	private LocationInterface location;
+public class VisionImpl extends Subsystem implements Vision, Runnable {
+	private Jevois jevois;
+	private Location location;
 	private Clock clock;
 	private double visionHMin, visionSMin, visionVMin;
 	private double visionHMax, visionSMax, visionVMax;
 	private TargetDetails lastSeenTarget = new TargetDetails();
 	private boolean connected = false;
 
-	public Vision(JevoisInterface jevois, LocationInterface location, DashboardInterface dashboard, Clock clock,
+	public VisionImpl(Jevois jevois, Location location, Dashboard dashboard, Clock clock,
 			double visionHMin, double visionSMin, double visionVMin, double visionHMax, double visionSMax,
 			double visionVMax) {
 		super("Vision", dashboard);

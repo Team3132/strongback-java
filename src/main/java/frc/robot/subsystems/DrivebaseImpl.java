@@ -9,8 +9,8 @@ import org.strongback.components.Solenoid;
 
 import frc.robot.drive.routines.ConstantDrive;
 import frc.robot.drive.routines.DriveRoutine;
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.DrivebaseInterface;
+import frc.robot.interfaces.Dashboard;
+import frc.robot.interfaces.Drivebase;
 import frc.robot.lib.Subsystem;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
@@ -24,7 +24,7 @@ import frc.robot.lib.log.Log;
  * It periodically queries the joysticks (or the auto routine) for the
  * speed/power for each side of the drivebase.
  */
-public class Drivebase extends Subsystem implements DrivebaseInterface {
+public class DrivebaseImpl extends Subsystem implements Drivebase {
 	private DriveRoutineParameters parameters = DriveRoutineParameters.getConstantPower(0);
 	private DriveRoutine routine = null;
 	private ControlMode controlMode = ControlMode.DutyCycle;  // The mode the talon should be in.
@@ -34,8 +34,8 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 	private Solenoid brakeSolenoid;
 	private DriveMotion currentMotion;
 
-	public Drivebase(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, 
-			DashboardInterface dashboard) {
+	public DrivebaseImpl(Motor left, Motor right, Solenoid ptoSolenoid, Solenoid brakeSolenoid, 
+			Dashboard dashboard) {
 		super("Drive", dashboard);
 		this.left = left;
 		this.right = right;
@@ -64,7 +64,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 	}
 
 	@Override
-	public DrivebaseInterface activateClimbMode(boolean extend) {
+	public Drivebase activateClimbMode(boolean extend) {
 		if (extend) {
 			ptoSolenoid.extend();
 		} else {
@@ -75,7 +75,7 @@ public class Drivebase extends Subsystem implements DrivebaseInterface {
 	}
 
 	@Override
-	public DrivebaseInterface applyBrake(boolean extend) {
+	public Drivebase applyBrake(boolean extend) {
 		if (extend) {
 			brakeSolenoid.extend();
 		} else {

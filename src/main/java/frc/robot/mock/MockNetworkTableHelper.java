@@ -6,13 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot.mock;
-import frc.robot.interfaces.NetworkTableHelperInterface;
+import frc.robot.interfaces.NetworkTableHelper;
 
 
 /**
  * Add your docs here.
  */
-public class MockNetworkTableHelper implements NetworkTableHelperInterface {
+public class MockNetworkTableHelper implements NetworkTableHelper {
 
     
     public MockNetworkTableHelper(String defaultName) {

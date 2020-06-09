@@ -26,10 +26,10 @@ import java.io.OutputStream;
 
 import com.fazecast.jSerialComm.*;
 
-import frc.robot.interfaces.JevoisInterface;
+import frc.robot.interfaces.Jevois;
 import frc.robot.lib.log.Log;
 
-public class Jevois implements JevoisInterface {
+public class JevoisImpl implements Jevois {
 
     private static class Parameter<T> {
         String name;
@@ -203,7 +203,7 @@ public class Jevois implements JevoisInterface {
      * 
      * @throws IOException
      */
-    public Jevois() throws IOException {
+    public JevoisImpl() throws IOException {
         SerialPort[] ports = SerialPort.getCommPorts();
         for (int i = 0; i < ports.length; i++) {
             SerialPort port = ports[i];

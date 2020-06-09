@@ -4,7 +4,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
-import frc.robot.interfaces.NetworkTableHelperInterface;
+import frc.robot.interfaces.NetworkTableHelper;
 
 /**
  * Wrapper for accessing values from NetworkTables.
@@ -12,11 +12,11 @@ import frc.robot.interfaces.NetworkTableHelperInterface;
  * Note: This will not work from within unit tests as it requires loading a
  * shared library and that will only work on the roborio :(
  */
-public class NetworkTablesHelper implements NetworkTableHelperInterface{
+public class NetworkTableHelperImpl implements NetworkTableHelper{
 	private NetworkTable table;
 	private final String tableName;
     
-	public NetworkTablesHelper(String tableName) {
+	public NetworkTableHelperImpl(String tableName) {
             this.tableName = tableName;
             table = NetworkTableInstance.getDefault().getTable(tableName);
 	}

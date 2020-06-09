@@ -2,18 +2,18 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.LEDStrip;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.MathUtil;
 
 // LED Strip Subsystem 2020
 
-public class LEDStrip implements LEDStripInterface {
+public class LEDStripImpl implements LEDStrip {
     public AddressableLED ledStrip;
     public AddressableLEDBuffer ledStripBuffer;
     private final int numberOfLEDs;
 
-    public LEDStrip(int PWM_Port, int numberOfLEDs) {   
+    public LEDStripImpl(int PWM_Port, int numberOfLEDs) {   
         this.numberOfLEDs = numberOfLEDs;
 
         ledStrip = new AddressableLED(PWM_Port);

@@ -12,8 +12,8 @@ import java.net.UnknownHostException;
 import org.junit.Test;
 import org.strongback.mock.Mock;
 import org.strongback.mock.MockClock;
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.LocationInterface;
+import frc.robot.interfaces.Dashboard;
+import frc.robot.interfaces.Location;
 import frc.robot.mock.MockDashboard;
 import frc.robot.mock.MockJevois;
 import frc.robot.mock.MockLocation;
@@ -31,11 +31,11 @@ public class TestVision {
     MockJevois jevois = new MockJevois();
 
     // Historic locations are based on the time it is requested at.
-    LocationInterface location = new MockLocation();
+    Location location = new MockLocation();
 
-    DashboardInterface dashboard = new MockDashboard();
+    Dashboard dashboard = new MockDashboard();
     // Listen on a port assigned by the operating system.
-    Vision vision = new Vision(jevois, location, dashboard, clock, 0, 0, 0, 255, 255, 255);
+    VisionImpl vision = new VisionImpl(jevois, location, dashboard, clock, 0, 0, 0, 255, 255, 255);
     // Shouldn't have a target lock.
     assertThat(vision.getTargetDetails().targetFound, is(equalTo(false)));
 

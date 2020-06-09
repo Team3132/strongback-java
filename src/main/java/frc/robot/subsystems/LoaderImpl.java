@@ -7,27 +7,27 @@ import org.strongback.components.Solenoid;
 import org.strongback.components.Motor;
 import org.strongback.components.Motor.ControlMode;
 
-import frc.robot.interfaces.LoaderInterface;
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.Loader;
+import frc.robot.interfaces.Dashboard;
 import frc.robot.interfaces.DashboardUpdater;
-import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.LEDStrip;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.Subsystem;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
 
-public class Loader extends Subsystem implements LoaderInterface {
+public class LoaderImpl extends Subsystem implements Loader {
     final private Motor spinner, passthrough;
     final private Solenoid paddleSolenoid;
     private double spinnerRPS = 0;
     final Counter inSensorCount;
     final Counter outSensorCount;
     private int initBallCount = 0;
-    final private LEDStripInterface led;
+    final private LEDStrip led;
     private double targetPassthroughDutyCycle = 0;
 
-    public Loader(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
-            final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStripInterface led, final DashboardInterface dashboard) {
+    public LoaderImpl(final Motor loaderSpinnerMotor, final Motor loaderPassthroughMotor, final Solenoid paddleSolenoid,
+            final BooleanSupplier inSensor, final BooleanSupplier outSensor, LEDStrip led, final Dashboard dashboard) {
         super("Loader", dashboard);
         this.spinner = loaderSpinnerMotor;
         this.passthrough = loaderPassthroughMotor;
@@ -93,7 +93,7 @@ public class Loader extends Subsystem implements LoaderInterface {
         this.initBallCount = initBallCount;
     }
 
-    public LoaderInterface setPaddleBlocking(final boolean block) {
+    public Loader setPaddleBlocking(final boolean block) {
         if (block) {
             paddleSolenoid.extend();
         } else {

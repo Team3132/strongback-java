@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import frc.robot.interfaces.ShooterInterface;
+import frc.robot.interfaces.Shooter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +16,7 @@ import frc.robot.mock.MockDashboard;
 public class TestShooter {
     MockMotor shooterMotor;
     MockSolenoid shooterSolenoid;
-    ShooterInterface shooter;
+    Shooter shooter;
 
 	public static final int SHOOTER_TARGET_SPEED_RPS = 100;
 
@@ -24,7 +24,7 @@ public class TestShooter {
     public void setUp() {
         shooterMotor = Mock.stoppedMotor();
         shooterSolenoid = Mock.Solenoids.singleSolenoid(0);
-        shooter = new Shooter(shooterMotor, shooterSolenoid, new MockDashboard());
+        shooter = new FlywheelShooter(shooterMotor, shooterSolenoid, new MockDashboard());
     }
 
     @Test

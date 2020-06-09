@@ -1,8 +1,8 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.VisionInterface;
+import frc.robot.interfaces.Vision;
 
-public class MockVision implements VisionInterface {
+public class MockVision implements Vision {
 
 	TargetDetails details = new TargetDetails();
 

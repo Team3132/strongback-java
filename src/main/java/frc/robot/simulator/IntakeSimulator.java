@@ -1,13 +1,13 @@
 package frc.robot.simulator;
 
-import frc.robot.interfaces.IntakeInterface;
+import frc.robot.interfaces.Intake;
 import frc.robot.lib.MovementSimulator;
 
 /**
  * Very basic intake simulator used for unit testing.
  * Does not do gravity/friction etc.
  */
-public class IntakeSimulator implements IntakeInterface {
+public class IntakeSimulator implements Intake {
 	private final double kMaxSpeed = 180;  // degrees/sec
 	private final double kMaxAccel = 200;   // degrees/sec/sec
 	private final double kMinAngle = 0;
@@ -22,7 +22,7 @@ public class IntakeSimulator implements IntakeInterface {
 	}
 	
 	@Override
-	public IntakeInterface setExtended(boolean extend) {
+	public Intake setExtended(boolean extend) {
 		arm.setTargetPos(extend?kMaxAngle:kMinAngle);
 		return this;
 	}
@@ -39,7 +39,7 @@ public class IntakeSimulator implements IntakeInterface {
 
 
 	@Override
-	public IntakeInterface setTargetRPS(double rps) {
+	public Intake setTargetRPS(double rps) {
 		this.rps = rps;
 		return this;
 	}

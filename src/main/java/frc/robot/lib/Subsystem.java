@@ -2,9 +2,9 @@ package frc.robot.lib;
 
 import org.strongback.Executable;
 import org.strongback.command.Requirable;
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.Dashboard;
 import frc.robot.interfaces.DashboardUpdater;
-import frc.robot.interfaces.NetworkTableHelperInterface;
+import frc.robot.interfaces.NetworkTableHelper;
 import edu.wpi.first.wpilibj.Notifier;
 
 /**
@@ -22,14 +22,14 @@ public abstract class Subsystem implements Requirable, Executable, DashboardUpda
 	protected String name;
 	protected Notifier notifier;
 	protected boolean enabled;
-	protected DashboardInterface dashboard;
-	protected NetworkTableHelperInterface networkTable;
+	protected Dashboard dashboard;
+	protected NetworkTableHelper networkTable;
 	
-	public Subsystem(String name, DashboardInterface dashboard) {
+	public Subsystem(String name, Dashboard dashboard) {
 		this(name, null, dashboard);
 	}
 
-	public Subsystem(String name, NetworkTableHelperInterface networkTable, DashboardInterface dashboard) {
+	public Subsystem(String name, NetworkTableHelper networkTable, Dashboard dashboard) {
 		this.name = name;
 		this.dashboard = dashboard;
 		this.networkTable = networkTable;

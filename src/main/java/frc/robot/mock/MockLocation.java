@@ -2,11 +2,11 @@ package frc.robot.mock;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import frc.robot.Config;
-import frc.robot.interfaces.LocationInterface;
+import frc.robot.interfaces.Location;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.Position;
 
-public class MockLocation implements LocationInterface {
+public class MockLocation implements Location {
 
 	Position here = new Position(0, 0, 0);
 	double heading = 0;

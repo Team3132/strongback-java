@@ -1,9 +1,9 @@
 package frc.robot.mock;
 
 import frc.robot.drive.routines.DriveRoutine;
-import frc.robot.interfaces.DrivebaseInterface;
+import frc.robot.interfaces.Drivebase;
 
-public class MockDrivebase implements DrivebaseInterface  {
+public class MockDrivebase implements Drivebase  {
 	private DriveRoutineParameters parameters = new DriveRoutineParameters(DriveRoutineType.ARCADE_DUTY_CYCLE);
 	private boolean ClimbModeEnabled = false;
 	private boolean BrakeApplied = false;
@@ -78,13 +78,13 @@ public class MockDrivebase implements DrivebaseInterface  {
 	}
 
 	@Override
-	public DrivebaseInterface activateClimbMode(boolean enabled) {
+	public Drivebase activateClimbMode(boolean enabled) {
 		ClimbModeEnabled = enabled;
 		return this;
 	}
 
 	@Override
-	public DrivebaseInterface applyBrake(boolean enabled) {
+	public Drivebase applyBrake(boolean enabled) {
 		BrakeApplied = enabled;
 		return this;
 	}

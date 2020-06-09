@@ -2,7 +2,7 @@ package frc.robot.drive.routines;
 
 import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.ui.ContinuousRange;
-import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
+import frc.robot.interfaces.Drivebase.DriveMotion;
 import frc.robot.lib.chart.Chart;
 
 public class ArcadeDrive extends DriveRoutine {

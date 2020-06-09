@@ -18,14 +18,14 @@ import frc.robot.lib.log.Log;
 import frc.robot.subsystems.*;
 
 
-public class OI implements OIInterface {
+public class OIImpl implements OI {
 
 	private SwitchReactor reactor = Strongback.switchReactor();
 	private Controller exec;
 	private Subsystems subsystems;
 
 
-	public OI(Controller controller, Subsystems subsystems) {
+	public OIImpl(Controller controller, Subsystems subsystems) {
 		this.exec = controller;
 		this.subsystems = subsystems;
 	}
@@ -148,9 +148,9 @@ public class OI implements OIInterface {
  	@Override
 	public void configureDiagBox(InputDevice box) {
 		// Shooter overrides.
-		OverridableSubsystem<ShooterInterface> shooterOverride = subsystems.shooterOverride;
+		OverridableSubsystem<Shooter> shooterOverride = subsystems.shooterOverride;
 		// Get the interface that the diag box uses.
-		ShooterInterface shooterIF = shooterOverride.getOverrideInterface();
+		Shooter shooterIF = shooterOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.SHOOTER_DISABLE, OperatorBoxButtons.SHOOTER_MANUAL, shooterOverride);
 		// While the shooter speed button is pressed, set the target speed. Does not
@@ -167,9 +167,9 @@ public class OI implements OIInterface {
 			() -> shooterIF.setTargetRPS(0));
 
 		// Intake overrides.
-		OverridableSubsystem<IntakeInterface> intakeOverride = subsystems.intakeOverride;
+		OverridableSubsystem<Intake> intakeOverride = subsystems.intakeOverride;
 		// Get the interface that the diag box uses.
-		IntakeInterface intakeIF = intakeOverride.getOverrideInterface();
+		Intake intakeIF = intakeOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.INTAKE_DISABLE, OperatorBoxButtons.INTAKE_MANUAL, intakeOverride);
 	    // While the intake speed button is pressed, set the target speed. Does not turn off.
@@ -184,7 +184,7 @@ public class OI implements OIInterface {
 
 
 		// Get the interface that the diag box uses.
-		LoaderInterface loaderIF = subsystems.loaderOverride.getOverrideInterface();
+		Loader loaderIF = subsystems.loaderOverride.getOverrideInterface();
 		// Setup the switch for manual/auto/off modes.
 		mapOverrideSwitch(box, OperatorBoxButtons.LOADER_DISABLE, OperatorBoxButtons.LOADER_MANUAL, subsystems.loaderOverride);
 		// While the loader speed button is pressed, set the target speed. Does not turn off.

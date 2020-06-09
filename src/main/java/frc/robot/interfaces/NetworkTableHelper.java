@@ -1,7 +1,7 @@
 package frc.robot.interfaces;
 
 
-public interface NetworkTableHelperInterface extends DashboardUpdater {
+public interface NetworkTableHelper extends DashboardUpdater {
     /**
      * Gets a named double value from the network tables. If not found
      * the defaultValue is returned.

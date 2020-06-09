@@ -4,7 +4,7 @@ import org.strongback.Executable;
 
 import frc.robot.lib.WheelColour;
 
-public interface ColourWheelInterface extends SubsystemInterface, Executable, DashboardUpdater {
+public interface ColourWheel extends Subsystem, Executable, DashboardUpdater {
     public class ColourAction {
         public final ColourWheelType type;
         public final WheelColour colour;
@@ -53,7 +53,7 @@ public interface ColourWheelInterface extends SubsystemInterface, Executable, Da
      * Sets the desired action for the colour sensor.
      * @param action
      */
-    public ColourWheelInterface setDesiredAction(ColourAction action);
+    public ColourWheel setDesiredAction(ColourAction action);
 
     /**
      * Gets the target action of the colour sensor.

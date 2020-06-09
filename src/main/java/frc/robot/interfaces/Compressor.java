@@ -1,6 +1,6 @@
 package frc.robot.interfaces;
 
-public interface CompressorInterface {
+public interface Compressor {
 	/**
 	 * Allows the compressor to run
 	 */

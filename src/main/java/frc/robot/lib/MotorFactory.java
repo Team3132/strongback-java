@@ -132,7 +132,7 @@ public class MotorFactory {
 		Chart.register(() -> leader.getOutputCurrent(), "Talons/%d/Current", canIDs[0]);
 		leader.configContinuousCurrentLimit(Config.motorController.currentLimit.defaultContinuousAmps, 10);
 		leader.configPeakCurrentLimit(Config.motorController.currentLimit.defaultPeakAmps, 10);
-		TunableMotor.tuneMotor(leader, pidf, new NetworkTablesHelper(name));
+		TunableMotor.tuneMotor(leader, pidf, new NetworkTableHelperImpl(name));
 
     	for (int n = 1; n < canIDs.length; n++) {
 			boolean shouldInvert = invert;
@@ -183,7 +183,7 @@ public class MotorFactory {
 		Chart.register(() -> leader.getOutputCurrent(), "SparkMAX/%d/Current", canIDs[0]);
 		leader.setSmartCurrentLimit(Config.motorController.currentLimit.defaultContinuousAmps, 10);
 		leader.setSecondaryCurrentLimit(Config.motorController.currentLimit.defaultPeakAmps, 10);
-		TunableMotor.tuneMotor(leader, pidf, new NetworkTablesHelper(name));
+		TunableMotor.tuneMotor(leader, pidf, new NetworkTableHelperImpl(name));
 
 		for (int n = 1; n < canIDs.length; n++) {
 			boolean shouldInvert = invert;

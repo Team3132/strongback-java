@@ -5,9 +5,9 @@ package frc.robot.interfaces;
  */
 import org.strongback.Executable;
 
-public interface IntakeInterface extends SubsystemInterface, Executable, DashboardUpdater {
+public interface Intake extends Subsystem, Executable, DashboardUpdater {
 
-	public IntakeInterface setExtended(boolean extended);
+	public Intake setExtended(boolean extended);
 
 	/**
 	 * @return the state of the intake solenoid. 
@@ -16,7 +16,7 @@ public interface IntakeInterface extends SubsystemInterface, Executable, Dashboa
 	public boolean isRetracted();
 
 	//Set intake speed
-	public IntakeInterface setTargetRPS(double rps);
+	public Intake setTargetRPS(double rps);
 
 	public double getTargetRPS();
 }

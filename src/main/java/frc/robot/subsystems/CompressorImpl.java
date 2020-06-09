@@ -2,15 +2,15 @@ package frc.robot.subsystems;
 
 import org.strongback.components.PneumaticsModule;
 import org.strongback.components.Relay;
-import frc.robot.interfaces.CompressorInterface;
+import frc.robot.interfaces.Compressor;
 
 
 /**
  * Subsystem responsible for the for the pneumatic compressor.
  */
-public class Compressor implements CompressorInterface {
+public class CompressorImpl implements Compressor {
 	private Relay relay;
-	public Compressor(PneumaticsModule compressor) {
+	public CompressorImpl(PneumaticsModule compressor) {
 		this.relay = compressor.automaticMode();
 	}
 	

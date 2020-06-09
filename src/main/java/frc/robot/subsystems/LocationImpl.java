@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import frc.robot.Config;
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.LocationInterface;
+import frc.robot.interfaces.Dashboard;
+import frc.robot.interfaces.Location;
 import frc.robot.lib.LocationHistory;
 import frc.robot.lib.MathUtil;
 import frc.robot.lib.NavXGyroscope;
@@ -88,7 +88,7 @@ import frc.robot.lib.log.Log;
  * A bearing is the relative angle from the initial angle. In nautical terms it is the absolute bearing.
  * A bearing is constrained to the range -180 to 180 degrees.
  */
-public class Location extends Subsystem implements LocationInterface {
+public class LocationImpl extends Subsystem implements Location {
     private Gyroscope gyro;
     private DoubleDelta leftDistanceDelta, rightDistanceDelta;
     private Clock clock;            // Source of time.
@@ -147,7 +147,7 @@ public class Location extends Subsystem implements LocationInterface {
 	 * @param gyro The gyro to get angles
 	 * @param log The log to store debug and other logging messages
 	 */
-    public Location(Runnable resetEncoders, DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, DashboardInterface dashboard) {
+    public LocationImpl(Runnable resetEncoders, DoubleSupplier leftDistance, DoubleSupplier rightDistance, Gyroscope gyro, Clock clock, Dashboard dashboard) {
 		super("Location", dashboard);	// always present!
 		this.resetEncoders = resetEncoders;
 		this.leftDistance = leftDistance;

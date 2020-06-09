@@ -1,6 +1,6 @@
 package frc.robot.interfaces;
 
-public interface SubsystemInterface {
+public interface Subsystem {
 	/**
 	 * Return the name of the subsystem
 	 */

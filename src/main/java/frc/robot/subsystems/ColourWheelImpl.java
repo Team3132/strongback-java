@@ -8,10 +8,10 @@ import org.strongback.components.Motor.ControlMode;
 import org.strongback.components.Solenoid;
 
 import frc.robot.Config;
-import frc.robot.interfaces.ColourWheelInterface;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.ColourWheel;
+import frc.robot.interfaces.ColourWheel.ColourAction.ColourWheelType;
+import frc.robot.interfaces.Dashboard;
+import frc.robot.interfaces.LEDStrip;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.Subsystem;
 import frc.robot.lib.WheelColour;
@@ -39,7 +39,7 @@ import frc.robot.lib.log.Log;
  * This class expects to be given one motor and a RevRobotics Colour Sensor V3.
  */
 
-public class ColourWheel extends Subsystem implements ColourWheelInterface {
+public class ColourWheelImpl extends Subsystem implements ColourWheel {
   // Used in doubleCheck to check for mistakes with colour detection.
   private WheelColour colourPrev = WheelColour.UNKNOWN;
   private WheelColour colour = WheelColour.UNKNOWN; // Variable for what the colour sensor currently sees.
@@ -55,11 +55,11 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   private Clock clock;
   private final Motor motor;
   private Solenoid solenoid;
-  private final LEDStripInterface ledStrip;
+  private final LEDStrip ledStrip;
   private final Supplier<WheelColour> colourSensor;
 
-  public ColourWheel(Motor motor, Solenoid solenoid, Supplier<WheelColour> colourSensor, LEDStripInterface ledStrip,
-      Clock clock, DashboardInterface dash) {
+  public ColourWheelImpl(Motor motor, Solenoid solenoid, Supplier<WheelColour> colourSensor, LEDStrip ledStrip,
+      Clock clock, Dashboard dash) {
     super("ColourWheel", dash);
     Log.info("Creating Colour Wheel Subsystem");
     this.motor = motor;
@@ -233,7 +233,7 @@ public class ColourWheel extends Subsystem implements ColourWheelInterface {
   }
 
   @Override
-  public ColourWheelInterface setDesiredAction(ColourAction action) {
+  public ColourWheel setDesiredAction(ColourAction action) {
     this.action = action;
     if (action == new ColourAction(ColourWheelType.POSITION, WheelColour.UNKNOWN)) {
       Log.error("%s: No colour found in FMS!", name);

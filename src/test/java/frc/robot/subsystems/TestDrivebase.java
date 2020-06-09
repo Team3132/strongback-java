@@ -9,10 +9,10 @@ import org.strongback.mock.MockMotor;
 import org.strongback.mock.MockSolenoid;
 
 import frc.robot.drive.routines.DriveRoutine;
-import frc.robot.interfaces.DrivebaseInterface;
-import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineType;
+import frc.robot.interfaces.Drivebase;
+import frc.robot.interfaces.Drivebase.DriveMotion;
+import frc.robot.interfaces.Drivebase.DriveRoutineParameters;
+import frc.robot.interfaces.Drivebase.DriveRoutineType;
 import frc.robot.mock.MockDashboard;
 
 public class TestDrivebase {
@@ -60,7 +60,7 @@ public class TestDrivebase {
         MockSolenoid ptoSolenoid = Mock.Solenoids.singleSolenoid(1);
         MockSolenoid brakeSolenoid = Mock.Solenoids.singleSolenoid(1);
         MockDriveRoutine arcade = new MockDriveRoutine("MockArcade");
-        DrivebaseInterface drive = new Drivebase(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid,
+        Drivebase drive = new DrivebaseImpl(leftMotor, rightMotor, ptoSolenoid, brakeSolenoid,
                 new MockDashboard());
         // Register this drive routine so it can be used.
         drive.registerDriveRoutine(DriveRoutineType.ARCADE_DUTY_CYCLE, arcade);

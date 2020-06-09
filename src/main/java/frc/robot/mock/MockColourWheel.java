@@ -1,10 +1,10 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.ColourWheelInterface;
+import frc.robot.interfaces.ColourWheel;
 import frc.robot.lib.WheelColour;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
+import frc.robot.interfaces.ColourWheel.ColourAction.ColourWheelType;
 
-public class MockColourWheel implements ColourWheelInterface {
+public class MockColourWheel implements ColourWheel {
     private ColourAction action = new ColourAction(ColourWheelType.NONE, WheelColour.UNKNOWN);
     private boolean extended = false;
 
@@ -42,7 +42,7 @@ public class MockColourWheel implements ColourWheelInterface {
     }
 
     @Override
-    public ColourWheelInterface setDesiredAction(ColourAction action) {
+    public ColourWheel setDesiredAction(ColourAction action) {
         this.action = action;
         return this;
     }

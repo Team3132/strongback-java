@@ -6,8 +6,8 @@ import java.util.function.DoubleSupplier;
 import org.strongback.components.Clock;
 import org.strongback.components.Motor.ControlMode;
 
-import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.interfaces.Drivebase.DriveMotion;
+import frc.robot.interfaces.Drivebase.DriveRoutineParameters;
 import frc.robot.lib.log.Log;
 import frc.robot.Config;
 import frc.robot.drive.util.LowPassFilter;

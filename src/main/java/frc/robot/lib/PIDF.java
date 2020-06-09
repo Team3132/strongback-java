@@ -1,6 +1,6 @@
 package frc.robot.lib;
 
-import frc.robot.interfaces.NetworkTableHelperInterface;
+import frc.robot.interfaces.NetworkTableHelper;
 
 /**
  * Store PIDF values for motor control.
@@ -17,14 +17,14 @@ public class PIDF {
         this.f = f;
     }
 
-    public void readFrom(NetworkTableHelperInterface networkTable) {
+    public void readFrom(NetworkTableHelper networkTable) {
         p = networkTable.get("p", p);
 		i = networkTable.get("i", i);
 		d = networkTable.get("d", d);
 		f = networkTable.get("f", f);
     }
 
-    public void saveTo(NetworkTableHelperInterface networkTable) {
+    public void saveTo(NetworkTableHelper networkTable) {
         networkTable.set("p", p);
 		networkTable.set("i", i);
 		networkTable.set("d", d);

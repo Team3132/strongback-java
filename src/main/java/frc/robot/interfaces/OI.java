@@ -3,7 +3,7 @@ package frc.robot.interfaces;
 import org.strongback.components.ui.InputDevice;
 import org.strongback.components.ui.FlightStick;
 
-public interface OIInterface {
+public interface OI {
     
     /**
      * Configure the standard Operator Interface

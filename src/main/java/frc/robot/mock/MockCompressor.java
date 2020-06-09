@@ -1,8 +1,8 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.CompressorInterface;
+import frc.robot.interfaces.Compressor;
 
-public class MockCompressor implements CompressorInterface {
+public class MockCompressor implements Compressor {
 
 	private boolean enabled = true;
 	@Override

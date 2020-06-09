@@ -12,17 +12,17 @@ import org.strongback.mock.MockClock;
 import org.strongback.mock.MockMotor;
 import org.strongback.mock.MockSolenoid;
 
-import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.LEDStrip;
 import frc.robot.mock.MockDashboard;
 
 public class TestLoader {
     MockMotor spinner, passthrough;
     MockSolenoid paddle;
-    Loader loader;
+    LoaderImpl loader;
     BooleanSupplier inSensor, outSensor = () -> false;
     ArrayList<Boolean> inSensorCounts = new ArrayList<Boolean>(10);
     int outSensorCounts = 0;
-    LEDStripInterface led;
+    LEDStrip led;
     MockDashboard dashboard;
     MockClock clock;
 
@@ -36,7 +36,7 @@ public class TestLoader {
             if (inSensorCounts.size() == 0) return false;
             return inSensorCounts.get(0);
         };
-        loader = new Loader(spinner, passthrough, paddle, inSensor, outSensor, led, dashboard);
+        loader = new LoaderImpl(spinner, passthrough, paddle, inSensor, outSensor, led, dashboard);
     }
 
     @Test

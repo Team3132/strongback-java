@@ -8,7 +8,7 @@ import frc.robot.lib.Position;
  * 
  * The vision subsystem has listens for messages indicating when and where a vision target was last seen.
  */
-public interface VisionInterface extends DashboardUpdater {
+public interface Vision extends DashboardUpdater {
 
 	/**
 	 * Information about the last target seen.

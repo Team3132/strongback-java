@@ -11,7 +11,7 @@ import org.strongback.mock.MockClock;
 import org.strongback.mock.MockPneumaticsModule;
 
 import frc.robot.Config;
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.Dashboard;
 import frc.robot.lib.WheelColour;
 import frc.robot.mock.MockBuddyClimb;
 import frc.robot.mock.MockColourWheel;
@@ -20,7 +20,7 @@ import frc.robot.mock.MockDrivebase;
 import frc.robot.mock.MockLEDStrip;
 import frc.robot.mock.MockLocation;
 import frc.robot.mock.MockLoader;
-import frc.robot.mock.MockShooter;
+import frc.robot.mock.MockFlywheelShooter;
 import frc.robot.simulator.IntakeSimulator;
 import frc.robot.subsystems.Subsystems;
 
@@ -34,7 +34,7 @@ public class TestController {
 	private final long ktestStepMs = 10;
 	private final long kRandomSeed = 123456;
 	private final double kMaxWaitTimeSeconds = 4;
-	protected DashboardInterface dashboard = new MockDashboard();
+	protected Dashboard dashboard = new MockDashboard();
 	private MockClock clock;
 	private Subsystems subsystems;
 	// Store direct access to the simulators so the simulator-only
@@ -58,7 +58,7 @@ public class TestController {
 		subsystems.compressor = new MockPneumaticsModule(); 
 		subsystems.drivebase = new MockDrivebase();
 		subsystems.loader = new MockLoader();
-		subsystems.shooter = new MockShooter();
+		subsystems.shooter = new MockFlywheelShooter();
 		subsystems.location = new MockLocation();
 		subsystems.colourWheel = new MockColourWheel();
 		subsystems.leftDriveDistance = () -> 0;

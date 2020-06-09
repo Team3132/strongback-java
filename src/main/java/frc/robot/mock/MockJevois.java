@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import frc.robot.interfaces.JevoisInterface;
+import frc.robot.interfaces.Jevois;
 
-public class MockJevois implements JevoisInterface {
+public class MockJevois implements Jevois {
 
     List<String> lines = new ArrayList<String>();
 

@@ -4,8 +4,8 @@ import org.strongback.components.Motor;
 import org.strongback.components.Solenoid;
 import org.strongback.components.Motor.ControlMode;
 
-import frc.robot.interfaces.DashboardInterface;
-import frc.robot.interfaces.IntakeInterface;
+import frc.robot.interfaces.Dashboard;
+import frc.robot.interfaces.Intake;
 import frc.robot.lib.Subsystem;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
@@ -14,14 +14,14 @@ import frc.robot.lib.log.Log;
  * Intake Subsystem 2019:
  * On the 2019 robot the intake is pneumatically driven and using one motor to intake game objects 
  */
-public class Intake extends Subsystem implements IntakeInterface
+public class IntakeImpl extends Subsystem implements Intake
  {
     private Motor motor;
     private Solenoid solenoid;
     private IntakeWheel intakeWheel;
 
-    public Intake(Motor motor, Solenoid solenoid, DashboardInterface dashboard) {
-        super("Intake", dashboard);   
+    public IntakeImpl(Motor motor, Solenoid solenoid, Dashboard dashboard) {
+        super("MecanumIntake", dashboard);   
         this.motor = motor;
         this.solenoid = solenoid;
         intakeWheel = new IntakeWheel(motor);
@@ -46,7 +46,7 @@ public class Intake extends Subsystem implements IntakeInterface
     }
 
     @Override
-    public IntakeInterface setExtended(boolean extend) {
+    public Intake setExtended(boolean extend) {
         if (extend) {
             solenoid.extend();
         } else {
@@ -70,7 +70,7 @@ public class Intake extends Subsystem implements IntakeInterface
      * Set the speed on the intake wheels.
      */
     @Override
-    public IntakeInterface setTargetRPS(double rps) { 
+    public Intake setTargetRPS(double rps) { 
         intakeWheel.setTargetRPS(rps);
         return this;
     }

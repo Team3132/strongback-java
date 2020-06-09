@@ -1,7 +1,7 @@
 package frc.robot.interfaces;
 import frc.robot.lib.LEDColour;
 
-public interface LEDStripInterface {
+public interface LEDStrip {
     public void setColour(LEDColour c);
 
     /**

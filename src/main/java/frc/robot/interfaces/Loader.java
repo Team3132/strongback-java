@@ -5,7 +5,7 @@ import org.strongback.Executable;
 /**
  * This is a system to store balls from the intake and then pass them to the shooter.
  */
-public interface LoaderInterface extends SubsystemInterface, Executable, DashboardUpdater {
+public interface Loader extends Subsystem, Executable, DashboardUpdater {
 
     public double getTargetSpinnerRPS();
 	public double getTargetPassthroughDutyCycle();
@@ -20,7 +20,7 @@ public interface LoaderInterface extends SubsystemInterface, Executable, Dashboa
 	 * @return the state of the loader solenoid. 
 	 * */
 
-    public LoaderInterface setPaddleBlocking(boolean blocking);
+    public Loader setPaddleBlocking(boolean blocking);
 
 	/**
 	 * @return the state of the loader paddle solenoid. 

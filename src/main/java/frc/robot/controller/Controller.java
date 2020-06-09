@@ -7,9 +7,9 @@ import java.util.function.Supplier;
 import org.strongback.components.Clock;
 
 import frc.robot.controller.Sequence.SequenceBuilder;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction;
-import frc.robot.interfaces.ColourWheelInterface.ColourAction.ColourWheelType;
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.ColourWheel.ColourAction;
+import frc.robot.interfaces.ColourWheel.ColourAction.ColourWheelType;
+import frc.robot.interfaces.Dashboard;
 import frc.robot.interfaces.DashboardUpdater;
 import frc.robot.lib.LEDColour;
 import frc.robot.lib.WheelColour;
@@ -39,7 +39,7 @@ import frc.robot.subsystems.Subsystems;
 public class Controller implements Runnable, DashboardUpdater {
 	private final Subsystems subsystems;
 	private final Clock clock;
-	private final DashboardInterface dashboard;
+	private final Dashboard dashboard;
 	private Sequence sequence = new SequenceBuilder("idle",false).build(); // Current sequence we are working through.
 	private boolean sequenceHasChanged = true;
 	private boolean sequenceHasFinished = true;

@@ -1,8 +1,8 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.LoaderInterface;
+import frc.robot.interfaces.Loader;
 
-public class MockLoader implements LoaderInterface {
+public class MockLoader implements Loader {
     private double spinnerRPS = 0;
     private double passthroughPower = 0;
 
@@ -12,7 +12,7 @@ public class MockLoader implements LoaderInterface {
     private boolean isPaddleBlocking = false;
 
     @Override
-	public LoaderInterface setPaddleBlocking(boolean blocking) {
+	public Loader setPaddleBlocking(boolean blocking) {
 		isPaddleBlocking = blocking;
 		return this;
 	}

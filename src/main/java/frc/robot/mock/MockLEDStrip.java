@@ -1,11 +1,11 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.LEDStripInterface;
+import frc.robot.interfaces.LEDStrip;
 import frc.robot.lib.LEDColour;
 
 // LED Strip Subsystem 2020
 
-public class MockLEDStrip implements LEDStripInterface {
+public class MockLEDStrip implements LEDStrip {
 
     @Override
     public void setColour(LEDColour c) {}

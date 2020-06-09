@@ -26,7 +26,7 @@ import frc.robot.drive.routines.DriveRoutine;
  * The Drivebase is passed the motors and other devices it uses and implements the
  * control algorithms needed to co-ordinate actions on these devices.
  */
-public abstract interface DrivebaseInterface extends Executable, SubsystemInterface, DashboardUpdater {
+public abstract interface Drivebase extends Executable, Subsystem, DashboardUpdater {
 	public enum DriveRoutineType {
 		CONSTANT_POWER,  // Set a constant power to drive wheels.
 		CONSTANT_SPEED,  // Set a constant speed to drive wheels.
@@ -42,8 +42,8 @@ public abstract interface DrivebaseInterface extends Executable, SubsystemInterf
 
 	}
 
-	public DrivebaseInterface activateClimbMode(boolean enabled);
-	public DrivebaseInterface applyBrake(boolean enabled);
+	public Drivebase activateClimbMode(boolean enabled);
+	public Drivebase applyBrake(boolean enabled);
 
 
 	/**

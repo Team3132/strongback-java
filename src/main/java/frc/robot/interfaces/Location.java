@@ -28,7 +28,7 @@ import frc.robot.lib.Position;
  * It also need to be able to return where the robot was at some time in the past.
  * This allows the code to work out relative angles to external objects based on current and historical positions (and through projection, future positions).
  */
-public abstract interface LocationInterface extends Executable, DashboardUpdater  {
+public abstract interface Location extends Executable, DashboardUpdater  {
     
     /**
      * Set the current location. This allows a subsystem to override the location and force the location to a particular point.

@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.robot.Config;
-import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.interfaces.Drivebase.DriveMotion;
+import frc.robot.interfaces.Drivebase.DriveRoutineParameters;
 import frc.robot.lib.chart.Chart;
 import frc.robot.lib.log.Log;
-import frc.robot.interfaces.LocationInterface;
+import frc.robot.interfaces.Location;
 
 /**
  * Walks the drivebase through a supplied list of waypoints.
@@ -59,7 +59,7 @@ public class TrajectoryDrive extends DriveRoutine {
 
 	private Clock clock;
 
-	public TrajectoryDrive(LocationInterface location, Clock clock) {
+	public TrajectoryDrive(Location location, Clock clock) {
 		super("Trajectory Drive", ControlMode.Voltage);
 		this.clock = clock;
 		m_startTime = clock.currentTime();

@@ -2,15 +2,15 @@ package frc.robot.subsystems;
 
 import org.strongback.components.Solenoid;
 
-import frc.robot.interfaces.BuddyClimbInterface;
-import frc.robot.interfaces.DashboardInterface;
+import frc.robot.interfaces.BuddyClimb;
+import frc.robot.interfaces.Dashboard;
 import frc.robot.lib.Subsystem;
 import frc.robot.lib.chart.Chart;
 
-public class BuddyClimb extends Subsystem implements BuddyClimbInterface {
+public class BuddyClimbImpl extends Subsystem implements BuddyClimb {
    private Solenoid solenoid;
 
-   public BuddyClimb(Solenoid solenoid, DashboardInterface dashboard) {
+   public BuddyClimbImpl(Solenoid solenoid, Dashboard dashboard) {
        super("BuddyClimb", dashboard);  
        this.solenoid = solenoid;
 
@@ -19,7 +19,7 @@ public class BuddyClimb extends Subsystem implements BuddyClimbInterface {
    }
 
    @Override
-   public BuddyClimbInterface setExtended(boolean extend) {
+   public BuddyClimb setExtended(boolean extend) {
        if (extend) {
            solenoid.extend();
        } else {

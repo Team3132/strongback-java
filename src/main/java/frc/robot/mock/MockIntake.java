@@ -1,12 +1,12 @@
 package frc.robot.mock;
 
-import frc.robot.interfaces.IntakeInterface;
+import frc.robot.interfaces.Intake;
 
 
 /**
  * Mock subsystem responsible for the intake
  */
-public class MockIntake implements IntakeInterface {
+public class MockIntake implements Intake {
 	private double output = 0;
 	private boolean isExtended = false;
 
@@ -14,7 +14,7 @@ public class MockIntake implements IntakeInterface {
 	}
 
 	@Override
-	public IntakeInterface setExtended(boolean extended) {
+	public Intake setExtended(boolean extended) {
 		isExtended = extended;
 		return this;
 	}
@@ -30,7 +30,7 @@ public class MockIntake implements IntakeInterface {
 	}
 
 	@Override
-	public IntakeInterface setTargetRPS(double rps){
+	public Intake setTargetRPS(double rps){
 		output = rps;
 		return this;
 	}

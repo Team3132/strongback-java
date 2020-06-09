@@ -1,7 +1,7 @@
 package frc.robot.drive.routines;
 
-import frc.robot.interfaces.DrivebaseInterface.DriveMotion;
-import frc.robot.interfaces.DrivebaseInterface.DriveRoutineParameters;
+import frc.robot.interfaces.Drivebase.DriveMotion;
+import frc.robot.interfaces.Drivebase.DriveRoutineParameters;
 import org.strongback.components.Motor.ControlMode;
 
 /**
