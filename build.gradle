@@ -51,7 +51,10 @@ dependencies {
     implementation wpi.deps.vendor.java()
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
-
+    
+    // https://mvnrepository.com/artifact/com.codahale.metrics/metrics-core
+    compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.1'
+    
     testImplementation 'junit:junit:4.12'
     testCompile("org.assertj:assertj-core:3.11.1")
 

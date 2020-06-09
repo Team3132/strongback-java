@@ -24,9 +24,6 @@ import org.strongback.control.PIDController.Gains;
 import org.strongback.control.SoftwarePIDController.SourceType;
 import org.strongback.function.DoubleBiFunction;
 
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
-
 /**
  * @author Randall Hauch
  *
@@ -81,7 +78,6 @@ public class SoftwarePIDControllerTest {
     private static boolean print = false;
     private SystemModel model;
     private SoftwarePIDController controller;
-    private edu.wpi.first.wpilibj.PIDController wpi;
 
     @Before
     public void beforeEach() {
@@ -223,40 +219,6 @@ public class SoftwarePIDControllerTest {
     }
 
     @Test
-    public void shouldUseProportionalDistanceOnlyWPILib() throws InterruptedException {
-        TestableRobotState.resetMatchTime();
-        model = simple(SourceType.DISTANCE);
-        // model.print = true;
-        model.setValue(0.30);
-        wpi = new edu.wpi.first.wpilibj.PIDController(0.9, 0.0, 0.0, sourceFor(model), model::setValue);
-        wpi.setSetpoint(0.5);
-        wpi.setAbsoluteTolerance(0.02);
-        wpi.setInputRange(-1.0, 1.0);
-        wpi.setOutputRange(-1.0, 1.0);
-        wpi.enable();
-        Thread.sleep(300);
-        wpi.disable();
-        assertThat(model.getActualValue() - 0.5 < 0.02).isTrue();
-    }
-
-    @Test
-    public void shouldUseProportionalRateOnlyWPILib() throws InterruptedException {
-        TestableRobotState.resetMatchTime();
-        model = simple(SourceType.RATE);
-        // model.print = true;
-        model.setValue(0.30);
-        wpi = new edu.wpi.first.wpilibj.PIDController(0.9, 0.0, 0.0, sourceFor(model), model::setValue);
-        wpi.setSetpoint(0.5);
-        wpi.setAbsoluteTolerance(0.02);
-        wpi.setInputRange(-1.0, 1.0);
-        wpi.setOutputRange(-1.0, 1.0);
-        wpi.enable();
-        Thread.sleep(300);
-        wpi.disable();
-        assertThat(model.getActualValue() - 0.5 < 0.02).isTrue();
-    }
-
-    @Test
     public void shouldCorrectlyOutputWithinTolerance() {
         final double target = 0.5;
         final double tolerance = 0.02;
@@ -299,30 +261,4 @@ public class SoftwarePIDControllerTest {
         assertThat(gains.getD()).isEqualTo(d);
         assertThat(gains.getFeedForward()).isEqualTo(f);
     }
-
-    protected static PIDSource sourceFor(SystemModel model) {
-        return sourceFor(model, PIDSourceType.kRate);
-    }
-
-    protected static PIDSource sourceFor(SystemModel model, PIDSourceType initialSourceType) {
-        return new PIDSource() {
-            private PIDSourceType sourceType = initialSourceType;
-
-            @Override
-            public PIDSourceType getPIDSourceType() {
-                return sourceType;
-            }
-
-            @Override
-            public void setPIDSourceType(PIDSourceType pidSource) {
-                this.sourceType = pidSource;
-            }
-
-            @Override
-            public double pidGet() {
-                return model.getActualValue();
-            }
-        };
-    }
-
 }

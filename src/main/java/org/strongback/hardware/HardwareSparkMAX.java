@@ -10,7 +10,7 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 
 import org.strongback.components.Motor;
 
-import frc.robot.lib.PIDF;
+import org.strongback.components.PIDF;
 
 /*
  * Package to wrap a Spark MAX controller driving a Neo.

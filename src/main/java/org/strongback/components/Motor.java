@@ -20,7 +20,6 @@ import org.strongback.annotation.ThreadSafe;
 import org.strongback.command.Requirable;
 import org.strongback.drive.TankDrive;
 
-import frc.robot.lib.PIDF;
 
 /**
  * A motor is a device that can be set to operate at a speed.

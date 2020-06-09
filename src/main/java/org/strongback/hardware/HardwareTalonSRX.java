@@ -3,7 +3,7 @@ package org.strongback.hardware;
 import org.strongback.components.Motor;
 import org.strongback.components.TalonSensorCollection;
 
-import frc.robot.lib.PIDF;
+import org.strongback.components.PIDF;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
