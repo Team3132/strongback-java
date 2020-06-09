@@ -21,13 +21,13 @@ import frc.robot.interfaces.NetworkTableHelper;
 	private double lastUpdateSec = 0;
 	private final PIDF pidf;
 
-	public static void tuneMotor(Motor  motor, PIDF pidf, NetworkTablesHelper networkTable) {
+	public static void tuneMotor(Motor  motor, PIDF pidf, NetworkTableHelperImpl networkTable) {
 		var tunable = new TunableMotor(motor, pidf, networkTable);
 		pidf.saveTo(networkTable);
 		Strongback.executor().register(tunable, Priority.LOW);
 	}
 
-	public TunableMotor(Motor motor, PIDF pidf, NetworkTablesHelper networkTable) {
+	public TunableMotor(Motor motor, PIDF pidf, NetworkTableHelperImpl networkTable) {
 		this.motor = motor;
 		this.pidf = pidf;
 		this.networkTable = networkTable;

@@ -12,11 +12,11 @@ import frc.robot.interfaces.NetworkTableHelper;
  * Note: This will not work from within unit tests as it requires loading a
  * shared library and that will only work on the roborio :(
  */
-public class NetworkTablesHelper implements NetworkTableHelper{
+public class NetworkTableHelperImpl implements NetworkTableHelper{
 	private NetworkTable table;
 	private final String tableName;
     
-	public NetworkTablesHelper(String tableName) {
+	public NetworkTableHelperImpl(String tableName) {
             this.tableName = tableName;
             table = NetworkTableInstance.getDefault().getTable(tableName);
 	}
